@@ -59,3 +59,14 @@
   border-color: var(--magenta);
   box-shadow: var(--glow-magenta);
 }
+
+.activation__arp-tempo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 4px;
+}
+
+.activation__arp-tempo input[type="range"] {
+  width: 90px;
+}

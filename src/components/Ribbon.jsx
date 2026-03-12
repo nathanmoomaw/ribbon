@@ -6,7 +6,7 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction }) {
+export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction, arpStart, arpStop }) {
   const [position, setPosition] = useState(null)
   const [isActive, setIsActive] = useState(false)
 
@@ -40,8 +40,10 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
       if (!engine.getIsPlaying()) {
         engine.noteOn()
       }
+    } else if (mode === 'arp') {
+      arpStart()
     }
-  }, [getEngine, mode, ribbonInteraction])
+  }, [getEngine, mode, ribbonInteraction, arpStart])
 
   const onUp = useCallback(() => {
     const engine = getEngine()
@@ -50,8 +52,10 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
 
     if (mode === 'play') {
       engine.noteOff()
+    } else if (mode === 'arp') {
+      arpStop()
     }
-  }, [getEngine, mode, ribbonInteraction])
+  }, [getEngine, mode, ribbonInteraction, arpStop])
 
   const { ribbonRef, handlers } = useRibbon(onPositionChange, onDown, onUp)
 

@@ -24,6 +24,7 @@ function App() {
   const [stepped, setStepped] = useState(false)
   const [scale, setScale] = useState('chromatic')
   const [ribbonPosition, setRibbonPosition] = useState(null)
+  const [visualMode, setVisualMode] = useState('party')
   const ribbonInteraction = useRef({ position: null, active: false })
 
   const keyHandlers = useMemo(() => ({
@@ -34,6 +35,7 @@ function App() {
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('latch'),
+    KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
   }), [mode, getEngine])
 
   useKeyboard(keyHandlers)
@@ -45,8 +47,8 @@ function App() {
   useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition)
 
   return (
-    <div className="app">
-      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} />
+    <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
+      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} />
 
       <header className="app-header">
         <h1>Ribbon</h1>
@@ -59,6 +61,8 @@ function App() {
         inputMode={inputMode}
         setInputMode={setInputMode}
         getEngine={getEngine}
+        visualMode={visualMode}
+        setVisualMode={setVisualMode}
       />
 
       <Controls

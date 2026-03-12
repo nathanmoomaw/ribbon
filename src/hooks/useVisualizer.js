@@ -41,9 +41,11 @@ const STAR_POINTS = []
   }
 }
 
-export function useVisualizer(canvasRef, getEngine, ribbonInteraction) {
+export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMode) {
   const particlesRef = useRef([])
   const frameRef = useRef(null)
+  const visualModeRef = useRef(visualMode)
+  visualModeRef.current = visualMode
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -348,8 +350,62 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction) {
     }
 
     let fireworkTimer = 0
+    let lastMode = visualModeRef.current
 
-    function render(time) {
+    function drawLoWaveform() {
+      if (!timeDomain) return
+
+      const sliceWidth = cachedW / timeDomain.length
+
+      // Single thin muted line — no glow layers
+      gl.strokeStyle = 'rgba(0, 240, 255, 0.25)'
+      gl.lineWidth = 1.5
+      gl.globalAlpha = 1
+      gl.beginPath()
+      for (let i = 0; i < timeDomain.length; i++) {
+        const v = timeDomain[i] / 128.0
+        const y = (v * cachedH) / 2
+        if (i === 0) gl.moveTo(0, y)
+        else gl.lineTo(i * sliceWidth, y)
+      }
+      gl.stroke()
+    }
+
+    function renderLo(time) {
+      // Full clear — no trails
+      gl.globalCompositeOperation = 'source-over'
+      gl.clearRect(0, 0, cachedW, cachedH)
+
+      // Kill any lingering particles from party mode
+      particlesRef.current.length = 0
+
+      const hasAnalyser = tryGetAnalyser()
+
+      if (hasAnalyser && analyser) {
+        analyser.getByteTimeDomainData(timeDomain)
+        drawLoWaveform()
+      }
+
+      // Very subtle ambient pulse — dimmer than party
+      const pulse = 0.3 + Math.sin(time * 0.0008) * 0.2
+      if (!ambientGradient) {
+        ambientGradient = gl.createRadialGradient(
+          cachedW / 2, cachedH / 2, 0,
+          cachedW / 2, cachedH / 2, cachedW * 0.5
+        )
+        ambientGradient.addColorStop(0, 'rgba(0, 240, 255, 0.03)')
+        ambientGradient.addColorStop(0.5, 'rgba(139, 92, 246, 0.015)')
+        ambientGradient.addColorStop(1, 'transparent')
+      }
+      gl.globalAlpha = pulse
+      gl.fillStyle = ambientGradient
+      gl.fillRect(0, 0, cachedW, cachedH)
+      gl.globalAlpha = 1
+
+      frameRef.current = requestAnimationFrame(render)
+    }
+
+    function renderParty(time) {
       gl.globalCompositeOperation = 'source-over'
       gl.fillStyle = 'rgba(10, 10, 18, 0.15)'
       gl.fillRect(0, 0, cachedW, cachedH)
@@ -403,6 +459,19 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction) {
       gl.globalCompositeOperation = 'source-over'
 
       frameRef.current = requestAnimationFrame(render)
+    }
+
+    function render(time) {
+      const mode = visualModeRef.current
+      if (mode !== lastMode) {
+        ambientGradient = null // invalidate on mode switch
+        lastMode = mode
+      }
+      if (mode === 'lo') {
+        renderLo(time)
+      } else {
+        renderParty(time)
+      }
     }
 
     frameRef.current = requestAnimationFrame(render)

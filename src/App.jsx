@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useRef, useMemo, useCallback } from 'react'
 import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
@@ -24,6 +24,7 @@ function App() {
   const [stepped, setStepped] = useState(false)
   const [scale, setScale] = useState('chromatic')
   const [ribbonPosition, setRibbonPosition] = useState(null)
+  const ribbonInteraction = useRef({ position: null, active: false })
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
@@ -45,7 +46,7 @@ function App() {
 
   return (
     <div className="app">
-      <Visualizer getEngine={getEngine} />
+      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} />
 
       <header className="app-header">
         <h1>Ribbon</h1>
@@ -86,6 +87,7 @@ function App() {
         stepped={stepped}
         scale={scale}
         externalPosition={ribbonPosition}
+        ribbonInteraction={ribbonInteraction}
       />
     </div>
   )

@@ -2,22 +2,32 @@
   width: 100%;
   padding: 4px;
   border-radius: 12px;
-  background: var(--bg-surface);
+  background: linear-gradient(165deg, rgba(22, 22, 40, 0.97), rgba(14, 14, 26, 0.97));
   border: 1px solid var(--border-subtle);
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
   backdrop-filter: blur(8px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  animation: shimmer-border 8s ease-in-out infinite;
+  transform: perspective(800px) rotateX(1deg);
+  transform-style: preserve-3d;
 }
 
 .ribbon--active {
   border-color: var(--cyan);
   box-shadow:
-    0 0 20px rgba(0, 240, 255, 0.2),
-    0 0 40px rgba(0, 240, 255, 0.1),
+    0 0 20px rgba(0, 240, 255, 0.25),
+    0 0 40px rgba(0, 240, 255, 0.12),
+    0 0 80px rgba(0, 240, 255, 0.06),
+    0 12px 40px rgba(0, 0, 0, 0.5),
     inset 0 0 20px rgba(0, 240, 255, 0.05);
   animation: pulse-glow 1.5s ease-in-out infinite;
+  transform: perspective(800px) rotateX(0.5deg) scale(1.005);
 }
 
 .ribbon__track {
@@ -37,21 +47,55 @@
   background-size: 200% 100%;
   animation: gradient-shift 8s ease infinite;
   overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) inset, 0 -1px 0 rgba(255, 255, 255, 0.08) inset;
+}
+
+.ribbon__track::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
 }
 
 .ribbon__cursor {
   position: absolute;
-  top: 0;
-  bottom: 0;
+  top: -2px;
+  bottom: -2px;
   width: 3px;
   transform: translateX(-50%);
-  background: #fff;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6), #fff, rgba(255, 255, 255, 0.6));
   box-shadow:
     0 0 8px var(--cyan),
     0 0 20px var(--cyan),
     0 0 40px rgba(0, 240, 255, 0.4),
-    0 0 60px rgba(0, 240, 255, 0.2);
+    0 0 60px rgba(0, 240, 255, 0.2),
+    0 0 100px rgba(0, 240, 255, 0.1);
   pointer-events: none;
+  border-radius: 2px;
+}
+
+.ribbon__cursor::before,
+.ribbon__cursor::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan);
+}
+
+.ribbon__cursor::before {
+  top: -4px;
+}
+
+.ribbon__cursor::after {
+  bottom: -4px;
 }
 
 .ribbon__keys {
@@ -107,8 +151,15 @@
 }
 
 /* Lo mode */
+.lo-mode .ribbon {
+  animation: none;
+  transform: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
 .lo-mode .ribbon--active {
   animation: none;
+  transform: none;
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.1);
 }
 
@@ -117,6 +168,15 @@
   background-size: 100% 100%;
 }
 
+.lo-mode .ribbon__track::after {
+  display: none;
+}
+
 .lo-mode .ribbon__cursor {
   box-shadow: 0 0 4px rgba(0, 240, 255, 0.3);
+}
+
+.lo-mode .ribbon__cursor::before,
+.lo-mode .ribbon__cursor::after {
+  display: none;
 }

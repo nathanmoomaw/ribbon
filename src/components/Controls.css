@@ -3,17 +3,30 @@
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
+  background: linear-gradient(165deg, rgba(22, 22, 40, 0.97), rgba(14, 14, 26, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 12px;
   backdrop-filter: blur(12px);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.3) inset;
+  animation: shimmer-border 8s ease-in-out infinite, float 6s ease-in-out infinite;
+  transform-style: preserve-3d;
 }
 
 .controls__osc {
   padding: 0.75rem;
   border-left: 3px solid var(--osc-color, var(--cyan));
   border-radius: 0 8px 8px 0;
-  background: rgba(255, 255, 255, 0.02);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), -3px 0 12px -4px var(--osc-color, var(--cyan));
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+
+.controls__osc:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), -3px 0 20px -4px var(--osc-color, var(--cyan));
 }
 
 .controls__osc-label {
@@ -41,6 +54,7 @@
   gap: 1.25rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-subtle);
+  border-image: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), rgba(139, 92, 246, 0.2), transparent) 1;
 }
 
 .controls__section {
@@ -103,6 +117,17 @@
 }
 
 /* Lo mode */
+.lo-mode .controls {
+  animation: none;
+  transform: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
 .lo-mode .controls__osc-label {
   text-shadow: none;
+}
+
+.lo-mode .controls__osc {
+  box-shadow: none;
 }

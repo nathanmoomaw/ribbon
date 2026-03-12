@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-03-12 — 3D depth effects and enhanced animations
+
+- Added retrowave perspective grid to visualizer background (scrolling horizontal lines + converging verticals + horizon glow)
+- Controls and ribbon panels now float with subtle 3D perspective transforms and breathing animation
+- Shimmer border animation cycles through cyan/purple/magenta on panels
+- Buttons now have 3D depth: gradient backgrounds, inset highlights, lift on hover, push on press
+- Ribbon cursor enhanced with diamond-shaped end caps and extended glow radius
+- Scan line sweeps across the ribbon track for a holographic feel
+- Slider thumbs upgraded to radial gradient spheres with inset border highlights
+- OSC sections glow along their color-coded left border on hover
+- Shared controls divider now uses a gradient border (cyan to purple fade)
+- All 3D effects and animations properly disabled in Lo mode for clean playing
+
 ## 2026-03-12 — Arpeggiator mode and always-on keyboard
 
 - Implemented arpeggiator activation mode with tempo control (40-300 BPM)

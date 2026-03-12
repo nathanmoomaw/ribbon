@@ -310,6 +310,57 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.globalAlpha = 1
     }
 
+    function drawPerspectiveGrid(time) {
+      const horizonY = cachedH * 0.45
+      const gridSpeed = time * 0.0003
+
+      // Draw horizontal lines with perspective
+      gl.strokeStyle = 'rgba(0, 240, 255, 0.08)'
+      gl.lineWidth = 1
+
+      const lineCount = 20
+      for (let i = 0; i < lineCount; i++) {
+        // Exponential spacing for perspective effect
+        const t = i / lineCount
+        const y = horizonY + Math.pow(t, 1.8) * (cachedH - horizonY)
+        // Scroll lines toward viewer
+        const scrollOffset = (gridSpeed % (1 / lineCount)) * lineCount
+        const adjustedT = (t + scrollOffset) % 1
+        const adjustedY = horizonY + Math.pow(adjustedT, 1.8) * (cachedH - horizonY)
+
+        const alpha = 0.03 + adjustedT * 0.08
+        gl.strokeStyle = `rgba(0, 240, 255, ${alpha})`
+        gl.beginPath()
+        gl.moveTo(0, adjustedY)
+        gl.lineTo(cachedW, adjustedY)
+        gl.stroke()
+      }
+
+      // Draw vertical lines converging to horizon vanishing point
+      const vanishX = cachedW / 2
+      const verticalLines = 16
+      gl.lineWidth = 1
+
+      for (let i = 0; i < verticalLines; i++) {
+        const t = (i / (verticalLines - 1)) * 2 - 1  // -1 to 1
+        const bottomX = vanishX + t * cachedW * 0.8
+        const alpha = 0.04 + (1 - Math.abs(t)) * 0.06
+        gl.strokeStyle = `rgba(139, 92, 246, ${alpha})`
+        gl.beginPath()
+        gl.moveTo(vanishX, horizonY)
+        gl.lineTo(bottomX, cachedH)
+        gl.stroke()
+      }
+
+      // Horizon glow line
+      const horizonGrad = gl.createLinearGradient(0, horizonY - 2, 0, horizonY + 2)
+      horizonGrad.addColorStop(0, 'transparent')
+      horizonGrad.addColorStop(0.5, 'rgba(255, 0, 170, 0.12)')
+      horizonGrad.addColorStop(1, 'transparent')
+      gl.fillStyle = horizonGrad
+      gl.fillRect(0, horizonY - 2, cachedW, 4)
+    }
+
     function drawIdleAmbient(time) {
       const particles = particlesRef.current
 
@@ -409,6 +460,9 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.globalCompositeOperation = 'source-over'
       gl.fillStyle = 'rgba(10, 10, 18, 0.15)'
       gl.fillRect(0, 0, cachedW, cachedH)
+
+      // Perspective grid behind everything
+      drawPerspectiveGrid(time)
 
       gl.globalCompositeOperation = 'lighter'
 

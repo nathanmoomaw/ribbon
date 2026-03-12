@@ -10,6 +10,8 @@
 - [ ] Rotary knob components (replace range sliders)
 - [ ] Mobile-optimized layout
 - [ ] Staging deploy pipeline (merge to staging, CI/CD)
+- [ ] Step sequencer functionality
+- [ ] Ambient autoplay mode (generative pleasant sound when not manually playing)
 - [ ] Production domain setup
 
 ## Completed

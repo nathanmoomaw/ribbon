@@ -1,8 +1,7 @@
 .app {
   position: relative;
   z-index: 1;
-  max-width: 900px;
-  margin: 0 auto;
+  margin: 0;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;

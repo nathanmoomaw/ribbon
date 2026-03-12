@@ -11,7 +11,7 @@
 - Slider thumbs upgraded to radial gradient spheres with inset border highlights
 - OSC sections glow along their color-coded left border on hover
 - Shared controls divider now uses a gradient border (cyan to purple fade)
-- Ribbon now stretches full viewport width (edge to edge) breaking out of container
+- Full-width layout: app container, controls, and ribbon all extend edge to edge
 - All 3D effects and animations properly disabled in Lo mode for clean playing
 
 ## 2026-03-12 — Arpeggiator mode and always-on keyboard

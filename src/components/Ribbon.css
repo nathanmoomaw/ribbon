@@ -1,21 +1,20 @@
 .ribbon {
-  width: 100%;
-  padding: 4px;
-  border-radius: 12px;
-  background: linear-gradient(165deg, rgba(22, 22, 40, 0.97), rgba(14, 14, 26, 0.97));
-  border: 1px solid var(--border-subtle);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  border-top: 1px solid rgba(0, 240, 255, 0.15);
+  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
   cursor: crosshair;
   user-select: none;
   -webkit-user-select: none;
-  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
-  backdrop-filter: blur(8px);
+  transition: border-color 0.3s, box-shadow 0.3s;
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+    0 -8px 32px rgba(0, 0, 0, 0.3);
   animation: shimmer-border 8s ease-in-out infinite;
-  transform: perspective(800px) rotateX(1deg);
-  transform-style: preserve-3d;
 }
 
 .ribbon--active {
@@ -27,13 +26,12 @@
     0 12px 40px rgba(0, 0, 0, 0.5),
     inset 0 0 20px rgba(0, 240, 255, 0.05);
   animation: pulse-glow 1.5s ease-in-out infinite;
-  transform: perspective(800px) rotateX(0.5deg) scale(1.005);
 }
 
 .ribbon__track {
   position: relative;
   height: 100px;
-  border-radius: 8px;
+  border-radius: 0;
   background: linear-gradient(
     90deg,
     rgba(139, 92, 246, 0.5),
@@ -153,13 +151,12 @@
 /* Lo mode */
 .lo-mode .ribbon {
   animation: none;
-  transform: none;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .lo-mode .ribbon--active {
   animation: none;
-  transform: none;
   box-shadow: 0 0 8px rgba(0, 240, 255, 0.1);
 }
 

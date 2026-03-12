@@ -4,9 +4,8 @@
 - [ ] Arpeggiate mode with tempo control
 - [ ] Scale selection UI (major, minor, pentatonic, blues)
 - [ ] Bitcrush effect (AudioWorklet)
-- [ ] Music-reactive animated visuals (Canvas/WebGL behind ribbon)
+- [ ] Third oscillator support
 - [ ] Camera input mode for ribbon control
-- [ ] Keyboard keys input mode (map piano keys to ribbon positions)
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
 - [ ] Rotary knob components (replace range sliders)
@@ -23,3 +22,9 @@
 - [x] Play and latch activation modes
 - [x] Keyboard shortcuts
 - [x] Dark sci-fi base theme
+- [x] Multi-oscillator engine (2 oscs with detune + mix)
+- [x] Music-reactive canvas visualizer (waveform, bars, particles)
+- [x] Keyboard keys input mode (A-L)
+- [x] Rave/neon styling overhaul
+- [x] Ribbon below controls layout
+- [x] Smooth continuous pitch (setTargetAtTime fix)

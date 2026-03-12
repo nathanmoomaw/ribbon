@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(git config:*)",
-      "Bash(node ~/.claude/prompt-logger.js)"
+      "Bash(node ~/.claude/prompt-logger.js)",
+      "Bash(npx vite:*)"
     ]
   }
 }

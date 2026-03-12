@@ -1,26 +1,99 @@
 import { useCallback } from 'react'
+import { SCALES } from '../utils/scales'
 import './Controls.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const OCTAVE_OPTIONS = [1, 2, 3, 4]
+const SCALE_NAMES = Object.keys(SCALES)
+const OSC_COLORS = ['var(--cyan)', 'var(--magenta)']
+
+function OscSection({ index, params, getEngine, onUpdate }) {
+  const handleWaveform = useCallback((type) => {
+    onUpdate(index, { ...params, waveform: type })
+    getEngine().setWaveform(type, index)
+  }, [index, params, getEngine, onUpdate])
+
+  const handleDetune = useCallback((e) => {
+    const detune = parseInt(e.target.value)
+    onUpdate(index, { ...params, detune })
+    getEngine().setOscDetune(index, detune)
+  }, [index, params, getEngine, onUpdate])
+
+  const handleMix = useCallback((e) => {
+    const mix = parseFloat(e.target.value)
+    onUpdate(index, { ...params, mix })
+    getEngine().setOscMix(index, mix)
+  }, [index, params, getEngine, onUpdate])
+
+  return (
+    <div className="controls__osc" style={{ '--osc-color': OSC_COLORS[index] }}>
+      <label className="controls__osc-label">OSC {index + 1}</label>
+      <div className="controls__osc-row">
+        <div className="controls__section">
+          <label className="controls__label">Wave</label>
+          <div className="controls__waveforms">
+            {WAVEFORMS.map((w) => (
+              <button
+                key={w}
+                className={params.waveform === w ? 'active' : ''}
+                onClick={() => handleWaveform(w)}
+              >
+                {w.slice(0, 3).toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="controls__section">
+          <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
+          <input
+            type="range"
+            min="-1200"
+            max="1200"
+            step="1"
+            value={params.detune}
+            onChange={handleDetune}
+          />
+        </div>
+        <div className="controls__section">
+          <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={params.mix}
+            onChange={handleMix}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function Controls({
   getEngine,
-  waveform,
-  setWaveform,
+  oscParams,
+  setOscParams,
   volume,
   setVolume,
   octaves,
   setOctaves,
+  stepped,
+  setStepped,
+  scale,
+  setScale,
   delayParams,
   setDelayParams,
   reverbMix,
   setReverbMix,
 }) {
-  const handleWaveform = useCallback((type) => {
-    setWaveform(type)
-    getEngine().setWaveform(type)
-  }, [getEngine, setWaveform])
+  const handleOscUpdate = useCallback((index, newParams) => {
+    setOscParams((prev) => {
+      const next = [...prev]
+      next[index] = newParams
+      return next
+    })
+  }, [setOscParams])
 
   const handleVolume = useCallback((e) => {
     const val = parseFloat(e.target.value)
@@ -30,24 +103,21 @@ export function Controls({
 
   const handleDelayTime = useCallback((e) => {
     const time = parseFloat(e.target.value)
-    const next = { ...delayParams, time }
-    setDelayParams(next)
+    setDelayParams((prev) => ({ ...prev, time }))
     getEngine().setDelay({ time })
-  }, [getEngine, delayParams, setDelayParams])
+  }, [getEngine, setDelayParams])
 
   const handleDelayFeedback = useCallback((e) => {
     const feedback = parseFloat(e.target.value)
-    const next = { ...delayParams, feedback }
-    setDelayParams(next)
+    setDelayParams((prev) => ({ ...prev, feedback }))
     getEngine().setDelay({ feedback })
-  }, [getEngine, delayParams, setDelayParams])
+  }, [getEngine, setDelayParams])
 
   const handleDelayMix = useCallback((e) => {
     const mix = parseFloat(e.target.value)
-    const next = { ...delayParams, mix }
-    setDelayParams(next)
+    setDelayParams((prev) => ({ ...prev, mix }))
     getEngine().setDelay({ mix })
-  }, [getEngine, delayParams, setDelayParams])
+  }, [getEngine, setDelayParams])
 
   const handleReverbMix = useCallback((e) => {
     const mix = parseFloat(e.target.value)
@@ -57,72 +127,98 @@ export function Controls({
 
   return (
     <div className="controls">
-      <div className="controls__section">
-        <label className="controls__label">Waveform</label>
-        <div className="controls__waveforms">
-          {WAVEFORMS.map((w) => (
-            <button
-              key={w}
-              className={waveform === w ? 'active' : ''}
-              onClick={() => handleWaveform(w)}
-            >
-              {w.slice(0, 3).toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="controls__section">
-        <label className="controls__label">Octaves</label>
-        <div className="controls__waveforms">
-          {OCTAVE_OPTIONS.map((o) => (
-            <button
-              key={o}
-              className={octaves === o ? 'active' : ''}
-              onClick={() => setOctaves(o)}
-            >
-              {o}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="controls__section">
-        <label className="controls__label">Volume</label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={handleVolume}
+      {oscParams.map((params, i) => (
+        <OscSection
+          key={i}
+          index={i}
+          params={params}
+          getEngine={getEngine}
+          onUpdate={handleOscUpdate}
         />
-      </div>
+      ))}
 
-      <div className="controls__section">
-        <label className="controls__label">Delay</label>
-        <div className="controls__knobs">
-          <div className="controls__knob">
-            <span>Time</span>
-            <input type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
-          </div>
-          <div className="controls__knob">
-            <span>Feedback</span>
-            <input type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
-          </div>
-          <div className="controls__knob">
-            <span>Mix</span>
-            <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
+      <div className="controls__shared">
+        <div className="controls__section">
+          <label className="controls__label">Octaves</label>
+          <div className="controls__waveforms">
+            {OCTAVE_OPTIONS.map((o) => (
+              <button
+                key={o}
+                className={octaves === o ? 'active' : ''}
+                onClick={() => setOctaves(o)}
+              >
+                {o}
+              </button>
+            ))}
           </div>
         </div>
-      </div>
 
-      <div className="controls__section">
-        <label className="controls__label">Reverb</label>
-        <div className="controls__knobs">
-          <div className="controls__knob">
-            <span>Mix</span>
-            <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+        <div className="controls__section">
+          <label className="controls__label">Stepped</label>
+          <div className="controls__waveforms">
+            <button
+              className={stepped ? 'active' : ''}
+              onClick={() => setStepped(!stepped)}
+            >
+              {stepped ? 'ON' : 'OFF'}
+            </button>
+          </div>
+        </div>
+
+        {stepped && (
+          <div className="controls__section">
+            <label className="controls__label">Scale</label>
+            <div className="controls__waveforms">
+              {SCALE_NAMES.map((s) => (
+                <button
+                  key={s}
+                  className={scale === s ? 'active' : ''}
+                  onClick={() => setScale(s)}
+                >
+                  {s.slice(0, 4).toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="controls__section">
+          <label className="controls__label">Volume</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={handleVolume}
+          />
+        </div>
+
+        <div className="controls__section">
+          <label className="controls__label">Delay</label>
+          <div className="controls__knobs">
+            <div className="controls__knob">
+              <span>Time</span>
+              <input type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
+            </div>
+            <div className="controls__knob">
+              <span>Fdbk</span>
+              <input type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
+            </div>
+            <div className="controls__knob">
+              <span>Mix</span>
+              <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
+            </div>
+          </div>
+        </div>
+
+        <div className="controls__section">
+          <label className="controls__label">Reverb</label>
+          <div className="controls__knobs">
+            <div className="controls__knob">
+              <span>Mix</span>
+              <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+            </div>
           </div>
         </div>
       </div>

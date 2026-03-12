@@ -14,6 +14,7 @@ function midiToFreq(midi) {
  * @param {object} options
  * @param {number} options.octaves - range in octaves (default 2)
  * @param {string} options.scale - scale name from SCALES (default 'chromatic')
+ * @param {boolean} options.stepped - snap to discrete notes (default false)
  * @param {number} options.baseNote - MIDI note at left edge (default 48 = C3)
  * @returns {number} frequency in Hz
  */
@@ -21,15 +22,15 @@ export function positionToFrequency(position, options = {}) {
   const {
     octaves = 2,
     scale = 'chromatic',
+    stepped = false,
     baseNote = BASE_NOTE,
   } = options
 
   const semitoneRange = octaves * 12
   const rawSemitone = position * semitoneRange
 
-  // Quantize to scale if not chromatic
-  const intervals = SCALES[scale] || SCALES.chromatic
-  if (scale !== 'chromatic') {
+  if (stepped) {
+    const intervals = SCALES[scale] || SCALES.chromatic
     const octave = Math.floor(rawSemitone / 12)
     const remainder = rawSemitone % 12
 
@@ -49,4 +50,28 @@ export function positionToFrequency(position, options = {}) {
   }
 
   return midiToFreq(baseNote + rawSemitone)
+}
+
+/**
+ * Get all note positions (0–1) for step markers on the ribbon.
+ */
+export function getStepPositions(options = {}) {
+  const { octaves = 2, scale = 'chromatic' } = options
+  const intervals = SCALES[scale] || SCALES.chromatic
+  const semitoneRange = octaves * 12
+  const positions = []
+
+  for (let oct = 0; oct < octaves; oct++) {
+    for (const interval of intervals) {
+      const semitone = oct * 12 + interval
+      if (semitone <= semitoneRange) {
+        positions.push(semitone / semitoneRange)
+      }
+    }
+  }
+  // Add the final note (top of range)
+  if (positions[positions.length - 1] !== 1) {
+    positions.push(1)
+  }
+  return positions
 }

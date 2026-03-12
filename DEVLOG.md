@@ -1,5 +1,23 @@
 # Devlog
 
+## 2026-03-11 — Fix stepped-sounding continuous pitch
+
+- Replaced exponentialRampToValueAtTime with setTargetAtTime in setFrequency
+- Eliminates staircase artifacts from discrete pointer events during ribbon drag
+- 5ms time constant provides smooth continuous glide without perceptible latency
+
+## 2026-03-11 — v2: Rave visuals, multi-oscillator, input modes
+
+- Refactored AudioEngine for 2 oscillators with per-osc waveform, detune, and mix
+- Added AnalyserNode for music-reactive visuals
+- Created fullscreen canvas Visualizer: waveform line, frequency bars, particle bursts
+- Moved ribbon below controls in layout
+- Per-oscillator control sections (OSC 1 cyan, OSC 2 magenta)
+- Keyboard play mode: A-L keys mapped to ribbon positions
+- Input mode switching UI (Touch / Keys)
+- Rave/neon styling overhaul: vivid animated gradients, pulse-glow, neon color palette
+- Semi-transparent surfaces with backdrop-filter for depth over canvas
+
 ## 2026-03-11 — Initial scaffold
 
 - Scaffolded Vite + React project

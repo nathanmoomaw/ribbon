@@ -28,3 +28,5 @@
 - [x] Rave/neon styling overhaul
 - [x] Ribbon below controls layout
 - [x] Smooth continuous pitch (setTargetAtTime fix)
+- [x] Ribbon-reactive confetti/firework particle visuals
+- [x] Visualizer performance optimizations (no shadowBlur, pre-computed values)

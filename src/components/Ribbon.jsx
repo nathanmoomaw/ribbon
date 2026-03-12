@@ -6,7 +6,7 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition }) {
+export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction }) {
   const [position, setPosition] = useState(null)
   const [isActive, setIsActive] = useState(false)
 
@@ -23,14 +23,16 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
 
   const onPositionChange = useCallback((pos) => {
     setPosition(pos)
+    if (ribbonInteraction) ribbonInteraction.current.position = pos
     const engine = getEngine()
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
     engine.setFrequency(hz)
-  }, [getEngine, octaves, stepped, scale])
+  }, [getEngine, octaves, stepped, scale, ribbonInteraction])
 
   const onDown = useCallback(() => {
     const engine = getEngine()
     setIsActive(true)
+    if (ribbonInteraction) ribbonInteraction.current.active = true
 
     if (mode === 'play') {
       engine.noteOn()
@@ -39,16 +41,17 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
         engine.noteOn()
       }
     }
-  }, [getEngine, mode])
+  }, [getEngine, mode, ribbonInteraction])
 
   const onUp = useCallback(() => {
     const engine = getEngine()
     setIsActive(false)
+    if (ribbonInteraction) ribbonInteraction.current.active = false
 
     if (mode === 'play') {
       engine.noteOff()
     }
-  }, [getEngine, mode])
+  }, [getEngine, mode, ribbonInteraction])
 
   const { ribbonRef, handlers } = useRibbon(onPositionChange, onDown, onUp)
 

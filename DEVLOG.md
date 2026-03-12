@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-11 — Ribbon-reactive confetti & firework visuals
+
+- Replaced center-spawn particles with ribbon-position-aware visuals
+- Confetti burst on note-on, continuous confetti stream while playing
+- Periodic firework bursts during active play with sufficient amplitude
+- 4 particle shapes: circle, rectangle, star, diamond with rotation & shimmer
+- Performance: removed all shadowBlur, pre-computed bar colors & star paths, manual transforms instead of save/restore, swap-remove for particle cleanup
+- Ribbon position passed via shared ref to avoid re-renders
+- Cached gradient and canvas dimensions on resize
+
 ## 2026-03-11 — Fix stepped-sounding continuous pitch
 
 - Replaced exponentialRampToValueAtTime with setTargetAtTime in setFrequency

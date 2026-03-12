@@ -8,22 +8,34 @@
   user-select: none;
   -webkit-user-select: none;
   transition: border-color 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(8px);
 }
 
 .ribbon--active {
   border-color: var(--cyan);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+  box-shadow:
+    0 0 20px rgba(0, 240, 255, 0.2),
+    0 0 40px rgba(0, 240, 255, 0.1),
+    inset 0 0 20px rgba(0, 240, 255, 0.05);
+  animation: pulse-glow 1.5s ease-in-out infinite;
 }
 
 .ribbon__track {
   position: relative;
   height: 100px;
   border-radius: 8px;
-  background: linear-gradient(90deg,
-    rgba(139, 92, 246, 0.15),
-    rgba(0, 240, 255, 0.15),
-    rgba(255, 0, 170, 0.15)
+  background: linear-gradient(
+    90deg,
+    rgba(139, 92, 246, 0.5),
+    rgba(0, 240, 255, 0.5),
+    rgba(57, 255, 20, 0.4),
+    rgba(255, 240, 31, 0.4),
+    rgba(255, 110, 199, 0.5),
+    rgba(255, 0, 170, 0.5),
+    rgba(139, 92, 246, 0.5)
   );
+  background-size: 200% 100%;
+  animation: gradient-shift 8s ease infinite;
   overflow: hidden;
 }
 
@@ -33,10 +45,52 @@
   bottom: 0;
   width: 3px;
   transform: translateX(-50%);
-  background: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0, 240, 255, 0.3);
+  background: #fff;
+  box-shadow:
+    0 0 8px var(--cyan),
+    0 0 20px var(--cyan),
+    0 0 40px rgba(0, 240, 255, 0.4),
+    0 0 60px rgba(0, 240, 255, 0.2);
   pointer-events: none;
-  transition: left 0.016s linear;
+}
+
+.ribbon__keys {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ribbon__key {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.ribbon__key kbd {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-muted);
+  backdrop-filter: blur(4px);
+}
+
+.ribbon__steps {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ribbon__step-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-0.5px);
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
 }
 
 .ribbon__label {
@@ -49,4 +103,5 @@
   font-size: 0.7rem;
   color: var(--text-muted);
   pointer-events: none;
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
 }

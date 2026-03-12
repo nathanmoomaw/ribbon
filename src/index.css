@@ -1,16 +1,21 @@
 :root {
   --bg-deep: #0a0a12;
-  --bg-surface: #12121e;
+  --bg-surface: rgba(18, 18, 30, 0.85);
   --bg-raised: #1a1a2e;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(0, 240, 255, 0.3);
   --cyan: #00f0ff;
   --magenta: #ff00aa;
   --purple: #8b5cf6;
+  --neon-green: #39ff14;
+  --neon-pink: #ff6ec7;
+  --neon-yellow: #fff01f;
   --text-primary: rgba(255, 255, 255, 0.9);
   --text-muted: rgba(255, 255, 255, 0.5);
   --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
   --font-sans: system-ui, -apple-system, sans-serif;
+  --glow-cyan: 0 0 8px var(--cyan), 0 0 20px rgba(0, 240, 255, 0.3);
+  --glow-magenta: 0 0 8px var(--magenta), 0 0 20px rgba(255, 0, 170, 0.3);
 
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -35,6 +40,17 @@ body {
   overflow-x: hidden;
 }
 
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 button {
   border-radius: 6px;
   border: 1px solid var(--border-subtle);
@@ -50,12 +66,14 @@ button {
 
 button:hover {
   border-color: var(--border-glow);
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.15);
 }
 
 button.active {
   border-color: var(--cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
-  background-color: rgba(0, 240, 255, 0.08);
+  box-shadow: var(--glow-cyan);
+  background-color: rgba(0, 240, 255, 0.1);
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
 input[type="range"] {
@@ -75,5 +93,5 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--cyan);
   cursor: pointer;
-  box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 8px var(--cyan), 0 0 16px rgba(0, 240, 255, 0.5);
 }

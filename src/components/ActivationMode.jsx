@@ -6,32 +6,56 @@ const MODES = [
   { id: 'arp', label: 'Arp', key: '3', description: 'Coming soon', disabled: true },
 ]
 
-export function ActivationMode({ mode, setMode, getEngine }) {
+const INPUT_MODES = [
+  { id: 'touch', label: 'Touch' },
+  { id: 'keys', label: 'Keys', description: 'A-L keys control ribbon' },
+]
+
+export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine }) {
   const handleStop = () => {
     getEngine().noteOff()
   }
 
   return (
     <div className="activation">
-      <div className="activation__modes">
-        {MODES.map((m) => (
-          <button
-            key={m.id}
-            className={mode === m.id ? 'active' : ''}
-            disabled={m.disabled}
-            onClick={() => !m.disabled && setMode(m.id)}
-            title={m.description}
-          >
-            {m.label}
-            <kbd>{m.key}</kbd>
-          </button>
-        ))}
+      <div className="activation__group">
+        <label className="activation__group-label">Play Mode</label>
+        <div className="activation__modes">
+          {MODES.map((m) => (
+            <button
+              key={m.id}
+              className={mode === m.id ? 'active' : ''}
+              disabled={m.disabled}
+              onClick={() => !m.disabled && setMode(m.id)}
+              title={m.description}
+            >
+              {m.label}
+              <kbd>{m.key}</kbd>
+            </button>
+          ))}
+          {mode === 'latch' && (
+            <button className="activation__stop" onClick={handleStop}>
+              Stop <kbd>Space</kbd>
+            </button>
+          )}
+        </div>
       </div>
-      {mode === 'latch' && (
-        <button className="activation__stop" onClick={handleStop}>
-          Stop <kbd>Space</kbd>
-        </button>
-      )}
+
+      <div className="activation__group">
+        <label className="activation__group-label">Input</label>
+        <div className="activation__modes">
+          {INPUT_MODES.map((m) => (
+            <button
+              key={m.id}
+              className={inputMode === m.id ? 'active' : ''}
+              onClick={() => setInputMode(m.id)}
+              title={m.description}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

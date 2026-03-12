@@ -1,7 +1,22 @@
 .activation {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.activation__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.activation__group-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
 }
 
 .activation__modes {
@@ -40,5 +55,5 @@
 
 .activation__stop:hover {
   border-color: var(--magenta);
-  box-shadow: 0 0 8px rgba(255, 0, 170, 0.2);
+  box-shadow: var(--glow-magenta);
 }

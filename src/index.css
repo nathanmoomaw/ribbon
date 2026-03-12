@@ -95,3 +95,24 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
   box-shadow: 0 0 8px var(--cyan), 0 0 16px rgba(0, 240, 255, 0.5);
 }
+
+/* ── Lo mode overrides ── */
+
+.lo-mode {
+  --glow-cyan: 0 0 4px rgba(0, 240, 255, 0.15);
+  --glow-magenta: 0 0 4px rgba(255, 0, 170, 0.15);
+  --border-glow: rgba(0, 240, 255, 0.15);
+}
+
+.lo-mode button.active {
+  animation: none;
+  box-shadow: 0 0 4px rgba(0, 240, 255, 0.15);
+}
+
+.lo-mode button:hover {
+  box-shadow: none;
+}
+
+.lo-mode input[type="range"]::-webkit-slider-thumb {
+  box-shadow: none;
+}

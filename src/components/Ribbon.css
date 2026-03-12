@@ -105,3 +105,18 @@
   pointer-events: none;
   text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
 }
+
+/* Lo mode */
+.lo-mode .ribbon--active {
+  animation: none;
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.1);
+}
+
+.lo-mode .ribbon__track {
+  animation: none;
+  background-size: 100% 100%;
+}
+
+.lo-mode .ribbon__cursor {
+  box-shadow: 0 0 4px rgba(0, 240, 255, 0.3);
+}

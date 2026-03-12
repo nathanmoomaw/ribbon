@@ -101,3 +101,8 @@
 .controls__section > input[type="range"] {
   width: 100%;
 }
+
+/* Lo mode */
+.lo-mode .controls__osc-label {
+  text-shadow: none;
+}

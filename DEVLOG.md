@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-11 — Lo visual mode (distraction-free)
+
+- Added "Lo" visual mode as alternative to "Party" (default)
+- Lo mode: no particles, no confetti/fireworks, no frequency bars — just a subtle thin waveform line and faint ambient pulse
+- CSS overrides in lo-mode: disabled all animations (gradient-shift, pulse-glow), removed glow box-shadows, muted slider/button effects
+- Retains same color palette and dark aesthetic, just calmer
+- Toggle via UI buttons (Party / Lo) in Visuals group or keyboard shortcut V
+- Used ref for visualMode to avoid re-creating the animation loop on toggle
+- Particles cleared immediately when switching to lo mode
+
 ## 2026-03-11 — Ribbon-reactive confetti & firework visuals
 
 - Replaced center-spawn particles with ribbon-position-aware visuals

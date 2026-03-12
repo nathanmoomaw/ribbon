@@ -12,6 +12,7 @@
 - [ ] Staging deploy pipeline (merge to staging, CI/CD)
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (generative pleasant sound when not manually playing)
+- [ ] Polyphonic support
 - [ ] Production domain setup
 
 ## Completed

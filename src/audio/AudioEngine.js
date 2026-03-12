@@ -104,6 +104,14 @@ export function noteOn() {
   noteGain.gain.cancelScheduledValues(ctx.currentTime)
   noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
   noteGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01)
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: 'Ribbon Synth',
+      artist: 'Live Session',
+    })
+    navigator.mediaSession.playbackState = 'playing'
+  }
 }
 
 export function noteOff() {
@@ -112,6 +120,10 @@ export function noteOff() {
   noteGain.gain.cancelScheduledValues(ctx.currentTime)
   noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
   noteGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.01)
+
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = 'paused'
+  }
 }
 
 export function setFrequency(hz) {

@@ -3,12 +3,10 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop) {
   const activeKeyRef = useRef(null)
 
   useEffect(() => {
-    if (inputMode !== 'keys') return
-
     function onKeyDown(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.repeat) return
@@ -31,6 +29,9 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
         if (!engine.getIsPlaying()) {
           engine.noteOn()
         }
+      } else if (mode === 'arp') {
+        arpStart()
+        activeKeyRef.current = e.code
       }
     }
 
@@ -38,8 +39,12 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       const index = KEYS.indexOf(e.code)
       if (index === -1) return
 
-      if (mode === 'play' && activeKeyRef.current === e.code) {
-        getEngine().noteOff()
+      if (activeKeyRef.current === e.code) {
+        if (mode === 'play') {
+          getEngine().noteOff()
+        } else if (mode === 'arp') {
+          arpStop()
+        }
         activeKeyRef.current = null
       }
     }
@@ -50,7 +55,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop])
 }
 
 export { KEYS }

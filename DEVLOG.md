@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-12 — Arpeggiator mode and always-on keyboard
+
+- Implemented arpeggiator activation mode with tempo control (40-300 BPM)
+- Arp mode rhythmically retriggers the note at the selected BPM with 50% gate
+- Added BPM slider in activation mode panel (visible when Arp selected)
+- Keyboard shortcut `3` to switch to Arp mode
+- Keyboard keys (A-L) now work in all input modes, not just "Keys" mode
+- Wired arpeggiator into both ribbon touch and keyboard play paths
+- Added do-later script to global Claude config (~/.claude/scripts/)
+
 ## 2026-03-12 — Fix UI readability in Party mode
 
 - Fixed visualizer canvas painting on top of all UI elements due to CSS stacking context issue

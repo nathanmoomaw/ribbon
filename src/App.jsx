@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useCallback } from 'react'
 import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
+import { useArpeggiator } from './hooks/useArpeggiator'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
@@ -25,6 +26,7 @@ function App() {
   const [scale, setScale] = useState('chromatic')
   const [ribbonPosition, setRibbonPosition] = useState(null)
   const [visualMode, setVisualMode] = useState('party')
+  const [arpBpm, setArpBpm] = useState(120)
   const ribbonInteraction = useRef({ position: null, active: false })
 
   const keyHandlers = useMemo(() => ({
@@ -35,6 +37,7 @@ function App() {
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('latch'),
+    Digit3: () => setMode('arp'),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
   }), [mode, getEngine])
 
@@ -44,7 +47,9 @@ function App() {
     setRibbonPosition(pos)
   }, [])
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition)
+  const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm)
+
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition, arpStart, arpStop)
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
@@ -63,6 +68,8 @@ function App() {
         getEngine={getEngine}
         visualMode={visualMode}
         setVisualMode={setVisualMode}
+        arpBpm={arpBpm}
+        setArpBpm={setArpBpm}
       />
 
       <Controls
@@ -92,6 +99,8 @@ function App() {
         scale={scale}
         externalPosition={ribbonPosition}
         ribbonInteraction={ribbonInteraction}
+        arpStart={arpStart}
+        arpStop={arpStop}
       />
     </div>
   )

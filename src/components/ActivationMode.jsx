@@ -3,7 +3,7 @@ import './ActivationMode.css'
 const MODES = [
   { id: 'play', label: 'Play', key: '1', description: 'Sound while touching' },
   { id: 'latch', label: 'Latch', key: '2', description: 'Touch to start, Space to stop' },
-  { id: 'arp', label: 'Arp', key: '3', description: 'Coming soon', disabled: true },
+  { id: 'arp', label: 'Arp', key: '3', description: 'Rhythmic retrigger while touching' },
 ]
 
 const INPUT_MODES = [
@@ -16,7 +16,7 @@ const VISUAL_MODES = [
   { id: 'lo', label: 'Lo' },
 ]
 
-export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode }) {
+export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode, arpBpm, setArpBpm }) {
   const handleStop = () => {
     getEngine().noteOff()
   }
@@ -42,6 +42,21 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
             <button className="activation__stop" onClick={handleStop}>
               Stop <kbd>Space</kbd>
             </button>
+          )}
+          {mode === 'arp' && (
+            <div className="activation__arp-tempo">
+              <label className="activation__group-label">
+                BPM <span className="controls__value">{arpBpm}</span>
+              </label>
+              <input
+                type="range"
+                min="40"
+                max="300"
+                step="1"
+                value={arpBpm}
+                onChange={(e) => setArpBpm(Number(e.target.value))}
+              />
+            </div>
           )}
         </div>
       </div>

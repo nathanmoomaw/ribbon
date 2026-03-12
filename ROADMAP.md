@@ -1,7 +1,6 @@
 # Roadmap
 
 ## Up Next
-- [ ] Arpeggiate mode with tempo control
 - [ ] Scale selection UI (major, minor, pentatonic, blues)
 - [ ] Bitcrush effect (AudioWorklet)
 - [ ] Third oscillator support
@@ -31,3 +30,5 @@
 - [x] Ribbon-reactive confetti/firework particle visuals
 - [x] Visualizer performance optimizations (no shadowBlur, pre-computed values)
 - [x] Lo visual mode (distraction-free, no animations, subtle waveform only)
+- [x] Arpeggiate mode with tempo control
+- [x] Always-on keyboard keys (A-L work in all input modes)

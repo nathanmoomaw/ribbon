@@ -6,7 +6,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
 }
 
 .controls__osc {
@@ -18,7 +18,7 @@
 
 .controls__osc-label {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -52,10 +52,10 @@
 
 .controls__label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   gap: 0.5em;
@@ -63,7 +63,7 @@
 
 .controls__value {
   color: var(--cyan);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
 }
 
 .controls__waveforms {
@@ -90,7 +90,7 @@
 
 .controls__knob span {
   font-family: var(--font-mono);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
 }
 

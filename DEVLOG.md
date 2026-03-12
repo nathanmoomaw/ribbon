@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-12 — Fix UI readability in Party mode
+
+- Fixed visualizer canvas painting on top of all UI elements due to CSS stacking context issue
+- Root cause: `position: fixed; z-index: 0` on visualizer painted over non-positioned siblings — changed to `z-index: -1`
+- Bumped font sizes across controls (labels 0.65->0.75rem, knob spans 0.6->0.7rem, osc labels 0.7->0.8rem)
+- Increased `--text-muted` from 0.5 to 0.75, `--border-subtle` from 0.12 to 0.25, `--bg-raised` from #1a1a2e to #222240
+- Made `--bg-surface` more opaque (0.85->0.96)
+- Styled disabled buttons with explicit colors instead of opacity
+- Brightened ribbon label, subtitle, and kbd elements
+
 ## 2026-03-11 — Lo visual mode (distraction-free)
 
 - Added "Lo" visual mode as alternative to "Party" (default)

@@ -1,8 +1,8 @@
 :root {
   --bg-deep: #0a0a12;
-  --bg-surface: rgba(18, 18, 30, 0.85);
-  --bg-raised: #1a1a2e;
-  --border-subtle: rgba(255, 255, 255, 0.08);
+  --bg-surface: rgba(18, 18, 30, 0.96);
+  --bg-raised: #222240;
+  --border-subtle: rgba(255, 255, 255, 0.25);
   --border-glow: rgba(0, 240, 255, 0.3);
   --cyan: #00f0ff;
   --magenta: #ff00aa;
@@ -11,7 +11,7 @@
   --neon-pink: #ff6ec7;
   --neon-yellow: #fff01f;
   --text-primary: rgba(255, 255, 255, 0.9);
-  --text-muted: rgba(255, 255, 255, 0.5);
+  --text-muted: rgba(255, 255, 255, 0.75);
   --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
   --font-sans: system-ui, -apple-system, sans-serif;
   --glow-cyan: 0 0 8px var(--cyan), 0 0 20px rgba(0, 240, 255, 0.3);

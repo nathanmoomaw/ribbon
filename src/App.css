@@ -5,6 +5,7 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 1.25rem;
   min-height: 100vh;
   perspective: 1200px;
@@ -12,8 +13,9 @@
 
 .app-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.25rem;
 }
 
 .app-header h1 {

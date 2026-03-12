@@ -8,6 +8,7 @@
   flex-direction: column;
   gap: 1.25rem;
   min-height: 100vh;
+  perspective: 1200px;
 }
 
 .app-header {
@@ -18,9 +19,9 @@
 
 .app-header h1 {
   font-family: var(--font-mono);
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   margin: 0;
   background: linear-gradient(
@@ -36,7 +37,8 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.4));
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 30px rgba(139, 92, 246, 0.3));
+  text-shadow: none;
 }
 
 .app-header .subtitle {

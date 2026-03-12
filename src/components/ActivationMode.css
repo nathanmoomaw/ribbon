@@ -17,6 +17,7 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
 }
 
 .activation__modes {

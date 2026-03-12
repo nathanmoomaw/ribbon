@@ -1,0 +1,60 @@
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+
+.controls__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 120px;
+}
+
+.controls__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.controls__waveforms {
+  display: flex;
+  gap: 4px;
+}
+
+.controls__waveforms button {
+  font-size: 0.7rem;
+  padding: 0.35em 0.7em;
+}
+
+.controls__knobs {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.controls__knob {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.controls__knob span {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.controls__knob input[type="range"] {
+  width: 70px;
+}
+
+.controls__section > input[type="range"] {
+  width: 100%;
+}

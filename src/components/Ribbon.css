@@ -1,0 +1,52 @@
+.ribbon {
+  width: 100%;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ribbon--active {
+  border-color: var(--cyan);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 20px rgba(0, 240, 255, 0.05);
+}
+
+.ribbon__track {
+  position: relative;
+  height: 100px;
+  border-radius: 8px;
+  background: linear-gradient(90deg,
+    rgba(139, 92, 246, 0.15),
+    rgba(0, 240, 255, 0.15),
+    rgba(255, 0, 170, 0.15)
+  );
+  overflow: hidden;
+}
+
+.ribbon__cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  transform: translateX(-50%);
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan), 0 0 24px rgba(0, 240, 255, 0.3);
+  pointer-events: none;
+  transition: left 0.016s linear;
+}
+
+.ribbon__label {
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}

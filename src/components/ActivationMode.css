@@ -1,0 +1,44 @@
+.activation {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.activation__modes {
+  display: flex;
+  gap: 4px;
+}
+
+.activation__modes button {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.activation__modes button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.activation__modes button kbd,
+.activation__stop kbd {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+}
+
+.activation__stop {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  border-color: var(--magenta);
+  color: var(--magenta);
+}
+
+.activation__stop:hover {
+  border-color: var(--magenta);
+  box-shadow: 0 0 8px rgba(255, 0, 170, 0.2);
+}

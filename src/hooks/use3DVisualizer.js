@@ -220,10 +220,11 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       // position: 0 (low pitch) to 1 (high pitch), centered at 0.5
       const position = ribbonInteraction?.current?.position ?? 0.5
 
-      // Smooth zoom
+      // Smooth zoom with ambient breathing
+      const breathe = Math.sin(time * 0.0004) * 0.6 + Math.sin(time * 0.00017) * 0.3
       const zoomDiff = targetZoomRef.current - zoomRef.current
       zoomRef.current += zoomDiff * 0.08
-      camera.position.z = zoomRef.current
+      camera.position.z = zoomRef.current + breathe
 
       // Calculate drift amount based on how far zoomed out from default
       const driftAmount = Math.max(0, (zoomRef.current - DEFAULT_ZOOM) / (MAX_ZOOM - DEFAULT_ZOOM)) * 3.5

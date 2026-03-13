@@ -9,7 +9,7 @@ let reverbSend = null
 let dryGain = null
 let glideTime = 0.005
 
-const NUM_OSCILLATORS = 2
+const NUM_OSCILLATORS = 3
 const MAX_VOICES = 8
 const CLEANUP_DELAY = 300 // ms before destroying inactive voice
 
@@ -17,9 +17,9 @@ const CLEANUP_DELAY = 300 // ms before destroying inactive voice
 const voiceMap = new Map()
 
 // Global settings applied to all voices (and new voices on creation)
-const globalWaveforms = ['sawtooth', 'sawtooth']
-const globalDetunes = [0, 0]
-const globalMixes = [1.0, 0.0]
+const globalWaveforms = ['sawtooth', 'sawtooth', 'sawtooth']
+const globalDetunes = [0, 0, 0]
+const globalMixes = [1.0, 0.0, 0.0]
 let globalFilterCutoff = 20000
 let globalFilterResonance = 0
 

@@ -19,6 +19,7 @@ function App() {
   const [oscParams, setOscParams] = useState([
     { waveform: 'sawtooth', detune: 0, mix: 1.0 },
     { waveform: 'sawtooth', detune: 0, mix: 0.0 },
+    { waveform: 'sawtooth', detune: 0, mix: 0.0 },
   ])
   const [volume, setVolume] = useState(0.5)
   const [octaves, setOctaves] = useState(2)
@@ -36,11 +37,9 @@ function App() {
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
-      if (mode === 'latch' || hold) {
-        getEngine().allNotesOff()
-        setHold(false)
-        setKeyboardPositions(new Map())
-      }
+      getEngine().allNotesOff()
+      setHold(false)
+      setKeyboardPositions(new Map())
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('latch'),

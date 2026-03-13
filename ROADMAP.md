@@ -4,13 +4,11 @@
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
 - [ ] Scale selection UI (major, minor, pentatonic, blues)
 - [ ] Bitcrush effect (AudioWorklet)
-- [ ] Third oscillator support
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
 - [ ] Rotary knob components (replace range sliders)
 - [ ] Mobile-optimized layout
-- [ ] Staging deploy pipeline (merge to staging, CI/CD)
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (generative pleasant sound when not manually playing)
 - [ ] Production domain setup
@@ -42,3 +40,6 @@
 - [x] Hold mode (independent toggle, global pitch control, composes with all play modes)
 - [x] Polyphonic support (voice pool, multi-touch, multi-key)
 - [x] 3D grid sphere visualizer (Three.js, 3 spheres, audio-reactive, zoom controls)
+- [x] Third oscillator support
+- [x] Controls layout reorganization (3 oscs across top, vertical stacking)
+- [x] CI/CD auto-deploy to S3/CloudFront on push to main

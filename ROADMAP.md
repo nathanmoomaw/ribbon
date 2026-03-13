@@ -35,3 +35,8 @@
 - [x] Lo visual mode (distraction-free, no animations, subtle waveform only)
 - [x] Arpeggiate mode with tempo control
 - [x] Always-on keyboard keys (A-L work in all input modes)
+- [x] Touch velocity (ribbon Y-axis)
+- [x] Input-reactive perspective grid (velocity → speed, pitch → drift)
+- [x] Filter controls (cutoff + resonance)
+- [x] Glide/portamento speed control
+- [x] Hold mode (independent toggle, global pitch control, composes with all play modes)

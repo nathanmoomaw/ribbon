@@ -3,7 +3,7 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop, hold) {
   const activeKeyRef = useRef(null)
 
   useEffect(() => {
@@ -21,6 +21,13 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
 
       engine.setFrequency(hz)
       onPositionChange?.(position)
+
+      // In hold mode, ensure note is playing but don't restart it
+      if (hold) {
+        if (!engine.getIsPlaying()) engine.noteOn()
+        activeKeyRef.current = e.code
+        return
+      }
 
       if (mode === 'play') {
         engine.noteOn()
@@ -40,10 +47,12 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       if (index === -1) return
 
       if (activeKeyRef.current === e.code) {
-        if (mode === 'play') {
-          getEngine().noteOff()
-        } else if (mode === 'arp') {
-          arpStop()
+        if (!hold) {
+          if (mode === 'play') {
+            getEngine().noteOff()
+          } else if (mode === 'arp') {
+            arpStop()
+          }
         }
         activeKeyRef.current = null
       }
@@ -55,7 +64,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop, hold])
 }
 
 export { KEYS }

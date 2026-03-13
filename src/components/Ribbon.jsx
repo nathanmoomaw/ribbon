@@ -6,16 +6,16 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction, arpStart, arpStop }) {
+export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction, arpStart, arpStop, hold }) {
   const [position, setPosition] = useState(null)
   const [isActive, setIsActive] = useState(false)
 
-  // Sync external position from keyboard play
+  // Sync external position from keyboard play or hold mode
   useEffect(() => {
-    if (externalPosition !== null && inputMode === 'keys') {
+    if (externalPosition !== null && (inputMode === 'keys' || hold)) {
       setPosition(externalPosition)
     }
-  }, [externalPosition, inputMode])
+  }, [externalPosition, inputMode, hold])
 
   const stepPositions = useMemo(() => {
     return stepped ? getStepPositions({ octaves, scale }) : []
@@ -47,19 +47,26 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
     } else if (mode === 'arp') {
       arpStart()
     }
-  }, [getEngine, mode, ribbonInteraction, arpStart])
+
+    // In hold mode, ensure note is on regardless of play mode
+    if (hold && !engine.getIsPlaying()) {
+      engine.noteOn(velocity)
+    }
+  }, [getEngine, mode, hold, ribbonInteraction, arpStart])
 
   const onUp = useCallback(() => {
     const engine = getEngine()
     setIsActive(false)
     if (ribbonInteraction) ribbonInteraction.current.active = false
 
+    if (hold) return // hold keeps the note alive
+
     if (mode === 'play') {
       engine.noteOff()
     } else if (mode === 'arp') {
       arpStop()
     }
-  }, [getEngine, mode, ribbonInteraction, arpStop])
+  }, [getEngine, mode, hold, ribbonInteraction, arpStop])
 
   const { ribbonRef, handlers } = useRibbon(onPositionChange, onDown, onUp)
 

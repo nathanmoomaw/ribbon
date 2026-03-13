@@ -2,7 +2,7 @@ import { useRef, useCallback } from 'react'
 
 export function useRibbon(onPositionChange, onDown, onUp) {
   const ribbonRef = useRef(null)
-  const activeRef = useRef(false)
+  const activePointers = useRef(new Set())
 
   const getPosition = useCallback((e) => {
     const rect = ribbonRef.current.getBoundingClientRect()
@@ -14,25 +14,25 @@ export function useRibbon(onPositionChange, onDown, onUp) {
   const handlePointerDown = useCallback((e) => {
     if (!ribbonRef.current) return
     ribbonRef.current.setPointerCapture(e.pointerId)
-    activeRef.current = true
+    activePointers.current.add(e.pointerId)
     const { x, y } = getPosition(e)
-    onDown?.(x, y)
-    onPositionChange?.(x, y)
+    onDown?.(e.pointerId, x, y)
+    onPositionChange?.(e.pointerId, x, y)
   }, [getPosition, onDown, onPositionChange])
 
   const handlePointerMove = useCallback((e) => {
-    if (!activeRef.current) return
+    if (!activePointers.current.has(e.pointerId)) return
     const { x, y } = getPosition(e)
-    onPositionChange?.(x, y)
+    onPositionChange?.(e.pointerId, x, y)
   }, [getPosition, onPositionChange])
 
   const handlePointerUp = useCallback((e) => {
-    if (!activeRef.current) return
-    activeRef.current = false
+    if (!activePointers.current.has(e.pointerId)) return
+    activePointers.current.delete(e.pointerId)
     if (ribbonRef.current) {
       ribbonRef.current.releasePointerCapture(e.pointerId)
     }
-    onUp?.()
+    onUp?.(e.pointerId)
   }, [onUp])
 
   return {

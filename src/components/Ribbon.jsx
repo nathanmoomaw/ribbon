@@ -6,87 +6,119 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPosition, ribbonInteraction, arpStart, arpStop, hold }) {
-  const [position, setPosition] = useState(null)
-  const [isActive, setIsActive] = useState(false)
+export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold }) {
+  // Map of voice id -> position (for both touch and keyboard cursors)
+  const [positions, setPositions] = useState(new Map())
+  const [activePointers, setActivePointers] = useState(new Set())
 
-  // Sync external position from keyboard play or hold mode
+  // Sync external positions from keyboard play or hold mode
   useEffect(() => {
-    if (externalPosition !== null && (inputMode === 'keys' || hold)) {
-      setPosition(externalPosition)
+    if (externalPositions && externalPositions.size > 0) {
+      setPositions(prev => {
+        const next = new Map(prev)
+        for (const [id, pos] of externalPositions) {
+          next.set(id, pos)
+        }
+        return next
+      })
     }
-  }, [externalPosition, inputMode, hold])
+  }, [externalPositions])
 
   const stepPositions = useMemo(() => {
     return stepped ? getStepPositions({ octaves, scale }) : []
   }, [stepped, octaves, scale])
 
-  const onPositionChange = useCallback((pos, velocity) => {
-    setPosition(pos)
+  const onPositionChange = useCallback((pointerId, pos, velocity) => {
+    const voiceId = `touch_${pointerId}`
+    setPositions(prev => new Map(prev).set(voiceId, pos))
     if (ribbonInteraction) {
       ribbonInteraction.current.position = pos
       if (velocity !== undefined) ribbonInteraction.current.velocity = velocity
     }
     const engine = getEngine()
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
-    engine.setFrequency(hz)
-    if (velocity !== undefined) engine.setVelocity(velocity)
+    engine.voiceSetFrequency(voiceId, hz)
+    if (velocity !== undefined) engine.voiceSetVelocity(voiceId, velocity)
   }, [getEngine, octaves, stepped, scale, ribbonInteraction])
 
-  const onDown = useCallback((pos, velocity) => {
+  const onDown = useCallback((pointerId, pos, velocity) => {
     const engine = getEngine()
-    setIsActive(true)
+    const voiceId = `touch_${pointerId}`
+    const hz = positionToFrequency(pos, { octaves, stepped, scale })
+    setActivePointers(prev => new Set(prev).add(voiceId))
     if (ribbonInteraction) ribbonInteraction.current.active = true
 
     if (mode === 'play') {
-      engine.noteOn(velocity)
+      engine.voiceOn(voiceId, hz, velocity)
     } else if (mode === 'latch') {
-      if (!engine.getIsPlaying()) {
-        engine.noteOn(velocity)
+      if (!engine.voiceIsPlaying(voiceId)) {
+        engine.voiceOn(voiceId, hz, velocity)
       }
     } else if (mode === 'arp') {
+      // Arp stays mono — set frequency and start arp
+      engine.setFrequency(hz)
       arpStart()
     }
 
-    // In hold mode, ensure note is on regardless of play mode
-    if (hold && !engine.getIsPlaying()) {
-      engine.noteOn(velocity)
+    // In hold mode, ensure voice is on
+    if (hold && !engine.voiceIsPlaying(voiceId) && mode !== 'arp') {
+      engine.voiceOn(voiceId, hz, velocity)
     }
-  }, [getEngine, mode, hold, ribbonInteraction, arpStart])
+  }, [getEngine, mode, hold, octaves, stepped, scale, ribbonInteraction, arpStart])
 
-  const onUp = useCallback(() => {
+  const onUp = useCallback((pointerId) => {
+    const voiceId = `touch_${pointerId}`
     const engine = getEngine()
-    setIsActive(false)
-    if (ribbonInteraction) ribbonInteraction.current.active = false
+    setActivePointers(prev => {
+      const next = new Set(prev)
+      next.delete(voiceId)
+      // Only mark interaction inactive when all pointers are up
+      if (next.size === 0 && ribbonInteraction) {
+        ribbonInteraction.current.active = false
+      }
+      return next
+    })
 
-    if (hold) return // hold keeps the note alive
+    if (hold) return // hold keeps voices alive
 
     if (mode === 'play') {
-      engine.noteOff()
+      engine.voiceOff(voiceId)
     } else if (mode === 'arp') {
       arpStop()
+    }
+
+    // Clean up position for released touch (unless hold or latch)
+    if (!hold && mode !== 'latch') {
+      setPositions(prev => {
+        const next = new Map(prev)
+        next.delete(voiceId)
+        return next
+      })
     }
   }, [getEngine, mode, hold, ribbonInteraction, arpStop])
 
   const { ribbonRef, handlers } = useRibbon(onPositionChange, onDown, onUp)
 
-  const displayPosition = position
-  const showFreq = displayPosition !== null
+  const allPositions = [...positions.entries()]
+  const showAnyFreq = allPositions.length > 0
+  // Use the most recent position for the Hz display
+  const displayPosition = allPositions.length > 0 ? allPositions[allPositions.length - 1][1] : null
 
   return (
     <div
-      className={`ribbon ${isActive ? 'ribbon--active' : ''}`}
+      className={`ribbon ${activePointers.size > 0 ? 'ribbon--active' : ''}`}
       ref={ribbonRef}
       {...handlers}
       style={{ touchAction: 'none' }}
     >
       <div className="ribbon__track">
-        {showFreq && (
+        {allPositions.map(([id, pos]) => (
           <div
+            key={id}
             className="ribbon__cursor"
-            style={{ left: `${displayPosition * 100}%` }}
+            style={{ left: `${pos * 100}%` }}
           />
-        )}
+        ))}
 
         {stepped && stepPositions.length > 0 && (
           <div className="ribbon__steps">
@@ -118,7 +150,7 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
         )}
 
         <div className="ribbon__label">
-          {showFreq
+          {showAnyFreq
             ? `${Math.round(positionToFrequency(displayPosition, { octaves, stepped, scale }))} Hz`
             : inputMode === 'keys' ? 'press A-L to play' : 'touch to play'}
         </div>

@@ -494,8 +494,7 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
 
     function renderParty(time) {
       gl.globalCompositeOperation = 'source-over'
-      gl.fillStyle = 'rgba(10, 10, 18, 0.15)'
-      gl.fillRect(0, 0, cachedW, cachedH)
+      gl.clearRect(0, 0, cachedW, cachedH)
 
       // Perspective grid behind everything
       const dt = lastTime ? time - lastTime : 16

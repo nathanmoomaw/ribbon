@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from 'react'
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
@@ -7,6 +7,7 @@ import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { ActivationMode } from './components/ActivationMode'
+import { positionToFrequency } from './utils/pitchMap'
 import './App.css'
 
 function App() {
@@ -29,19 +30,22 @@ function App() {
   const [ribbonPosition, setRibbonPosition] = useState(null)
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
+  const [hold, setHold] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
-      if (mode === 'latch') {
+      if (mode === 'latch' || hold) {
         getEngine().noteOff()
+        setHold(false)
       }
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('latch'),
     Digit3: () => setMode('arp'),
+    Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
-  }), [mode, getEngine])
+  }), [mode, hold, getEngine])
 
   useKeyboard(keyHandlers)
 
@@ -51,7 +55,37 @@ function App() {
 
   const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm)
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition, arpStart, arpStop)
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition, arpStart, arpStop, hold)
+
+  // When hold is active and a note is playing, global mouse movement controls pitch
+  useEffect(() => {
+    if (!hold) return
+    const handleGlobalMove = (e) => {
+      const engine = getEngine()
+      if (!engine.getIsPlaying()) return
+      // Map screen X to ribbon position (0-1)
+      const pos = Math.max(0, Math.min(1, e.clientX / window.innerWidth))
+      const hz = positionToFrequency(pos, { octaves, stepped, scale })
+      engine.setFrequency(hz)
+      setRibbonPosition(pos)
+      if (ribbonInteraction.current) ribbonInteraction.current.position = pos
+    }
+    window.addEventListener('pointermove', handleGlobalMove)
+    return () => window.removeEventListener('pointermove', handleGlobalMove)
+  }, [hold, getEngine, octaves, stepped, scale, ribbonInteraction])
+
+  // When hold is toggled off, stop the note if in play mode
+  const holdRef = useRef(hold)
+  useEffect(() => {
+    const wasHold = holdRef.current
+    holdRef.current = hold
+    if (wasHold && !hold) {
+      const engine = getEngine()
+      if (engine.getIsPlaying() && mode === 'play') {
+        engine.noteOff()
+      }
+    }
+  }, [hold, getEngine, mode])
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
@@ -72,6 +106,8 @@ function App() {
         setVisualMode={setVisualMode}
         arpBpm={arpBpm}
         setArpBpm={setArpBpm}
+        hold={hold}
+        setHold={setHold}
       />
 
       <Controls
@@ -107,6 +143,7 @@ function App() {
         ribbonInteraction={ribbonInteraction}
         arpStart={arpStart}
         arpStop={arpStop}
+        hold={hold}
       />
     </div>
   )

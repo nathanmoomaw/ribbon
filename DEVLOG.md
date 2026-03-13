@@ -1,5 +1,21 @@
 # Devlog
 
+## 2026-03-12 — Hold mode, velocity, filter, glide, and visualizer enhancements
+
+- Added touch velocity via ribbon Y-axis (bottom=quiet, top=full volume)
+- Perspective grid now responds to input: forward speed from velocity, lateral drift from pitch
+- Frequency bars render from top instead of bottom
+- Tuned grid speed and lateral drift through multiple iterations
+- Particles (confetti/fireworks) drift longer with reduced decay and gravity
+- Added filter controls: cutoff (20-20000 Hz) and resonance (0-25) with BiquadFilterNode in audio chain
+- Added glide/portamento speed control (0.001-0.3s time constant)
+- Implemented Hold mode: independent toggle that composes with play/latch/arp
+  - Keeps note alive after release; global mouse movement controls pitch across full screen
+  - Ribbon cursor tracks during hold mode
+  - Keyboard keys (A-L) change pitch without interrupting held note
+  - Space bar clears hold mode (like latch)
+- Fixed stale closure bug in keyHandlers useMemo (added `hold` to dependency array)
+
 ## 2026-03-12 — 3D depth effects and enhanced animations
 
 - Added retrowave perspective grid to visualizer background (scrolling horizontal lines + converging verticals + horizon glow)

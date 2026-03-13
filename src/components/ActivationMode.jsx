@@ -16,7 +16,7 @@ const VISUAL_MODES = [
   { id: 'lo', label: 'Lo' },
 ]
 
-export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode, arpBpm, setArpBpm }) {
+export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode, arpBpm, setArpBpm, hold, setHold }) {
   const handleStop = () => {
     getEngine().noteOff()
   }
@@ -38,6 +38,14 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
               <kbd>{m.key}</kbd>
             </button>
           ))}
+          <button
+            className={hold ? 'active' : ''}
+            onClick={() => setHold((h) => !h)}
+            title="Hold note and control pitch globally"
+          >
+            Hold
+            <kbd>4</kbd>
+          </button>
           {mode === 'latch' && (
             <button className="activation__stop" onClick={handleStop}>
               Stop <kbd>Space</kbd>

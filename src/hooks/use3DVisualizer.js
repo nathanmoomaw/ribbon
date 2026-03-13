@@ -1,6 +1,15 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
+// Simple 3D noise for brain-like displacement (cheap hash-based)
+function noise3D(x, y, z) {
+  // Multiple octaves of sine-based pseudo-noise for organic folds
+  const n1 = Math.sin(x * 3.7 + y * 1.3 + z * 2.1) * Math.cos(y * 4.1 + z * 1.7 + x * 0.9)
+  const n2 = Math.sin(x * 7.3 + y * 5.1 + z * 3.3) * Math.cos(y * 2.9 + z * 6.1 + x * 4.7) * 0.5
+  const n3 = Math.sin(x * 13.1 + y * 11.7 + z * 9.3) * Math.cos(y * 8.3 + z * 12.7 + x * 10.1) * 0.25
+  return (n1 + n2 + n3) / 1.75  // normalize roughly to -1..1
+}
+
 // Each sphere drifts in a different direction when zooming out
 const SPHERE_DRIFT_DIRS = [
   new THREE.Vector3(-1, 0.5, -0.3).normalize(),
@@ -31,12 +40,14 @@ const MIN_ZOOM = 0.5
 const MAX_ZOOM = 25
 const ZOOM_STEP = 0.8
 
-export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode) {
+export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0) {
   const stateRef = useRef(null)
   const zoomRef = useRef(DEFAULT_ZOOM)
   const targetZoomRef = useRef(DEFAULT_ZOOM)
   const visualModeRef = useRef(visualMode)
   visualModeRef.current = visualMode
+  const reverbMixRef = useRef(reverbMix)
+  reverbMixRef.current = reverbMix
 
   useEffect(() => {
     const mount = mountRef.current
@@ -60,17 +71,23 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
     for (let i = 0; i < 3; i++) {
       const group = new THREE.Group()
 
-      // Main wireframe sphere
-      const geo = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32)
-      const wireGeo = new THREE.WireframeGeometry(geo)
-      const mat = new THREE.LineBasicMaterial({
+      // Main wireframe sphere (using Mesh + wireframe material for vertex displacement)
+      const geo = new THREE.SphereGeometry(SPHERE_RADIUS, 48, 48)
+      const mat = new THREE.MeshBasicMaterial({
         color: SPHERE_COLORS[i],
         transparent: true,
         opacity: 0.35,
         depthWrite: false,
+        wireframe: true,
       })
-      const wireframe = new THREE.LineSegments(wireGeo, mat)
-      group.add(wireframe)
+      const mesh = new THREE.Mesh(geo, mat)
+
+      // Store original vertex positions for displacement
+      const posAttr = geo.getAttribute('position')
+      const basePositions = new Float32Array(posAttr.array.length)
+      basePositions.set(posAttr.array)
+
+      group.add(mesh)
 
       // Inner glow sphere (slightly smaller, very faint)
       const innerGeo = new THREE.SphereGeometry(SPHERE_RADIUS * 0.96, 20, 20)
@@ -85,7 +102,7 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       group.add(innerMesh)
 
       scene.add(group)
-      spheres.push({ wireframe, mat, innerMesh, innerMat, group })
+      spheres.push({ mesh, geo, mat, basePositions, innerMesh, innerMat, group })
       sphereGroups.push(group)
     }
 
@@ -235,6 +252,41 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const scalePulse = 1 + energy * 0.3
         sphere.group.scale.setScalar(scalePulse)
 
+        // Brain-like vertex displacement driven by reverb mix
+        const reverb = reverbMixRef.current
+        if (reverb > 0.01) {
+          const posAttr = sphere.geo.getAttribute('position')
+          const arr = posAttr.array
+          const base = sphere.basePositions
+          const vertCount = posAttr.count
+          // Displacement amount: reverb controls intensity, time adds slow undulation
+          const displaceAmt = reverb * 0.35
+          // Slow time crawl for organic pulsing of the folds
+          const t = time * 0.0003 + i * 2.0
+
+          for (let v = 0; v < vertCount; v++) {
+            const bx = base[v * 3]
+            const by = base[v * 3 + 1]
+            const bz = base[v * 3 + 2]
+
+            // Normal direction (sphere centered at origin, so normal = normalized position)
+            const len = Math.sqrt(bx * bx + by * by + bz * bz)
+            if (len === 0) continue
+            const nx = bx / len
+            const ny = by / len
+            const nz = bz / len
+
+            // Noise-based displacement along normal (brain folds)
+            const n = noise3D(bx * 1.2 + t, by * 1.2 + t * 0.7, bz * 1.2 + t * 0.5)
+            const displacement = n * displaceAmt
+
+            arr[v * 3] = bx + nx * displacement
+            arr[v * 3 + 1] = by + ny * displacement
+            arr[v * 3 + 2] = bz + nz * displacement
+          }
+          posAttr.needsUpdate = true
+        }
+
         // Calculate target reactive offset from pitch + velocity
         // Each sphere shifts in its own direction based on pitch, different magnitude
         const pitchMag = pitchOffset * (0.6 + i * 0.3)
@@ -279,7 +331,7 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       renderer.dispose()
       // Cleanup geometries and materials
       for (const s of spheres) {
-        s.wireframe.geometry.dispose()
+        s.geo.dispose()
         s.mat.dispose()
         s.innerMesh.geometry.dispose()
         s.innerMat.dispose()

@@ -1,5 +1,17 @@
 # Devlog
 
+## 2026-03-13 — Shake/Quake feature
+
+- New shake/quake mechanic: shakes the synth universe, randomizes controls, triggers ribbon sound
+- Trigger methods: Enter key, click outside controls/ribbon, device accelerometer (mobile shake)
+- Accelerometer intensity mapped from shake magnitude for variable effect strength
+- ~25% of all slider/button parameters randomly nudged on each shake, scaled by intensity
+- CSS shake animation on controls panel and ribbon container
+- Ribbon track undulation animation (scaleY + translateY spring effect)
+- Random ribbon press at <50% velocity with auto-release after 150-400ms
+- useShake hook handles all detection with cooldown to prevent spam
+- Controls and Ribbon converted to forwardRef for click-outside detection
+
 ## 2026-03-13 — Controls reorganization, 3rd oscillator, polish
 
 - Added 3rd oscillator (AudioEngine NUM_OSCILLATORS=3, App state, Controls UI)

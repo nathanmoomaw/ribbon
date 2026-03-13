@@ -3,6 +3,7 @@ import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
+import { useShake } from './hooks/useShake'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
@@ -10,6 +11,15 @@ import { ActivationMode } from './components/ActivationMode'
 import { RibbonLogo } from './components/RibbonLogo'
 import { positionToFrequency } from './utils/pitchMap'
 import './App.css'
+
+const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
+
+// Nudge a numeric value randomly within its range, scaled by intensity
+function nudge(current, min, max, intensity) {
+  const range = max - min
+  const delta = (Math.random() - 0.5) * range * 0.3 * intensity
+  return Math.max(min, Math.min(max, current + delta))
+}
 
 function App() {
   const getEngine = useAudioEngine()
@@ -33,7 +43,11 @@ function App() {
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
   const [hold, setHold] = useState(false)
+  const [shaking, setShaking] = useState(false)
+  const [undulating, setUndulating] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
+  const controlsRef = useRef(null)
+  const ribbonRef = useRef(null)
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
@@ -57,6 +71,108 @@ function App() {
   const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm)
 
   useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold)
+
+  // --- Shake/Quake handler ---
+  const handleShake = useCallback((intensity) => {
+    const engine = getEngine()
+
+    // 1. Visual shake on controls + ribbon
+    setShaking(true)
+    setUndulating(true)
+    setTimeout(() => setShaking(false), 400)
+    setTimeout(() => setUndulating(false), 500)
+
+    // 2. Randomize ~25% of slider/button parameters
+    // Each parameter has a 25% chance of being nudged
+    const shouldNudge = () => Math.random() < 0.25
+
+    // Oscillator params
+    setOscParams(prev => prev.map((osc, i) => {
+      const next = { ...osc }
+      if (shouldNudge()) next.waveform = WAVEFORMS[Math.floor(Math.random() * WAVEFORMS.length)]
+      if (shouldNudge()) next.mix = nudge(osc.mix, 0, 1, intensity)
+      if (shouldNudge()) next.detune = Math.round(nudge(osc.detune, -1200, 1200, intensity))
+      // Apply to engine
+      if (next.waveform !== osc.waveform) engine.setWaveform(next.waveform, i)
+      if (next.mix !== osc.mix) engine.setOscMix(i, next.mix)
+      if (next.detune !== osc.detune) engine.setOscDetune(i, next.detune)
+      return next
+    }))
+
+    if (shouldNudge()) {
+      const newVol = nudge(volume, 0, 1, intensity)
+      setVolume(newVol)
+      engine.setVolume(newVol)
+    }
+
+    if (shouldNudge()) {
+      const newCutoff = nudge(filterParams.cutoff, 20, 20000, intensity)
+      setFilterParams(prev => ({ ...prev, cutoff: newCutoff }))
+      engine.setFilter({ cutoff: newCutoff })
+    }
+
+    if (shouldNudge()) {
+      const newRes = nudge(filterParams.resonance, 0, 25, intensity)
+      setFilterParams(prev => ({ ...prev, resonance: newRes }))
+      engine.setFilter({ resonance: newRes })
+    }
+
+    if (shouldNudge()) {
+      const newSpeed = nudge(glideSpeed, 0.001, 0.3, intensity)
+      setGlideSpeed(newSpeed)
+      engine.setGlideSpeed(newSpeed)
+    }
+
+    if (shouldNudge()) {
+      const newTime = nudge(delayParams.time, 0.05, 1, intensity)
+      setDelayParams(prev => ({ ...prev, time: newTime }))
+      engine.setDelay({ time: newTime })
+    }
+
+    if (shouldNudge()) {
+      const newFeedback = nudge(delayParams.feedback, 0, 0.9, intensity)
+      setDelayParams(prev => ({ ...prev, feedback: newFeedback }))
+      engine.setDelay({ feedback: newFeedback })
+    }
+
+    if (shouldNudge()) {
+      const newDelayMix = nudge(delayParams.mix, 0, 1, intensity)
+      setDelayParams(prev => ({ ...prev, mix: newDelayMix }))
+      engine.setDelay({ mix: newDelayMix })
+    }
+
+    if (shouldNudge()) {
+      const newReverb = nudge(reverbMix, 0, 1, intensity)
+      setReverbMix(newReverb)
+      engine.setReverb({ mix: newReverb })
+    }
+
+    // 3. Trigger a random ribbon press at <50% velocity
+    const shakeVoiceId = `shake_${Date.now()}`
+    const shakePosition = Math.random()
+    const shakeVelocity = Math.random() * 0.5 * intensity
+    const shakeHz = positionToFrequency(shakePosition, { octaves, stepped, scale })
+
+    // Update ribbon interaction ref for visualizer
+    if (ribbonInteraction.current) {
+      ribbonInteraction.current.position = shakePosition
+      ribbonInteraction.current.velocity = shakeVelocity
+      ribbonInteraction.current.active = true
+    }
+
+    engine.voiceOn(shakeVoiceId, shakeHz, shakeVelocity)
+
+    // Short note — release after 150-400ms depending on intensity
+    const noteDuration = 150 + (1 - intensity) * 250
+    setTimeout(() => {
+      engine.voiceOff(shakeVoiceId)
+      if (ribbonInteraction.current) {
+        ribbonInteraction.current.active = false
+      }
+    }, noteDuration)
+  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, octaves, stepped, scale, ribbonInteraction])
+
+  useShake(handleShake, controlsRef, ribbonRef)
 
   // When hold is active and only one voice is playing, global mouse movement controls pitch
   useEffect(() => {
@@ -112,6 +228,7 @@ function App() {
       />
 
       <Ribbon
+        ref={ribbonRef}
         getEngine={getEngine}
         mode={mode}
         inputMode={inputMode}
@@ -123,9 +240,12 @@ function App() {
         arpStart={arpStart}
         arpStop={arpStop}
         hold={hold}
+        shaking={shaking}
+        undulating={undulating}
       />
 
       <Controls
+        ref={controlsRef}
         getEngine={getEngine}
         oscParams={oscParams}
         setOscParams={setOscParams}
@@ -145,6 +265,7 @@ function App() {
         setFilterParams={setFilterParams}
         glideSpeed={glideSpeed}
         setGlideSpeed={setGlideSpeed}
+        shaking={shaking}
       />
     </div>
   )

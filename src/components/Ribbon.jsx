@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, forwardRef } from 'react'
 import { useRibbon } from '../hooks/useRibbon'
 import { positionToFrequency, getStepPositions } from '../utils/pitchMap'
 import { KEYS } from '../hooks/useKeyboardPlay'
@@ -6,7 +6,7 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold }) {
+export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold, shaking, undulating }, ref) {
   // Map of voice id -> position (for both touch and keyboard cursors)
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -106,12 +106,16 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
 
   return (
     <div
-      className={`ribbon ${activePointers.size > 0 ? 'ribbon--active' : ''}`}
-      ref={ribbonRef}
+      className={`ribbon ${activePointers.size > 0 ? 'ribbon--active' : ''} ${shaking ? 'ribbon--shaking' : ''}`}
+      ref={(el) => {
+        ribbonRef.current = el
+        if (typeof ref === 'function') ref(el)
+        else if (ref) ref.current = el
+      }}
       {...handlers}
       style={{ touchAction: 'none' }}
     >
-      <div className="ribbon__track">
+      <div className={`ribbon__track ${undulating ? 'ribbon__track--undulating' : ''}`}>
         {allPositions.map(([id, pos]) => (
           <div
             key={id}
@@ -157,4 +161,4 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
       </div>
     </div>
   )
-}
+})

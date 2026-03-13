@@ -149,6 +149,16 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
+/* Shake effect */
+.ribbon--shaking {
+  animation: shake 0.4s ease-out !important;
+}
+
+.ribbon__track--undulating {
+  animation: ribbon-undulate 0.5s ease-out;
+  transform-origin: center center;
+}
+
 /* Lo mode */
 .lo-mode .ribbon {
   animation: none;

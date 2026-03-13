@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, forwardRef } from 'react'
 import { SCALES } from '../utils/scales'
 import './Controls.css'
 
@@ -68,7 +68,7 @@ function OscSection({ index, params, getEngine, onUpdate }) {
   )
 }
 
-export function Controls({
+export const Controls = forwardRef(function Controls({
   getEngine,
   oscParams,
   setOscParams,
@@ -88,7 +88,8 @@ export function Controls({
   setFilterParams,
   glideSpeed,
   setGlideSpeed,
-}) {
+  shaking,
+}, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
       const next = [...prev]
@@ -146,7 +147,7 @@ export function Controls({
   }, [getEngine, setGlideSpeed])
 
   return (
-    <div className="controls">
+    <div ref={ref} className={`controls ${shaking ? 'controls--shaking' : ''}`}>
       <div className="controls__oscillators">
         {oscParams.map((params, i) => (
           <OscSection
@@ -272,4 +273,4 @@ export function Controls({
       </div>
     </div>
   )
-}
+})

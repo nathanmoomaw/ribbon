@@ -1,13 +1,15 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-// Simple 3D noise for brain-like displacement (cheap hash-based)
+// Smooth sinusoidal 3D displacement for brain-like folds
 function noise3D(x, y, z) {
-  // Multiple octaves of sine-based pseudo-noise for organic folds
-  const n1 = Math.sin(x * 3.7 + y * 1.3 + z * 2.1) * Math.cos(y * 4.1 + z * 1.7 + x * 0.9)
-  const n2 = Math.sin(x * 7.3 + y * 5.1 + z * 3.3) * Math.cos(y * 2.9 + z * 6.1 + x * 4.7) * 0.5
-  const n3 = Math.sin(x * 13.1 + y * 11.7 + z * 9.3) * Math.cos(y * 8.3 + z * 12.7 + x * 10.1) * 0.25
-  return (n1 + n2 + n3) / 1.75  // normalize roughly to -1..1
+  // Broad, rolling waves — low frequency for smooth undulations
+  const n1 = Math.sin(x * 1.1 + y * 0.7) * Math.sin(y * 1.3 + z * 0.9) * Math.sin(z * 0.8 + x * 1.0)
+  // Secondary wave at slightly different scale for asymmetry
+  const n2 = Math.sin(x * 1.7 - z * 1.1 + y * 0.5) * Math.cos(y * 1.5 + x * 0.6 - z * 0.8) * 0.6
+  // Gentle third harmonic for subtle variation
+  const n3 = Math.sin(x * 2.3 + y * 2.1 - z * 1.4) * 0.3
+  return (n1 + n2 + n3) / 1.9
 }
 
 // Each sphere drifts in a different direction when zooming out

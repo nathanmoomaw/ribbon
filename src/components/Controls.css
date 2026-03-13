@@ -136,6 +136,11 @@
   box-shadow: none;
 }
 
+/* Shake effect */
+.controls--shaking {
+  animation: shake 0.4s ease-out !important;
+}
+
 /* Mobile responsive */
 @media (max-width: 767px) {
   .controls {

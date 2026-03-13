@@ -38,11 +38,20 @@
   }
 }
 
-/* Mobile: tighter spacing */
+/* Mobile: tighter spacing, full width controls */
 @media (max-width: 767px) {
   .app {
     padding: 1rem 0.5rem;
     gap: 1rem;
+    align-items: stretch;
+  }
+
+  .app-header {
+    align-self: center;
+  }
+
+  .app .activation {
+    align-self: center;
   }
 }
 

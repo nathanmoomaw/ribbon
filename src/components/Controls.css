@@ -135,3 +135,61 @@
 .lo-mode .controls__osc {
   box-shadow: none;
 }
+
+/* Mobile responsive */
+@media (max-width: 767px) {
+  .controls {
+    padding: 0.75rem;
+    gap: 0.75rem;
+    max-width: 100%;
+  }
+
+  .controls__oscillators {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .controls__osc {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .controls__osc-label {
+    width: 100%;
+    margin-bottom: 0;
+    font-size: 0.7rem;
+  }
+
+  .controls__osc .controls__section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .controls__shared {
+    gap: 0.75rem;
+  }
+
+  .controls__section {
+    min-width: 80px;
+  }
+
+  .controls__waveforms {
+    flex-wrap: wrap;
+  }
+
+  .controls__waveforms button {
+    font-size: 0.65rem;
+    padding: 0.3em 0.5em;
+  }
+
+  .controls__knobs {
+    gap: 0.5rem;
+  }
+
+  .controls__knob input[type="range"] {
+    width: 60px;
+  }
+}

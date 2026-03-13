@@ -178,3 +178,14 @@
 .lo-mode .ribbon__cursor::after {
   display: none;
 }
+
+@media (max-width: 767px) {
+  .ribbon__track {
+    height: 80px;
+  }
+
+  .ribbon__key kbd {
+    font-size: 0.6rem;
+    padding: 0.15em 0.4em;
+  }
+}

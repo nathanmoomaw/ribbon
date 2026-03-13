@@ -28,4 +28,22 @@
   font-family: var(--font-mono);
 }
 
+/* On desktop, swap ribbon below controls */
+@media (min-width: 768px) {
+  .app .ribbon {
+    order: 5;
+  }
+  .app .controls {
+    order: 4;
+  }
+}
+
+/* Mobile: tighter spacing */
+@media (max-width: 767px) {
+  .app {
+    padding: 1rem 0.5rem;
+    gap: 1rem;
+  }
+}
+
 /* Lo mode — logo animations handled in RibbonLogo.css */

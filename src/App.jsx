@@ -111,6 +111,20 @@ function App() {
         setHold={setHold}
       />
 
+      <Ribbon
+        getEngine={getEngine}
+        mode={mode}
+        inputMode={inputMode}
+        octaves={octaves}
+        stepped={stepped}
+        scale={scale}
+        externalPositions={keyboardPositions}
+        ribbonInteraction={ribbonInteraction}
+        arpStart={arpStart}
+        arpStop={arpStop}
+        hold={hold}
+      />
+
       <Controls
         getEngine={getEngine}
         oscParams={oscParams}
@@ -131,20 +145,6 @@ function App() {
         setFilterParams={setFilterParams}
         glideSpeed={glideSpeed}
         setGlideSpeed={setGlideSpeed}
-      />
-
-      <Ribbon
-        getEngine={getEngine}
-        mode={mode}
-        inputMode={inputMode}
-        octaves={octaves}
-        stepped={stepped}
-        scale={scale}
-        externalPositions={keyboardPositions}
-        ribbonInteraction={ribbonInteraction}
-        arpStart={arpStart}
-        arpStop={arpStop}
-        hold={hold}
       />
     </div>
   )

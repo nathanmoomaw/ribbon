@@ -285,24 +285,48 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
 
     }
 
-    function drawFrequencyBars() {
-      if (!freqData) return
-      analyser.getByteFrequencyData(freqData)
-
+    function drawFrequencyBars(time) {
       const barWidth = cachedW / BAR_COUNT
-      const step = Math.floor(freqData.length / BAR_COUNT)
+      const hasFreq = freqData && analyser
 
-      // No shadowBlur — just alpha for glow feel
+      if (hasFreq) {
+        analyser.getByteFrequencyData(freqData)
+      }
+
+      const step = hasFreq ? Math.floor(freqData.length / BAR_COUNT) : 1
+
       for (let i = 0; i < BAR_COUNT; i++) {
-        const value = freqData[i * step] / 255
-        const barHeight = value * cachedH * 0.4
+        const value = hasFreq ? freqData[i * step] / 255 : 0
 
-        gl.fillStyle = BAR_COLORS[i]
-        gl.globalAlpha = 0.3 + value * 0.4
-        gl.fillRect(
-          i * barWidth,
-          0,
-          barWidth - 1,
+        // Shimmer: per-bar wave at different speeds/phases
+        const shimmer1 = Math.sin(time * 0.001 + i * 0.4) * 0.5 + 0.5
+        const shimmer2 = Math.sin(time * 0.0017 + i * 0.25 + 2.0) * 0.5 + 0.5
+        const shimmer3 = Math.sin(time * 0.0007 + i * 0.6 + 4.5) * 0.5 + 0.5
+        const shimmerAlpha = (shimmer1 * 0.4 + shimmer2 * 0.35 + shimmer3 * 0.25)
+
+        // Idle: subtle shimmering outlines; active: shimmer + frequency response
+        const idleAlpha = 0.03 + shimmerAlpha * 0.08
+        const activeAlpha = 0.3 + value * 0.4 + shimmerAlpha * 0.15
+        const alpha = value > 0.01 ? activeAlpha : idleAlpha
+
+        const idleHeight = (10 + shimmerAlpha * 25)
+        const activeHeight = value * cachedH * 0.4
+        const barHeight = Math.max(idleHeight, activeHeight)
+
+        // Shimmer the hue slightly for extra sparkle
+        const hueShift = Math.sin(time * 0.002 + i * 0.3) * 8
+        const hue = (i / BAR_COUNT) * 360 + hueShift
+        const idleLightness = 40 + shimmerAlpha * 10
+        const activeLightness = 60 + shimmerAlpha * 15
+        const lightness = value > 0.01 ? activeLightness : idleLightness
+
+        gl.strokeStyle = `hsl(${hue}, 100%, ${lightness}%)`
+        gl.lineWidth = 1 + shimmerAlpha * 0.8
+        gl.globalAlpha = alpha
+        gl.strokeRect(
+          i * barWidth + 0.5,
+          0.5,
+          barWidth - 2,
           barHeight
         )
       }
@@ -514,12 +538,12 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
           fireworkTimer = 0
         }
 
-        drawFrequencyBars()
         drawWaveform()
       }
 
       wasActive = isActive
 
+      drawFrequencyBars(time)
       drawIdleAmbient(time)
       updateParticles()
       drawParticles()

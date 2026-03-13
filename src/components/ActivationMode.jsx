@@ -18,7 +18,7 @@ const VISUAL_MODES = [
 
 export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode, arpBpm, setArpBpm, hold, setHold }) {
   const handleStop = () => {
-    getEngine().noteOff()
+    getEngine().allNotesOff()
   }
 
   return (

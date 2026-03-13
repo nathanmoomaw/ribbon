@@ -12,7 +12,6 @@
 - [ ] Staging deploy pipeline (merge to staging, CI/CD)
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (generative pleasant sound when not manually playing)
-- [ ] Polyphonic support
 - [ ] Production domain setup
 
 ## Completed
@@ -40,3 +39,4 @@
 - [x] Filter controls (cutoff + resonance)
 - [x] Glide/portamento speed control
 - [x] Hold mode (independent toggle, global pitch control, composes with all play modes)
+- [x] Polyphonic support (voice pool, multi-touch, multi-key)

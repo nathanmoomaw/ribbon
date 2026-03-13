@@ -1,7 +1,4 @@
 let ctx = null
-let oscillators = []
-let noteGain = null
-let filterNode = null
 let masterGain = null
 let analyser = null
 let delayNode = null
@@ -10,10 +7,21 @@ let delaySend = null
 let reverbNode = null
 let reverbSend = null
 let dryGain = null
-let isPlaying = false
 let glideTime = 0.005
 
 const NUM_OSCILLATORS = 2
+const MAX_VOICES = 8
+const CLEANUP_DELAY = 300 // ms before destroying inactive voice
+
+// Voice map: id -> { oscs, noteGain, filter, active, cleanupTimer }
+const voiceMap = new Map()
+
+// Global settings applied to all voices (and new voices on creation)
+const globalWaveforms = ['sawtooth', 'sawtooth']
+const globalDetunes = [0, 0]
+const globalMixes = [1.0, 0.0]
+let globalFilterCutoff = 20000
+let globalFilterResonance = 0
 
 function generateImpulseResponse(context, duration = 2, decay = 2) {
   const rate = context.sampleRate
@@ -28,19 +36,49 @@ function generateImpulseResponse(context, duration = 2, decay = 2) {
   return impulse
 }
 
-function createOscillator(index) {
-  const osc = ctx.createOscillator()
-  osc.type = 'sawtooth'
-  osc.frequency.setValueAtTime(220, ctx.currentTime)
+function createVoice(hz) {
+  const noteGain = ctx.createGain()
+  noteGain.gain.setValueAtTime(0, ctx.currentTime)
 
-  const gain = ctx.createGain()
-  gain.gain.setValueAtTime(index === 0 ? 1.0 : 0.0, ctx.currentTime)
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'lowpass'
+  filter.frequency.setValueAtTime(globalFilterCutoff, ctx.currentTime)
+  filter.Q.setValueAtTime(globalFilterResonance, ctx.currentTime)
 
-  osc.connect(gain)
-  gain.connect(noteGain)
-  osc.start()
+  const oscs = []
+  for (let i = 0; i < NUM_OSCILLATORS; i++) {
+    const osc = ctx.createOscillator()
+    osc.type = globalWaveforms[i]
+    osc.frequency.setValueAtTime(Math.max(hz, 20), ctx.currentTime)
+    osc.detune.setValueAtTime(globalDetunes[i], ctx.currentTime)
 
-  return { osc, gain }
+    const gain = ctx.createGain()
+    gain.gain.setValueAtTime(globalMixes[i], ctx.currentTime)
+
+    osc.connect(gain)
+    gain.connect(noteGain)
+    osc.start()
+    oscs.push({ osc, gain })
+  }
+
+  noteGain.connect(filter)
+  filter.connect(masterGain)
+
+  return { oscs, noteGain, filter, active: false, cleanupTimer: null }
+}
+
+function destroyVoice(id) {
+  const voice = voiceMap.get(id)
+  if (!voice) return
+  clearTimeout(voice.cleanupTimer)
+  voice.oscs.forEach(({ osc, gain }) => {
+    osc.stop()
+    osc.disconnect()
+    gain.disconnect()
+  })
+  voice.noteGain.disconnect()
+  voice.filter.disconnect()
+  voiceMap.delete(id)
 }
 
 export function init() {
@@ -48,24 +86,8 @@ export function init() {
 
   ctx = new (window.AudioContext || window.webkitAudioContext)()
 
-  noteGain = ctx.createGain()
-  noteGain.gain.setValueAtTime(0, ctx.currentTime)
-
-  filterNode = ctx.createBiquadFilter()
-  filterNode.type = 'lowpass'
-  filterNode.frequency.setValueAtTime(20000, ctx.currentTime)
-  filterNode.Q.setValueAtTime(0, ctx.currentTime)
-
   masterGain = ctx.createGain()
   masterGain.gain.setValueAtTime(0.5, ctx.currentTime)
-
-  noteGain.connect(filterNode)
-  filterNode.connect(masterGain)
-
-  // Create oscillators
-  for (let i = 0; i < NUM_OSCILLATORS; i++) {
-    oscillators.push(createOscillator(i))
-  }
 
   // Analyser (passive tap for visuals)
   analyser = ctx.createAnalyser()
@@ -105,14 +127,39 @@ export function init() {
   return getEngine()
 }
 
-export function noteOn(velocity = 1) {
-  if (!ctx || isPlaying) return
-  isPlaying = true
+// --- Voice-based API ---
+
+export function voiceOn(id, hz, velocity = 1) {
+  if (!ctx) return
   if (ctx.state === 'suspended') ctx.resume()
+
+  let voice = voiceMap.get(id)
+  if (voice) {
+    // Reuse existing voice — cancel pending cleanup
+    clearTimeout(voice.cleanupTimer)
+    voice.cleanupTimer = null
+  } else {
+    // Steal oldest voice if at capacity
+    if (voiceMap.size >= MAX_VOICES) {
+      const oldestId = voiceMap.keys().next().value
+      destroyVoice(oldestId)
+    }
+    voice = createVoice(hz)
+    voiceMap.set(id, voice)
+  }
+
+  // Set frequency
+  for (const { osc } of voice.oscs) {
+    osc.frequency.cancelScheduledValues(ctx.currentTime)
+    osc.frequency.setTargetAtTime(Math.max(hz, 20), ctx.currentTime, glideTime)
+  }
+
+  // Ramp up gain
   const v = Math.max(0, Math.min(1, velocity))
-  noteGain.gain.cancelScheduledValues(ctx.currentTime)
-  noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
-  noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
+  voice.noteGain.gain.cancelScheduledValues(ctx.currentTime)
+  voice.noteGain.gain.setValueAtTime(voice.noteGain.gain.value, ctx.currentTime)
+  voice.noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
+  voice.active = true
 
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
@@ -123,46 +170,102 @@ export function noteOn(velocity = 1) {
   }
 }
 
-export function noteOff() {
-  if (!ctx || !isPlaying) return
-  isPlaying = false
-  noteGain.gain.cancelScheduledValues(ctx.currentTime)
-  noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
-  noteGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.01)
+export function voiceOff(id) {
+  const voice = voiceMap.get(id)
+  if (!voice) return
 
-  if ('mediaSession' in navigator) {
+  voice.noteGain.gain.cancelScheduledValues(ctx.currentTime)
+  voice.noteGain.gain.setValueAtTime(voice.noteGain.gain.value, ctx.currentTime)
+  voice.noteGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.01)
+  voice.active = false
+
+  // Schedule cleanup after fade out
+  clearTimeout(voice.cleanupTimer)
+  voice.cleanupTimer = setTimeout(() => destroyVoice(id), CLEANUP_DELAY)
+
+  if (!getIsPlaying() && 'mediaSession' in navigator) {
     navigator.mediaSession.playbackState = 'paused'
   }
 }
 
-export function setVelocity(value) {
-  if (!noteGain || !isPlaying) return
-  const v = Math.max(0, Math.min(1, value))
-  noteGain.gain.cancelScheduledValues(ctx.currentTime)
-  noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
-  noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
-}
-
-export function setFrequency(hz) {
-  if (!oscillators.length) return
+export function voiceSetFrequency(id, hz) {
+  const voice = voiceMap.get(id)
+  if (!voice) return
   const safeHz = Math.max(hz, 20)
-  for (const { osc } of oscillators) {
+  for (const { osc } of voice.oscs) {
     osc.frequency.cancelScheduledValues(ctx.currentTime)
     osc.frequency.setTargetAtTime(safeHz, ctx.currentTime, glideTime)
   }
 }
 
-export function setFilter({ cutoff, resonance }) {
-  if (!filterNode) return
-  if (cutoff !== undefined) {
-    filterNode.frequency.cancelScheduledValues(ctx.currentTime)
-    filterNode.frequency.setValueAtTime(filterNode.frequency.value, ctx.currentTime)
-    filterNode.frequency.linearRampToValueAtTime(cutoff, ctx.currentTime + 0.01)
+export function voiceSetVelocity(id, value) {
+  const voice = voiceMap.get(id)
+  if (!voice || !voice.active) return
+  const v = Math.max(0, Math.min(1, value))
+  voice.noteGain.gain.cancelScheduledValues(ctx.currentTime)
+  voice.noteGain.gain.setValueAtTime(voice.noteGain.gain.value, ctx.currentTime)
+  voice.noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
+}
+
+export function voiceIsPlaying(id) {
+  const voice = voiceMap.get(id)
+  return voice ? voice.active : false
+}
+
+// --- Mono convenience API (for arp and simple use) ---
+
+const MONO_ID = '_mono'
+
+export function noteOn(velocity = 1) {
+  voiceOn(MONO_ID, 220, velocity)
+}
+
+export function noteOff() {
+  voiceOff(MONO_ID)
+}
+
+export function setFrequency(hz) {
+  // If mono voice exists, update it. Otherwise just store for next noteOn.
+  const voice = voiceMap.get(MONO_ID)
+  if (voice) {
+    voiceSetFrequency(MONO_ID, hz)
   }
-  if (resonance !== undefined) {
-    filterNode.Q.cancelScheduledValues(ctx.currentTime)
-    filterNode.Q.setValueAtTime(filterNode.Q.value, ctx.currentTime)
-    filterNode.Q.linearRampToValueAtTime(resonance, ctx.currentTime + 0.01)
+}
+
+export function setVelocity(value) {
+  voiceSetVelocity(MONO_ID, value)
+}
+
+export function setAllActiveFrequencies(hz) {
+  for (const [id, voice] of voiceMap) {
+    if (voice.active) voiceSetFrequency(id, hz)
+  }
+}
+
+// --- All notes off ---
+
+export function allNotesOff() {
+  for (const id of [...voiceMap.keys()]) {
+    voiceOff(id)
+  }
+}
+
+// --- Global settings (apply to all existing + future voices) ---
+
+export function setFilter({ cutoff, resonance }) {
+  if (cutoff !== undefined) globalFilterCutoff = cutoff
+  if (resonance !== undefined) globalFilterResonance = resonance
+  for (const voice of voiceMap.values()) {
+    if (cutoff !== undefined) {
+      voice.filter.frequency.cancelScheduledValues(ctx.currentTime)
+      voice.filter.frequency.setValueAtTime(voice.filter.frequency.value, ctx.currentTime)
+      voice.filter.frequency.linearRampToValueAtTime(cutoff, ctx.currentTime + 0.01)
+    }
+    if (resonance !== undefined) {
+      voice.filter.Q.cancelScheduledValues(ctx.currentTime)
+      voice.filter.Q.setValueAtTime(voice.filter.Q.value, ctx.currentTime)
+      voice.filter.Q.linearRampToValueAtTime(resonance, ctx.currentTime + 0.01)
+    }
   }
 }
 
@@ -172,26 +275,38 @@ export function setGlideSpeed(value) {
 
 export function setWaveform(type, oscIndex) {
   if (oscIndex !== undefined) {
-    if (oscillators[oscIndex]) oscillators[oscIndex].osc.type = type
+    globalWaveforms[oscIndex] = type
+    for (const voice of voiceMap.values()) {
+      if (voice.oscs[oscIndex]) voice.oscs[oscIndex].osc.type = type
+    }
   } else {
-    for (const { osc } of oscillators) osc.type = type
+    for (let i = 0; i < NUM_OSCILLATORS; i++) globalWaveforms[i] = type
+    for (const voice of voiceMap.values()) {
+      for (const { osc } of voice.oscs) osc.type = type
+    }
   }
 }
 
 export function setOscDetune(oscIndex, cents) {
-  if (!oscillators[oscIndex]) return
-  const { osc } = oscillators[oscIndex]
-  osc.detune.cancelScheduledValues(ctx.currentTime)
-  osc.detune.setValueAtTime(osc.detune.value, ctx.currentTime)
-  osc.detune.linearRampToValueAtTime(cents, ctx.currentTime + 0.01)
+  globalDetunes[oscIndex] = cents
+  for (const voice of voiceMap.values()) {
+    if (!voice.oscs[oscIndex]) continue
+    const { osc } = voice.oscs[oscIndex]
+    osc.detune.cancelScheduledValues(ctx.currentTime)
+    osc.detune.setValueAtTime(osc.detune.value, ctx.currentTime)
+    osc.detune.linearRampToValueAtTime(cents, ctx.currentTime + 0.01)
+  }
 }
 
 export function setOscMix(oscIndex, value) {
-  if (!oscillators[oscIndex]) return
-  const { gain } = oscillators[oscIndex]
-  gain.gain.cancelScheduledValues(ctx.currentTime)
-  gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime)
-  gain.gain.linearRampToValueAtTime(value, ctx.currentTime + 0.01)
+  globalMixes[oscIndex] = value
+  for (const voice of voiceMap.values()) {
+    if (!voice.oscs[oscIndex]) continue
+    const { gain } = voice.oscs[oscIndex]
+    gain.gain.cancelScheduledValues(ctx.currentTime)
+    gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime)
+    gain.gain.linearRampToValueAtTime(value, ctx.currentTime + 0.01)
+  }
 }
 
 export function setVolume(value) {
@@ -229,8 +344,23 @@ export function getAnalyser() {
   return analyser
 }
 
-export function getIsPlaying() {
-  return isPlaying
+export function getIsPlaying(id) {
+  if (id !== undefined) {
+    const voice = voiceMap.get(id)
+    return voice ? voice.active : false
+  }
+  for (const voice of voiceMap.values()) {
+    if (voice.active) return true
+  }
+  return false
+}
+
+export function getActiveVoiceCount() {
+  let count = 0
+  for (const voice of voiceMap.values()) {
+    if (voice.active) count++
+  }
+  return count
 }
 
 function getEngine() {
@@ -240,6 +370,14 @@ function getEngine() {
     noteOff,
     setFrequency,
     setVelocity,
+    voiceOn,
+    voiceOff,
+    voiceSetFrequency,
+    voiceSetVelocity,
+    voiceIsPlaying,
+    allNotesOff,
+    setAllActiveFrequencies,
+    getActiveVoiceCount,
     setFilter,
     setGlideSpeed,
     setWaveform,

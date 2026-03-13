@@ -1,5 +1,21 @@
 # Devlog
 
+## 2026-03-12 — Polyphonic support
+
+- Refactored AudioEngine from monophonic to voice pool system (max 8 voices)
+- Voices created on demand with per-voice oscillator pair, gain, and filter nodes
+- All voices feed into shared masterGain → effects chain (delay, reverb, analyser)
+- Voice lifecycle: create on voiceOn, fade + cleanup on voiceOff, with 300ms reuse window for arp
+- Voice stealing: oldest voice replaced when at capacity
+- Multi-touch ribbon: each pointer gets its own voice via pointerId tracking
+- Multi-key keyboard: each held key (A-L) plays its own voice simultaneously
+- Multiple cursors rendered on ribbon for all active voices
+- Global settings (waveform, detune, mix, filter, volume) propagated to all active voices
+- Latch mode: individual note toggling (press key to start, press again to stop)
+- Hold mode: works with poly — voices sustain after release, global mouse pitch control only when single voice active
+- Space / Stop button uses allNotesOff to clear all voices
+- Arp mode stays monophonic (uses mono convenience API)
+
 ## 2026-03-12 — Hold mode, velocity, filter, glide, and visualizer enhancements
 
 - Added touch velocity via ribbon Y-axis (bottom=quiet, top=full volume)

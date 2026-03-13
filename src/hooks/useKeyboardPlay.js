@@ -3,8 +3,8 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop, hold) {
-  const activeKeyRef = useRef(null)
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold) {
+  const activeKeysRef = useRef(new Set())
 
   useEffect(() => {
     function onKeyDown(e) {
@@ -18,44 +18,64 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       const position = index / (KEYS.length - 1)
       const hz = positionToFrequency(position, { octaves, stepped, scale })
       const engine = getEngine()
+      const voiceId = `key_${e.code}`
 
-      engine.setFrequency(hz)
-      onPositionChange?.(position)
-
-      // In hold mode, ensure note is playing but don't restart it
+      // In hold mode, start voice if needed but don't restart
       if (hold) {
-        if (!engine.getIsPlaying()) engine.noteOn()
-        activeKeyRef.current = e.code
+        engine.voiceOn(voiceId, hz, 1)
+        activeKeysRef.current.add(e.code)
+        updatePositions()
         return
       }
 
       if (mode === 'play') {
-        engine.noteOn()
-        activeKeyRef.current = e.code
+        engine.voiceOn(voiceId, hz, 1)
+        activeKeysRef.current.add(e.code)
       } else if (mode === 'latch') {
-        if (!engine.getIsPlaying()) {
-          engine.noteOn()
+        if (engine.voiceIsPlaying(voiceId)) {
+          engine.voiceOff(voiceId)
+          activeKeysRef.current.delete(e.code)
+        } else {
+          engine.voiceOn(voiceId, hz, 1)
+          activeKeysRef.current.add(e.code)
         }
       } else if (mode === 'arp') {
+        // Arp stays mono
+        engine.setFrequency(hz)
         arpStart()
-        activeKeyRef.current = e.code
+        activeKeysRef.current.add(e.code)
       }
+
+      updatePositions()
     }
 
     function onKeyUp(e) {
       const index = KEYS.indexOf(e.code)
       if (index === -1) return
 
-      if (activeKeyRef.current === e.code) {
+      if (activeKeysRef.current.has(e.code)) {
         if (!hold) {
+          const voiceId = `key_${e.code}`
           if (mode === 'play') {
-            getEngine().noteOff()
+            getEngine().voiceOff(voiceId)
           } else if (mode === 'arp') {
             arpStop()
           }
         }
-        activeKeyRef.current = null
+        activeKeysRef.current.delete(e.code)
+        updatePositions()
       }
+    }
+
+    function updatePositions() {
+      const posMap = new Map()
+      for (const code of activeKeysRef.current) {
+        const index = KEYS.indexOf(code)
+        if (index !== -1) {
+          posMap.set(`key_${code}`, index / (KEYS.length - 1))
+        }
+      }
+      onPositionsChange?.(posMap)
     }
 
     window.addEventListener('keydown', onKeyDown)
@@ -64,7 +84,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionChange, arpStart, arpStop, hold])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold])
 }
 
 export { KEYS }

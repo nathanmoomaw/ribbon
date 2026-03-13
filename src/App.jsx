@@ -27,7 +27,7 @@ function App() {
   const [glideSpeed, setGlideSpeed] = useState(0.005)
   const [stepped, setStepped] = useState(false)
   const [scale, setScale] = useState('chromatic')
-  const [ribbonPosition, setRibbonPosition] = useState(null)
+  const [keyboardPositions, setKeyboardPositions] = useState(new Map())
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
   const [hold, setHold] = useState(false)
@@ -36,8 +36,9 @@ function App() {
   const keyHandlers = useMemo(() => ({
     Space: () => {
       if (mode === 'latch' || hold) {
-        getEngine().noteOff()
+        getEngine().allNotesOff()
         setHold(false)
+        setKeyboardPositions(new Map())
       }
     },
     Digit1: () => setMode('play'),
@@ -49,32 +50,32 @@ function App() {
 
   useKeyboard(keyHandlers)
 
-  const handleKeyboardPosition = useCallback((pos) => {
-    setRibbonPosition(pos)
+  const handleKeyboardPositions = useCallback((posMap) => {
+    setKeyboardPositions(posMap)
   }, [])
 
   const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm)
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPosition, arpStart, arpStop, hold)
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold)
 
-  // When hold is active and a note is playing, global mouse movement controls pitch
+  // When hold is active and only one voice is playing, global mouse movement controls pitch
   useEffect(() => {
     if (!hold) return
     const handleGlobalMove = (e) => {
       const engine = getEngine()
       if (!engine.getIsPlaying()) return
-      // Map screen X to ribbon position (0-1)
+      // Only do global pitch control when a single voice is active
+      if (engine.getActiveVoiceCount() !== 1) return
       const pos = Math.max(0, Math.min(1, e.clientX / window.innerWidth))
       const hz = positionToFrequency(pos, { octaves, stepped, scale })
-      engine.setFrequency(hz)
-      setRibbonPosition(pos)
+      engine.setAllActiveFrequencies(hz)
       if (ribbonInteraction.current) ribbonInteraction.current.position = pos
     }
     window.addEventListener('pointermove', handleGlobalMove)
     return () => window.removeEventListener('pointermove', handleGlobalMove)
   }, [hold, getEngine, octaves, stepped, scale, ribbonInteraction])
 
-  // When hold is toggled off, stop the note if in play mode
+  // When hold is toggled off, stop all notes if in play mode
   const holdRef = useRef(hold)
   useEffect(() => {
     const wasHold = holdRef.current
@@ -82,7 +83,7 @@ function App() {
     if (wasHold && !hold) {
       const engine = getEngine()
       if (engine.getIsPlaying() && mode === 'play') {
-        engine.noteOff()
+        engine.allNotesOff()
       }
     }
   }, [hold, getEngine, mode])
@@ -139,7 +140,7 @@ function App() {
         octaves={octaves}
         stepped={stepped}
         scale={scale}
-        externalPosition={ribbonPosition}
+        externalPositions={keyboardPositions}
         ribbonInteraction={ribbonInteraction}
         arpStart={arpStart}
         arpStop={arpStop}

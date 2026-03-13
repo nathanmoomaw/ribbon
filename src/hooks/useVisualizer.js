@@ -111,13 +111,13 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
           vx: Math.cos(angle) * speed + (Math.random() - 0.5) * 2,
           vy: Math.sin(angle) * speed,
           life: 1,
-          decay: 0.004 + Math.random() * 0.008,
+          decay: 0.001 + Math.random() * 0.003,
           color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
           size: 2 + Math.random() * 5,
           shape: Math.floor(Math.random() * 4),
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.2,
-          gravity: 0.03 + Math.random() * 0.04,
+          gravity: 0.008 + Math.random() * 0.012,
           shimmer: Math.random(),
         })
       }
@@ -137,13 +137,13 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 1,
-          decay: 0.008 + Math.random() * 0.012,
+          decay: 0.002 + Math.random() * 0.004,
           color,
           size: 1.5 + Math.random() * 2.5,
           shape: SHAPE_CIRCLE,
           rotation: 0,
           rotationSpeed: 0,
-          gravity: 0.02,
+          gravity: 0.005,
           shimmer: 0,
           trail: true,
         })
@@ -164,13 +164,13 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed,
           life: 1,
-          decay: 0.006 + Math.random() * 0.012,
+          decay: 0.0015 + Math.random() * 0.004,
           color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
           size: 1.5 + Math.random() * 4,
           shape: Math.floor(Math.random() * 4),
           rotation: Math.random() * Math.PI * 2,
           rotationSpeed: (Math.random() - 0.5) * 0.15,
-          gravity: 0.02 + Math.random() * 0.03,
+          gravity: 0.006 + Math.random() * 0.01,
           shimmer: Math.random(),
         })
       }
@@ -301,7 +301,7 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         gl.globalAlpha = 0.3 + value * 0.4
         gl.fillRect(
           i * barWidth,
-          cachedH - barHeight,
+          0,
           barWidth - 1,
           barHeight
         )
@@ -310,21 +310,33 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.globalAlpha = 1
     }
 
-    function drawPerspectiveGrid(time) {
+    let gridPhase = 0
+    let vanishXSmoothed = 0.5
+
+    function drawPerspectiveGrid(time, dt) {
       const horizonY = cachedH * 0.45
-      const gridSpeed = time * 0.0003
+      const isActive = ribbonInteraction?.current?.active
+      const velocity = ribbonInteraction?.current?.velocity ?? 0
+      const position = ribbonInteraction?.current?.position ?? 0.5
+
+      // Forward speed: only moves when actively touching, scaled by velocity
+      if (isActive) {
+        gridPhase += velocity * 0.000015 * (dt || 16)
+      }
+
+      // Lateral drift: lower notes push vanishing point right, higher push left
+      const targetVanishNorm = isActive ? 0.5 - (position - 0.5) * 0.8 : 0.5
+      vanishXSmoothed += (targetVanishNorm - vanishXSmoothed) * 0.05
+      const vanishX = vanishXSmoothed * cachedW
 
       // Draw horizontal lines with perspective
-      gl.strokeStyle = 'rgba(0, 240, 255, 0.08)'
       gl.lineWidth = 1
 
       const lineCount = 20
       for (let i = 0; i < lineCount; i++) {
-        // Exponential spacing for perspective effect
         const t = i / lineCount
-        const y = horizonY + Math.pow(t, 1.8) * (cachedH - horizonY)
-        // Scroll lines toward viewer
-        const scrollOffset = (gridSpeed % (1 / lineCount)) * lineCount
+        // Scroll lines toward viewer using accumulated phase
+        const scrollOffset = (gridPhase % (1 / lineCount)) * lineCount
         const adjustedT = (t + scrollOffset) % 1
         const adjustedY = horizonY + Math.pow(adjustedT, 1.8) * (cachedH - horizonY)
 
@@ -336,8 +348,7 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         gl.stroke()
       }
 
-      // Draw vertical lines converging to horizon vanishing point
-      const vanishX = cachedW / 2
+      // Draw vertical lines converging to vanishing point
       const verticalLines = 16
       gl.lineWidth = 1
 
@@ -402,6 +413,7 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
 
     let fireworkTimer = 0
     let lastMode = visualModeRef.current
+    let lastTime = 0
 
     function drawLoWaveform() {
       if (!timeDomain) return
@@ -462,7 +474,9 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.fillRect(0, 0, cachedW, cachedH)
 
       // Perspective grid behind everything
-      drawPerspectiveGrid(time)
+      const dt = lastTime ? time - lastTime : 16
+      lastTime = time
+      drawPerspectiveGrid(time, dt)
 
       gl.globalCompositeOperation = 'lighter'
 

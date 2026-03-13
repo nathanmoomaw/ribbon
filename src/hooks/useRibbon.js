@@ -7,22 +7,23 @@ export function useRibbon(onPositionChange, onDown, onUp) {
   const getPosition = useCallback((e) => {
     const rect = ribbonRef.current.getBoundingClientRect()
     const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-    return x
+    const y = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
+    return { x, y }
   }, [])
 
   const handlePointerDown = useCallback((e) => {
     if (!ribbonRef.current) return
     ribbonRef.current.setPointerCapture(e.pointerId)
     activeRef.current = true
-    const pos = getPosition(e)
-    onDown?.(pos)
-    onPositionChange?.(pos)
+    const { x, y } = getPosition(e)
+    onDown?.(x, y)
+    onPositionChange?.(x, y)
   }, [getPosition, onDown, onPositionChange])
 
   const handlePointerMove = useCallback((e) => {
     if (!activeRef.current) return
-    const pos = getPosition(e)
-    onPositionChange?.(pos)
+    const { x, y } = getPosition(e)
+    onPositionChange?.(x, y)
   }, [getPosition, onPositionChange])
 
   const handlePointerUp = useCallback((e) => {

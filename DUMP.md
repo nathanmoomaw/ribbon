@@ -29,3 +29,4 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] spread out the b's more (wider)
 [x] space should also cut the sound.  sometimes it stays on
 [x] sphere grids should be a bit dimmer
+[x] add visual buttons for zooming in the upper right corner, but make them fairly subtle

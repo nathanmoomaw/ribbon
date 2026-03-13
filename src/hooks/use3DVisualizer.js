@@ -38,9 +38,9 @@ const SPHERE_IDLE_OFFSETS = [
 
 const SPHERE_RADIUS = 3.5
 const DEFAULT_ZOOM = 1.8   // inside the spheres by default
-const MIN_ZOOM = 0.5
-const MAX_ZOOM = 25
-const ZOOM_STEP = 0.8
+export const MIN_ZOOM = 0.5
+export const MAX_ZOOM = 25
+export const ZOOM_STEP = 0.8
 
 export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}) {
   const stateRef = useRef(null)

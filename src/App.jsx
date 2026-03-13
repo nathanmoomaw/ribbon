@@ -91,7 +91,7 @@ function App() {
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
-      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} />
+      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} reverbMix={reverbMix} />
 
       <header className="app-header">
         <RibbonLogo />

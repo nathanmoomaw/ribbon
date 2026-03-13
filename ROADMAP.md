@@ -41,3 +41,4 @@
 - [x] Glide/portamento speed control
 - [x] Hold mode (independent toggle, global pitch control, composes with all play modes)
 - [x] Polyphonic support (voice pool, multi-touch, multi-key)
+- [x] 3D grid sphere visualizer (Three.js, 3 spheres, audio-reactive, zoom controls)

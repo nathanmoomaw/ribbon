@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-03-13 — 3D grid sphere visualizer
+
+- Added Three.js for 3D rendering layer behind existing 2D canvas
+- 3 wireframe grid spheres, each mapped to a frequency band (low/mid/high)
+- Spheres rotate around unique axes, speed driven by audio energy + ribbon velocity
+- Scale pulses with audio energy per band
+- Opacity responds to energy (brighter when louder, dim at idle)
+- +/- keyboard controls zoom camera in/out with smooth interpolation
+- Zooming out causes spheres to drift apart in 3 different directions
+- Inner glow mesh per sphere for depth effect
+- Layered behind existing 2D visualizer (particles, waveform, bars still visible on top)
+- Works in both party and lo visual modes (lo = very dim)
+
 ## 2026-03-12 — Polyphonic support
 
 - Refactored AudioEngine from monophonic to voice pool system (max 8 voices)

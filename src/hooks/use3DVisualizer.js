@@ -18,10 +18,18 @@ const SPHERE_ROTATION_AXES = [
 // Colors for each sphere: cyan, magenta, purple
 const SPHERE_COLORS = [0x00f0ff, 0xff00aa, 0x8b5cf6]
 
-const DEFAULT_ZOOM = 4.5
-const MIN_ZOOM = 2.5
-const MAX_ZOOM = 20
-const ZOOM_STEP = 0.5
+// Idle drift offsets so spheres aren't perfectly centered on each other
+const SPHERE_IDLE_OFFSETS = [
+  new THREE.Vector3(0, 0, 0),
+  new THREE.Vector3(0.4, -0.3, 0.2),
+  new THREE.Vector3(-0.3, 0.5, -0.4),
+]
+
+const SPHERE_RADIUS = 3.5
+const DEFAULT_ZOOM = 1.8   // inside the spheres by default
+const MIN_ZOOM = 0.5
+const MAX_ZOOM = 25
+const ZOOM_STEP = 0.8
 
 export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode) {
   const stateRef = useRef(null)
@@ -53,7 +61,7 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       const group = new THREE.Group()
 
       // Main wireframe sphere
-      const geo = new THREE.SphereGeometry(1.2, 24, 24)
+      const geo = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32)
       const wireGeo = new THREE.WireframeGeometry(geo)
       const mat = new THREE.LineBasicMaterial({
         color: SPHERE_COLORS[i],
@@ -65,7 +73,7 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       group.add(wireframe)
 
       // Inner glow sphere (slightly smaller, very faint)
-      const innerGeo = new THREE.SphereGeometry(1.15, 16, 16)
+      const innerGeo = new THREE.SphereGeometry(SPHERE_RADIUS * 0.96, 20, 20)
       const innerMat = new THREE.MeshBasicMaterial({
         color: SPHERE_COLORS[i],
         transparent: true,
@@ -136,11 +144,11 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
 
     // --- Keyboard handler for +/- zoom ---
     function onKeyDown(e) {
-      if (e.key === '=' || e.key === '+') {
-        // Zoom out (increase distance)
+      if (e.key === '-' || e.key === '_') {
+        // Zoom out (pull camera back, see more)
         targetZoomRef.current = Math.min(MAX_ZOOM, targetZoomRef.current + ZOOM_STEP)
-      } else if (e.key === '-' || e.key === '_') {
-        // Zoom in (decrease distance)
+      } else if (e.key === '=' || e.key === '+') {
+        // Zoom in (push camera forward, deeper inside)
         targetZoomRef.current = Math.max(MIN_ZOOM, targetZoomRef.current - ZOOM_STEP)
       }
     }
@@ -197,9 +205,9 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const scalePulse = 1 + energy * 0.3
         sphere.group.scale.setScalar(scalePulse)
 
-        // Position: drift apart as zoom increases
+        // Position: idle offset + drift apart as zoom increases
         const drift = SPHERE_DRIFT_DIRS[i].clone().multiplyScalar(driftAmount)
-        sphere.group.position.copy(drift)
+        sphere.group.position.copy(SPHERE_IDLE_OFFSETS[i]).add(drift)
 
         // Opacity: brighter when there's energy
         if (isParty) {

@@ -1,18 +1,18 @@
 import './RibbonLogo.css'
 
 export function RibbonLogo() {
-  // Full continuous figure-8 — slightly tighter loops (22px each)
+  // Full continuous figure-8 — wider loops to match spread b stems
   const infinityPath = [
-    "M 48,44",
-    "C 48,24 59,22 70,44",
-    "C 81,66 92,64 92,44",
-    "C 92,24 81,22 70,44",
-    "C 59,66 48,64 48,44",
+    "M 44,44",
+    "C 44,24 60,22 76,44",
+    "C 87,66 98,64 98,44",
+    "C 98,24 87,22 76,44",
+    "C 60,66 44,64 44,44",
     "Z"
   ].join(" ")
 
-  const strandOver = "M 48,44 C 48,24 59,22 70,44 C 81,66 92,64 92,44"
-  const strandUnder = "M 92,44 C 92,24 81,22 70,44 C 59,66 48,64 48,44"
+  const strandOver = "M 44,44 C 44,24 60,22 76,44 C 87,66 98,64 98,44"
+  const strandUnder = "M 98,44 C 98,24 87,22 76,44 C 60,66 44,64 44,44"
 
   return (
     <svg
@@ -98,10 +98,10 @@ export function RibbonLogo() {
         <path d="M 38,30 L 38,58" />
 
         {/* first b stem */}
-        <path d="M 48,10 L 48,46" />
+        <path d="M 44,10 L 44,46" />
 
         {/* second b stem */}
-        <path d="M 70,10 L 70,46" />
+        <path d="M 76,10 L 76,46" />
 
         {/* o */}
         <ellipse cx="112" cy="44" rx="12" ry="14" />
@@ -136,7 +136,7 @@ export function RibbonLogo() {
       />
 
       {/* Crossing bridge — covers the under strand at the fold point */}
-      <ellipse cx="70" cy="44" rx="5" ry="4" fill="var(--bg-deep)" />
+      <ellipse cx="76" cy="44" rx="5" ry="4" fill="var(--bg-deep)" />
 
       {/* OVER strand — the front side of the fold (bright, thicker) */}
       <path
@@ -170,12 +170,12 @@ export function RibbonLogo() {
 
       {/* Sparkle particles along the ribbon */}
       <g className="sparkles" filter="url(#sparkle-glow)">
-        <circle className="sparkle s1" cx="54" cy="34" r="1" fill="white" />
-        <circle className="sparkle s2" cx="82" cy="54" r="0.8" fill="var(--cyan)" />
-        <circle className="sparkle s3" cx="90" cy="38" r="1" fill="var(--magenta)" />
-        <circle className="sparkle s4" cx="62" cy="58" r="0.8" fill="var(--neon-green)" />
-        <circle className="sparkle s5" cx="70" cy="44" r="1.2" fill="white" />
-        <circle className="sparkle s6" cx="50" cy="50" r="0.7" fill="var(--neon-yellow)" />
+        <circle className="sparkle s1" cx="50" cy="34" r="1" fill="white" />
+        <circle className="sparkle s2" cx="88" cy="54" r="0.8" fill="var(--cyan)" />
+        <circle className="sparkle s3" cx="96" cy="38" r="1" fill="var(--magenta)" />
+        <circle className="sparkle s4" cx="64" cy="58" r="0.8" fill="var(--neon-green)" />
+        <circle className="sparkle s5" cx="76" cy="44" r="1.2" fill="white" />
+        <circle className="sparkle s6" cx="48" cy="50" r="0.7" fill="var(--neon-yellow)" />
       </g>
     </svg>
   )

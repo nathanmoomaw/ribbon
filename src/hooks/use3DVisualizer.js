@@ -80,7 +80,7 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       const mat = new THREE.MeshBasicMaterial({
         color: SPHERE_COLORS[i],
         transparent: true,
-        opacity: 0.35,
+        opacity: 0.2,
         depthWrite: false,
         wireframe: true,
       })
@@ -325,14 +325,14 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
 
         // Opacity: brighter when there's energy, modulated by delay shimmer
         if (isParty) {
-          const baseOpacity = 0.2
-          const activeOpacity = baseOpacity + energy * 0.5 + shimmer
-          sphere.mat.opacity = Math.max(0.05, Math.min(1, activeOpacity))
-          sphere.innerMat.opacity = Math.max(0, 0.02 + energy * 0.08 + shimmer * 0.3)
+          const baseOpacity = 0.12
+          const activeOpacity = baseOpacity + energy * 0.35 + shimmer * 0.6
+          sphere.mat.opacity = Math.max(0.04, Math.min(0.6, activeOpacity))
+          sphere.innerMat.opacity = Math.max(0, 0.01 + energy * 0.05 + shimmer * 0.2)
         } else {
           // Lo mode: very dim, subtle shimmer
-          sphere.mat.opacity = Math.max(0.03, 0.08 + energy * 0.12 + shimmer * 0.5)
-          sphere.innerMat.opacity = 0.01
+          sphere.mat.opacity = Math.max(0.02, 0.05 + energy * 0.08 + shimmer * 0.3)
+          sphere.innerMat.opacity = 0.005
         }
       }
 

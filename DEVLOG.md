@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-13 — Controls reorganization, 3rd oscillator, polish
+
+- Added 3rd oscillator (AudioEngine NUM_OSCILLATORS=3, App state, Controls UI)
+- Reorganized controls: 3 oscillators laid out horizontally across top, each with vertical wave/mix/detune stack
+- Speed control moved under Filter section
+- Widened logo b stems (44→76 spread, up from 48→70) with updated infinity ribbon paths
+- Space key now always cuts sound regardless of mode (was only working in latch/hold)
+- Dimmed sphere grid opacity (base 0.2→0.12, capped at 0.6)
+- CI/CD auto-deploy to S3/CloudFront on push to main
+
 ## 2026-03-13 — 3D grid sphere visualizer
 
 - Added Three.js for 3D rendering layer behind existing 2D canvas

@@ -18,13 +18,22 @@
   transform-style: preserve-3d;
 }
 
+.controls__oscillators {
+  display: flex;
+  gap: 0.75rem;
+}
+
 .controls__osc {
+  flex: 1;
   padding: 0.75rem;
   border-left: 3px solid var(--osc-color, var(--cyan));
   border-radius: 0 8px 8px 0;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), -3px 0 12px -4px var(--osc-color, var(--cyan));
   transition: box-shadow 0.3s, transform 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .controls__osc:hover {
@@ -40,14 +49,7 @@
   color: var(--osc-color, var(--cyan));
   text-shadow: 0 0 8px var(--osc-color, var(--cyan));
   display: block;
-  margin-bottom: 0.5rem;
-}
-
-.controls__osc-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  align-items: flex-start;
+  margin-bottom: 0.25rem;
 }
 
 .controls__shared {

@@ -5,7 +5,7 @@ import './Controls.css'
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const OCTAVE_OPTIONS = [1, 2, 3, 4]
 const SCALE_NAMES = Object.keys(SCALES)
-const OSC_COLORS = ['var(--cyan)', 'var(--magenta)']
+const OSC_COLORS = ['var(--cyan)', 'var(--magenta)', 'var(--purple)']
 
 function OscSection({ index, params, getEngine, onUpdate }) {
   const handleWaveform = useCallback((type) => {
@@ -28,43 +28,41 @@ function OscSection({ index, params, getEngine, onUpdate }) {
   return (
     <div className="controls__osc" style={{ '--osc-color': OSC_COLORS[index] }}>
       <label className="controls__osc-label">OSC {index + 1}</label>
-      <div className="controls__osc-row">
-        <div className="controls__section">
-          <label className="controls__label">Wave</label>
-          <div className="controls__waveforms">
-            {WAVEFORMS.map((w) => (
-              <button
-                key={w}
-                className={params.waveform === w ? 'active' : ''}
-                onClick={() => handleWaveform(w)}
-              >
-                {w.slice(0, 3).toUpperCase()}
-              </button>
-            ))}
-          </div>
+      <div className="controls__section">
+        <label className="controls__label">Wave</label>
+        <div className="controls__waveforms">
+          {WAVEFORMS.map((w) => (
+            <button
+              key={w}
+              className={params.waveform === w ? 'active' : ''}
+              onClick={() => handleWaveform(w)}
+            >
+              {w.slice(0, 3).toUpperCase()}
+            </button>
+          ))}
         </div>
-        <div className="controls__section">
-          <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
-          <input
-            type="range"
-            min="-1200"
-            max="1200"
-            step="1"
-            value={params.detune}
-            onChange={handleDetune}
-          />
-        </div>
-        <div className="controls__section">
-          <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={params.mix}
-            onChange={handleMix}
-          />
-        </div>
+      </div>
+      <div className="controls__section">
+        <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={params.mix}
+          onChange={handleMix}
+        />
+      </div>
+      <div className="controls__section">
+        <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
+        <input
+          type="range"
+          min="-1200"
+          max="1200"
+          step="1"
+          value={params.detune}
+          onChange={handleDetune}
+        />
       </div>
     </div>
   )
@@ -149,15 +147,17 @@ export function Controls({
 
   return (
     <div className="controls">
-      {oscParams.map((params, i) => (
-        <OscSection
-          key={i}
-          index={i}
-          params={params}
-          getEngine={getEngine}
-          onUpdate={handleOscUpdate}
-        />
-      ))}
+      <div className="controls__oscillators">
+        {oscParams.map((params, i) => (
+          <OscSection
+            key={i}
+            index={i}
+            params={params}
+            getEngine={getEngine}
+            onUpdate={handleOscUpdate}
+          />
+        ))}
+      </div>
 
       <div className="controls__shared">
         <div className="controls__section">

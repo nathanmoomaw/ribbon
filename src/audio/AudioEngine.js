@@ -1,6 +1,7 @@
 let ctx = null
 let oscillators = []
 let noteGain = null
+let filterNode = null
 let masterGain = null
 let analyser = null
 let delayNode = null
@@ -10,6 +11,7 @@ let reverbNode = null
 let reverbSend = null
 let dryGain = null
 let isPlaying = false
+let glideTime = 0.005
 
 const NUM_OSCILLATORS = 2
 
@@ -49,10 +51,16 @@ export function init() {
   noteGain = ctx.createGain()
   noteGain.gain.setValueAtTime(0, ctx.currentTime)
 
+  filterNode = ctx.createBiquadFilter()
+  filterNode.type = 'lowpass'
+  filterNode.frequency.setValueAtTime(20000, ctx.currentTime)
+  filterNode.Q.setValueAtTime(0, ctx.currentTime)
+
   masterGain = ctx.createGain()
   masterGain.gain.setValueAtTime(0.5, ctx.currentTime)
 
-  noteGain.connect(masterGain)
+  noteGain.connect(filterNode)
+  filterNode.connect(masterGain)
 
   // Create oscillators
   for (let i = 0; i < NUM_OSCILLATORS; i++) {
@@ -97,13 +105,14 @@ export function init() {
   return getEngine()
 }
 
-export function noteOn() {
+export function noteOn(velocity = 1) {
   if (!ctx || isPlaying) return
   isPlaying = true
   if (ctx.state === 'suspended') ctx.resume()
+  const v = Math.max(0, Math.min(1, velocity))
   noteGain.gain.cancelScheduledValues(ctx.currentTime)
   noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
-  noteGain.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01)
+  noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
 
   if ('mediaSession' in navigator) {
     navigator.mediaSession.metadata = new MediaMetadata({
@@ -126,13 +135,39 @@ export function noteOff() {
   }
 }
 
+export function setVelocity(value) {
+  if (!noteGain || !isPlaying) return
+  const v = Math.max(0, Math.min(1, value))
+  noteGain.gain.cancelScheduledValues(ctx.currentTime)
+  noteGain.gain.setValueAtTime(noteGain.gain.value, ctx.currentTime)
+  noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
+}
+
 export function setFrequency(hz) {
   if (!oscillators.length) return
   const safeHz = Math.max(hz, 20)
   for (const { osc } of oscillators) {
     osc.frequency.cancelScheduledValues(ctx.currentTime)
-    osc.frequency.setTargetAtTime(safeHz, ctx.currentTime, 0.005)
+    osc.frequency.setTargetAtTime(safeHz, ctx.currentTime, glideTime)
   }
+}
+
+export function setFilter({ cutoff, resonance }) {
+  if (!filterNode) return
+  if (cutoff !== undefined) {
+    filterNode.frequency.cancelScheduledValues(ctx.currentTime)
+    filterNode.frequency.setValueAtTime(filterNode.frequency.value, ctx.currentTime)
+    filterNode.frequency.linearRampToValueAtTime(cutoff, ctx.currentTime + 0.01)
+  }
+  if (resonance !== undefined) {
+    filterNode.Q.cancelScheduledValues(ctx.currentTime)
+    filterNode.Q.setValueAtTime(filterNode.Q.value, ctx.currentTime)
+    filterNode.Q.linearRampToValueAtTime(resonance, ctx.currentTime + 0.01)
+  }
+}
+
+export function setGlideSpeed(value) {
+  glideTime = value
 }
 
 export function setWaveform(type, oscIndex) {
@@ -204,6 +239,9 @@ function getEngine() {
     noteOn,
     noteOff,
     setFrequency,
+    setVelocity,
+    setFilter,
+    setGlideSpeed,
     setWaveform,
     setOscDetune,
     setOscMix,

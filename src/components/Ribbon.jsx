@@ -21,24 +21,28 @@ export function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, ex
     return stepped ? getStepPositions({ octaves, scale }) : []
   }, [stepped, octaves, scale])
 
-  const onPositionChange = useCallback((pos) => {
+  const onPositionChange = useCallback((pos, velocity) => {
     setPosition(pos)
-    if (ribbonInteraction) ribbonInteraction.current.position = pos
+    if (ribbonInteraction) {
+      ribbonInteraction.current.position = pos
+      if (velocity !== undefined) ribbonInteraction.current.velocity = velocity
+    }
     const engine = getEngine()
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
     engine.setFrequency(hz)
+    if (velocity !== undefined) engine.setVelocity(velocity)
   }, [getEngine, octaves, stepped, scale, ribbonInteraction])
 
-  const onDown = useCallback(() => {
+  const onDown = useCallback((pos, velocity) => {
     const engine = getEngine()
     setIsActive(true)
     if (ribbonInteraction) ribbonInteraction.current.active = true
 
     if (mode === 'play') {
-      engine.noteOn()
+      engine.noteOn(velocity)
     } else if (mode === 'latch') {
       if (!engine.getIsPlaying()) {
-        engine.noteOn()
+        engine.noteOn(velocity)
       }
     } else if (mode === 'arp') {
       arpStart()

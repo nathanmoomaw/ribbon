@@ -86,6 +86,10 @@ export function Controls({
   setDelayParams,
   reverbMix,
   setReverbMix,
+  filterParams,
+  setFilterParams,
+  glideSpeed,
+  setGlideSpeed,
 }) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -124,6 +128,24 @@ export function Controls({
     setReverbMix(mix)
     getEngine().setReverb({ mix })
   }, [getEngine, setReverbMix])
+
+  const handleCutoff = useCallback((e) => {
+    const cutoff = parseFloat(e.target.value)
+    setFilterParams((prev) => ({ ...prev, cutoff }))
+    getEngine().setFilter({ cutoff })
+  }, [getEngine, setFilterParams])
+
+  const handleResonance = useCallback((e) => {
+    const resonance = parseFloat(e.target.value)
+    setFilterParams((prev) => ({ ...prev, resonance }))
+    getEngine().setFilter({ resonance })
+  }, [getEngine, setFilterParams])
+
+  const handleGlideSpeed = useCallback((e) => {
+    const value = parseFloat(e.target.value)
+    setGlideSpeed(value)
+    getEngine().setGlideSpeed(value)
+  }, [getEngine, setGlideSpeed])
 
   return (
     <div className="controls">
@@ -191,6 +213,32 @@ export function Controls({
             step="0.01"
             value={volume}
             onChange={handleVolume}
+          />
+        </div>
+
+        <div className="controls__section">
+          <label className="controls__label">Filter</label>
+          <div className="controls__knobs">
+            <div className="controls__knob">
+              <span>Cutoff</span>
+              <input type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
+            </div>
+            <div className="controls__knob">
+              <span>Res</span>
+              <input type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
+            </div>
+          </div>
+        </div>
+
+        <div className="controls__section">
+          <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
+          <input
+            type="range"
+            min="0.001"
+            max="0.3"
+            step="0.001"
+            value={glideSpeed}
+            onChange={handleGlideSpeed}
           />
         </div>
 

@@ -22,12 +22,14 @@ function App() {
   const [octaves, setOctaves] = useState(2)
   const [delayParams, setDelayParams] = useState({ time: 0.3, feedback: 0.4, mix: 0 })
   const [reverbMix, setReverbMix] = useState(0)
+  const [filterParams, setFilterParams] = useState({ cutoff: 20000, resonance: 0 })
+  const [glideSpeed, setGlideSpeed] = useState(0.005)
   const [stepped, setStepped] = useState(false)
   const [scale, setScale] = useState('chromatic')
   const [ribbonPosition, setRibbonPosition] = useState(null)
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
-  const ribbonInteraction = useRef({ position: null, active: false })
+  const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
@@ -88,6 +90,10 @@ function App() {
         setDelayParams={setDelayParams}
         reverbMix={reverbMix}
         setReverbMix={setReverbMix}
+        filterParams={filterParams}
+        setFilterParams={setFilterParams}
+        glideSpeed={glideSpeed}
+        setGlideSpeed={setGlideSpeed}
       />
 
       <Ribbon

@@ -18,28 +18,8 @@
   gap: 0.25rem;
 }
 
-.app-header h1 {
-  font-family: var(--font-mono);
-  font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+.app-header .ribbon-logo {
   margin: 0;
-  background: linear-gradient(
-    135deg,
-    var(--cyan),
-    var(--neon-green),
-    var(--neon-yellow),
-    var(--magenta),
-    var(--cyan)
-  );
-  background-size: 300% 300%;
-  animation: gradient-shift 4s ease infinite;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.5)) drop-shadow(0 0 30px rgba(139, 92, 246, 0.3));
-  text-shadow: none;
 }
 
 .app-header .subtitle {
@@ -48,9 +28,4 @@
   font-family: var(--font-mono);
 }
 
-/* Lo mode */
-.lo-mode .app-header h1 {
-  animation: none;
-  background-size: 100% 100%;
-  filter: none;
-}
+/* Lo mode — logo animations handled in RibbonLogo.css */

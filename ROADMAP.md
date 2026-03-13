@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Up Next
+- [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
 - [ ] Scale selection UI (major, minor, pentatonic, blues)
 - [ ] Bitcrush effect (AudioWorklet)
 - [ ] Third oscillator support

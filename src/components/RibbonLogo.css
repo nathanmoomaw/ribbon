@@ -1,0 +1,78 @@
+.ribbon-logo {
+  width: 280px;
+  height: auto;
+  display: block;
+}
+
+/* ── Möbius fold: front side subtly pulses ── */
+.ribbon-over {
+  animation: ribbon-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ribbon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+/* ── Shimmer 1: fast bright streak orbiting the figure-8 ── */
+.shimmer-1 {
+  stroke-dasharray: 16 184;
+  opacity: 0.5;
+  animation: shimmer-fast 2s linear infinite;
+}
+
+@keyframes shimmer-fast {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -200; }
+}
+
+/* ── Shimmer 2: slower, wider colored glow that trails behind ── */
+.shimmer-2 {
+  stroke-dasharray: 30 170;
+  opacity: 0.25;
+  animation: shimmer-slow 3.5s linear infinite;
+}
+
+@keyframes shimmer-slow {
+  from { stroke-dashoffset: -40; }
+  to { stroke-dashoffset: -240; }
+}
+
+/* ── Sparkle particles: staggered twinkle ── */
+.sparkle {
+  opacity: 0;
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+
+.s1 { animation-delay: 0s; }
+.s2 { animation-delay: 0.4s; }
+.s3 { animation-delay: 0.9s; }
+.s4 { animation-delay: 1.3s; }
+.s5 { animation-delay: 1.7s; }
+.s6 { animation-delay: 2.1s; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.9; transform: scale(1.5); }
+}
+
+/* ── Lo mode: kill all animation ── */
+.lo-mode .ribbon-logo .ribbon-over,
+.lo-mode .ribbon-logo .shimmer-1,
+.lo-mode .ribbon-logo .shimmer-2 {
+  animation: none;
+}
+
+.lo-mode .ribbon-logo .shimmer-1,
+.lo-mode .ribbon-logo .shimmer-2 {
+  opacity: 0;
+}
+
+.lo-mode .ribbon-logo .sparkle {
+  animation: none;
+  opacity: 0;
+}
+
+.lo-mode .ribbon-logo .logo-letters {
+  filter: none;
+}

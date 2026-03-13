@@ -7,6 +7,7 @@ import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { ActivationMode } from './components/ActivationMode'
+import { RibbonLogo } from './components/RibbonLogo'
 import { positionToFrequency } from './utils/pitchMap'
 import './App.css'
 
@@ -93,7 +94,7 @@ function App() {
       <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} />
 
       <header className="app-header">
-        <h1>Ribbon</h1>
+        <RibbonLogo />
         <span className="subtitle">analog ribbon synth</span>
       </header>
 

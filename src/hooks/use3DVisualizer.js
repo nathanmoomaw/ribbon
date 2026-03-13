@@ -165,6 +165,27 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
     ]
     const tempQuat = new THREE.Quaternion()
 
+    // Smoothed reactive offsets per sphere (lerped toward targets each frame)
+    const reactiveOffsets = [
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+      new THREE.Vector3(),
+    ]
+
+    // Each sphere reacts to pitch differently — unique direction per sphere
+    const PITCH_SHIFT_DIRS = [
+      new THREE.Vector3(-0.8, 0.2, 0.3).normalize(),
+      new THREE.Vector3(0.5, -0.7, -0.2).normalize(),
+      new THREE.Vector3(0.3, 0.5, -0.8).normalize(),
+    ]
+
+    // Each sphere reacts to velocity differently — push outward
+    const VELOCITY_PUSH_DIRS = [
+      new THREE.Vector3(-0.4, 0.6, -0.5).normalize(),
+      new THREE.Vector3(0.7, -0.3, 0.4).normalize(),
+      new THREE.Vector3(-0.3, -0.5, 0.7).normalize(),
+    ]
+
     function animate(time) {
       frameId = requestAnimationFrame(animate)
 
@@ -177,6 +198,8 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
       const bands = getBandEnergies()
       const isActive = ribbonInteraction?.current?.active
       const velocity = ribbonInteraction?.current?.velocity ?? 0
+      // position: 0 (low pitch) to 1 (high pitch), centered at 0.5
+      const position = ribbonInteraction?.current?.position ?? 0.5
 
       // Smooth zoom
       const zoomDiff = targetZoomRef.current - zoomRef.current
@@ -185,6 +208,13 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
 
       // Calculate drift amount based on how far zoomed out from default
       const driftAmount = Math.max(0, (zoomRef.current - DEFAULT_ZOOM) / (MAX_ZOOM - DEFAULT_ZOOM)) * 3.5
+
+      // Pitch offset: how far from center (0 = center, ±0.5 = extremes)
+      const pitchOffset = isActive ? (position - 0.5) * 2 : 0  // -1 to 1
+      // Velocity as a 0–1 factor for push strength
+      const velFactor = isActive ? Math.min(1, velocity * 0.0003) : 0
+
+      const lerpSpeed = 3.0 * dt  // smoothing rate
 
       for (let i = 0; i < 3; i++) {
         const sphere = spheres[i]
@@ -205,9 +235,22 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const scalePulse = 1 + energy * 0.3
         sphere.group.scale.setScalar(scalePulse)
 
-        // Position: idle offset + drift apart as zoom increases
+        // Calculate target reactive offset from pitch + velocity
+        // Each sphere shifts in its own direction based on pitch, different magnitude
+        const pitchMag = pitchOffset * (0.6 + i * 0.3)
+        const velMag = velFactor * (0.4 + i * 0.25) + energy * 0.3
+        const targetX = PITCH_SHIFT_DIRS[i].x * pitchMag + VELOCITY_PUSH_DIRS[i].x * velMag
+        const targetY = PITCH_SHIFT_DIRS[i].y * pitchMag + VELOCITY_PUSH_DIRS[i].y * velMag
+        const targetZ = PITCH_SHIFT_DIRS[i].z * pitchMag + VELOCITY_PUSH_DIRS[i].z * velMag
+
+        // Smoothly lerp reactive offsets
+        reactiveOffsets[i].x += (targetX - reactiveOffsets[i].x) * lerpSpeed
+        reactiveOffsets[i].y += (targetY - reactiveOffsets[i].y) * lerpSpeed
+        reactiveOffsets[i].z += (targetZ - reactiveOffsets[i].z) * lerpSpeed
+
+        // Position: idle offset + zoom drift + reactive offset
         const drift = SPHERE_DRIFT_DIRS[i].clone().multiplyScalar(driftAmount)
-        sphere.group.position.copy(SPHERE_IDLE_OFFSETS[i]).add(drift)
+        sphere.group.position.copy(SPHERE_IDLE_OFFSETS[i]).add(drift).add(reactiveOffsets[i])
 
         // Opacity: brighter when there's energy
         if (isParty) {

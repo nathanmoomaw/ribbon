@@ -42,7 +42,7 @@ const MIN_ZOOM = 0.5
 const MAX_ZOOM = 25
 const ZOOM_STEP = 0.8
 
-export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0) {
+export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}) {
   const stateRef = useRef(null)
   const zoomRef = useRef(DEFAULT_ZOOM)
   const targetZoomRef = useRef(DEFAULT_ZOOM)
@@ -50,6 +50,8 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
   visualModeRef.current = visualMode
   const reverbMixRef = useRef(reverbMix)
   reverbMixRef.current = reverbMix
+  const delayRef = useRef(delayParams)
+  delayRef.current = delayParams
 
   useEffect(() => {
     const mount = mountRef.current
@@ -307,15 +309,29 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const drift = SPHERE_DRIFT_DIRS[i].clone().multiplyScalar(driftAmount)
         sphere.group.position.copy(SPHERE_IDLE_OFFSETS[i]).add(drift).add(reactiveOffsets[i])
 
-        // Opacity: brighter when there's energy
+        // Delay-driven shimmer: time → speed, feedback → depth, mix → intensity
+        const delay = delayRef.current
+        const delayMix = delay.mix ?? 0
+        const delayTime = delay.time ?? 0.3
+        const delayFeedback = delay.feedback ?? 0.4
+        // Shimmer frequency: shorter delay time = faster shimmer
+        const shimmerSpeed = delayMix > 0.01 ? (1 / Math.max(delayTime, 0.05)) * 2 : 0
+        // Shimmer depth: feedback controls how dramatic the pulsing is
+        const shimmerDepth = delayMix * delayFeedback * 0.4
+        // Each sphere shimmers at offset phase
+        const shimmer = shimmerDepth > 0.001
+          ? Math.sin(time * 0.001 * shimmerSpeed + i * 2.1) * shimmerDepth
+          : 0
+
+        // Opacity: brighter when there's energy, modulated by delay shimmer
         if (isParty) {
           const baseOpacity = 0.2
-          const activeOpacity = baseOpacity + energy * 0.5
-          sphere.mat.opacity = activeOpacity
-          sphere.innerMat.opacity = 0.02 + energy * 0.08
+          const activeOpacity = baseOpacity + energy * 0.5 + shimmer
+          sphere.mat.opacity = Math.max(0.05, Math.min(1, activeOpacity))
+          sphere.innerMat.opacity = Math.max(0, 0.02 + energy * 0.08 + shimmer * 0.3)
         } else {
-          // Lo mode: very dim
-          sphere.mat.opacity = 0.08 + energy * 0.12
+          // Lo mode: very dim, subtle shimmer
+          sphere.mat.opacity = Math.max(0.03, 0.08 + energy * 0.12 + shimmer * 0.5)
           sphere.innerMat.opacity = 0.01
         }
       }

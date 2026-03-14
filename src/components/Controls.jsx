@@ -177,40 +177,34 @@ export const Controls = forwardRef(function Controls({
         </div>
 
         <div className="controls__section">
-          <label className="controls__label">Stepped</label>
+          <label className="controls__label">Scale</label>
           <div className="controls__waveforms">
-            <button
-              className={stepped ? 'active' : ''}
-              onClick={() => setStepped(!stepped)}
-            >
-              {stepped ? 'ON' : 'OFF'}
-            </button>
-          </div>
-        </div>
-
-        {stepped && (
-          <div className="controls__section">
-            <label className="controls__label">Scale</label>
-            <div className="controls__waveforms">
-              {SCALE_NAMES.map((s) => (
-                <button
-                  key={s}
-                  className={scale.includes(s) ? 'active' : ''}
-                  onClick={() => setScale(prev => {
-                    if (s === 'chromatic') return ['chromatic']
+            {SCALE_NAMES.map((s) => (
+              <button
+                key={s}
+                className={scale.includes(s) ? 'active' : ''}
+                onClick={() => {
+                  setScale(prev => {
+                    if (s === 'chromatic') {
+                      setStepped(false)
+                      return ['chromatic']
+                    }
+                    setStepped(true)
                     const without = prev.filter(x => x !== 'chromatic' && x !== s)
                     if (prev.includes(s)) {
-                      return without.length === 0 ? ['chromatic'] : without
+                      const remaining = without.length === 0 ? ['chromatic'] : without
+                      if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
+                      return remaining
                     }
                     return [...without, s]
-                  })}
-                >
-                  {s.slice(0, 4).toUpperCase()}
-                </button>
-              ))}
-            </div>
+                  })
+                }}
+              >
+                {s.slice(0, 4).toUpperCase()}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
         <div className="controls__section">
           <label className="controls__label">Volume</label>

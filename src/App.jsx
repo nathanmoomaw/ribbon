@@ -38,7 +38,7 @@ function App() {
   const [filterParams, setFilterParams] = useState({ cutoff: 20000, resonance: 0 })
   const [glideSpeed, setGlideSpeed] = useState(0.005)
   const [stepped, setStepped] = useState(false)
-  const [scale, setScale] = useState('chromatic')
+  const [scale, setScale] = useState(['chromatic'])
   const [keyboardPositions, setKeyboardPositions] = useState(new Map())
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
@@ -48,6 +48,8 @@ function App() {
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
+  const shakeTimerRef = useRef(null)
+  const undulateTimerRef = useRef(null)
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
@@ -76,15 +78,17 @@ function App() {
   const handleShake = useCallback((intensity) => {
     const engine = getEngine()
 
-    // 1. Visual shake on controls + ribbon
+    // 1. Visual shake on controls + ribbon — restart timers on rapid triggers
     setShaking(true)
     setUndulating(true)
-    setTimeout(() => setShaking(false), 400)
-    setTimeout(() => setUndulating(false), 500)
+    clearTimeout(shakeTimerRef.current)
+    clearTimeout(undulateTimerRef.current)
+    shakeTimerRef.current = setTimeout(() => setShaking(false), 400)
+    undulateTimerRef.current = setTimeout(() => setUndulating(false), 500)
 
-    // 2. Randomize ~25% of slider/button parameters
-    // Each parameter has a 25% chance of being nudged
-    const shouldNudge = () => Math.random() < 0.25
+    // 2. Randomize parameters — chance scales with intensity (20%-50%)
+    const nudgeChance = 0.15 + intensity * 0.35
+    const shouldNudge = () => Math.random() < nudgeChance
 
     // Oscillator params
     setOscParams(prev => prev.map((osc, i) => {
@@ -147,10 +151,10 @@ function App() {
       engine.setReverb({ mix: newReverb })
     }
 
-    // 3. Trigger a random ribbon press at <50% velocity
+    // 3. Trigger a random ribbon press — velocity scales with intensity
     const shakeVoiceId = `shake_${Date.now()}`
     const shakePosition = Math.random()
-    const shakeVelocity = Math.random() * 0.5 * intensity
+    const shakeVelocity = Math.random() * 0.3 + intensity * 0.5
     const shakeHz = positionToFrequency(shakePosition, { octaves, stepped, scale })
 
     // Update ribbon interaction ref for visualizer
@@ -206,7 +210,7 @@ function App() {
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
-      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} reverbMix={reverbMix} delayParams={delayParams} />
+      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
 
       <header className="app-header">
         <RibbonLogo />
@@ -219,8 +223,6 @@ function App() {
         inputMode={inputMode}
         setInputMode={setInputMode}
         getEngine={getEngine}
-        visualMode={visualMode}
-        setVisualMode={setVisualMode}
         arpBpm={arpBpm}
         setArpBpm={setArpBpm}
         hold={hold}

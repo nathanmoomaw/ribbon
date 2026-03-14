@@ -30,3 +30,10 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] space should also cut the sound.  sometimes it stays on
 [x] sphere grids should be a bit dimmer
 [x] add visual buttons for zooming in the upper right corner, but make them fairly subtle
+
+# Saturday March 14 features, etc
+
+[x] tag the current branch as v1
+[x] add scale options.  these should be buttons and multiple should be able to be pressed at once resulting in combination scales.
+[x] move the visuals buttons (party/lo) to the upper left corner of the screen (if this doesn't look good, we'll try the upper right, alongside the zoom)
+[x] instead of the current blocking of multiple clicks for the shake functionality it should allow for fast clicking and this action should be seen as a larger shake (a bit louder and randomizes a bit more controls)

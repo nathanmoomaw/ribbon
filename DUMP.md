@@ -37,3 +37,7 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] add scale options.  these should be buttons and multiple should be able to be pressed at once resulting in combination scales.
 [x] move the visuals buttons (party/lo) to the upper left corner of the screen (if this doesn't look good, we'll try the upper right, alongside the zoom)
 [x] instead of the current blocking of multiple clicks for the shake functionality it should allow for fast clicking and this action should be seen as a larger shake (a bit louder and randomizes a bit more controls)
+[x] spacebar should also stop the arp if it keeps playing
+[x] bpm should also vary like the other controls on shake
+[x] get rid of the touch button and just have a more minimal version of the keys button that just turns on and off
+[x] allow latch and arp to both be pressed, the result being that multiple taps on the ribbon add those notes to the arp pattern.  ie. if user clicks latch and arp then clicks on F and then B and then D the arp would cycle those notes in the order they were triggered

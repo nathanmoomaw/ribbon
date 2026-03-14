@@ -47,3 +47,7 @@
 - [x] Visual mode toggle relocated to upper-left overlay
 - [x] Shake combo system (rapid triggers = bigger shake)
 - [x] Bitcrush effect (AudioWorklet, bit depth + rate reduction + mix)
+- [x] Spacebar stops arpeggiator
+- [x] BPM included in shake randomization
+- [x] Simplified input mode (Keys toggle replaces Touch/Keys selector)
+- [x] Latch+Arp combo mode (multi-note arp sequences via latched taps)

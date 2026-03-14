@@ -6,11 +6,6 @@ const MODES = [
   { id: 'arp', label: 'Arp', key: '3', description: 'Rhythmic retrigger while touching' },
 ]
 
-const INPUT_MODES = [
-  { id: 'touch', label: 'Touch' },
-  { id: 'keys', label: 'Keys', description: 'A-L keys control ribbon' },
-]
-
 export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, arpBpm, setArpBpm, hold, setHold }) {
   const handleStop = () => {
     getEngine().allNotesOff()
@@ -24,9 +19,17 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
           {MODES.map((m) => (
             <button
               key={m.id}
-              className={mode === m.id ? 'active' : ''}
+              className={mode === m.id || (mode === 'latch+arp' && (m.id === 'latch' || m.id === 'arp')) ? 'active' : ''}
               disabled={m.disabled}
-              onClick={() => !m.disabled && setMode(m.id)}
+              onClick={() => {
+                if (m.disabled) return
+                if (m.id === 'play') { setMode('play'); return }
+                if (m.id === 'latch') {
+                  setMode(prev => prev === 'arp' ? 'latch+arp' : prev === 'latch+arp' ? 'arp' : 'latch')
+                } else if (m.id === 'arp') {
+                  setMode(prev => prev === 'latch' ? 'latch+arp' : prev === 'latch+arp' ? 'latch' : 'arp')
+                }
+              }}
               title={m.description}
             >
               {m.label}
@@ -41,12 +44,12 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
             Hold
             <kbd>4</kbd>
           </button>
-          {mode === 'latch' && (
+          {mode.includes('latch') && (
             <button className="activation__stop" onClick={handleStop}>
               Stop <kbd>Space</kbd>
             </button>
           )}
-          {mode === 'arp' && (
+          {mode.includes('arp') && (
             <div className="activation__arp-tempo">
               <label className="activation__group-label">
                 BPM <span className="controls__value">{arpBpm}</span>
@@ -64,21 +67,13 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
         </div>
       </div>
 
-      <div className="activation__group">
-        <label className="activation__group-label">Input</label>
-        <div className="activation__modes">
-          {INPUT_MODES.map((m) => (
-            <button
-              key={m.id}
-              className={inputMode === m.id ? 'active' : ''}
-              onClick={() => setInputMode(m.id)}
-              title={m.description}
-            >
-              {m.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <button
+        className={`activation__keys-toggle ${inputMode === 'keys' ? 'active' : ''}`}
+        onClick={() => setInputMode(inputMode === 'keys' ? 'touch' : 'keys')}
+        title="A-L keys control ribbon"
+      >
+        Keys
+      </button>
 
     </div>
   )

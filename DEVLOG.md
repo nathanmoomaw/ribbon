@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-03-14 — Spacebar arp stop, BPM shake, input simplification, latch+arp combo
+
+- Spacebar now stops the arpeggiator in addition to cutting all notes
+- BPM added to shake randomization (nudged within 40-300 range like other controls)
+- Removed Touch/Keys input mode selector; replaced with a single minimal Keys toggle button
+- New latch+arp combo mode: pressing both Latch (2) and Arp (3) activates combined mode
+  - Tapping notes on the ribbon or keyboard adds them to an arp sequence
+  - Tapping the same note removes it from the sequence
+  - Arp auto-starts when first note is added, auto-stops when all removed
+  - Spacebar clears all latched arp notes
+- Arpeggiator refactored to support cycling through a notes array (for latch+arp)
+- Mode buttons highlight both Latch and Arp when in combined mode
+
 ## 2026-03-14 — Bitcrush effect
 
 - Added bitcrush/digitize effect via AudioWorklet processor

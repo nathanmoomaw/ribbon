@@ -44,6 +44,7 @@ function App() {
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
   const [hold, setHold] = useState(false)
+  const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
@@ -51,16 +52,27 @@ function App() {
   const ribbonRef = useRef(null)
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
+  const arpStopRef = useRef(null)
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
       getEngine().allNotesOff()
       setHold(false)
       setKeyboardPositions(new Map())
+      setArpNotes([])
+      arpStopRef.current?.()
     },
-    Digit1: () => setMode('play'),
-    Digit2: () => setMode('latch'),
-    Digit3: () => setMode('arp'),
+    Digit1: () => { setMode('play'); setArpNotes([]) },
+    Digit2: () => setMode(m => {
+      if (m === 'arp') return 'latch+arp'
+      if (m === 'latch+arp') { setArpNotes([]); return 'arp' }
+      return 'latch'
+    }),
+    Digit3: () => setMode(m => {
+      if (m === 'latch') return 'latch+arp'
+      if (m === 'latch+arp') { setArpNotes([]); return 'latch' }
+      return 'arp'
+    }),
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
   }), [mode, hold, getEngine])
@@ -71,9 +83,44 @@ function App() {
     setKeyboardPositions(posMap)
   }, [])
 
-  const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm)
+  const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm, arpNotes)
+  arpStopRef.current = arpStop
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold)
+  // Toggle a note in/out of the arp sequence (latch+arp mode)
+  const handleArpNoteToggle = useCallback((hz) => {
+    setArpNotes(prev => {
+      const existing = prev.findIndex(n => Math.abs(n - hz) < 1)
+      if (existing !== -1) {
+        const next = [...prev]
+        next.splice(existing, 1)
+        return next
+      }
+      return [...prev, hz]
+    })
+  }, [])
+
+  // Auto-start/stop arp when notes are added/removed in latch+arp mode
+  const prevArpNotesLenRef = useRef(0)
+  useEffect(() => {
+    if (mode === 'latch+arp') {
+      const prevLen = prevArpNotesLenRef.current
+      if (prevLen === 0 && arpNotes.length > 0) {
+        arpStart()
+      } else if (prevLen > 0 && arpNotes.length === 0) {
+        arpStop()
+      }
+    }
+    prevArpNotesLenRef.current = arpNotes.length
+  }, [arpNotes, mode, arpStart, arpStop])
+
+  // Clear arp notes when leaving latch+arp mode
+  useEffect(() => {
+    if (mode !== 'latch+arp') {
+      setArpNotes([])
+    }
+  }, [mode])
+
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, handleArpNoteToggle)
 
   // --- Shake/Quake handler ---
   const handleShake = useCallback((intensity) => {
@@ -170,6 +217,11 @@ function App() {
       engine.setCrush({ reduction: newReduction })
     }
 
+    if (shouldNudge()) {
+      const newBpm = Math.round(nudge(arpBpm, 40, 300, intensity))
+      setArpBpm(newBpm)
+    }
+
     // 3. Trigger a random ribbon press — velocity scales with intensity
     const shakeVoiceId = `shake_${Date.now()}`
     const shakePosition = Math.random()
@@ -193,7 +245,7 @@ function App() {
         ribbonInteraction.current.active = false
       }
     }, noteDuration)
-  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, crushParams, octaves, stepped, scale, ribbonInteraction])
+  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, crushParams, arpBpm, octaves, stepped, scale, ribbonInteraction])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
@@ -263,6 +315,8 @@ function App() {
         hold={hold}
         shaking={shaking}
         undulating={undulating}
+        onArpNoteToggle={handleArpNoteToggle}
+        arpNotes={arpNotes}
       />
 
       <Controls

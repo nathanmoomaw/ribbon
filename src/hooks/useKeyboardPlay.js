@@ -3,7 +3,7 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, onArpNoteToggle) {
   const activeKeysRef = useRef(new Set())
 
   useEffect(() => {
@@ -44,6 +44,10 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
         engine.setFrequency(hz)
         arpStart()
         activeKeysRef.current.add(e.code)
+      } else if (mode === 'latch+arp') {
+        // Add/remove note from arp sequence
+        onArpNoteToggle?.(hz)
+        activeKeysRef.current.add(e.code)
       }
 
       updatePositions()
@@ -61,6 +65,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
           } else if (mode === 'arp') {
             arpStop()
           }
+          // latch+arp: don't stop on key release — notes stay latched
         }
         activeKeysRef.current.delete(e.code)
         updatePositions()
@@ -84,7 +89,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, onArpNoteToggle])
 }
 
 export { KEYS }

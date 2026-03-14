@@ -6,7 +6,7 @@ import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold, shaking, undulating }, ref) {
+export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold, shaking, undulating, onArpNoteToggle, arpNotes }, ref) {
   // Map of voice id -> position (for both touch and keyboard cursors)
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -58,13 +58,16 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
       // Arp stays mono — set frequency and start arp
       engine.setFrequency(hz)
       arpStart()
+    } else if (mode === 'latch+arp') {
+      // Add/remove note from arp sequence
+      onArpNoteToggle(hz)
     }
 
     // In hold mode, ensure voice is on
-    if (hold && !engine.voiceIsPlaying(voiceId) && mode !== 'arp') {
+    if (hold && !engine.voiceIsPlaying(voiceId) && !mode.includes('arp')) {
       engine.voiceOn(voiceId, hz, velocity)
     }
-  }, [getEngine, mode, hold, octaves, stepped, scale, ribbonInteraction, arpStart])
+  }, [getEngine, mode, hold, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle])
 
   const onUp = useCallback((pointerId) => {
     const voiceId = `touch_${pointerId}`
@@ -86,9 +89,10 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     } else if (mode === 'arp') {
       arpStop()
     }
+    // latch+arp: don't stop on release — notes stay latched
 
-    // Clean up position for released touch (unless hold or latch)
-    if (!hold && mode !== 'latch') {
+    // Clean up position for released touch (unless hold or latch-like)
+    if (!hold && !mode.includes('latch')) {
       setPositions(prev => {
         const next = new Map(prev)
         next.delete(voiceId)

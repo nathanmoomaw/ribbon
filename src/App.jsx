@@ -35,6 +35,7 @@ function App() {
   const [octaves, setOctaves] = useState(2)
   const [delayParams, setDelayParams] = useState({ time: 0.3, feedback: 0.4, mix: 0 })
   const [reverbMix, setReverbMix] = useState(0)
+  const [crushParams, setCrushParams] = useState({ bitDepth: 16, reduction: 1, mix: 0 })
   const [filterParams, setFilterParams] = useState({ cutoff: 20000, resonance: 0 })
   const [glideSpeed, setGlideSpeed] = useState(0.005)
   const [stepped, setStepped] = useState(false)
@@ -151,6 +152,24 @@ function App() {
       engine.setReverb({ mix: newReverb })
     }
 
+    if (shouldNudge()) {
+      const newCrushMix = nudge(crushParams.mix, 0, 1, intensity)
+      setCrushParams(prev => ({ ...prev, mix: newCrushMix }))
+      engine.setCrush({ mix: newCrushMix })
+    }
+
+    if (shouldNudge()) {
+      const newBitDepth = Math.round(nudge(crushParams.bitDepth, 1, 16, intensity))
+      setCrushParams(prev => ({ ...prev, bitDepth: newBitDepth }))
+      engine.setCrush({ bitDepth: newBitDepth })
+    }
+
+    if (shouldNudge()) {
+      const newReduction = Math.round(nudge(crushParams.reduction, 1, 40, intensity))
+      setCrushParams(prev => ({ ...prev, reduction: newReduction }))
+      engine.setCrush({ reduction: newReduction })
+    }
+
     // 3. Trigger a random ribbon press — velocity scales with intensity
     const shakeVoiceId = `shake_${Date.now()}`
     const shakePosition = Math.random()
@@ -174,7 +193,7 @@ function App() {
         ribbonInteraction.current.active = false
       }
     }, noteDuration)
-  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, octaves, stepped, scale, ribbonInteraction])
+  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, crushParams, octaves, stepped, scale, ribbonInteraction])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
@@ -263,6 +282,8 @@ function App() {
         setDelayParams={setDelayParams}
         reverbMix={reverbMix}
         setReverbMix={setReverbMix}
+        crushParams={crushParams}
+        setCrushParams={setCrushParams}
         filterParams={filterParams}
         setFilterParams={setFilterParams}
         glideSpeed={glideSpeed}

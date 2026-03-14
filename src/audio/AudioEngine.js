@@ -8,6 +8,11 @@ let reverbNode = null
 let reverbSend = null
 let dryGain = null
 let glideTime = 0.005
+let crushNode = null
+let crushWetGain = null
+let crushDryGain = null
+let postCrushGain = null
+let crushReady = false
 
 const NUM_OSCILLATORS = 3
 const MAX_VOICES = 8
@@ -89,15 +94,39 @@ export function init() {
   masterGain = ctx.createGain()
   masterGain.gain.setValueAtTime(0.5, ctx.currentTime)
 
+  // Post-crush mixing point — everything downstream connects here
+  postCrushGain = ctx.createGain()
+  postCrushGain.gain.setValueAtTime(1, ctx.currentTime)
+
+  // Bitcrush dry/wet blend: masterGain → [crushDry, crushNode→crushWet] → postCrushGain
+  crushDryGain = ctx.createGain()
+  crushDryGain.gain.setValueAtTime(1, ctx.currentTime)
+  crushWetGain = ctx.createGain()
+  crushWetGain.gain.setValueAtTime(0, ctx.currentTime)
+
+  masterGain.connect(crushDryGain)
+  crushDryGain.connect(postCrushGain)
+  crushWetGain.connect(postCrushGain)
+
+  // Load AudioWorklet for bitcrush (async, wires in when ready)
+  ctx.audioWorklet.addModule('/bitcrush-processor.js').then(() => {
+    crushNode = new AudioWorkletNode(ctx, 'bitcrush-processor')
+    masterGain.connect(crushNode)
+    crushNode.connect(crushWetGain)
+    crushReady = true
+  }).catch(err => {
+    console.warn('Bitcrush worklet failed to load:', err)
+  })
+
   // Analyser (passive tap for visuals)
   analyser = ctx.createAnalyser()
   analyser.fftSize = 2048
-  masterGain.connect(analyser)
+  postCrushGain.connect(analyser)
 
   // Dry path
   dryGain = ctx.createGain()
   dryGain.gain.setValueAtTime(1, ctx.currentTime)
-  masterGain.connect(dryGain)
+  postCrushGain.connect(dryGain)
   dryGain.connect(ctx.destination)
 
   // Delay send (parallel)
@@ -108,7 +137,7 @@ export function init() {
   delayFeedback = ctx.createGain()
   delayFeedback.gain.setValueAtTime(0.4, ctx.currentTime)
 
-  masterGain.connect(delaySend)
+  postCrushGain.connect(delaySend)
   delaySend.connect(delayNode)
   delayNode.connect(delayFeedback)
   delayFeedback.connect(delayNode)
@@ -120,7 +149,7 @@ export function init() {
   reverbNode = ctx.createConvolver()
   reverbNode.buffer = generateImpulseResponse(ctx)
 
-  masterGain.connect(reverbSend)
+  postCrushGain.connect(reverbSend)
   reverbSend.connect(reverbNode)
   reverbNode.connect(ctx.destination)
 
@@ -340,6 +369,24 @@ export function setReverb({ mix }) {
   }
 }
 
+export function setCrush({ bitDepth, reduction, mix }) {
+  if (!ctx) return
+  if (mix !== undefined) {
+    crushWetGain.gain.cancelScheduledValues(ctx.currentTime)
+    crushWetGain.gain.linearRampToValueAtTime(mix, ctx.currentTime + 0.01)
+    crushDryGain.gain.cancelScheduledValues(ctx.currentTime)
+    crushDryGain.gain.linearRampToValueAtTime(1 - mix, ctx.currentTime + 0.01)
+  }
+  if (crushReady && crushNode) {
+    if (bitDepth !== undefined) {
+      crushNode.parameters.get('bitDepth').setValueAtTime(bitDepth, ctx.currentTime)
+    }
+    if (reduction !== undefined) {
+      crushNode.parameters.get('reduction').setValueAtTime(reduction, ctx.currentTime)
+    }
+  }
+}
+
 export function getAnalyser() {
   return analyser
 }
@@ -386,6 +433,7 @@ function getEngine() {
     setVolume,
     setDelay,
     setReverb,
+    setCrush,
     getAnalyser,
     getIsPlaying,
   }

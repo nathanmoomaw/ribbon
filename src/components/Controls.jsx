@@ -195,8 +195,15 @@ export const Controls = forwardRef(function Controls({
               {SCALE_NAMES.map((s) => (
                 <button
                   key={s}
-                  className={scale === s ? 'active' : ''}
-                  onClick={() => setScale(s)}
+                  className={scale.includes(s) ? 'active' : ''}
+                  onClick={() => setScale(prev => {
+                    if (s === 'chromatic') return ['chromatic']
+                    const without = prev.filter(x => x !== 'chromatic' && x !== s)
+                    if (prev.includes(s)) {
+                      return without.length === 0 ? ['chromatic'] : without
+                    }
+                    return [...without, s]
+                  })}
                 >
                   {s.slice(0, 4).toUpperCase()}
                 </button>

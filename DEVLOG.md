@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-03-14 — Multi-select scales, visual mode relocation, shake combos
+
+- Scale selection now supports multi-select: toggle multiple scales (major+blues, etc.) to create combined note sets
+- Scale intervals merged via union — selecting multiple scales gives you all notes from each
+- Chromatic acts as reset/default; selecting any other scale deselects chromatic
+- If all scales are deselected, falls back to chromatic
+- Moved Party/Lo visual mode toggle from ActivationMode bar to upper-left corner overlay (matches zoom buttons style)
+- Shake/quake reworked: removed blocking cooldown, rapid clicks/Enter presses now accumulate
+- Combo system: triggers within 800ms window boost intensity (each extra hit adds ~0.15 up to +0.6)
+- Randomization chance scales with intensity (20%–50% of parameters nudged)
+- Shake sound velocity now scales with combo intensity (louder rapid shakes)
+- Tagged main as v1
+
 ## 2026-03-13 — Shake/Quake feature
 
 - New shake/quake mechanic: shakes the synth universe, randomizes controls, triggers ribbon sound

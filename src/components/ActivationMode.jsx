@@ -11,12 +11,7 @@ const INPUT_MODES = [
   { id: 'keys', label: 'Keys', description: 'A-L keys control ribbon' },
 ]
 
-const VISUAL_MODES = [
-  { id: 'party', label: 'Party' },
-  { id: 'lo', label: 'Lo' },
-]
-
-export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, visualMode, setVisualMode, arpBpm, setArpBpm, hold, setHold }) {
+export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngine, arpBpm, setArpBpm, hold, setHold }) {
   const handleStop = () => {
     getEngine().allNotesOff()
   }
@@ -85,21 +80,6 @@ export function ActivationMode({ mode, setMode, inputMode, setInputMode, getEngi
         </div>
       </div>
 
-      <div className="activation__group">
-        <label className="activation__group-label">Visuals</label>
-        <div className="activation__modes">
-          {VISUAL_MODES.map((m) => (
-            <button
-              key={m.id}
-              className={visualMode === m.id ? 'active' : ''}
-              onClick={() => setVisualMode(m.id)}
-            >
-              {m.label}
-              {m.id === 'lo' && <kbd>V</kbd>}
-            </button>
-          ))}
-        </div>
-      </div>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 ## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
-- [ ] Scale selection UI (major, minor, pentatonic, blues)
+- [x] Scale selection UI (multi-select combination scales)
 - [ ] Bitcrush effect (AudioWorklet)
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
@@ -43,3 +43,6 @@
 - [x] Third oscillator support
 - [x] Controls layout reorganization (3 oscs across top, vertical stacking)
 - [x] CI/CD auto-deploy to S3/CloudFront on push to main
+- [x] Multi-select scale combination UI
+- [x] Visual mode toggle relocated to upper-left overlay
+- [x] Shake combo system (rapid triggers = bigger shake)

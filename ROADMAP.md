@@ -3,7 +3,7 @@
 ## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
 - [x] Scale selection UI (multi-select combination scales)
-- [ ] Bitcrush effect (AudioWorklet)
+- [x] Bitcrush effect (AudioWorklet)
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
@@ -46,3 +46,4 @@
 - [x] Multi-select scale combination UI
 - [x] Visual mode toggle relocated to upper-left overlay
 - [x] Shake combo system (rapid triggers = bigger shake)
+- [x] Bitcrush effect (AudioWorklet, bit depth + rate reduction + mix)

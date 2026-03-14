@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-03-14 — Bitcrush effect
+
+- Added bitcrush/digitize effect via AudioWorklet processor
+- Two parameters: bit depth (1-16) and sample rate reduction (1-40x)
+- Dry/wet mix control for blending clean and crushed signal
+- Signal chain: masterGain → [crushDry + crushNode→crushWet] → postCrushGain → effects
+- Worklet loads async on init; gracefully degrades if unavailable
+- UI: Crush section with Bits, Rate, and Mix knobs in controls panel
+- Integrated into shake randomization (all 3 crush params can be nudged)
+
 ## 2026-03-14 — Multi-select scales, visual mode relocation, shake combos
 
 - Scale selection now supports multi-select: toggle multiple scales (major+blues, etc.) to create combined note sets

@@ -84,6 +84,8 @@ export const Controls = forwardRef(function Controls({
   setDelayParams,
   reverbMix,
   setReverbMix,
+  crushParams,
+  setCrushParams,
   filterParams,
   setFilterParams,
   glideSpeed,
@@ -139,6 +141,24 @@ export const Controls = forwardRef(function Controls({
     setFilterParams((prev) => ({ ...prev, resonance }))
     getEngine().setFilter({ resonance })
   }, [getEngine, setFilterParams])
+
+  const handleCrushDepth = useCallback((e) => {
+    const bitDepth = parseFloat(e.target.value)
+    setCrushParams((prev) => ({ ...prev, bitDepth }))
+    getEngine().setCrush({ bitDepth })
+  }, [getEngine, setCrushParams])
+
+  const handleCrushReduction = useCallback((e) => {
+    const reduction = parseFloat(e.target.value)
+    setCrushParams((prev) => ({ ...prev, reduction }))
+    getEngine().setCrush({ reduction })
+  }, [getEngine, setCrushParams])
+
+  const handleCrushMix = useCallback((e) => {
+    const mix = parseFloat(e.target.value)
+    setCrushParams((prev) => ({ ...prev, mix }))
+    getEngine().setCrush({ mix })
+  }, [getEngine, setCrushParams])
 
   const handleGlideSpeed = useCallback((e) => {
     const value = parseFloat(e.target.value)
@@ -268,6 +288,24 @@ export const Controls = forwardRef(function Controls({
             <div className="controls__knob">
               <span>Mix</span>
               <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+            </div>
+          </div>
+        </div>
+
+        <div className="controls__section">
+          <label className="controls__label">Crush</label>
+          <div className="controls__knobs">
+            <div className="controls__knob">
+              <span>Bits</span>
+              <input type="range" min="1" max="16" step="1" value={crushParams.bitDepth} onChange={handleCrushDepth} />
+            </div>
+            <div className="controls__knob">
+              <span>Rate</span>
+              <input type="range" min="1" max="40" step="1" value={crushParams.reduction} onChange={handleCrushReduction} />
+            </div>
+            <div className="controls__knob">
+              <span>Mix</span>
+              <input type="range" min="0" max="1" step="0.01" value={crushParams.mix} onChange={handleCrushMix} />
             </div>
           </div>
         </div>

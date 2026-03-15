@@ -91,9 +91,9 @@ export function useArpeggiator(getEngine, mode, bpm, notes = []) {
     }
   }, [bpm]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Stop arp when mode changes away from arp modes
+  // Stop arp when mode changes away from arp
   useEffect(() => {
-    if (!mode.includes('arp')) {
+    if (mode !== 'arp') {
       arpStop()
     }
   }, [mode, arpStop])

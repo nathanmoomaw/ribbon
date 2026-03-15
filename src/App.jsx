@@ -7,7 +7,6 @@ import { useShake } from './hooks/useShake'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
-import { ActivationMode } from './components/ActivationMode'
 import { RibbonLogo } from './components/RibbonLogo'
 import { positionToFrequency } from './utils/pitchMap'
 import './App.css'
@@ -309,19 +308,6 @@ function App() {
         <span className="subtitle">analog ribbon synth</span>
       </header>
 
-      <div className="controls-row">
-      <ActivationMode
-        mode={mode}
-        setMode={setMode}
-        poly={poly}
-        setPoly={setPoly}
-        getEngine={getEngine}
-        arpBpm={arpBpm}
-        setArpBpm={setArpBpm}
-        hold={hold}
-        setHold={setHold}
-      />
-
       <Controls
         ref={controlsRef}
         getEngine={getEngine}
@@ -346,8 +332,15 @@ function App() {
         glideSpeed={glideSpeed}
         setGlideSpeed={setGlideSpeed}
         shaking={shaking}
+        mode={mode}
+        setMode={setMode}
+        poly={poly}
+        setPoly={setPoly}
+        arpBpm={arpBpm}
+        setArpBpm={setArpBpm}
+        hold={hold}
+        setHold={setHold}
       />
-      </div>
 
       <div className="keys-toggle">
         <button

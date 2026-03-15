@@ -57,3 +57,7 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] the keys button isn't in the right place. it should be below the control panel and above the ribbon, no need to add any more spacing, just stick it nicely in there
 [x] pressing multiple keys on the keyboard while poly and arp are triggered should cycle through those keys
 [x] let's try the play/arp, mono/poly, hold button, and bpm slider all neatly organized to the left of the control panel, top to bottom
+[x] give the toggle switches more dimension as if they were real physical switches
+[x] put play/arp THEN below that mono/poly then hold (aligned with the other please) and THEN the bpm slider under that.  let's call that chunk of items the "toggles".  then put this whole thing (the toggles) into the control panel on the left side, pushing everything nicely to the right.
+[x] put the main volume slider vertically and looking like a DJ mixer line fader underneath the toggles.
+[x] the rest of the items should slide right and fit as messily as they currently are.  need to work on their alignment in the future

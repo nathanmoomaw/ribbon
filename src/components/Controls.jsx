@@ -1,5 +1,6 @@
 import { useCallback, forwardRef } from 'react'
 import { SCALES } from '../utils/scales'
+import { ActivationMode } from './ActivationMode'
 import './Controls.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -91,6 +92,14 @@ export const Controls = forwardRef(function Controls({
   glideSpeed,
   setGlideSpeed,
   shaking,
+  mode,
+  setMode,
+  poly,
+  setPoly,
+  arpBpm,
+  setArpBpm,
+  hold,
+  setHold,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -168,144 +177,165 @@ export const Controls = forwardRef(function Controls({
 
   return (
     <div ref={ref} className={`controls ${shaking ? 'controls--shaking' : ''}`}>
-      <div className="controls__oscillators">
-        {oscParams.map((params, i) => (
-          <OscSection
-            key={i}
-            index={i}
-            params={params}
+      <div className="controls__layout">
+        <div className="controls__toggles">
+          <ActivationMode
+            mode={mode}
+            setMode={setMode}
+            poly={poly}
+            setPoly={setPoly}
             getEngine={getEngine}
-            onUpdate={handleOscUpdate}
+            arpBpm={arpBpm}
+            setArpBpm={setArpBpm}
+            hold={hold}
+            setHold={setHold}
           />
-        ))}
-      </div>
+          <div className="controls__fader">
+            <label className="controls__fader-label">Vol</label>
+            <div className="controls__fader-track">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolume}
+                className="controls__fader-input"
+              />
+            </div>
+            <span className="controls__fader-value">{Math.round(volume * 100)}</span>
+          </div>
+        </div>
 
-      <div className="controls__shared">
-        <div className="controls__section">
-          <label className="controls__label">Octaves</label>
-          <div className="controls__waveforms">
-            {OCTAVE_OPTIONS.map((o) => (
-              <button
-                key={o}
-                className={octaves === o ? 'active' : ''}
-                onClick={() => setOctaves(o)}
-              >
-                {o}
-              </button>
+        <div className="controls__main">
+          <div className="controls__oscillators">
+            {oscParams.map((params, i) => (
+              <OscSection
+                key={i}
+                index={i}
+                params={params}
+                getEngine={getEngine}
+                onUpdate={handleOscUpdate}
+              />
             ))}
           </div>
-        </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Scale</label>
-          <div className="controls__waveforms">
-            {SCALE_NAMES.map((s) => (
-              <button
-                key={s}
-                className={scale.includes(s) ? 'active' : ''}
-                onClick={() => {
-                  setScale(prev => {
-                    if (s === 'chromatic') {
-                      setStepped(false)
-                      return ['chromatic']
-                    }
-                    setStepped(true)
-                    const without = prev.filter(x => x !== 'chromatic' && x !== s)
-                    if (prev.includes(s)) {
-                      const remaining = without.length === 0 ? ['chromatic'] : without
-                      if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
-                      return remaining
-                    }
-                    return [...without, s]
-                  })
-                }}
-              >
-                {s.slice(0, 4).toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
+          <div className="controls__shared">
+            <div className="controls__section">
+              <label className="controls__label">Octaves</label>
+              <div className="controls__waveforms">
+                {OCTAVE_OPTIONS.map((o) => (
+                  <button
+                    key={o}
+                    className={octaves === o ? 'active' : ''}
+                    onClick={() => setOctaves(o)}
+                  >
+                    {o}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Volume</label>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolume}
-          />
-        </div>
+            <div className="controls__section">
+              <label className="controls__label">Scale</label>
+              <div className="controls__waveforms">
+                {SCALE_NAMES.map((s) => (
+                  <button
+                    key={s}
+                    className={scale.includes(s) ? 'active' : ''}
+                    onClick={() => {
+                      setScale(prev => {
+                        if (s === 'chromatic') {
+                          setStepped(false)
+                          return ['chromatic']
+                        }
+                        setStepped(true)
+                        const without = prev.filter(x => x !== 'chromatic' && x !== s)
+                        if (prev.includes(s)) {
+                          const remaining = without.length === 0 ? ['chromatic'] : without
+                          if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
+                          return remaining
+                        }
+                        return [...without, s]
+                      })
+                    }}
+                  >
+                    {s.slice(0, 4).toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Filter</label>
-          <div className="controls__knobs">
-            <div className="controls__knob">
-              <span>Cutoff</span>
-              <input type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
+            <div className="controls__section">
+              <label className="controls__label">Filter</label>
+              <div className="controls__knobs">
+                <div className="controls__knob">
+                  <span>Cutoff</span>
+                  <input type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
+                </div>
+                <div className="controls__knob">
+                  <span>Res</span>
+                  <input type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
+                </div>
+              </div>
             </div>
-            <div className="controls__knob">
-              <span>Res</span>
-              <input type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
-            </div>
-          </div>
-        </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
-          <input
-            type="range"
-            min="0.001"
-            max="0.3"
-            step="0.001"
-            value={glideSpeed}
-            onChange={handleGlideSpeed}
-          />
-        </div>
+            <div className="controls__section">
+              <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
+              <input
+                type="range"
+                min="0.001"
+                max="0.3"
+                step="0.001"
+                value={glideSpeed}
+                onChange={handleGlideSpeed}
+              />
+            </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Delay</label>
-          <div className="controls__knobs">
-            <div className="controls__knob">
-              <span>Time</span>
-              <input type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
+            <div className="controls__section">
+              <label className="controls__label">Delay</label>
+              <div className="controls__knobs">
+                <div className="controls__knob">
+                  <span>Time</span>
+                  <input type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
+                </div>
+                <div className="controls__knob">
+                  <span>Fdbk</span>
+                  <input type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
+                </div>
+                <div className="controls__knob">
+                  <span>Mix</span>
+                  <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
+                </div>
+              </div>
             </div>
-            <div className="controls__knob">
-              <span>Fdbk</span>
-              <input type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
-            </div>
-            <div className="controls__knob">
-              <span>Mix</span>
-              <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
-            </div>
-          </div>
-        </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Reverb</label>
-          <div className="controls__knobs">
-            <div className="controls__knob">
-              <span>Mix</span>
-              <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+            <div className="controls__section">
+              <label className="controls__label">Reverb</label>
+              <div className="controls__knobs">
+                <div className="controls__knob">
+                  <span>Mix</span>
+                  <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="controls__section">
-          <label className="controls__label">Crush</label>
-          <div className="controls__knobs">
-            <div className="controls__knob">
-              <span>Bits</span>
-              <input type="range" min="1" max="16" step="1" value={crushParams.bitDepth} onChange={handleCrushDepth} />
-            </div>
-            <div className="controls__knob">
-              <span>Rate</span>
-              <input type="range" min="1" max="40" step="1" value={crushParams.reduction} onChange={handleCrushReduction} />
-            </div>
-            <div className="controls__knob">
-              <span>Mix</span>
-              <input type="range" min="0" max="1" step="0.01" value={crushParams.mix} onChange={handleCrushMix} />
+            <div className="controls__section">
+              <label className="controls__label">Crush</label>
+              <div className="controls__knobs">
+                <div className="controls__knob">
+                  <span>Bits</span>
+                  <input type="range" min="1" max="16" step="1" value={crushParams.bitDepth} onChange={handleCrushDepth} />
+                </div>
+                <div className="controls__knob">
+                  <span>Rate</span>
+                  <input type="range" min="1" max="40" step="1" value={crushParams.reduction} onChange={handleCrushReduction} />
+                </div>
+                <div className="controls__knob">
+                  <span>Mix</span>
+                  <input type="range" min="0" max="1" step="0.01" value={crushParams.mix} onChange={handleCrushMix} />
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -60,20 +60,6 @@ export function ActivationMode({ mode, setMode, poly, setPoly, getEngine, arpBpm
         isRight={mode === 'arp'}
         onToggle={() => setMode(m => m === 'play' ? 'arp' : 'play')}
       />
-      <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
-        <label className="activation__tempo-label">
-          BPM <span className="activation__tempo-value">{arpBpm}</span>
-        </label>
-        <input
-          type="range"
-          min="40"
-          max="300"
-          step="1"
-          value={arpBpm}
-          onChange={(e) => setArpBpm(Number(e.target.value))}
-          disabled={mode !== 'arp'}
-        />
-      </div>
       <RockerSwitch
         leftLabel="Mono"
         rightLabel="Poly"
@@ -96,6 +82,20 @@ export function ActivationMode({ mode, setMode, poly, setPoly, getEngine, arpBpm
           Stop <kbd>Space</kbd>
         </button>
       )}
+      <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
+        <label className="activation__tempo-label">
+          BPM <span className="activation__tempo-value">{arpBpm}</span>
+        </label>
+        <input
+          type="range"
+          min="40"
+          max="300"
+          step="1"
+          value={arpBpm}
+          onChange={(e) => setArpBpm(Number(e.target.value))}
+          disabled={mode !== 'arp'}
+        />
+      </div>
     </div>
   )
 }

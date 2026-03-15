@@ -12,13 +12,19 @@
 .rocker {
   display: flex;
   align-items: stretch;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0a0a15;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #161628 0%, #0a0a15 40%, #080812 100%);
   cursor: pointer;
   user-select: none;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 -1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 1px 0 rgba(0, 0, 0, 0.5) inset;
 }
 
 .rocker__side {
@@ -34,27 +40,36 @@
 }
 
 .rocker__side--active {
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.04) 100%);
+  box-shadow:
+    inset 0 4px 10px rgba(0, 0, 0, 0.7),
+    inset 0 1px 3px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.03);
+  transform: translateY(1px);
 }
 
 .rocker__side:not(.rocker__side--active) {
-  background: rgba(255, 255, 255, 0.02);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  transform: translateY(-1px);
 }
 
 .rocker__side:not(.rocker__side--active):hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
 }
 
 .rocker__side:not(.rocker__side--active):active {
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.4);
+  transform: translateY(0px);
 }
 
 .rocker__divider {
-  width: 1px;
-  background: rgba(255, 255, 255, 0.08);
+  width: 2px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
   flex-shrink: 0;
+  box-shadow: -1px 0 0 rgba(255, 255, 255, 0.04), 1px 0 0 rgba(255, 255, 255, 0.04);
 }
 
 .rocker__lights {
@@ -79,17 +94,19 @@
 
 /* Individual indicator light */
 .switch-light {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--light-color);
+  background: radial-gradient(circle at 35% 35%, var(--light-color), color-mix(in srgb, var(--light-color), black 50%));
   opacity: 0.15;
   transition: opacity 0.25s, box-shadow 0.25s;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 .switch-light--on {
   opacity: 1;
-  box-shadow: 0 0 8px var(--light-color), 0 0 3px var(--light-color);
+  box-shadow: 0 0 10px var(--light-color), 0 0 4px var(--light-color), inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 /* --- Hold button --- */
@@ -98,6 +115,10 @@
   display: flex;
   align-items: center;
   gap: 0.4em;
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 100%);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 }
 
 .activation__hold kbd {

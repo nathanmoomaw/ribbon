@@ -62,3 +62,5 @@
 - [x] v1 deployed to ribbon.obfusco.us/v1
 - [x] Live multi-key arp cycling (arp+poly holds multiple keys → cycles through them)
 - [x] Activation controls sidebar (Play/Arp, BPM, Mono/Poly, Hold to left of controls panel)
+- [x] Toggles integrated into controls panel (left column with DJ volume fader)
+- [x] Enhanced 3D physical rocker switch styling

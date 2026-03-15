@@ -1,7 +1,59 @@
-import { useCallback, forwardRef } from 'react'
+import { useCallback, useRef as useRefHook, forwardRef } from 'react'
 import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import './Controls.css'
+
+function DJFader({ value, onChange }) {
+  const trackRef = useRefHook(null)
+  const dragging = useRefHook(false)
+
+  const updateValue = useCallback((clientY) => {
+    const track = trackRef.current
+    if (!track) return
+    const rect = track.getBoundingClientRect()
+    const ratio = 1 - Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
+    onChange(ratio)
+  }, [onChange])
+
+  const onPointerDown = useCallback((e) => {
+    dragging.current = true
+    e.currentTarget.setPointerCapture(e.pointerId)
+    updateValue(e.clientY)
+  }, [updateValue])
+
+  const onPointerMove = useCallback((e) => {
+    if (!dragging.current) return
+    updateValue(e.clientY)
+  }, [updateValue])
+
+  const onPointerUp = useCallback(() => {
+    dragging.current = false
+  }, [])
+
+  const pct = Math.round(value * 100)
+  const thumbTop = (1 - value) * 100
+
+  return (
+    <div className="controls__fader">
+      <label className="controls__fader-label">Vol</label>
+      <div
+        className="controls__fader-track"
+        ref={trackRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+      >
+        <div className="controls__fader-groove" />
+        <div
+          className="controls__fader-thumb"
+          style={{ top: `calc(${thumbTop}% - 5px)` }}
+        />
+      </div>
+      <span className="controls__fader-value">{pct}</span>
+    </div>
+  )
+}
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const OCTAVE_OPTIONS = [1, 2, 3, 4]
@@ -109,8 +161,7 @@ export const Controls = forwardRef(function Controls({
     })
   }, [setOscParams])
 
-  const handleVolume = useCallback((e) => {
-    const val = parseFloat(e.target.value)
+  const handleVolume = useCallback((val) => {
     setVolume(val)
     getEngine().setVolume(val)
   }, [getEngine, setVolume])
@@ -190,21 +241,7 @@ export const Controls = forwardRef(function Controls({
             hold={hold}
             setHold={setHold}
           />
-          <div className="controls__fader">
-            <label className="controls__fader-label">Vol</label>
-            <div className="controls__fader-track">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={handleVolume}
-                className="controls__fader-input"
-              />
-            </div>
-            <span className="controls__fader-value">{Math.round(volume * 100)}</span>
-          </div>
+          <DJFader value={volume} onChange={handleVolume} />
         </div>
 
         <div className="controls__main">

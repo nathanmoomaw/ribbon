@@ -61,3 +61,14 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] put play/arp THEN below that mono/poly then hold (aligned with the other please) and THEN the bpm slider under that.  let's call that chunk of items the "toggles".  then put this whole thing (the toggles) into the control panel on the left side, pushing everything nicely to the right.
 [x] put the main volume slider vertically and looking like a DJ mixer line fader underneath the toggles.
 [x] the rest of the items should slide right and fit as messily as they currently are.  need to work on their alignment in the future
+[x] hold button should be same width as toggle switches
+[x] bpm slider should also be this width
+[x] make the volume knob wider, so it is wider than the track it runs on (to better emulate a dj fader)
+[x] still not seeing proper poly arping when pressing multiple keyboard keys
+[x] outline on hold button looks funny
+[x] always keep the stop button visible, just disable it
+[x] future buttons and features should follow that pattern.  it's weird to have stuff move around in the ui when things are enabled
+[x] the main volume slider should no longer change on shake. the velocity differences achieve this effect
+[x] scale and octave should change sometimes on shake tho
+[x] general note: when i say dev branch i mean nmj/wX where X is the number of the week i've been working on the project
+[x] i don't see the octaves changing on shake

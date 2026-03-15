@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-14 — Shake refinements
+
+- Removed volume slider from shake randomization (velocity differences handle this)
+- Added octave randomization on shake (random 1-5, not nudge — small range needs full random)
+- Added scale randomization on shake (picks random scale from available options)
+- Fixed octave not visibly changing on shake (nudge delta too small for integer range)
+
 ## 2026-03-14 — Toggles integrated into controls panel with DJ fader
 
 - Moved toggles (Play/Arp, Mono/Poly, Hold, BPM) inside the controls panel as a left column

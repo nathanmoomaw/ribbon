@@ -178,12 +178,12 @@
   width: 90px;
 }
 
-/* --- Keys toggle (floating between ribbon and controls) --- */
+/* --- Keys toggle (between controls panel and ribbon) --- */
 
 .keys-toggle {
   display: flex;
   justify-content: center;
-  margin: -0.5rem 0;
+  margin: -1rem 0 -1rem;
   position: relative;
   z-index: 2;
 }

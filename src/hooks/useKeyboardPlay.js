@@ -3,7 +3,7 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, onArpNoteToggle) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle) {
   const activeKeysRef = useRef(new Set())
 
   useEffect(() => {
@@ -20,8 +20,9 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       const engine = getEngine()
       const voiceId = `key_${e.code}`
 
-      // In hold mode, start voice if needed but don't restart
-      if (hold) {
+      // In hold mode (non-arp), start voice if needed but don't restart
+      if (hold && mode !== 'arp') {
+        if (!poly) engine.allNotesOff() // mono: one voice at a time
         engine.voiceOn(voiceId, hz, 1)
         activeKeysRef.current.add(e.code)
         updatePositions()
@@ -29,24 +30,18 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       }
 
       if (mode === 'play') {
+        if (!poly) engine.allNotesOff() // mono: one voice at a time
         engine.voiceOn(voiceId, hz, 1)
         activeKeysRef.current.add(e.code)
-      } else if (mode === 'latch') {
-        if (engine.voiceIsPlaying(voiceId)) {
-          engine.voiceOff(voiceId)
-          activeKeysRef.current.delete(e.code)
-        } else {
-          engine.voiceOn(voiceId, hz, 1)
-          activeKeysRef.current.add(e.code)
-        }
       } else if (mode === 'arp') {
-        // Arp stays mono
-        engine.setFrequency(hz)
-        arpStart()
-        activeKeysRef.current.add(e.code)
-      } else if (mode === 'latch+arp') {
-        // Add/remove note from arp sequence
-        onArpNoteToggle?.(hz)
+        if (hold && poly) {
+          // Multi-note arp building (arp+hold+poly)
+          onArpNoteToggle?.(hz)
+        } else {
+          // Normal arp or arp+hold(mono)
+          engine.setFrequency(hz)
+          arpStart()
+        }
         activeKeysRef.current.add(e.code)
       }
 
@@ -65,7 +60,6 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
           } else if (mode === 'arp') {
             arpStop()
           }
-          // latch+arp: don't stop on key release — notes stay latched
         }
         activeKeysRef.current.delete(e.code)
         updatePositions()
@@ -89,7 +83,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, onArpNoteToggle])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle])
 }
 
 export { KEYS }

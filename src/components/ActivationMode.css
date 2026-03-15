@@ -1,46 +1,101 @@
 .activation {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 1.25rem;
 }
 
-.activation__group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
+/* --- Toggle Switch --- */
 
-.activation__group-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-primary);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
-}
-
-.activation__modes {
-  display: flex;
-  gap: 4px;
-}
-
-.activation__modes button {
+.synth-switch {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  padding: 4px 8px;
 }
 
-.activation__modes button:disabled {
-  cursor: not-allowed;
-  color: rgba(255, 255, 255, 0.5);
-  border-color: rgba(255, 255, 255, 0.1);
-  background-color: var(--bg-raised);
+.synth-switch__side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 28px;
 }
 
-.activation__modes button kbd,
-.activation__stop kbd {
+.synth-switch__label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.synth-switch__side--active .synth-switch__label {
+  color: var(--text-primary);
+}
+
+.synth-switch__lights {
+  display: flex;
+  gap: 4px;
+  height: 8px;
+  align-items: center;
+}
+
+/* Individual indicator light */
+.switch-light {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--light-color);
+  opacity: 0.15;
+  transition: opacity 0.25s, box-shadow 0.25s;
+}
+
+.switch-light--on {
+  opacity: 1;
+  box-shadow: 0 0 8px var(--light-color), 0 0 3px var(--light-color);
+}
+
+/* Track and thumb */
+.synth-switch__track {
+  width: 32px;
+  height: 16px;
+  border-radius: 8px;
+  background: #0d0d1a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.synth-switch__thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #888, #555);
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: left 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.synth-switch__track--right .synth-switch__thumb {
+  left: 17px;
+}
+
+/* --- Hold button --- */
+
+.activation__hold {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.activation__hold kbd {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   padding: 0.1em 0.35em;
@@ -48,6 +103,8 @@
   background: rgba(255, 255, 255, 0.1);
   color: var(--text-muted);
 }
+
+/* --- Stop button --- */
 
 .activation__stop {
   display: flex;
@@ -62,6 +119,26 @@
   box-shadow: var(--glow-magenta);
 }
 
+.activation__stop kbd {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+/* --- BPM tempo --- */
+
+.activation__group-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+
 .activation__arp-tempo {
   display: flex;
   align-items: center;
@@ -73,31 +150,63 @@
   width: 90px;
 }
 
-.activation__keys-toggle {
-  font-size: 0.7rem;
-  padding: 0.2em 0.6em;
-  opacity: 0.5;
-  transition: opacity 0.15s;
+/* --- Keys toggle (floating between ribbon and controls) --- */
+
+.keys-toggle {
+  display: flex;
+  justify-content: center;
+  margin: -0.5rem 0;
+  position: relative;
+  z-index: 2;
 }
 
-.activation__keys-toggle.active {
-  opacity: 1;
+.keys-toggle__btn {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15em 0.8em;
+  border-radius: 3px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  opacity: 0.35;
+  cursor: pointer;
+  transition: opacity 0.15s, border-color 0.15s;
 }
+
+.keys-toggle__btn:hover {
+  opacity: 0.6;
+}
+
+.keys-toggle__btn.active {
+  opacity: 0.75;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-primary);
+}
+
+/* --- Mobile --- */
 
 @media (max-width: 767px) {
   .activation {
     gap: 0.75rem;
   }
 
-  .activation__modes button {
+  .synth-switch {
+    gap: 4px;
+    padding: 2px 4px;
+  }
+
+  .synth-switch__label {
+    font-size: 0.55rem;
+  }
+
+  .activation__hold {
     font-size: 0.75rem;
     padding: 0.3em 0.6em;
   }
 
-  .activation__modes button kbd {
-    display: none;
-  }
-
+  .activation__hold kbd,
   .activation__stop kbd {
     display: none;
   }

@@ -1,5 +1,23 @@
 # Devlog
 
+## 2026-03-14 — Hardware-style switches, mono/poly, control redesign
+
+- Replaced Play/Latch/Arp mode buttons with hardware-style toggle switches
+  - Play/Arp toggle switch: clementine orange light (play), grapefruit pink + avocado green + meyer lemon yellow lights (arp)
+  - Mono/Poly toggle switch: sky blue light (mono), eggplant purple + lime green + silver lights (poly)
+  - Indicator lights glow when active, dim when inactive
+- Removed standalone latch mode (functionality preserved via arp+hold+poly combo)
+- Added mono/poly voice mode: mono = one voice at a time, poly = multi-voice (default: mono)
+- Arp+Hold now triggers held arp (continues after release)
+- Arp+Hold+Poly triggers multi-note arp building (tap notes to add to sequence)
+- Hold button now has blood orange red indicator light
+- Keys toggle moved between ribbon and controls panel, more subtle/discreet styling
+- Shake randomization now sometimes toggles switches (play/arp, mono/poly) and hold
+  - Switch toggle chance is lower (~8-23%) than parameter nudges
+  - Hold toggle even rarer (~60% of switch chance)
+- Keyboard shortcuts updated: 1=play, 2=arp, 3=mono/poly toggle, 4=hold
+- Stop button now shown whenever Hold is active (replaces latch-only stop)
+
 ## 2026-03-14 — Spacebar arp stop, BPM shake, input simplification, latch+arp combo
 
 - Spacebar now stops the arpeggiator in addition to cutting all notes

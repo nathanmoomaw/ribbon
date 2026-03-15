@@ -44,6 +44,7 @@ function App() {
   const [visualMode, setVisualMode] = useState('party')
   const [arpBpm, setArpBpm] = useState(120)
   const [hold, setHold] = useState(false)
+  const [poly, setPoly] = useState(false)
   const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
@@ -62,17 +63,9 @@ function App() {
       setArpNotes([])
       arpStopRef.current?.()
     },
-    Digit1: () => { setMode('play'); setArpNotes([]) },
-    Digit2: () => setMode(m => {
-      if (m === 'arp') return 'latch+arp'
-      if (m === 'latch+arp') { setArpNotes([]); return 'arp' }
-      return 'latch'
-    }),
-    Digit3: () => setMode(m => {
-      if (m === 'latch') return 'latch+arp'
-      if (m === 'latch+arp') { setArpNotes([]); return 'latch' }
-      return 'arp'
-    }),
+    Digit1: () => setMode('play'),
+    Digit2: () => setMode('arp'),
+    Digit3: () => setPoly(p => !p),
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
   }), [mode, hold, getEngine])
@@ -86,7 +79,7 @@ function App() {
   const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm, arpNotes)
   arpStopRef.current = arpStop
 
-  // Toggle a note in/out of the arp sequence (latch+arp mode)
+  // Toggle a note in/out of the arp sequence (arp+hold+poly mode)
   const handleArpNoteToggle = useCallback((hz) => {
     setArpNotes(prev => {
       const existing = prev.findIndex(n => Math.abs(n - hz) < 1)
@@ -99,10 +92,10 @@ function App() {
     })
   }, [])
 
-  // Auto-start/stop arp when notes are added/removed in latch+arp mode
+  // Auto-start/stop arp when notes are added/removed in arp+hold+poly mode
   const prevArpNotesLenRef = useRef(0)
   useEffect(() => {
-    if (mode === 'latch+arp') {
+    if (mode === 'arp' && hold && poly) {
       const prevLen = prevArpNotesLenRef.current
       if (prevLen === 0 && arpNotes.length > 0) {
         arpStart()
@@ -111,16 +104,16 @@ function App() {
       }
     }
     prevArpNotesLenRef.current = arpNotes.length
-  }, [arpNotes, mode, arpStart, arpStop])
+  }, [arpNotes, mode, hold, poly, arpStart, arpStop])
 
-  // Clear arp notes when leaving latch+arp mode
+  // Clear arp notes when leaving arp+hold+poly mode
   useEffect(() => {
-    if (mode !== 'latch+arp') {
+    if (!(mode === 'arp' && hold && poly)) {
       setArpNotes([])
     }
-  }, [mode])
+  }, [mode, hold, poly])
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, handleArpNoteToggle)
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle)
 
   // --- Shake/Quake handler ---
   const handleShake = useCallback((intensity) => {
@@ -222,6 +215,18 @@ function App() {
       setArpBpm(newBpm)
     }
 
+    // Switches — lower chance, bigger impact
+    const switchChance = 0.08 + intensity * 0.15
+    if (Math.random() < switchChance) {
+      setMode(m => m === 'play' ? 'arp' : 'play')
+    }
+    if (Math.random() < switchChance) {
+      setPoly(p => !p)
+    }
+    if (Math.random() < switchChance * 0.6) {
+      setHold(h => !h)
+    }
+
     // 3. Trigger a random ribbon press — velocity scales with intensity
     const shakeVoiceId = `shake_${Date.now()}`
     const shakePosition = Math.random()
@@ -266,14 +271,18 @@ function App() {
     return () => window.removeEventListener('pointermove', handleGlobalMove)
   }, [hold, getEngine, octaves, stepped, scale, ribbonInteraction])
 
-  // When hold is toggled off, stop all notes if in play mode
+  // When hold is toggled off, stop all notes and arp
   const holdRef = useRef(hold)
   useEffect(() => {
     const wasHold = holdRef.current
     holdRef.current = hold
     if (wasHold && !hold) {
       const engine = getEngine()
-      if (engine.getIsPlaying() && mode === 'play') {
+      if (mode === 'play') {
+        if (engine.getIsPlaying()) engine.allNotesOff()
+      } else if (mode === 'arp') {
+        setArpNotes([])
+        arpStopRef.current?.()
         engine.allNotesOff()
       }
     }
@@ -291,8 +300,8 @@ function App() {
       <ActivationMode
         mode={mode}
         setMode={setMode}
-        inputMode={inputMode}
-        setInputMode={setInputMode}
+        poly={poly}
+        setPoly={setPoly}
         getEngine={getEngine}
         arpBpm={arpBpm}
         setArpBpm={setArpBpm}
@@ -313,11 +322,22 @@ function App() {
         arpStart={arpStart}
         arpStop={arpStop}
         hold={hold}
+        poly={poly}
         shaking={shaking}
         undulating={undulating}
         onArpNoteToggle={handleArpNoteToggle}
         arpNotes={arpNotes}
       />
+
+      <div className="keys-toggle">
+        <button
+          className={`keys-toggle__btn ${inputMode === 'keys' ? 'active' : ''}`}
+          onClick={() => setInputMode(inputMode === 'keys' ? 'touch' : 'keys')}
+          title="A-L keys control ribbon"
+        >
+          Keys
+        </button>
+      </div>
 
       <Controls
         ref={controlsRef}

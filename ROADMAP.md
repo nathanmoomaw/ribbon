@@ -51,3 +51,9 @@
 - [x] BPM included in shake randomization
 - [x] Simplified input mode (Keys toggle replaces Touch/Keys selector)
 - [x] Latch+Arp combo mode (multi-note arp sequences via latched taps)
+- [x] Hardware-style toggle switches (Play/Arp, Mono/Poly) with indicator lights
+- [x] Mono/poly voice mode
+- [x] Latch removed; arp+hold(+poly) replaces latch+arp combo
+- [x] Hold button indicator light
+- [x] Shake toggles switches and hold
+- [x] Keys toggle repositioned (subtle, between ribbon and controls)

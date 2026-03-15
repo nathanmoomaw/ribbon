@@ -1,24 +1,10 @@
 .activation {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-}
-
-/* --- Switch group layout --- */
-
-.activation__switch-group {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.4rem;
-}
-
-.activation__switch-row {
-  display: flex;
-  align-items: center;
   gap: 0.6rem;
+  flex-shrink: 0;
 }
 
 /* --- Rocker Switch --- */
@@ -147,12 +133,13 @@
   color: var(--text-muted);
 }
 
-/* --- BPM tempo (always visible, under play/arp) --- */
+/* --- BPM tempo --- */
 
 .activation__arp-tempo {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
   transition: opacity 0.2s;
 }
 
@@ -217,7 +204,9 @@
 
 @media (max-width: 767px) {
   .activation {
-    gap: 0.75rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .rocker__side {
@@ -237,6 +226,11 @@
   .activation__hold kbd,
   .activation__stop kbd {
     display: none;
+  }
+
+  .activation__arp-tempo {
+    flex-direction: row;
+    gap: 0.5rem;
   }
 
   .activation__arp-tempo input[type="range"] {

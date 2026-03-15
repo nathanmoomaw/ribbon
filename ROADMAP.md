@@ -61,3 +61,4 @@
 - [x] Controls layout polish (BPM beside Play/Arp, Hold beside Mono/Poly)
 - [x] v1 deployed to ribbon.obfusco.us/v1
 - [x] Live multi-key arp cycling (arp+poly holds multiple keys → cycles through them)
+- [x] Activation controls sidebar (Play/Arp, BPM, Mono/Poly, Hold to left of controls panel)

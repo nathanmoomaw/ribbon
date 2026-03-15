@@ -309,6 +309,7 @@ function App() {
         <span className="subtitle">analog ribbon synth</span>
       </header>
 
+      <div className="controls-row">
       <ActivationMode
         mode={mode}
         setMode={setMode}
@@ -346,6 +347,7 @@ function App() {
         setGlideSpeed={setGlideSpeed}
         shaking={shaking}
       />
+      </div>
 
       <div className="keys-toggle">
         <button

@@ -52,56 +52,50 @@ export function ActivationMode({ mode, setMode, poly, setPoly, getEngine, arpBpm
 
   return (
     <div className="activation">
-      <div className="activation__switch-group">
-        <div className="activation__switch-row">
-          <RockerSwitch
-            leftLabel="Play"
-            rightLabel="Arp"
-            leftLights={[COLORS.clementine]}
-            rightLights={[COLORS.grapefruit, COLORS.avocado, COLORS.lemon]}
-            isRight={mode === 'arp'}
-            onToggle={() => setMode(m => m === 'play' ? 'arp' : 'play')}
-          />
-          <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
-            <label className="activation__tempo-label">
-              BPM <span className="activation__tempo-value">{arpBpm}</span>
-            </label>
-            <input
-              type="range"
-              min="40"
-              max="300"
-              step="1"
-              value={arpBpm}
-              onChange={(e) => setArpBpm(Number(e.target.value))}
-              disabled={mode !== 'arp'}
-            />
-          </div>
-        </div>
-        <div className="activation__switch-row">
-          <RockerSwitch
-            leftLabel="Mono"
-            rightLabel="Poly"
-            leftLights={[COLORS.sky]}
-            rightLights={[COLORS.eggplant, COLORS.lime, COLORS.silver]}
-            isRight={poly}
-            onToggle={() => setPoly(p => !p)}
-          />
-          <button
-            className={`activation__hold ${hold ? 'active' : ''}`}
-            onClick={() => setHold(h => !h)}
-            title="Hold note"
-          >
-            <Light color={COLORS.blood} on={hold} />
-            Hold
-            <kbd>4</kbd>
-          </button>
-          {hold && (
-            <button className="activation__stop" onClick={handleStop}>
-              Stop <kbd>Space</kbd>
-            </button>
-          )}
-        </div>
+      <RockerSwitch
+        leftLabel="Play"
+        rightLabel="Arp"
+        leftLights={[COLORS.clementine]}
+        rightLights={[COLORS.grapefruit, COLORS.avocado, COLORS.lemon]}
+        isRight={mode === 'arp'}
+        onToggle={() => setMode(m => m === 'play' ? 'arp' : 'play')}
+      />
+      <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
+        <label className="activation__tempo-label">
+          BPM <span className="activation__tempo-value">{arpBpm}</span>
+        </label>
+        <input
+          type="range"
+          min="40"
+          max="300"
+          step="1"
+          value={arpBpm}
+          onChange={(e) => setArpBpm(Number(e.target.value))}
+          disabled={mode !== 'arp'}
+        />
       </div>
+      <RockerSwitch
+        leftLabel="Mono"
+        rightLabel="Poly"
+        leftLights={[COLORS.sky]}
+        rightLights={[COLORS.eggplant, COLORS.lime, COLORS.silver]}
+        isRight={poly}
+        onToggle={() => setPoly(p => !p)}
+      />
+      <button
+        className={`activation__hold ${hold ? 'active' : ''}`}
+        onClick={() => setHold(h => !h)}
+        title="Hold note"
+      >
+        <Light color={COLORS.blood} on={hold} />
+        Hold
+        <kbd>4</kbd>
+      </button>
+      {hold && (
+        <button className="activation__stop" onClick={handleStop}>
+          Stop <kbd>Space</kbd>
+        </button>
+      )}
     </div>
   )
 }

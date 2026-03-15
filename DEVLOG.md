@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-14 — Activation controls sidebar layout
+
+- Moved activation controls (Play/Arp, BPM, Mono/Poly, Hold, Stop) to a vertical sidebar on the left of the controls panel
+- Wrapped ActivationMode + Controls in a flex row container (`.controls-row`)
+- Simplified ActivationMode JSX: removed switch-group/switch-row wrappers, flat vertical stack
+- BPM slider stacks vertically under Play/Arp rocker
+- On mobile, activation controls flow horizontally and stack above controls
+
 ## 2026-03-14 — Live multi-key arp cycling
 
 - In arp+poly mode, holding multiple keyboard keys now cycles the arpeggiator through all held notes

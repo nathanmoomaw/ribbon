@@ -321,36 +321,6 @@ function App() {
         setHold={setHold}
       />
 
-      <Ribbon
-        ref={ribbonRef}
-        getEngine={getEngine}
-        mode={mode}
-        inputMode={inputMode}
-        octaves={octaves}
-        stepped={stepped}
-        scale={scale}
-        externalPositions={keyboardPositions}
-        ribbonInteraction={ribbonInteraction}
-        arpStart={arpStart}
-        arpStop={arpStop}
-        hold={hold}
-        poly={poly}
-        shaking={shaking}
-        undulating={undulating}
-        onArpNoteToggle={handleArpNoteToggle}
-        arpNotes={arpNotes}
-      />
-
-      <div className="keys-toggle">
-        <button
-          className={`keys-toggle__btn ${inputMode === 'keys' ? 'active' : ''}`}
-          onClick={() => setInputMode(inputMode === 'keys' ? 'touch' : 'keys')}
-          title="A-L keys control ribbon"
-        >
-          Keys
-        </button>
-      </div>
-
       <Controls
         ref={controlsRef}
         getEngine={getEngine}
@@ -375,6 +345,36 @@ function App() {
         glideSpeed={glideSpeed}
         setGlideSpeed={setGlideSpeed}
         shaking={shaking}
+      />
+
+      <div className="keys-toggle">
+        <button
+          className={`keys-toggle__btn ${inputMode === 'keys' ? 'active' : ''}`}
+          onClick={() => setInputMode(inputMode === 'keys' ? 'touch' : 'keys')}
+          title="A-L keys control ribbon"
+        >
+          Keys
+        </button>
+      </div>
+
+      <Ribbon
+        ref={ribbonRef}
+        getEngine={getEngine}
+        mode={mode}
+        inputMode={inputMode}
+        octaves={octaves}
+        stepped={stepped}
+        scale={scale}
+        externalPositions={keyboardPositions}
+        ribbonInteraction={ribbonInteraction}
+        arpStart={arpStart}
+        arpStop={arpStop}
+        hold={hold}
+        poly={poly}
+        shaking={shaking}
+        undulating={undulating}
+        onArpNoteToggle={handleArpNoteToggle}
+        arpNotes={arpNotes}
       />
     </div>
   )

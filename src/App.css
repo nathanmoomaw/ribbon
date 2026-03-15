@@ -30,11 +30,17 @@
 
 /* On desktop, swap ribbon below controls */
 @media (min-width: 768px) {
-  .app .ribbon {
-    order: 5;
+  .app .activation {
+    order: 3;
   }
   .app .controls {
     order: 4;
+  }
+  .app .keys-toggle {
+    order: 5;
+  }
+  .app .ribbon {
+    order: 6;
   }
 }
 

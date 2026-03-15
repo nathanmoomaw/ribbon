@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-14 — Live multi-key arp cycling
+
+- In arp+poly mode, holding multiple keyboard keys now cycles the arpeggiator through all held notes
+- Notes added on keydown, removed on keyup — arp auto-starts/stops based on held keys
+- Distinct from arp+hold+poly (latched toggle): this is live, based on which keys are currently pressed
+- Extended arp note auto-start/stop effect to cover arp+poly (not just arp+hold+poly)
+
 ## 2026-03-14 — Rocker switches, layout polish, v1 deploy
 
 - Redesigned toggle switches as rocker switches with pressed/raised 3D visual states

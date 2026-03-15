@@ -92,10 +92,22 @@ function App() {
     })
   }, [])
 
-  // Auto-start/stop arp when notes are added/removed in arp+hold+poly mode
+  // Add/remove notes for live arp+poly (keys held down)
+  const handleArpNoteAdd = useCallback((hz) => {
+    setArpNotes(prev => {
+      if (prev.some(n => Math.abs(n - hz) < 1)) return prev
+      return [...prev, hz]
+    })
+  }, [])
+
+  const handleArpNoteRemove = useCallback((hz) => {
+    setArpNotes(prev => prev.filter(n => Math.abs(n - hz) >= 1))
+  }, [])
+
+  // Auto-start/stop arp when notes are added/removed in arp+poly mode
   const prevArpNotesLenRef = useRef(0)
   useEffect(() => {
-    if (mode === 'arp' && hold && poly) {
+    if (mode === 'arp' && poly) {
       const prevLen = prevArpNotesLenRef.current
       if (prevLen === 0 && arpNotes.length > 0) {
         arpStart()
@@ -104,16 +116,16 @@ function App() {
       }
     }
     prevArpNotesLenRef.current = arpNotes.length
-  }, [arpNotes, mode, hold, poly, arpStart, arpStop])
+  }, [arpNotes, mode, poly, arpStart, arpStop])
 
-  // Clear arp notes when leaving arp+hold+poly mode
+  // Clear arp notes when leaving arp+poly mode
   useEffect(() => {
-    if (!(mode === 'arp' && hold && poly)) {
+    if (!(mode === 'arp' && poly)) {
       setArpNotes([])
     }
-  }, [mode, hold, poly])
+  }, [mode, poly])
 
-  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle)
+  useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove)
 
   // --- Shake/Quake handler ---
   const handleShake = useCallback((intensity) => {

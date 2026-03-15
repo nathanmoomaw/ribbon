@@ -55,5 +55,5 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] put the bpm slider to the right of play/arp
 [x] put the hold button cleanly to theh right of the mono/poly button
 [x] the keys button isn't in the right place. it should be below the control panel and above the ribbon, no need to add any more spacing, just stick it nicely in there
-[] pressing multiple keys on the keyboard while poly and arp are triggered should cycle through those keys
+[x] pressing multiple keys on the keyboard while poly and arp are triggered should cycle through those keys
 [] 

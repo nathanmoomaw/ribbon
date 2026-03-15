@@ -3,8 +3,9 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove) {
   const activeKeysRef = useRef(new Set())
+  const keyFreqRef = useRef(new Map()) // track hz per key for arp+poly removal
 
   useEffect(() => {
     function onKeyDown(e) {
@@ -35,8 +36,12 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
         activeKeysRef.current.add(e.code)
       } else if (mode === 'arp') {
         if (hold && poly) {
-          // Multi-note arp building (arp+hold+poly)
+          // Multi-note arp building (arp+hold+poly) — latched toggle
           onArpNoteToggle?.(hz)
+        } else if (poly) {
+          // Live multi-key arp (arp+poly) — cycle held keys
+          keyFreqRef.current.set(e.code, hz)
+          onArpNoteAdd?.(hz)
         } else {
           // Normal arp or arp+hold(mono)
           engine.setFrequency(hz)
@@ -58,7 +63,14 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
           if (mode === 'play') {
             getEngine().voiceOff(voiceId)
           } else if (mode === 'arp') {
-            arpStop()
+            if (poly) {
+              // Remove this key's note from arp cycle
+              const hz = keyFreqRef.current.get(e.code)
+              if (hz) onArpNoteRemove?.(hz)
+              keyFreqRef.current.delete(e.code)
+            } else {
+              arpStop()
+            }
           }
         }
         activeKeysRef.current.delete(e.code)
@@ -83,7 +95,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove])
 }
 
 export { KEYS }

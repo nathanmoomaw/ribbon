@@ -60,3 +60,4 @@
 - [x] Rocker switch UI (pressed/raised 3D toggle switches)
 - [x] Controls layout polish (BPM beside Play/Arp, Hold beside Mono/Poly)
 - [x] v1 deployed to ribbon.obfusco.us/v1
+- [x] Live multi-key arp cycling (arp+poly holds multiple keys → cycles through them)

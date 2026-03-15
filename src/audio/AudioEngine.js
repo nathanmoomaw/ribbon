@@ -244,9 +244,10 @@ export function voiceIsPlaying(id) {
 // --- Mono convenience API (for arp and simple use) ---
 
 const MONO_ID = '_mono'
+let monoFrequency = 220
 
 export function noteOn(velocity = 1) {
-  voiceOn(MONO_ID, 220, velocity)
+  voiceOn(MONO_ID, monoFrequency, velocity)
 }
 
 export function noteOff() {
@@ -254,7 +255,7 @@ export function noteOff() {
 }
 
 export function setFrequency(hz) {
-  // If mono voice exists, update it. Otherwise just store for next noteOn.
+  monoFrequency = hz
   const voice = voiceMap.get(MONO_ID)
   if (voice) {
     voiceSetFrequency(MONO_ID, hz)

@@ -64,3 +64,7 @@
 - [x] Activation controls sidebar (Play/Arp, BPM, Mono/Poly, Hold to left of controls panel)
 - [x] Toggles integrated into controls panel (left column with DJ volume fader)
 - [x] Enhanced 3D physical rocker switch styling
+- [x] Shake refinements (no volume change, add octave/scale randomization)
+- [x] Stop button always visible (disabled when inactive)
+- [x] Fixed poly arp keyboard cycling
+- [x] UI stability pattern (disable rather than hide controls)

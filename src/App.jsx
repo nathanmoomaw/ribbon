@@ -4,6 +4,7 @@ import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
 import { useShake } from './hooks/useShake'
+import { SCALES } from './utils/scales'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
@@ -156,12 +157,6 @@ function App() {
     }))
 
     if (shouldNudge()) {
-      const newVol = nudge(volume, 0, 1, intensity)
-      setVolume(newVol)
-      engine.setVolume(newVol)
-    }
-
-    if (shouldNudge()) {
       const newCutoff = nudge(filterParams.cutoff, 20, 20000, intensity)
       setFilterParams(prev => ({ ...prev, cutoff: newCutoff }))
       engine.setFilter({ cutoff: newCutoff })
@@ -226,6 +221,17 @@ function App() {
       setArpBpm(newBpm)
     }
 
+    if (shouldNudge()) {
+      const newOctaves = Math.floor(Math.random() * 5) + 1
+      setOctaves(newOctaves)
+    }
+
+    if (shouldNudge()) {
+      const scaleNames = Object.keys(SCALES)
+      const randomScale = scaleNames[Math.floor(Math.random() * scaleNames.length)]
+      setScale([randomScale])
+    }
+
     // Switches — lower chance, bigger impact
     const switchChance = 0.08 + intensity * 0.15
     if (Math.random() < switchChance) {
@@ -261,7 +267,7 @@ function App() {
         ribbonInteraction.current.active = false
       }
     }, noteDuration)
-  }, [getEngine, volume, filterParams, glideSpeed, delayParams, reverbMix, crushParams, arpBpm, octaves, stepped, scale, ribbonInteraction])
+  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crushParams, arpBpm, octaves, stepped, scale, ribbonInteraction])
 
   useShake(handleShake, controlsRef, ribbonRef)
 

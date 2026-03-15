@@ -48,5 +48,12 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] the arp+latch combo functionality created earlier should be triggered by a combination of arp and the hold key.  if poly is also selected the functionality should be like that described by the latch+arp combo before.
 [x] the keys button created before should be more discreet and subtle, hovering over the ribbon itself, between the ribbon and the controls panel
 [x] shake should also affect these switches and sometimes even the hold button
-[] deploy my v1 branch to ribbon.obfusco.us/v1 and leave it there for posterity.  will do this for each iteration of "version"
-
+[x] deploy my v1 branch to ribbon.obfusco.us/v1 and leave it there for posterity.  will do this for each iteration of "version"
+[x] make the switches rocker switches (and larger, more fun to press)
+[x] keep the tempo slider up always, but not active until on arp mode, also move it down under play/arp
+[x] put the mono/poly button directly below the play/arp button
+[x] put the bpm slider to the right of play/arp
+[x] put the hold button cleanly to theh right of the mono/poly button
+[x] the keys button isn't in the right place. it should be below the control panel and above the ribbon, no need to add any more spacing, just stick it nicely in there
+[] pressing multiple keys on the keyboard while poly and arp are triggered should cycle through those keys
+[] 

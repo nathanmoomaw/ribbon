@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-03-14 — Rocker switches, layout polish, v1 deploy
+
+- Redesigned toggle switches as rocker switches with pressed/raised 3D visual states
+  - Active side pressed inward (inset shadow), inactive side raised (outset shadow)
+  - Larger, more tactile — more fun to press
+- Layout reorganization:
+  - Row 1: Play/Arp rocker + BPM slider to the right
+  - Row 2: Mono/Poly rocker + Hold button + Stop button
+  - BPM slider always visible, dimmed when not in arp mode
+  - Keys toggle repositioned below controls panel, above ribbon
+- Deployed v1 branch to ribbon.obfusco.us/v1 for posterity
+- Updated deploy workflow to preserve versioned folders (`--exclude "v*/*"`)
+
 ## 2026-03-14 — Hardware-style switches, mono/poly, control redesign
 
 - Replaced Play/Latch/Arp mode buttons with hardware-style toggle switches

@@ -28,25 +28,9 @@
   font-family: var(--font-mono);
 }
 
-/* --- Controls row: activation sidebar + controls panel --- */
-
-.controls-row {
-  display: flex;
-  align-items: stretch;
-  gap: 0.75rem;
-  max-width: 800px;
-  width: 100%;
-}
-
-.controls-row .controls {
-  flex: 1;
-  max-width: none;
-  margin: 0;
-}
-
-/* On desktop, order controls-row and ribbon */
+/* On desktop, order controls and ribbon */
 @media (min-width: 768px) {
-  .app .controls-row {
+  .app .controls {
     order: 4;
   }
   .app .keys-toggle {
@@ -66,15 +50,6 @@
   }
 
   .app-header {
-    align-self: center;
-  }
-
-  .controls-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .controls-row .activation {
     align-self: center;
   }
 }

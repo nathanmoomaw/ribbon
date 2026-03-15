@@ -1,5 +1,20 @@
 # Devlog
 
+## 2026-03-14 — Toggles integrated into controls panel with DJ fader
+
+- Moved toggles (Play/Arp, Mono/Poly, Hold, BPM) inside the controls panel as a left column
+- Reordered: Play/Arp → Mono/Poly → Hold → BPM (top to bottom)
+- Added vertical DJ mixer line fader for volume underneath the toggles
+- Removed volume from the shared controls section (replaced by fader)
+- Enhanced rocker switches with more physical 3D dimension:
+  - Multi-layer gradients, beveled borders, raised/pressed transforms
+  - Deeper inset shadows on active side, subtle highlight on inactive
+  - Thicker divider with edge highlights
+  - Indicator lights with radial gradient and glass-like border
+  - Hold button matches 3D style
+- Rest of controls slide right of the toggles column
+- On mobile, toggles wrap horizontally above the main controls
+
 ## 2026-03-14 — Activation controls sidebar layout
 
 - Moved activation controls (Play/Arp, BPM, Mono/Poly, Hold, Stop) to a vertical sidebar on the left of the controls panel

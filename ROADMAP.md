@@ -57,3 +57,6 @@
 - [x] Hold button indicator light
 - [x] Shake toggles switches and hold
 - [x] Keys toggle repositioned (subtle, between ribbon and controls)
+- [x] Rocker switch UI (pressed/raised 3D toggle switches)
+- [x] Controls layout polish (BPM beside Play/Arp, Hold beside Mono/Poly)
+- [x] v1 deployed to ribbon.obfusco.us/v1

@@ -6,49 +6,95 @@
   gap: 1.25rem;
 }
 
-/* --- Toggle Switch --- */
+/* --- Switch group layout --- */
 
-.synth-switch {
+.activation__switch-group {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  user-select: none;
-  padding: 4px 8px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
 }
 
-.synth-switch__side {
+.activation__switch-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* --- Rocker Switch --- */
+
+.rocker {
+  display: flex;
+  align-items: stretch;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0a0a15;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.rocker__side {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  min-width: 28px;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 18px;
+  min-width: 56px;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  position: relative;
 }
 
-.synth-switch__label {
+.rocker__side--active {
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.rocker__side:not(.rocker__side--active) {
+  background: rgba(255, 255, 255, 0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.rocker__side:not(.rocker__side--active):hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.rocker__side:not(.rocker__side--active):active {
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.rocker__divider {
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.rocker__lights {
+  display: flex;
+  gap: 5px;
+  height: 8px;
+  align-items: center;
+}
+
+.rocker__label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
   transition: color 0.2s;
 }
 
-.synth-switch__side--active .synth-switch__label {
+.rocker__side--active .rocker__label {
   color: var(--text-primary);
-}
-
-.synth-switch__lights {
-  display: flex;
-  gap: 4px;
-  height: 8px;
-  align-items: center;
 }
 
 /* Individual indicator light */
 .switch-light {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--light-color);
   opacity: 0.15;
@@ -58,33 +104,6 @@
 .switch-light--on {
   opacity: 1;
   box-shadow: 0 0 8px var(--light-color), 0 0 3px var(--light-color);
-}
-
-/* Track and thumb */
-.synth-switch__track {
-  width: 32px;
-  height: 16px;
-  border-radius: 8px;
-  background: #0d0d1a;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  position: relative;
-  flex-shrink: 0;
-}
-
-.synth-switch__thumb {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: linear-gradient(145deg, #888, #555);
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  transition: left 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-}
-
-.synth-switch__track--right .synth-switch__thumb {
-  left: 17px;
 }
 
 /* --- Hold button --- */
@@ -128,22 +147,31 @@
   color: var(--text-muted);
 }
 
-/* --- BPM tempo --- */
-
-.activation__group-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--text-primary);
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
-}
+/* --- BPM tempo (always visible, under play/arp) --- */
 
 .activation__arp-tempo {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: 4px;
+  transition: opacity 0.2s;
+}
+
+.activation__arp-tempo--inactive {
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.activation__tempo-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.activation__tempo-value {
+  color: var(--text-primary);
 }
 
 .activation__arp-tempo input[type="range"] {
@@ -192,13 +220,13 @@
     gap: 0.75rem;
   }
 
-  .synth-switch {
-    gap: 4px;
-    padding: 2px 4px;
+  .rocker__side {
+    padding: 8px 12px;
+    min-width: 44px;
   }
 
-  .synth-switch__label {
-    font-size: 0.55rem;
+  .rocker__label {
+    font-size: 0.6rem;
   }
 
   .activation__hold {

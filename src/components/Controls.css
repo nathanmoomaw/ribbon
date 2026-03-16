@@ -11,7 +11,8 @@
   gap: 0.75rem;
   flex-shrink: 0;
   padding-right: 0.75rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 3px solid rgba(20, 18, 38, 0.5);
+  box-shadow: 1px 0 0 rgba(100, 95, 140, 0.06);
 }
 
 .controls__main {
@@ -128,20 +129,145 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  padding: 1rem;
+  padding: 1.25rem 1.25rem 0.5rem;
   max-width: 800px;
   margin: 0 auto;
-  background: linear-gradient(165deg, rgba(22, 22, 40, 0.97), rgba(14, 14, 26, 0.97));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  backdrop-filter: blur(12px);
+  position: relative;
+  background:
+    /* Heavy horizontal panel seams — welded steel plate joins */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 58px,
+      rgba(15, 12, 30, 0.6) 58px,
+      rgba(80, 70, 110, 0.1) 59px,
+      rgba(15, 12, 30, 0.5) 60px,
+      transparent 61px
+    ),
+    /* Vertical structural ribs — wide spacing, brutalist */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 148px,
+      rgba(15, 12, 30, 0.45) 148px,
+      rgba(80, 70, 110, 0.08) 149px,
+      rgba(15, 12, 30, 0.4) 150px,
+      transparent 151px
+    ),
+    /* Brushed steel grain — fine horizontal lines */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(140, 130, 170, 0.015) 1px,
+      rgba(140, 130, 170, 0.015) 2px
+    ),
+    /* Base — heavy blue-purple steel, brutalist building palette */
+    linear-gradient(
+      178deg,
+      rgba(48, 44, 72, 0.88) 0%,
+      rgba(32, 30, 55, 0.85) 20%,
+      rgba(38, 40, 68, 0.83) 40%,
+      rgba(25, 22, 45, 0.87) 60%,
+      rgba(42, 38, 65, 0.85) 80%,
+      rgba(30, 28, 52, 0.88) 100%
+    );
+  /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
+  border: 3px solid rgba(50, 45, 75, 0.6);
+  border-top-color: rgba(100, 95, 140, 0.25);
+  border-left-color: rgba(90, 85, 130, 0.2);
+  border-bottom-color: rgba(10, 8, 20, 0.8);
+  border-right-color: rgba(15, 12, 28, 0.7);
+  border-radius: 4px;
+  backdrop-filter: blur(14px);
+  /* Outer frame — like the steel casing around the CRT */
+  outline: 2px solid rgba(25, 22, 42, 0.6);
+  outline-offset: 1px;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 2px 8px rgba(0, 0, 0, 0.3),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 -1px 0 rgba(0, 0, 0, 0.3) inset;
-  animation: shimmer-border 8s ease-in-out infinite, float 6s ease-in-out infinite;
+    /* Massive structural shadow — brutalist weight */
+    0 16px 50px rgba(0, 0, 0, 0.7),
+    0 6px 20px rgba(0, 0, 0, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    /* Deep inner bevel — recessed panel */
+    0 3px 0 rgba(100, 95, 140, 0.06) inset,
+    0 -3px 0 rgba(0, 0, 0, 0.5) inset,
+    3px 0 0 rgba(80, 75, 110, 0.04) inset,
+    -3px 0 0 rgba(0, 0, 0, 0.3) inset;
+  animation: float 6s ease-in-out infinite, sphere-light 12s ease-in-out infinite;
   transform-style: preserve-3d;
+}
+
+/* Rivet strip along edges + scanline overlay */
+.controls::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background:
+    /* Bolt/rivet dots along top edge */
+    radial-gradient(circle 2.5px at 16px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at 56px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at 96px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 16px) 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 56px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 96px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    /* Bolt dots along bottom edge */
+    radial-gradient(circle 2.5px at 16px calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at 56px calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 16px) calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 56px) calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    /* Side bolts */
+    radial-gradient(circle 2.5px at 10px 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
+    radial-gradient(circle 2.5px at calc(100% - 10px) 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+/* Animated sphere light — shifts which color is dominant, casting onto the panel */
+@keyframes sphere-light {
+  0%, 100% {
+    box-shadow:
+      0 16px 50px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.5),
+      0 2px 6px rgba(0, 0, 0, 0.4),
+      0 3px 0 rgba(100, 95, 140, 0.06) inset,
+      0 -3px 0 rgba(0, 0, 0, 0.5) inset,
+      3px 0 0 rgba(80, 75, 110, 0.04) inset,
+      -3px 0 0 rgba(0, 0, 0, 0.3) inset,
+      /* Sphere glow — cyan dominant */
+      -30px 15px 80px -20px rgba(0, 200, 220, 0.16),
+      22px -12px 100px -30px rgba(200, 0, 140, 0.07),
+      8px 28px 120px -35px rgba(110, 80, 200, 0.06);
+  }
+  33% {
+    box-shadow:
+      0 16px 50px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.5),
+      0 2px 6px rgba(0, 0, 0, 0.4),
+      0 3px 0 rgba(100, 95, 140, 0.06) inset,
+      0 -3px 0 rgba(0, 0, 0, 0.5) inset,
+      3px 0 0 rgba(80, 75, 110, 0.04) inset,
+      -3px 0 0 rgba(0, 0, 0, 0.3) inset,
+      /* Sphere glow — magenta dominant */
+      26px -22px 80px -20px rgba(0, 200, 220, 0.07),
+      -18px 26px 100px -30px rgba(200, 0, 140, 0.16),
+      -22px -14px 120px -35px rgba(110, 80, 200, 0.06);
+  }
+  66% {
+    box-shadow:
+      0 16px 50px rgba(0, 0, 0, 0.7),
+      0 6px 20px rgba(0, 0, 0, 0.5),
+      0 2px 6px rgba(0, 0, 0, 0.4),
+      0 3px 0 rgba(100, 95, 140, 0.06) inset,
+      0 -3px 0 rgba(0, 0, 0, 0.5) inset,
+      3px 0 0 rgba(80, 75, 110, 0.04) inset,
+      -3px 0 0 rgba(0, 0, 0, 0.3) inset,
+      /* Sphere glow — purple dominant */
+      14px 24px 80px -20px rgba(0, 200, 220, 0.06),
+      26px 8px 100px -30px rgba(200, 0, 140, 0.07),
+      -28px -20px 120px -35px rgba(110, 80, 200, 0.16);
+  }
 }
 
 .controls__oscillators {
@@ -152,18 +278,55 @@
 .controls__osc {
   flex: 1;
   padding: 0.75rem;
-  border-left: 3px solid var(--osc-color, var(--cyan));
-  border-radius: 0 8px 8px 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), -3px 0 12px -4px var(--osc-color, var(--cyan));
+  border-radius: 4px;
+  background:
+    /* Brushed grain */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 18px,
+      rgba(100, 90, 140, 0.05) 18px,
+      rgba(100, 90, 140, 0.05) 19px
+    ),
+    linear-gradient(180deg, rgba(55, 50, 85, 0.5) 0%, rgba(35, 32, 58, 0.4) 100%);
+  /* Chunky beveled border — raised panel look */
+  border: 2px solid rgba(60, 55, 90, 0.6);
+  border-top-color: rgba(110, 100, 155, 0.35);
+  border-left-color: rgba(100, 90, 145, 0.3);
+  border-bottom-color: rgba(10, 8, 20, 0.7);
+  border-right-color: rgba(15, 12, 28, 0.6);
+  box-shadow:
+    0 3px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(140, 130, 180, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(20, 18, 35, 0.5);
   transition: box-shadow 0.3s, transform 0.3s;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  position: relative;
+}
+
+/* Color accent strip along top — subtle nod to the osc color */
+.controls__osc::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--osc-color, var(--cyan));
+  opacity: 0.4;
+  border-radius: 0 0 2px 2px;
 }
 
 .controls__osc:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3), -3px 0 20px -4px var(--osc-color, var(--cyan));
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(140, 130, 180, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(20, 18, 35, 0.5),
+    0 0 12px -4px var(--osc-color, var(--cyan));
 }
 
 .controls__osc-label {
@@ -183,8 +346,8 @@
   flex-wrap: wrap;
   gap: 1.25rem;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-subtle);
-  border-image: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), rgba(139, 92, 246, 0.2), transparent) 1;
+  border-top: 3px solid rgba(20, 18, 38, 0.6);
+  box-shadow: 0 1px 0 rgba(100, 95, 140, 0.06) inset, 0 -1px 0 rgba(60, 55, 90, 0.15);
 }
 
 .controls__section {
@@ -250,8 +413,8 @@
 .lo-mode .controls {
   animation: none;
   transform: none;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+  border-color: rgba(80, 70, 110, 0.12);
 }
 
 .lo-mode .controls__osc-label {
@@ -260,6 +423,56 @@
 
 .lo-mode .controls__osc {
   box-shadow: none;
+}
+
+/* Shake trigger button — lower right, subtle & animated */
+.controls__shake-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(100, 90, 140, 0.25);
+  background: linear-gradient(145deg, rgba(60, 55, 90, 0.6), rgba(35, 32, 58, 0.8));
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
+  animation: shake-idle 4s ease-in-out infinite;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.controls__shake-btn:hover {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(160, 140, 220, 0.4);
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.2), 0 0 20px rgba(139, 92, 246, 0.1);
+  animation: none;
+  transform: scale(1.1);
+}
+
+.controls__shake-btn:active {
+  transform: scale(0.9);
+  animation: shake 0.4s ease-out;
+}
+
+.controls__shake-icon {
+  display: block;
+  line-height: 1;
+}
+
+/* Subtle idle animation — gentle wobble/pulse to draw attention */
+@keyframes shake-idle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  15% { transform: rotate(-3deg) scale(1.02); }
+  30% { transform: rotate(2deg) scale(0.98); }
+  45% { transform: rotate(-1deg) scale(1.01); }
+  60% { transform: rotate(0deg) scale(1); }
 }
 
 /* Shake effect */
@@ -289,7 +502,8 @@
     padding-right: 0;
     padding-bottom: 0.75rem;
     border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: none;
+    border-bottom: 3px solid rgba(20, 18, 38, 0.5);
   }
 
   .controls__fader {

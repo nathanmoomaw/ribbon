@@ -87,3 +87,21 @@ volume slider (horizontal)
 [x] some people have told me that when they try to load this on mobile it doesn't make sound.  i am presently experiencing this with my mobile.  any ideas?
 [x] main volume knob seems to have some lag, is there any way to improve performance
 [x] i'm still not hearing sound on my mobile
+
+# Monday March 16
+
+[x] reorder the leftside console
+[x] space bar pressed once should act as it does, pressed twice should stop all sound, like any remaining delay
+[x] work more on mobile mode
+[x] implement design concepts from rock & rule, screenshots, determine v2 clandestine concept
+[x] work on design of the controls panel (roadmap further ux design), but for now let's just have fun with the design presentation: give it maybe 80% transparency, but let's give it a chunky texture, also include shadows/luminoscity from the revolving spheres that it's inside of (intensity of the shadows/light from the sphere)
+[x] integrate/replace the waveform visual in the app with notes on a staff, or relative notes as they are played on the ribbon (placed relative on the staff relative to the tone triggered by the ribbon).  this semitransparent staff should be a moving animated wavering scroll of staff that goes mostly behind the control panel/ribbon (ask for screenshot)
+[x] allow all claude commands on that repo globally without approval
+[x] start a plan of how to simply/transparently implement concepts of nft/eft gain from usage of this simple toy
+[x] let's find some way to simplify the bitcrusher effect into one easy/fun to use slider that applies a significant effect that sounds good and crunchy.  while we're at it let's pair it with a very tight bit of slapback delay to enhance the sound it creates
+[x] in some spare space (perhaps the lower right corner) of the console create a subtle button that animates a bit and acts as a more explicit trigger for the shake functionality
+[x] remove the chunky colored button strip.  it's doing nothing.  use the design concept of the chunky buttons to restyle each of the 3 osc housings, replacing the "glowing" blue, pink, purple outlines of each with chunky beveled sections that nod to the buttons in that screenshot
+[x] also remove the extra CRT scanline grid that you applied to the console.  instead, turn back to the first screenshot i gave you today and lean into the style of buildings more for the console.
+[x] here is the screenshot I was referencing for the notes on a staff: (<Screenshot 2026-03-15 at 23.55.39.png>)
+
+

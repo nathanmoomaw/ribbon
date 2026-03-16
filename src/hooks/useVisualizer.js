@@ -261,29 +261,260 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.globalAlpha = 1
     }
 
-    function drawWaveform() {
-      // timeDomain already populated by render()
-      if (!timeDomain) return
+    // --- Staff notation state ---
+    const staffNotes = [] // { x, staffY, age, freq, velocity }
+    const STAFF_SCROLL_SPEED = 1.2 // px per frame
+    const MAX_STAFF_NOTES = 120
+    const NOTE_SPAWN_INTERVAL = 3 // frames between note spawns when active
+    let noteSpawnCounter = 0
+    let lastDetectedFreq = 0
 
-      const sliceWidth = cachedW / timeDomain.length
+    // Convert frequency to staff Y position (relative 0-1 within staff)
+    // Maps roughly C3(130Hz) to C6(1046Hz) across staff range
+    function freqToStaffPosition(freq) {
+      if (freq < 20) return 0.5
+      // MIDI note number from freq
+      const midi = 12 * Math.log2(freq / 440) + 69
+      // Map MIDI 48(C3) to bottom, MIDI 84(C6) to top — 3 octaves = 36 semitones
+      const normalized = (midi - 48) / 36
+      return Math.max(0, Math.min(1, normalized))
+    }
 
-      // Draw twice for glow effect: thick transparent + thin bright (no shadowBlur)
-      gl.strokeStyle = '#00f0ff'
-      gl.globalAlpha = 0.3
-      gl.lineWidth = 6
-      gl.beginPath()
-      for (let i = 0; i < timeDomain.length; i++) {
-        const v = timeDomain[i] / 128.0
-        const y = (v * cachedH) / 2
-        if (i === 0) gl.moveTo(0, y)
-        else gl.lineTo(i * sliceWidth, y)
+    // Detect dominant frequency from analyser data
+    function detectPitch() {
+      if (!freqData || !analyser) return 0
+      analyser.getByteFrequencyData(freqData)
+      let maxVal = 0
+      let maxIdx = 0
+      // Skip very low bins (noise)
+      for (let i = 2; i < freqData.length / 2; i++) {
+        if (freqData[i] > maxVal) {
+          maxVal = freqData[i]
+          maxIdx = i
+        }
       }
-      gl.stroke()
+      if (maxVal < 30) return 0 // silence threshold
+      // Convert bin index to frequency
+      const nyquist = (analyser.context?.sampleRate || 44100) / 2
+      return maxIdx * nyquist / analyser.frequencyBinCount
+    }
+
+    function drawStaffNotation(time) {
+      const staffTop = cachedH * 0.32
+      const staffBottom = cachedH * 0.58
+      const staffHeight = staffBottom - staffTop
+      const lineCount = 5
+      const lineSpacing = staffHeight / (lineCount - 1)
+
+      // Detect current pitch and spawn notes
+      const isActive = ribbonInteraction?.current?.active
+      const velocity = ribbonInteraction?.current?.velocity ?? 0
+
+      if (isActive && velocity > 0.05) {
+        const freq = detectPitch()
+        if (freq > 40) {
+          lastDetectedFreq = freq
+          noteSpawnCounter++
+          if (noteSpawnCounter >= NOTE_SPAWN_INTERVAL) {
+            noteSpawnCounter = 0
+            const staffPos = freqToStaffPosition(freq)
+            // Snap to nearest staff line or space
+            const lineUnit = 1 / ((lineCount - 1) * 2) // half-steps between lines
+            const snapped = Math.round(staffPos / lineUnit) * lineUnit
+            staffNotes.push({
+              x: cachedW + 20,
+              staffY: snapped,
+              age: 0,
+              freq,
+              velocity,
+              size: 8 + velocity * 6,
+            })
+            if (staffNotes.length > MAX_STAFF_NOTES) staffNotes.shift()
+          }
+        }
+      } else {
+        noteSpawnCounter = 0
+      }
+
+      // Wavering offset for the whole staff
+      const waver = Math.sin(time * 0.0008) * 3 + Math.sin(time * 0.0013) * 2
+
+      // Draw staff lines — green neon, like the screenshot
+      gl.globalAlpha = 0.35
+      gl.lineWidth = 1.5
+      for (let i = 0; i < lineCount; i++) {
+        const y = staffTop + i * lineSpacing + waver
+        // Subtle wave per line
+        const lineWaver = Math.sin(time * 0.001 + i * 0.8) * 1.5
+        gl.strokeStyle = `rgba(57, 255, 20, ${0.25 + Math.sin(time * 0.002 + i) * 0.08})`
+        gl.beginPath()
+        // Draw as a gentle curve rather than straight
+        for (let x = 0; x <= cachedW; x += 40) {
+          const localWave = Math.sin(x * 0.003 + time * 0.0006 + i * 1.2) * 2 + lineWaver
+          if (x === 0) gl.moveTo(x, y + localWave)
+          else gl.lineTo(x, y + localWave)
+        }
+        gl.stroke()
+      }
+
+      // Glow layer for staff lines
+      gl.globalAlpha = 0.12
+      gl.lineWidth = 4
+      for (let i = 0; i < lineCount; i++) {
+        const y = staffTop + i * lineSpacing + waver
+        const lineWaver = Math.sin(time * 0.001 + i * 0.8) * 1.5
+        gl.strokeStyle = '#39ff14'
+        gl.beginPath()
+        for (let x = 0; x <= cachedW; x += 40) {
+          const localWave = Math.sin(x * 0.003 + time * 0.0006 + i * 1.2) * 2 + lineWaver
+          if (x === 0) gl.moveTo(x, y + localWave)
+          else gl.lineTo(x, y + localWave)
+        }
+        gl.stroke()
+      }
+
+      // Update and draw notes — pink/magenta neon
+      let writeIdx = 0
+      for (let i = 0; i < staffNotes.length; i++) {
+        const note = staffNotes[i]
+        note.x -= STAFF_SCROLL_SPEED
+        note.age++
+
+        if (note.x < -40) continue // off screen left
+        staffNotes[writeIdx++] = note
+
+        // Position on staff (1 = top, 0 = bottom)
+        const noteY = staffBottom - note.staffY * staffHeight + waver
+        const noteWaver = Math.sin(note.x * 0.005 + time * 0.001) * 2
+
+        // Fade in and out
+        const fadeIn = Math.min(1, note.age / 15)
+        const fadeOut = note.x < 60 ? note.x / 60 : 1
+        const alpha = fadeIn * fadeOut * 0.8
+
+        const sz = note.size
+
+        // Glow
+        gl.globalAlpha = alpha * 0.3
+        gl.fillStyle = '#ff00aa'
+        gl.beginPath()
+        gl.ellipse(note.x, noteY + noteWaver, sz * 1.8, sz * 1.3, -0.2, 0, Math.PI * 2)
+        gl.fill()
+
+        // Note head (filled ellipse)
+        gl.globalAlpha = alpha
+        gl.fillStyle = '#ff6ec7'
+        gl.beginPath()
+        gl.ellipse(note.x, noteY + noteWaver, sz, sz * 0.7, -0.2, 0, Math.PI * 2)
+        gl.fill()
+
+        // Bright center
+        gl.globalAlpha = alpha * 0.6
+        gl.fillStyle = '#ffaadd'
+        gl.beginPath()
+        gl.ellipse(note.x, noteY + noteWaver, sz * 0.5, sz * 0.35, -0.2, 0, Math.PI * 2)
+        gl.fill()
+
+        // Note stem
+        gl.globalAlpha = alpha * 0.7
+        gl.strokeStyle = '#ff6ec7'
+        gl.lineWidth = 1.5
+        const stemDir = note.staffY > 0.5 ? 1 : -1 // stems down if above middle, up if below
+        gl.beginPath()
+        gl.moveTo(note.x + (stemDir > 0 ? -sz : sz) * 0.9, noteY + noteWaver)
+        gl.lineTo(note.x + (stemDir > 0 ? -sz : sz) * 0.9, noteY + noteWaver + stemDir * 28)
+        gl.stroke()
+
+        // Flag on the stem (for eighth-note look)
+        if (note.velocity > 0.3) {
+          gl.globalAlpha = alpha * 0.5
+          gl.beginPath()
+          const flagX = note.x + (stemDir > 0 ? -sz : sz) * 0.9
+          const flagY = noteY + noteWaver + stemDir * 28
+          gl.moveTo(flagX, flagY)
+          gl.quadraticCurveTo(
+            flagX + 10, flagY + stemDir * 5,
+            flagX + 8, flagY + stemDir * 14
+          )
+          gl.strokeStyle = '#ff6ec7'
+          gl.lineWidth = 1.5
+          gl.stroke()
+        }
+      }
+      staffNotes.length = writeIdx
 
       gl.globalAlpha = 1
-      gl.lineWidth = 2
-      gl.stroke() // reuse same path
+    }
 
+    function drawLoStaff(time) {
+      const staffTop = cachedH * 0.35
+      const staffBottom = cachedH * 0.55
+      const staffHeight = staffBottom - staffTop
+      const lineCount = 5
+      const lineSpacing = staffHeight / (lineCount - 1)
+
+      // Detect and spawn notes in lo mode too
+      const isActive = ribbonInteraction?.current?.active
+      const velocity = ribbonInteraction?.current?.velocity ?? 0
+
+      if (isActive && velocity > 0.05) {
+        const freq = detectPitch()
+        if (freq > 40) {
+          noteSpawnCounter++
+          if (noteSpawnCounter >= NOTE_SPAWN_INTERVAL) {
+            noteSpawnCounter = 0
+            const staffPos = freqToStaffPosition(freq)
+            const lineUnit = 1 / ((lineCount - 1) * 2)
+            const snapped = Math.round(staffPos / lineUnit) * lineUnit
+            staffNotes.push({
+              x: cachedW + 20,
+              staffY: snapped,
+              age: 0,
+              freq,
+              velocity,
+              size: 6 + velocity * 4,
+            })
+            if (staffNotes.length > MAX_STAFF_NOTES) staffNotes.shift()
+          }
+        }
+      } else {
+        noteSpawnCounter = 0
+      }
+
+      // Simple straight staff lines — muted
+      gl.globalAlpha = 0.15
+      gl.lineWidth = 1
+      gl.strokeStyle = 'rgba(57, 255, 20, 0.2)'
+      for (let i = 0; i < lineCount; i++) {
+        const y = staffTop + i * lineSpacing
+        gl.beginPath()
+        gl.moveTo(0, y)
+        gl.lineTo(cachedW, y)
+        gl.stroke()
+      }
+
+      // Notes — simpler, muted
+      let writeIdx = 0
+      for (let i = 0; i < staffNotes.length; i++) {
+        const note = staffNotes[i]
+        note.x -= STAFF_SCROLL_SPEED * 0.8
+        note.age++
+        if (note.x < -30) continue
+        staffNotes[writeIdx++] = note
+
+        const noteY = staffBottom - note.staffY * staffHeight
+        const fadeIn = Math.min(1, note.age / 15)
+        const fadeOut = note.x < 60 ? note.x / 60 : 1
+        const alpha = fadeIn * fadeOut * 0.35
+
+        gl.globalAlpha = alpha
+        gl.fillStyle = 'rgba(255, 110, 199, 0.4)'
+        gl.beginPath()
+        gl.ellipse(note.x, noteY, note.size, note.size * 0.7, -0.2, 0, Math.PI * 2)
+        gl.fill()
+      }
+      staffNotes.length = writeIdx
+      gl.globalAlpha = 1
     }
 
     function drawFrequencyBars(time) {
@@ -440,25 +671,6 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
     let lastMode = visualModeRef.current
     let lastTime = 0
 
-    function drawLoWaveform() {
-      if (!timeDomain) return
-
-      const sliceWidth = cachedW / timeDomain.length
-
-      // Single thin muted line — no glow layers
-      gl.strokeStyle = 'rgba(0, 240, 255, 0.25)'
-      gl.lineWidth = 1.5
-      gl.globalAlpha = 1
-      gl.beginPath()
-      for (let i = 0; i < timeDomain.length; i++) {
-        const v = timeDomain[i] / 128.0
-        const y = (v * cachedH) / 2
-        if (i === 0) gl.moveTo(0, y)
-        else gl.lineTo(i * sliceWidth, y)
-      }
-      gl.stroke()
-    }
-
     function renderLo(time) {
       // Full clear — no trails
       gl.globalCompositeOperation = 'source-over'
@@ -471,8 +683,8 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
 
       if (hasAnalyser && analyser) {
         analyser.getByteTimeDomainData(timeDomain)
-        drawLoWaveform()
       }
+      drawLoStaff(time)
 
       // Very subtle ambient pulse — dimmer than party
       const pulse = 0.3 + Math.sin(time * 0.0008) * 0.2
@@ -538,11 +750,11 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
           fireworkTimer = 0
         }
 
-        drawWaveform()
       }
 
       wasActive = isActive
 
+      drawStaffNotation(time)
       drawFrequencyBars(time)
       drawIdleAmbient(time)
       updateParticles()

@@ -64,6 +64,18 @@ export function positionToFrequency(position, options = {}) {
 }
 
 /**
+ * Inverse of positionToFrequency — map a frequency back to a ribbon position (0–1).
+ */
+export function frequencyToPosition(freq, options = {}) {
+  const { octaves = 2, baseNote = BASE_NOTE } = options
+  const semitoneRange = octaves * 12
+  // freq = 440 * 2^((baseNote + semitone - 69) / 12)
+  // semitone = 12 * log2(freq / 440) + 69 - baseNote
+  const semitone = 12 * Math.log2(freq / 440) + 69 - baseNote
+  return Math.max(0, Math.min(1, semitone / semitoneRange))
+}
+
+/**
  * Get all note positions (0–1) for step markers on the ribbon.
  */
 export function getStepPositions(options = {}) {

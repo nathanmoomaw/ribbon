@@ -13,6 +13,9 @@ let crushWetGain = null
 let crushDryGain = null
 let postCrushGain = null
 let crushReady = false
+let slapbackNode = null
+let slapbackSend = null
+let slapbackFeedback = null
 
 const NUM_OSCILLATORS = 3
 const MAX_VOICES = 8
@@ -188,6 +191,20 @@ export function init() {
   reverbSend.connect(reverbNode)
   reverbNode.connect(ctx.destination)
 
+  // Slapback delay (paired with crush — very short, tight)
+  slapbackSend = ctx.createGain()
+  slapbackSend.gain.setValueAtTime(0, ctx.currentTime)
+  slapbackNode = ctx.createDelay(0.5)
+  slapbackNode.delayTime.setValueAtTime(0.04, ctx.currentTime) // 40ms slapback
+  slapbackFeedback = ctx.createGain()
+  slapbackFeedback.gain.setValueAtTime(0.2, ctx.currentTime) // subtle repeat
+
+  postCrushGain.connect(slapbackSend)
+  slapbackSend.connect(slapbackNode)
+  slapbackNode.connect(slapbackFeedback)
+  slapbackFeedback.connect(slapbackNode)
+  slapbackNode.connect(ctx.destination)
+
   return getEngine()
 }
 
@@ -315,6 +332,45 @@ export function allNotesOff() {
   }
 }
 
+// Kill ALL sound immediately — voices, delay tails, reverb tails
+export function killAllSound() {
+  // Stop all voices immediately (no fade)
+  for (const id of [...voiceMap.keys()]) {
+    destroyVoice(id)
+  }
+  if (!ctx) return
+  // Save current send/feedback values
+  const prevDelaySend = delaySend ? delaySend.gain.value : 0
+  const prevDelayFeedback = delayFeedback ? delayFeedback.gain.value : 0
+  const prevReverbSend = reverbSend ? reverbSend.gain.value : 0
+  const prevSlapbackSend = slapbackSend ? slapbackSend.gain.value : 0
+  // Zero everything to kill tails
+  if (delayFeedback) {
+    delayFeedback.gain.cancelScheduledValues(ctx.currentTime)
+    delayFeedback.gain.setValueAtTime(0, ctx.currentTime)
+  }
+  if (delaySend) {
+    delaySend.gain.cancelScheduledValues(ctx.currentTime)
+    delaySend.gain.setValueAtTime(0, ctx.currentTime)
+  }
+  if (reverbSend) {
+    reverbSend.gain.cancelScheduledValues(ctx.currentTime)
+    reverbSend.gain.setValueAtTime(0, ctx.currentTime)
+  }
+  if (slapbackSend) {
+    slapbackSend.gain.cancelScheduledValues(ctx.currentTime)
+    slapbackSend.gain.setValueAtTime(0, ctx.currentTime)
+  }
+  // Restore after tails have died
+  setTimeout(() => {
+    if (!ctx) return
+    if (delaySend) delaySend.gain.setValueAtTime(prevDelaySend, ctx.currentTime)
+    if (delayFeedback) delayFeedback.gain.setValueAtTime(prevDelayFeedback, ctx.currentTime)
+    if (reverbSend) reverbSend.gain.setValueAtTime(prevReverbSend, ctx.currentTime)
+    if (slapbackSend) slapbackSend.gain.setValueAtTime(prevSlapbackSend, ctx.currentTime)
+  }, 200)
+}
+
 // --- Global settings (apply to all existing + future voices) ---
 
 export function setFilter({ cutoff, resonance }) {
@@ -423,6 +479,24 @@ export function setCrush({ bitDepth, reduction, mix }) {
   }
 }
 
+// Single-slider crunch: maps 0-1 to bitDepth + reduction + mix + slapback
+export function setCrunch(amount) {
+  if (!ctx) return
+  // Map amount to crush parameters — aggressive curve for crunchy, lo-fi sound
+  // Use exponential curve so the first half of the slider has noticeable bite
+  const curve = amount * amount * 0.4 + amount * 0.6 // front-loaded curve
+  const mix = Math.min(1, amount * 1.3) // reach full wet earlier
+  const bitDepth = Math.round(16 - curve * 14)  // 16 → 2
+  const reduction = Math.round(1 + curve * 38)   // 1 → 39
+  setCrush({ bitDepth, reduction, mix })
+  // Slapback delay paired with crunch
+  if (slapbackSend) {
+    const slapMix = amount * 0.45  // punchier slapback, scales with crunch
+    slapbackSend.gain.cancelScheduledValues(ctx.currentTime)
+    slapbackSend.gain.linearRampToValueAtTime(slapMix, ctx.currentTime + 0.01)
+  }
+}
+
 export function getAnalyser() {
   return analyser
 }
@@ -459,6 +533,7 @@ function getEngine() {
     voiceSetVelocity,
     voiceIsPlaying,
     allNotesOff,
+    killAllSound,
     setAllActiveFrequencies,
     getActiveVoiceCount,
     setFilter,
@@ -470,6 +545,7 @@ function getEngine() {
     setDelay,
     setReverb,
     setCrush,
+    setCrunch,
     getAnalyser,
     getIsPlaying,
   }

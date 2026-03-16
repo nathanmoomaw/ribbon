@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useMemo, forwardRef } from 'react'
 import { useRibbon } from '../hooks/useRibbon'
-import { positionToFrequency, getStepPositions } from '../utils/pitchMap'
+import { positionToFrequency, frequencyToPosition, getStepPositions } from '../utils/pitchMap'
 import { KEYS } from '../hooks/useKeyboardPlay'
 import './Ribbon.css'
 
@@ -27,6 +27,15 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
   const stepPositions = useMemo(() => {
     return stepped ? getStepPositions({ octaves, scale }) : []
   }, [stepped, octaves, scale])
+
+  // Compute ribbon positions for active arp notes (arp+poly+hold mode)
+  const arpMarkerPositions = useMemo(() => {
+    if (mode !== 'arp' || !poly || !hold || arpNotes.length === 0) return []
+    return arpNotes.map(hz => ({
+      hz,
+      pos: frequencyToPosition(hz, { octaves }),
+    }))
+  }, [arpNotes, mode, poly, hold, octaves])
 
   const onPositionChange = useCallback((pointerId, pos, velocity) => {
     // In arp+poly+hold, don't track pitch changes on drag — taps add discrete notes
@@ -128,6 +137,22 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
             style={{ left: `${pos * 100}%` }}
           />
         ))}
+
+        {arpMarkerPositions.length > 0 && (
+          <div className="ribbon__arp-markers">
+            {arpMarkerPositions.map(({ hz, pos }) => (
+              <div
+                key={hz}
+                className="ribbon__arp-marker"
+                style={{ left: `${pos * 100}%` }}
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  onArpNoteToggle(hz)
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {stepped && stepPositions.length > 0 && (
           <div className="ribbon__steps">

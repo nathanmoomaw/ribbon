@@ -300,7 +300,7 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
     }
 
     // Flag wave function — returns Y offset for a given x position and time
-    // Creates a flag-like undulation that waves back and forth
+    // Creates a flag-like undulation that waves back and forth with depth
     function flagWave(x, time) {
       // Amplitude increases toward the edges (like a flag on a pole in the center)
       const centerDist = Math.abs(x / cachedW - 0.5) * 2 // 0 at center, 1 at edges
@@ -310,6 +310,14 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       const wave2 = Math.sin(x * 0.012 + time * 0.0015) * amp * 0.4
       const wave3 = Math.sin(x * 0.004 - time * 0.001) * amp * 0.25
       return wave1 + wave2 + wave3
+    }
+
+    // Depth (z-axis) wave — returns a scale factor (0.85–1.15) to simulate forward/backward motion
+    function flagDepth(x, time) {
+      const centerDist = Math.abs(x / cachedW - 0.5) * 2
+      const depthAmp = 0.12 + centerDist * 0.06
+      return 1 + Math.sin(x * 0.006 + time * 0.0018) * depthAmp +
+             Math.sin(x * 0.01 - time * 0.0012) * depthAmp * 0.4
     }
 
     function drawStaffNotation(time) {
@@ -349,34 +357,48 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         noteSpawnCounter = 0
       }
 
-      // Draw staff lines — green neon, waving like a flag
-      gl.globalAlpha = 0.35
-      gl.lineWidth = 1.5
-      for (let i = 0; i < lineCount; i++) {
-        const baseY = staffTop + i * lineSpacing
-        gl.strokeStyle = `rgba(57, 255, 20, ${0.25 + Math.sin(time * 0.002 + i) * 0.08})`
-        gl.beginPath()
-        for (let x = 0; x <= cachedW; x += 8) {
-          const waveY = baseY + flagWave(x, time + i * 80)
-          if (x === 0) gl.moveTo(x, waveY)
-          else gl.lineTo(x, waveY)
-        }
-        gl.stroke()
-      }
+      // Staff activity factor: dim when no notes visible, bright when playing
+      const hasNotes = staffNotes.length > 0
+      const staffActivity = hasNotes ? 1 : 0.3
 
-      // Glow layer for staff lines
-      gl.globalAlpha = 0.12
-      gl.lineWidth = 4
+      // Draw staff lines — green neon, waving like a flag with depth
+      const staffCenterY = (staffTop + staffBottom) / 2
       for (let i = 0; i < lineCount; i++) {
         const baseY = staffTop + i * lineSpacing
-        gl.strokeStyle = '#39ff14'
+        // Main line
+        gl.lineWidth = 1.5
         gl.beginPath()
         for (let x = 0; x <= cachedW; x += 8) {
+          const depth = flagDepth(x, time + i * 60)
           const waveY = baseY + flagWave(x, time + i * 80)
-          if (x === 0) gl.moveTo(x, waveY)
-          else gl.lineTo(x, waveY)
+          // Depth pulls lines toward/away from staff center (perspective)
+          const perspY = staffCenterY + (waveY - staffCenterY) * depth
+          const lineAlpha = (0.2 + depth * 0.18 + Math.sin(time * 0.002 + i) * 0.06) * staffActivity
+          if (x === 0) {
+            gl.strokeStyle = `rgba(57, 255, 20, ${lineAlpha})`
+            gl.moveTo(x, perspY)
+          } else {
+            gl.lineTo(x, perspY)
+          }
         }
+        gl.globalAlpha = 0.35 * staffActivity
         gl.stroke()
+
+        // Glow layer (skip when inactive for performance)
+        if (hasNotes) {
+          gl.beginPath()
+          gl.lineWidth = 3 + Math.sin(time * 0.001 + i * 1.5) * 1
+          for (let x = 0; x <= cachedW; x += 8) {
+            const depth = flagDepth(x, time + i * 60)
+            const waveY = baseY + flagWave(x, time + i * 80)
+            const perspY = staffCenterY + (waveY - staffCenterY) * depth
+            if (x === 0) gl.moveTo(x, perspY)
+            else gl.lineTo(x, perspY)
+          }
+          gl.globalAlpha = 0.08 + Math.abs(flagDepth(cachedW * 0.5, time + i * 60) - 1) * 0.3
+          gl.strokeStyle = '#39ff14'
+          gl.stroke()
+        }
       }
 
       // Update and draw notes — pink/magenta neon, following the flag wave
@@ -389,17 +411,21 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         if (note.x < -40) continue // off screen left
         staffNotes[writeIdx++] = note
 
-        // Base staff position + flag wave displacement at this note's x
+        // Base staff position + flag wave displacement at this note's x, with depth
         const baseNoteY = staffBottom - note.staffY * staffHeight
         const waveOffset = flagWave(note.x, time)
-        const noteY = baseNoteY + waveOffset
+        const depth = flagDepth(note.x, time)
+        const rawNoteY = baseNoteY + waveOffset
+        const noteY = staffCenterY + (rawNoteY - staffCenterY) * depth
 
         // Fade in and out
         const fadeIn = Math.min(1, note.age / 15)
         const fadeOut = note.x < 60 ? note.x / 60 : 1
-        const alpha = fadeIn * fadeOut * 0.8
+        // Depth affects brightness — closer = brighter, further = dimmer
+        const depthAlpha = 0.7 + (depth - 0.88) * 1.5
+        const alpha = fadeIn * fadeOut * Math.min(1, depthAlpha)
 
-        const sz = note.size
+        const sz = note.size * depth // scale with depth
 
         // Glow
         gl.globalAlpha = alpha * 0.3
@@ -425,10 +451,10 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         // Note stem — follows wave slope for natural look
         gl.globalAlpha = alpha * 0.7
         gl.strokeStyle = '#ff6ec7'
-        gl.lineWidth = 1.5
+        gl.lineWidth = 1.5 * depth
         const stemDir = note.staffY > 0.5 ? 1 : -1
         const stemX = note.x + (stemDir > 0 ? -sz : sz) * 0.9
-        const stemTopY = noteY + stemDir * 28
+        const stemTopY = noteY + stemDir * 28 * depth
         gl.beginPath()
         gl.moveTo(stemX, noteY)
         gl.lineTo(stemX, stemTopY)
@@ -438,12 +464,12 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         if (note.velocity > 0.3) {
           gl.globalAlpha = alpha * 0.5
           gl.strokeStyle = '#ff6ec7'
-          gl.lineWidth = 1.5
+          gl.lineWidth = 1.5 * depth
           gl.beginPath()
           gl.moveTo(stemX, stemTopY)
           gl.quadraticCurveTo(
-            stemX + 10, stemTopY + stemDir * 5,
-            stemX + 8, stemTopY + stemDir * 14
+            stemX + 10 * depth, stemTopY + stemDir * 5,
+            stemX + 8 * depth, stemTopY + stemDir * 14
           )
           gl.stroke()
         }
@@ -459,6 +485,13 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       const amp = 3 + centerDist * 6
       return Math.sin(x * 0.008 - time * 0.0015) * amp +
              Math.sin(x * 0.012 + time * 0.001) * amp * 0.3
+    }
+
+    // Gentle depth for lo mode
+    function loFlagDepth(x, time) {
+      const centerDist = Math.abs(x / cachedW - 0.5) * 2
+      const depthAmp = 0.06 + centerDist * 0.03
+      return 1 + Math.sin(x * 0.006 + time * 0.0012) * depthAmp
     }
 
     function drawLoStaff(time) {
@@ -496,22 +529,27 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         noteSpawnCounter = 0
       }
 
-      // Staff lines with gentle flag wave — muted
-      gl.globalAlpha = 0.15
+      // Staff lines with gentle flag wave + depth — muted, dimmer when inactive
+      const loStaffCenterY = (staffTop + staffBottom) / 2
+      const loHasNotes = staffNotes.length > 0
+      const loStaffActivity = loHasNotes ? 1 : 0.25
       gl.lineWidth = 1
-      gl.strokeStyle = 'rgba(57, 255, 20, 0.2)'
+      gl.strokeStyle = `rgba(57, 255, 20, ${0.2 * loStaffActivity})`
       for (let i = 0; i < lineCount; i++) {
         const baseY = staffTop + i * lineSpacing
         gl.beginPath()
         for (let x = 0; x <= cachedW; x += 12) {
           const waveY = baseY + loFlagWave(x, time + i * 80)
-          if (x === 0) gl.moveTo(x, waveY)
-          else gl.lineTo(x, waveY)
+          const depth = loFlagDepth(x, time + i * 60)
+          const perspY = loStaffCenterY + (waveY - loStaffCenterY) * depth
+          if (x === 0) gl.moveTo(x, perspY)
+          else gl.lineTo(x, perspY)
         }
+        gl.globalAlpha = 0.15 * loStaffActivity
         gl.stroke()
       }
 
-      // Notes — follow the wave, simpler muted style
+      // Notes — follow the wave with depth, simpler muted style
       let writeIdx = 0
       for (let i = 0; i < staffNotes.length; i++) {
         const note = staffNotes[i]
@@ -522,15 +560,18 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
 
         const baseNoteY = staffBottom - note.staffY * staffHeight
         const waveOffset = loFlagWave(note.x, time)
-        const noteY = baseNoteY + waveOffset
+        const depth = loFlagDepth(note.x, time)
+        const rawY = baseNoteY + waveOffset
+        const noteY = loStaffCenterY + (rawY - loStaffCenterY) * depth
         const fadeIn = Math.min(1, note.age / 15)
         const fadeOut = note.x < 60 ? note.x / 60 : 1
         const alpha = fadeIn * fadeOut * 0.35
+        const sz = note.size * depth
 
         gl.globalAlpha = alpha
         gl.fillStyle = 'rgba(255, 110, 199, 0.4)'
         gl.beginPath()
-        gl.ellipse(note.x, noteY, note.size, note.size * 0.7, -0.2, 0, Math.PI * 2)
+        gl.ellipse(note.x, noteY, sz, sz * 0.7, -0.2, 0, Math.PI * 2)
         gl.fill()
       }
       staffNotes.length = writeIdx

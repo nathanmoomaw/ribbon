@@ -74,3 +74,6 @@
 - [x] Osc color scheme: red/gold/green console button palette
 - [x] Prevent accidental text selection on console
 - [x] Arp+poly+hold fix (discrete note taps, no pitch-follow on drag)
+- [x] Staff depth perspective (forward/backward z-axis motion, inactive dimming)
+- [x] Crunch effect boost (more aggressive bitcrush curve, lower bit depth floor)
+- [x] Arp trigger markers on ribbon (visual lines at note positions, click to remove)

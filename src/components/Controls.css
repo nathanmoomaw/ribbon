@@ -74,6 +74,7 @@
   position: absolute;
   left: -6px;
   right: -6px;
+  top: var(--thumb-top, 0);
   height: 10px;
   border-radius: 2px;
   background: linear-gradient(180deg,
@@ -282,9 +283,8 @@
   }
 
   .controls__toggles {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
     padding-right: 0;
     padding-bottom: 0.75rem;
     border-right: none;
@@ -314,10 +314,10 @@
   }
 
   .controls__fader-thumb {
-    left: auto;
-    right: auto;
     top: 3px;
     bottom: 3px;
+    left: var(--thumb-left, 0);
+    right: auto;
     height: auto;
     width: 10px;
   }

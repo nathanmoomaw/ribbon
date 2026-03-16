@@ -7,23 +7,29 @@ function DJFader({ value, onChange }) {
   const trackRef = useRefHook(null)
   const dragging = useRefHook(false)
 
-  const updateValue = useCallback((clientY) => {
+  const updateValue = useCallback((e) => {
     const track = trackRef.current
     if (!track) return
     const rect = track.getBoundingClientRect()
-    const ratio = 1 - Math.max(0, Math.min(1, (clientY - rect.top) / rect.height))
-    onChange(ratio)
+    // If the track is wider than tall, it's horizontal (mobile layout)
+    if (rect.width > rect.height) {
+      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+      onChange(ratio)
+    } else {
+      const ratio = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
+      onChange(ratio)
+    }
   }, [onChange])
 
   const onPointerDown = useCallback((e) => {
     dragging.current = true
     e.currentTarget.setPointerCapture(e.pointerId)
-    updateValue(e.clientY)
+    updateValue(e)
   }, [updateValue])
 
   const onPointerMove = useCallback((e) => {
     if (!dragging.current) return
-    updateValue(e.clientY)
+    updateValue(e)
   }, [updateValue])
 
   const onPointerUp = useCallback(() => {
@@ -32,6 +38,7 @@ function DJFader({ value, onChange }) {
 
   const pct = Math.round(value * 100)
   const thumbTop = (1 - value) * 100
+  const thumbLeft = value * 100
 
   return (
     <div className="controls__fader">
@@ -47,7 +54,10 @@ function DJFader({ value, onChange }) {
         <div className="controls__fader-groove" />
         <div
           className="controls__fader-thumb"
-          style={{ top: `calc(${thumbTop}% - 5px)` }}
+          style={{
+            '--thumb-top': `calc(${thumbTop}% - 5px)`,
+            '--thumb-left': `calc(${thumbLeft}% - 5px)`,
+          }}
         />
       </div>
       <span className="controls__fader-value">{pct}</span>

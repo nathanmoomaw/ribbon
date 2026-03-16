@@ -72,3 +72,9 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 [x] scale and octave should change sometimes on shake tho
 [x] general note: when i say dev branch i mean nmj/wX where X is the number of the week i've been working on the project
 [x] i don't see the octaves changing on shake
+[x] seems to be bug where shake makes no octave selected. i don't know what it's doing, but it seems cool as fuck and i'd like to leave this bug
+
+# Sunday March 15
+
+[x] this is not optimized for mobile, the play/arp button falls off left, fix that and put directly under it the mono/poly button switch
+[x] mobile master volume does not work as it should.  i think there's a bug where it thinks it's still a vertical slider, but apparently at this size it's not

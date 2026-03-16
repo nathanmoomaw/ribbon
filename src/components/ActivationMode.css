@@ -251,14 +251,21 @@
 
 @media (max-width: 767px) {
   .activation {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
     gap: 0.5rem;
+    width: 100%;
+  }
+
+  .rocker {
+    width: 100%;
+    justify-content: center;
   }
 
   .rocker__side {
     padding: 8px 12px;
     min-width: 44px;
+    flex: 1;
   }
 
   .rocker__label {
@@ -268,6 +275,13 @@
   .activation__hold {
     font-size: 0.75rem;
     padding: 0.3em 0.6em;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .activation__stop {
+    width: 100%;
+    box-sizing: border-box;
   }
 
   .activation__hold kbd,
@@ -278,9 +292,11 @@
   .activation__arp-tempo {
     flex-direction: row;
     gap: 0.5rem;
+    width: 100%;
   }
 
   .activation__arp-tempo input[type="range"] {
-    width: 70px;
+    flex: 1;
+    min-width: 0;
   }
 }

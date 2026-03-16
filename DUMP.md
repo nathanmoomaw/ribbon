@@ -122,3 +122,7 @@ volume slider (horizontal)
 [x] right when ambient mode is about to start give a random, but non-zero amount of delay and reverb so the tight little short taps ring out pleasantly
 [x] ambient mode should be short taps and they don't need to be fast
 [x] the logo shouldn't highlight in a selected kind of way when tapped
+[x] move the lightning bolt to the top on desktop, just like mobile
+[x] adjust the position of the ambient icon to align more vertically centered with the logo
+[x] by default the ambient icon should be disabled.  after 30 seconds of inactivity it should animate "awake" emitting a brief bit of sparkles as it wake up.  then it should be lit up and ambient play should begin.
+[x] if the user clicks the ambient icon ambient play can start immediately (also, show the same awakening animation as if it woke itself up when clicked)

@@ -427,8 +427,9 @@
   box-shadow: none;
 }
 
-/* Shake trigger button — lower right, subtle & animated */
+/* Shake trigger button — replaced by header bolt on all sizes */
 .controls__shake-btn {
+  display: none;
   position: absolute;
   bottom: 16px;
   right: 16px;

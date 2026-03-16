@@ -68,3 +68,5 @@
 - [x] Stop button always visible (disabled when inactive)
 - [x] Fixed poly arp keyboard cycling
 - [x] UI stability pattern (disable rather than hide controls)
+- [x] Staff notation visual (scrolling neon notes on wavering staff, replaces waveform)
+- [x] Console restyling (removed CRT scanlines, removed button strip, beveled osc panels)

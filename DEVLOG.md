@@ -1,5 +1,24 @@
 # Devlog
 
+## 2026-03-16 — Staff notation visual, console restyling
+
+- Replaced waveform display with scrolling musical staff notation visual
+  - 5 green neon staff lines with gentle wavering animation
+  - Pink/magenta neon notes spawn as user plays, scroll right to left
+  - Notes positioned on staff based on detected pitch frequency (MIDI mapping)
+  - Note heads as tilted ellipses with stems and flags, glow layers for neon effect
+  - Lo mode gets a simpler muted version of the staff
+  - Inspired by Rock & Rule neon music staff screenshot
+- Removed CRT scanline grid from controls panel background
+  - Kept structural elements: horizontal panel seams, vertical ribs, brushed steel grain
+  - Slightly increased opacity on remaining layers for more solid building feel
+- Removed chunky colored button strip from bottom of controls panel (was decorative only)
+- Restyled oscillator section housings:
+  - Replaced glowing colored border-left with chunky beveled panel borders
+  - Light/shadow border pattern creates raised panel illusion (brutalist hardware feel)
+  - Subtle color accent strip along top of each osc section
+  - Hover state adds faint osc-color glow
+
 ## 2026-03-15 — iOS audio fix (root cause)
 
 - Root cause: visualizer animation loop called `getEngine()` on every frame, which triggered `AudioContext` creation outside a user gesture — iOS Safari permanently suspends contexts created this way

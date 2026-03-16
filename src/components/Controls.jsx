@@ -5,35 +5,54 @@ import './Controls.css'
 
 function DJFader({ value, onChange }) {
   const trackRef = useRefHook(null)
+  const thumbRef = useRefHook(null)
+  const valueRef = useRefHook(null)
   const dragging = useRefHook(false)
+  const cachedRect = useRefHook(null)
+  const isHorizontal = useRefHook(false)
 
-  const updateValue = useCallback((e) => {
-    const track = trackRef.current
-    if (!track) return
-    const rect = track.getBoundingClientRect()
-    // If the track is wider than tall, it's horizontal (mobile layout)
-    if (rect.width > rect.height) {
-      const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-      onChange(ratio)
-    } else {
-      const ratio = 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
-      onChange(ratio)
+  // Direct DOM update — bypasses React re-render for zero-lag thumb movement
+  const applyThumbPosition = useCallback((ratio) => {
+    const thumb = thumbRef.current
+    const valEl = valueRef.current
+    if (thumb) {
+      const topPct = (1 - ratio) * 100
+      const leftPct = ratio * 100
+      thumb.style.setProperty('--thumb-top', `calc(${topPct}% - 5px)`)
+      thumb.style.setProperty('--thumb-left', `calc(${leftPct}% - 5px)`)
     }
-  }, [onChange])
+    if (valEl) valEl.textContent = Math.round(ratio * 100)
+  }, [])
 
   const onPointerDown = useCallback((e) => {
     dragging.current = true
+    const track = trackRef.current
+    if (!track) return
     e.currentTarget.setPointerCapture(e.pointerId)
-    updateValue(e)
-  }, [updateValue])
+    // Cache rect once on pointer down — avoids layout thrash on every move
+    cachedRect.current = track.getBoundingClientRect()
+    isHorizontal.current = cachedRect.current.width > cachedRect.current.height
+    const rect = cachedRect.current
+    const ratio = isHorizontal.current
+      ? Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+      : 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
+    applyThumbPosition(ratio)
+    onChange(ratio)
+  }, [onChange, applyThumbPosition])
 
   const onPointerMove = useCallback((e) => {
-    if (!dragging.current) return
-    updateValue(e)
-  }, [updateValue])
+    if (!dragging.current || !cachedRect.current) return
+    const rect = cachedRect.current
+    const ratio = isHorizontal.current
+      ? Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+      : 1 - Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
+    applyThumbPosition(ratio)
+    onChange(ratio)
+  }, [onChange, applyThumbPosition])
 
   const onPointerUp = useCallback(() => {
     dragging.current = false
+    cachedRect.current = null
   }, [])
 
   const pct = Math.round(value * 100)
@@ -53,6 +72,7 @@ function DJFader({ value, onChange }) {
       >
         <div className="controls__fader-groove" />
         <div
+          ref={thumbRef}
           className="controls__fader-thumb"
           style={{
             '--thumb-top': `calc(${thumbTop}% - 5px)`,
@@ -60,7 +80,7 @@ function DJFader({ value, onChange }) {
           }}
         />
       </div>
-      <span className="controls__fader-value">{pct}</span>
+      <span ref={valueRef} className="controls__fader-value">{pct}</span>
     </div>
   )
 }
@@ -172,8 +192,11 @@ export const Controls = forwardRef(function Controls({
   }, [setOscParams])
 
   const handleVolume = useCallback((val) => {
-    setVolume(val)
+    // Update engine immediately; skip React state to avoid re-rendering entire Controls tree
     getEngine().setVolume(val)
+    // Debounced state sync so React value stays roughly current
+    if (handleVolume._raf) cancelAnimationFrame(handleVolume._raf)
+    handleVolume._raf = requestAnimationFrame(() => setVolume(val))
   }, [getEngine, setVolume])
 
   const handleDelayTime = useCallback((e) => {

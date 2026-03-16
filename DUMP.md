@@ -85,3 +85,4 @@ volume slider (horizontal)
 [x] on mobile always keep the ribbon at the top (but under the header logo), above all the controls
 [x] let's remove the words 'analog ribbon synth' from this thing for now
 [x] some people have told me that when they try to load this on mobile it doesn't make sound.  i am presently experiencing this with my mobile.  any ideas?
+[x] main volume knob seems to have some lag, is there any way to improve performance

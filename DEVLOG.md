@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-15 — Volume fader performance fix
+
+- Eliminated lag on DJ volume fader by caching getBoundingClientRect on pointerdown instead of every move
+- Thumb position updates directly via DOM refs, bypassing React re-render cycle during drag
+- Volume state sync deferred to requestAnimationFrame to avoid re-rendering entire Controls tree on each pointer move
+
 ## 2026-03-15 — Mobile overhaul + audio fix
 
 - Restructured mobile toggles into two rows: Row 1 (play/arp + hold + stop), Row 2 (mono/poly + BPM slider) — compact layout, no overflow

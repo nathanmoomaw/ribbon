@@ -77,3 +77,6 @@
 - [x] Staff depth perspective (forward/backward z-axis motion, inactive dimming)
 - [x] Crunch effect boost (more aggressive bitcrush curve, lower bit depth floor)
 - [x] Arp trigger markers on ribbon (visual lines at note positions, click to remove)
+- [x] Mobile switch layout fix (play/arp, hold, stop in row 1; mono/poly + bpm in row 2)
+- [x] Android localhost audio fix (AudioWorklet secure context guard, HTTPS dev server)
+- [x] Mobile floating lightning bolt shake button (replaces circle button, dances by logo)

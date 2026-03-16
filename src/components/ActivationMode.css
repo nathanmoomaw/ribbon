@@ -269,22 +269,13 @@
     gap: 0.5rem;
   }
 
-  /* Row 1: both rocker switches side by side */
+  /* Row 1: play/arp, hold, stop */
   .activation__row--1 {
     justify-content: center;
   }
 
-  .activation__row--1 .rocker {
-    flex: 1;
-  }
-
-  /* Row 2: Hold + Stop side by side */
+  /* Row 2: mono/poly, bpm slider (horizontal) */
   .activation__row--2 {
-    justify-content: center;
-  }
-
-  /* Row 3: BPM slider full width */
-  .activation__row--3 {
     justify-content: center;
   }
 

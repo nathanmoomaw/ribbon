@@ -111,4 +111,6 @@ volume slider (horizontal)
 [x] the inactive staff should be lighter, more transparent
 [x] increase the effect of the crunch
 [x] arp+poly+hold should add trigger lines to the ribbon at the areas where it's being pressed.  if the user re-clicks one of these it should act to deactivate that note from the presently cycling arp
-[] 
+[x] looks like you messed up the switches and their layout on mobile again.  look at the 3rd item from yesterday again and organize them like that.
+[x] i'm still having that issue on my mobile phone (android) where it's not playing sound, but seems to only be happening for my localhost site.  when i navigate to ribbon.obfusco.us it seems to work.
+[x] let's move the mobile shake button as a floating/hovering lightning bolt (semi transparent) that will dance to the right of the logo (no circle button thingy, just the bolt)

@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-15 — iOS audio fix (root cause)
+
+- Root cause: visualizer animation loop called `getEngine()` on every frame, which triggered `AudioContext` creation outside a user gesture — iOS Safari permanently suspends contexts created this way
+- Fix: `useAudioEngine` now pre-initializes on first user gesture (touchstart/mousedown/click/keydown/pointerdown) via document-level capture listeners
+- Added `getEngine.peek()` — returns engine or null without triggering init, used by visualizer animation loops
+- Both `useVisualizer` and `use3DVisualizer` updated to use `peek()` so they never create the AudioContext
+
 ## 2026-03-15 — Volume fader performance fix
 
 - Eliminated lag on DJ volume fader by caching getBoundingClientRect on pointerdown instead of every move

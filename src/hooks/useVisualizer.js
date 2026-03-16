@@ -77,9 +77,10 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
     function tryGetAnalyser() {
       if (analyser) return true
       try {
-        const engine = getEngine()
-        analyser = engine.getAnalyser()
-        if (analyser) {
+        // Use getAnalyser import to avoid triggering AudioContext init outside a gesture
+        const a = getEngine.peek ? getEngine.peek()?.getAnalyser() : getEngine()?.getAnalyser()
+        if (a) {
+          analyser = a
           timeDomain = new Uint8Array(analyser.fftSize)
           freqData = new Uint8Array(analyser.frequencyBinCount)
           return true

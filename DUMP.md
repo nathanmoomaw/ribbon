@@ -111,3 +111,4 @@ volume slider (horizontal)
 [x] the inactive staff should be lighter, more transparent
 [x] increase the effect of the crunch
 [x] arp+poly+hold should add trigger lines to the ribbon at the areas where it's being pressed.  if the user re-clicks one of these it should act to deactivate that note from the presently cycling arp
+[] 

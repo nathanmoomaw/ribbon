@@ -247,6 +247,12 @@
   color: var(--text-primary);
 }
 
+/* --- Activation rows (used for mobile reflow) --- */
+
+.activation__row {
+  display: contents;
+}
+
 /* --- Mobile --- */
 
 @media (max-width: 767px) {
@@ -257,15 +263,15 @@
     width: 100%;
   }
 
-  .rocker {
-    width: 100%;
-    justify-content: center;
+  .activation__row {
+    display: flex;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 
   .rocker__side {
     padding: 8px 12px;
     min-width: 44px;
-    flex: 1;
   }
 
   .rocker__label {
@@ -275,13 +281,11 @@
   .activation__hold {
     font-size: 0.75rem;
     padding: 0.3em 0.6em;
-    width: 100%;
-    box-sizing: border-box;
+    flex: 1;
   }
 
   .activation__stop {
-    width: 100%;
-    box-sizing: border-box;
+    flex: 1;
   }
 
   .activation__hold kbd,
@@ -292,7 +296,8 @@
   .activation__arp-tempo {
     flex-direction: row;
     gap: 0.5rem;
-    width: 100%;
+    flex: 1;
+    align-items: center;
   }
 
   .activation__arp-tempo input[type="range"] {

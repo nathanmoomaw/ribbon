@@ -285,6 +285,7 @@
   .controls__toggles {
     flex-direction: column;
     align-items: stretch;
+    gap: 0.5rem;
     padding-right: 0;
     padding-bottom: 0.75rem;
     border-right: none;
@@ -299,7 +300,8 @@
   }
 
   .controls__fader-track {
-    width: 80px;
+    flex: 1;
+    min-width: 80px;
     height: 28px;
   }
 

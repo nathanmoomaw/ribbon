@@ -311,7 +311,6 @@ function App() {
 
       <header className="app-header">
         <RibbonLogo />
-        <span className="subtitle">analog ribbon synth</span>
       </header>
 
       <Controls

@@ -22,12 +22,6 @@
   margin: 0;
 }
 
-.app-header .subtitle {
-  font-size: 0.75rem;
-  color: var(--text-primary);
-  font-family: var(--font-mono);
-}
-
 /* On desktop, order controls and ribbon */
 @media (min-width: 768px) {
   .app .controls {
@@ -41,7 +35,7 @@
   }
 }
 
-/* Mobile: tighter spacing, full width controls */
+/* Mobile: tighter spacing, full width controls, ribbon on top */
 @media (max-width: 767px) {
   .app {
     padding: 1rem 0.5rem;
@@ -51,6 +45,19 @@
 
   .app-header {
     align-self: center;
+    order: 1;
+  }
+
+  .app .ribbon {
+    order: 2;
+  }
+
+  .app .keys-toggle {
+    order: 3;
+  }
+
+  .app .controls {
+    order: 4;
   }
 }
 

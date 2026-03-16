@@ -1,10 +1,14 @@
 # Devlog
 
-## 2026-03-15 — Mobile layout fixes
+## 2026-03-15 — Mobile overhaul + audio fix
 
-- Fixed toggles (Play/Arp, Mono/Poly, Hold, BPM) stacking vertically on mobile instead of wrapping horizontally (which caused play/arp to fall off-screen)
+- Restructured mobile toggles into two rows: Row 1 (play/arp + hold + stop), Row 2 (mono/poly + BPM slider) — compact layout, no overflow
+- Volume fader stretches full width on mobile as its own row
+- Ribbon now appears above controls on mobile (under header logo) via CSS `order`
+- Removed 'analog ribbon synth' subtitle text
+- Fixed mobile audio not playing: added document-level gesture listener (touchstart, mousedown, click, keydown) to resume suspended AudioContext — required by iOS/mobile Safari autoplay policy
+- Bitcrush AudioWorklet now retries loading after context resumes (was silently failing on mobile)
 - Fixed DJ volume fader on mobile: JS was calculating position from clientY (vertical) but CSS transforms the fader to horizontal on small screens — now auto-detects orientation from track dimensions
-- Volume thumb positioning uses CSS custom properties (`--thumb-top`, `--thumb-left`) so desktop vertical and mobile horizontal layouts each use the correct axis
 
 ## 2026-03-14 — Shake refinements
 

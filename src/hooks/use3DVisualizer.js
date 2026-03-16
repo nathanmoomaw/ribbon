@@ -117,9 +117,10 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
     function tryGetAnalyser() {
       if (analyser) return true
       try {
-        const engine = getEngine()
-        analyser = engine.getAnalyser()
-        if (analyser) {
+        // Use peek to avoid triggering AudioContext init outside a gesture
+        const a = getEngine.peek ? getEngine.peek()?.getAnalyser() : getEngine()?.getAnalyser()
+        if (a) {
+          analyser = a
           freqData = new Uint8Array(analyser.frequencyBinCount)
           return true
         }

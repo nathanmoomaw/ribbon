@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-16 — Desktop bolt, ambient icon polish, sparkle wake
+
+- Lightning bolt shake button now visible on desktop too (was mobile-only), circle button in Controls hidden
+- Ambient möbius icon vertically centered with logo via flexbox alignment
+- Ambient icon starts dim/disabled, shows sparkle wake-up animation (✦✧ pseudo-elements) when ambient play begins
+- Same sparkle animation fires on manual click to start ambient
+- Armed state (on but not playing) is very subtle (25% opacity, desaturated)
+
 ## 2026-03-16 — Accelerometer shake, ambient play mode, logo shake
 
 - Accelerometer shake: rewrote useShake to request DeviceMotionEvent permission on first user gesture (required on iOS 13+), added proper permission flow with `requestMotionPermission()` export

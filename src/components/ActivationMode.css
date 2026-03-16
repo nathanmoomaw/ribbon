@@ -269,6 +269,25 @@
     gap: 0.5rem;
   }
 
+  /* Row 1: both rocker switches side by side */
+  .activation__row--1 {
+    justify-content: center;
+  }
+
+  .activation__row--1 .rocker {
+    flex: 1;
+  }
+
+  /* Row 2: Hold + Stop side by side */
+  .activation__row--2 {
+    justify-content: center;
+  }
+
+  /* Row 3: BPM slider full width */
+  .activation__row--3 {
+    justify-content: center;
+  }
+
   .rocker__side {
     padding: 8px 12px;
     min-width: 44px;

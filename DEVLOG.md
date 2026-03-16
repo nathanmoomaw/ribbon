@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-16 — Mobile layout reorg, stop button refactor
+
+- Reorganized ActivationMode mobile layout: rocker switches side-by-side in row 1, Hold+Stop in row 2, BPM slider full-width in row 3
+- Stop button refactored: uses onStop/onKillAll callbacks instead of direct engine access; double-tap (< 400ms) kills all sound including tails
+- Stop button always enabled (no longer gated on hold mode)
+
 ## 2026-03-16 — Staff depth, crunch boost, arp trigger markers
 
 - Staff notation now has depth (z-axis) perspective — notes and lines scale/brighten as they wave forward and dim as they recede, creating genuine forward/backward motion instead of just up/down

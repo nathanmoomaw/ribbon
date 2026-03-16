@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-16 — Staff depth, crunch boost, arp trigger markers
+
+- Staff notation now has depth (z-axis) perspective — notes and lines scale/brighten as they wave forward and dim as they recede, creating genuine forward/backward motion instead of just up/down
+- Inactive staff (no notes playing) is now much more transparent, fading to ~25-30% opacity when silent
+- Crunch effect significantly boosted: bit depth now drops to 2 (was 3), sample reduction up to 39× (was 26×), front-loaded curve so first half of slider has more bite, fuller slapback mix
+- Arp+poly+hold mode now shows glowing pink trigger lines on the ribbon at each active arp note position; clicking a marker removes that note from the arp cycle
+- Added `frequencyToPosition()` inverse utility for mapping Hz back to ribbon position
+
 ## 2026-03-16 — Flag-wave staff, osc recolor, arp+hold fix
 
 - Staff notation now waves like a flag — amplitude increases toward edges, multiple sine waves create organic billowing motion

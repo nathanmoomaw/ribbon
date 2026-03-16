@@ -86,10 +86,33 @@ function destroyVoice(id) {
   voiceMap.delete(id)
 }
 
+// Ensure AudioContext is resumed on user gesture (required by iOS/mobile browsers)
+function ensureResumed() {
+  if (!ctx || ctx.state !== 'suspended') return
+  ctx.resume()
+}
+
+let gestureListenerAdded = false
+function addGestureListener() {
+  if (gestureListenerAdded) return
+  gestureListenerAdded = true
+  const events = ['touchstart', 'touchend', 'mousedown', 'click', 'keydown']
+  const handler = () => {
+    ensureResumed()
+    if (ctx && ctx.state === 'running') {
+      events.forEach(e => document.removeEventListener(e, handler, true))
+    }
+  }
+  events.forEach(e => document.addEventListener(e, handler, true))
+}
+
 export function init() {
   if (ctx) return getEngine()
 
   ctx = new (window.AudioContext || window.webkitAudioContext)()
+
+  // Set up gesture-based resume for mobile browsers
+  addGestureListener()
 
   masterGain = ctx.createGain()
   masterGain.gain.setValueAtTime(0.5, ctx.currentTime)
@@ -109,14 +132,26 @@ export function init() {
   crushWetGain.connect(postCrushGain)
 
   // Load AudioWorklet for bitcrush (async, wires in when ready)
-  ctx.audioWorklet.addModule('/bitcrush-processor.js').then(() => {
-    crushNode = new AudioWorkletNode(ctx, 'bitcrush-processor')
-    masterGain.connect(crushNode)
-    crushNode.connect(crushWetGain)
-    crushReady = true
-  }).catch(err => {
-    console.warn('Bitcrush worklet failed to load:', err)
-  })
+  function loadCrushWorklet() {
+    ctx.audioWorklet.addModule('/bitcrush-processor.js').then(() => {
+      crushNode = new AudioWorkletNode(ctx, 'bitcrush-processor')
+      masterGain.connect(crushNode)
+      crushNode.connect(crushWetGain)
+      crushReady = true
+    }).catch(err => {
+      console.warn('Bitcrush worklet failed to load:', err)
+      // Retry after context resumes (common on mobile)
+      if (ctx.state === 'suspended') {
+        ctx.addEventListener('statechange', function retry() {
+          if (ctx.state === 'running') {
+            ctx.removeEventListener('statechange', retry)
+            loadCrushWorklet()
+          }
+        })
+      }
+    })
+  }
+  loadCrushWorklet()
 
   // Analyser (passive tap for visuals)
   analyser = ctx.createAnalyser()
@@ -160,7 +195,7 @@ export function init() {
 
 export function voiceOn(id, hz, velocity = 1) {
   if (!ctx) return
-  if (ctx.state === 'suspended') ctx.resume()
+  ensureResumed()
 
   let voice = voiceMap.get(id)
   if (voice) {

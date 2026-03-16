@@ -78,3 +78,10 @@ This will eventually live on it's own domain somewhere, but in the meantime I wa
 
 [x] this is not optimized for mobile, the play/arp button falls off left, fix that and put directly under it the mono/poly button switch
 [x] mobile master volume does not work as it should.  i think there's a bug where it thinks it's still a vertical slider, but apparently at this size it's not
+[x] ok, the change you made for the switches isn't good.  they should be the same smaller width they were before.  they use too much screen estate like this.  the order and layout on mobile should be like this:
+play/arp, hold, stop
+mono/poly, bpm slider (horizontal)
+volume slider (horizontal)
+[x] on mobile always keep the ribbon at the top (but under the header logo), above all the controls
+[x] let's remove the words 'analog ribbon synth' from this thing for now
+[x] some people have told me that when they try to load this on mobile it doesn't make sound.  i am presently experiencing this with my mobile.  any ideas?

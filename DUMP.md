@@ -114,3 +114,11 @@ volume slider (horizontal)
 [x] looks like you messed up the switches and their layout on mobile again.  look at the 3rd item from yesterday again and organize them like that.
 [x] i'm still having that issue on my mobile phone (android) where it's not playing sound, but seems to only be happening for my localhost site.  when i navigate to ribbon.obfusco.us it seems to work.
 [x] let's move the mobile shake button as a floating/hovering lightning bolt (semi transparent) that will dance to the right of the logo (no circle button thingy, just the bolt)
+[x] would like to actually implment shake as an accelerometer gesture for mobile.  it doesn't seem to be working like this so far.
+[x] clicking the logo should also trigger shake
+[x] let's start to implement "ambient play" mode.  it should be enabled by default, but shouldn't start playing until at least 30 seconds of inactivity (this interval is subject to change).  ambient play should all be low velocity taps of the ribbon, gently playing a generally pleasant sounding ambient "music", slowly quietly.  there will need to be a toggle so the user can easily disable this functionality.  let's place some kind of floating icon thing to the left of the logo for now.  the icon should be disabled by default (until ambient mode begins) and light up in some fashion when ambient mode starts.  if allowed to continue for awhile the controls should start to subtly adjust to continue the experience and generate new sounds.  if the user interacts with app in any way the ambient icon should turn off as well as the ambient music.
+[x] let's make that new infinity icon larger and more like a moebius strip and more motion.
+[x] if the user clicks the ambient icon it should start ambient mode immediately
+[x] right when ambient mode is about to start give a random, but non-zero amount of delay and reverb so the tight little short taps ring out pleasantly
+[x] ambient mode should be short taps and they don't need to be fast
+[x] the logo shouldn't highlight in a selected kind of way when tapped

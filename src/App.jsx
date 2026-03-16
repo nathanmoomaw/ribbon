@@ -3,13 +3,14 @@ import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
-import { useShake } from './hooks/useShake'
+import { useShake, requestMotionPermission } from './hooks/useShake'
 import { SCALES } from './utils/scales'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { positionToFrequency } from './utils/pitchMap'
+import { useAmbientPlay } from './hooks/useAmbientPlay'
 import './App.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -48,6 +49,7 @@ function App() {
   const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
+  const [ambientPlay, setAmbientPlay] = useState(true)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -270,6 +272,57 @@ function App() {
 
   useShake(handleShake, controlsRef, ribbonRef)
 
+  // Subtle control tweaks during ambient play — gently evolve the sound
+  const handleAmbientTweak = useCallback(() => {
+    const engine = getEngine()
+    if (!engine) return
+    // Pick a random tweak: reverb, delay mix, filter, or crunch
+    const choice = Math.random()
+    if (choice < 0.3) {
+      // Nudge reverb
+      setReverbMix(prev => {
+        const next = Math.max(0, Math.min(1, prev + (Math.random() - 0.4) * 0.15))
+        engine.setReverbMix(next)
+        return next
+      })
+    } else if (choice < 0.55) {
+      // Nudge delay mix
+      setDelayParams(prev => {
+        const next = { ...prev, mix: Math.max(0, Math.min(1, prev.mix + (Math.random() - 0.4) * 0.1)) }
+        engine.setDelay(next)
+        return next
+      })
+    } else if (choice < 0.8) {
+      // Nudge filter cutoff gently
+      setFilterParams(prev => {
+        const next = { ...prev, cutoff: Math.max(200, Math.min(18000, prev.cutoff + (Math.random() - 0.5) * 3000)) }
+        engine.setFilter(next)
+        return next
+      })
+    } else {
+      // Nudge crunch slightly
+      setCrunch(prev => {
+        const next = Math.max(0, Math.min(0.4, prev + (Math.random() - 0.5) * 0.08))
+        engine.setCrunch(next)
+        return next
+      })
+    }
+  }, [getEngine, setReverbMix, setDelayParams, setFilterParams, setCrunch])
+
+  // When ambient starts, add random reverb + delay so short taps ring out
+  const handleAmbientStart = useCallback(() => {
+    const engine = getEngine()
+    if (!engine) return
+    const newReverb = 0.2 + Math.random() * 0.4 // 0.2–0.6
+    const newDelay = { time: 0.2 + Math.random() * 0.3, feedback: 0.2 + Math.random() * 0.3, mix: 0.15 + Math.random() * 0.25 }
+    setReverbMix(newReverb)
+    engine.setReverbMix(newReverb)
+    setDelayParams(newDelay)
+    engine.setDelay(newDelay)
+  }, [getEngine])
+
+  const { isPlaying: ambientIsPlaying, startNow: ambientStartNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, ribbonInteraction, handleAmbientTweak, handleAmbientStart)
+
   // When hold is active in play mode, global mouse movement controls pitch
   // Does NOT apply in arp mode — arp+hold builds note sequences instead
   useEffect(() => {
@@ -326,10 +379,30 @@ function App() {
       <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
 
       <header className="app-header">
-        <RibbonLogo />
+        <button
+          className={`app-header__ambient ${ambientPlay ? 'app-header__ambient--on' : ''} ${ambientIsPlaying ? 'app-header__ambient--playing' : ''}`}
+          onClick={() => {
+            setAmbientPlay(a => {
+              if (!a) setTimeout(() => ambientStartNow(), 0)
+              return !a
+            })
+          }}
+          aria-label="Toggle ambient play"
+          title={ambientPlay ? 'Ambient play on (plays after 30s idle)' : 'Ambient play off'}
+        >
+          <svg className="app-header__ambient-icon" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            {/* Möbius strip infinity — two crossing loops with depth */}
+            <path d="M12,12 C12,5 18,4 24,12 C28,18 33,17 33,12 C33,7 28,6 24,12 C18,20 12,19 12,12 Z" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" opacity="0.5" />
+            <path d="M12,12 C12,5 18,4 24,12 C28,18 33,17 33,12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M33,12 C33,7 28,6 24,12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+          </svg>
+        </button>
+        <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
+          <RibbonLogo />
+        </div>
         <button
           className="app-header__shake-bolt"
-          onClick={() => handleShake(0.5)}
+          onClick={() => { requestMotionPermission(); handleShake(0.5) }}
           aria-label="Shake / Randomize"
         >
           ⚡

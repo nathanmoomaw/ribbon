@@ -1,5 +1,20 @@
 # Devlog
 
+## 2026-03-16 — Accelerometer shake, ambient play mode, logo shake
+
+- Accelerometer shake: rewrote useShake to request DeviceMotionEvent permission on first user gesture (required on iOS 13+), added proper permission flow with `requestMotionPermission()` export
+- Logo click now triggers shake (with shake animation on tap)
+- Logo tap highlight suppressed (`-webkit-tap-highlight-color: transparent`)
+- **Ambient play mode** (new feature):
+  - Enabled by default; starts after 30s of inactivity
+  - Plays gentle short taps (0.3–1.2s sustain) at unhurried pace (2–5s gaps)
+  - When ambient starts, auto-applies random reverb + delay for pleasant ringing
+  - Controls subtly evolve every ~10 notes (nudges reverb, delay, filter, crunch)
+  - Any user interaction stops ambient and resets the 30s countdown
+  - SVG möbius strip toggle icon left of logo: dim when off, medium when armed, breathing glow when playing
+  - Click toggle starts ambient immediately (no waiting)
+  - `useAmbientPlay` hook with `startNow`, `onAmbientStart`, `onAmbientTweak` callbacks
+
 ## 2026-03-16 — Mobile fixes, Android audio, floating shake bolt
 
 - Fixed mobile switch layout to match spec: row 1 = play/arp + hold + stop, row 2 = mono/poly + bpm slider

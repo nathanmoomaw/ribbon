@@ -5,10 +5,39 @@ const ACCEL_SAMPLE_INTERVAL = 50 // ms between acceleration checks
 const COMBO_WINDOW = 800         // ms window for accumulating rapid shakes
 const MIN_GAP = 80               // ms minimum between triggers (debounce double-fires)
 
+// Track whether we've already requested/been granted accelerometer permission
+let motionPermissionState = 'unknown' // 'unknown' | 'granted' | 'denied' | 'not-needed'
+
+/**
+ * Request DeviceMotion permission (required on iOS 13+ and some Android).
+ * Must be called from a user gesture handler.
+ * Returns true if permission was granted (or not needed).
+ */
+export async function requestMotionPermission() {
+  if (motionPermissionState === 'granted' || motionPermissionState === 'not-needed') return true
+  if (motionPermissionState === 'denied') return false
+
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const result = await DeviceMotionEvent.requestPermission()
+      motionPermissionState = result === 'granted' ? 'granted' : 'denied'
+      return result === 'granted'
+    } catch {
+      motionPermissionState = 'denied'
+      return false
+    }
+  }
+
+  // Browser doesn't require permission (most Android Chrome)
+  motionPermissionState = 'not-needed'
+  return true
+}
+
 export function useShake(onShake, controlsRef, ribbonRef) {
   const lastAccelRef = useRef({ x: 0, y: 0, z: 0 })
   const recentTimesRef = useRef([])
   const lastTriggerRef = useRef(0)
+  const motionListenerRef = useRef(false)
 
   const triggerShake = useCallback((baseIntensity = 0.5) => {
     const now = Date.now()
@@ -29,6 +58,39 @@ export function useShake(onShake, controlsRef, ribbonRef) {
     onShake(intensity)
   }, [onShake])
 
+  // Motion event handler (stable ref so we can add/remove it)
+  const onMotionRef = useRef(null)
+  onMotionRef.current = (e) => {
+    const now = Date.now()
+    const lastSample = lastAccelRef.current._t || 0
+    if (now - lastSample < ACCEL_SAMPLE_INTERVAL) return
+
+    const acc = e.accelerationIncludingGravity || e.acceleration
+    if (!acc || (acc.x === null && acc.y === null && acc.z === null)) return
+
+    const x = acc.x || 0, y = acc.y || 0, z = acc.z || 0
+    const dx = x - (lastAccelRef.current.x || 0)
+    const dy = y - (lastAccelRef.current.y || 0)
+    const dz = z - (lastAccelRef.current.z || 0)
+    lastAccelRef.current = { x, y, z, _t: now }
+
+    const magnitude = Math.sqrt(dx * dx + dy * dy + dz * dz)
+    if (magnitude > SHAKE_THRESHOLD) {
+      const intensity = Math.min(1, 0.3 + (magnitude - SHAKE_THRESHOLD) / 35 * 0.7)
+      triggerShake(intensity)
+    }
+  }
+
+  // Attach motion listener once permission is granted
+  const attachMotionListener = useCallback(() => {
+    if (motionListenerRef.current) return
+    motionListenerRef.current = true
+    function handler(e) { onMotionRef.current?.(e) }
+    window.addEventListener('devicemotion', handler)
+    // Store for cleanup
+    motionListenerRef.current = handler
+  }, [])
+
   useEffect(() => {
     // --- Enter key ---
     function onKeyDown(e) {
@@ -41,49 +103,43 @@ export function useShake(onShake, controlsRef, ribbonRef) {
 
     // --- Click outside controls/ribbon ---
     function onClick(e) {
-      // Check if click is inside controls or ribbon
       const controls = controlsRef?.current
       const ribbon = ribbonRef?.current
       if (controls && controls.contains(e.target)) return
       if (ribbon && ribbon.contains(e.target)) return
-      // Also ignore clicks on activation mode buttons, header, zoom/visuals buttons
       if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
-      // Ignore clicks on buttons/inputs generally
       if (e.target.closest('button') || e.target.closest('input')) return
       triggerShake(0.4)
     }
 
-    // --- Device accelerometer (mobile shake) ---
-    let lastSampleTime = 0
-    function onMotion(e) {
-      const now = Date.now()
-      if (now - lastSampleTime < ACCEL_SAMPLE_INTERVAL) return
-      lastSampleTime = now
+    // --- Request accelerometer permission on first user gesture ---
+    function onFirstGesture() {
+      requestMotionPermission().then(granted => {
+        if (granted) attachMotionListener()
+      })
+      // Remove after first attempt
+      gestureEvents.forEach(e => document.removeEventListener(e, onFirstGesture, true))
+    }
 
-      const acc = e.accelerationIncludingGravity
-      if (!acc) return
-
-      const dx = acc.x - lastAccelRef.current.x
-      const dy = acc.y - lastAccelRef.current.y
-      const dz = acc.z - lastAccelRef.current.z
-      lastAccelRef.current = { x: acc.x, y: acc.y, z: acc.z }
-
-      const magnitude = Math.sqrt(dx * dx + dy * dy + dz * dz)
-      if (magnitude > SHAKE_THRESHOLD) {
-        // Map magnitude to intensity (threshold..50 -> 0.3..1)
-        const intensity = Math.min(1, 0.3 + (magnitude - SHAKE_THRESHOLD) / 35 * 0.7)
-        triggerShake(intensity)
-      }
+    // If permission already granted, attach immediately
+    if (motionPermissionState === 'granted' || motionPermissionState === 'not-needed') {
+      attachMotionListener()
+    } else {
+      // Wait for a user gesture to request permission
+      var gestureEvents = ['touchstart', 'pointerdown', 'click', 'keydown']
+      gestureEvents.forEach(e => document.addEventListener(e, onFirstGesture, true))
     }
 
     window.addEventListener('keydown', onKeyDown)
     window.addEventListener('click', onClick)
-    window.addEventListener('devicemotion', onMotion)
 
     return () => {
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('click', onClick)
-      window.removeEventListener('devicemotion', onMotion)
+      if (motionListenerRef.current && typeof motionListenerRef.current === 'function') {
+        window.removeEventListener('devicemotion', motionListenerRef.current)
+        motionListenerRef.current = false
+      }
     }
-  }, [triggerShake, controlsRef, ribbonRef])
+  }, [triggerShake, controlsRef, ribbonRef, attachMotionListener])
 }

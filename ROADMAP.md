@@ -10,7 +10,7 @@
 - [ ] Rotary knob components (replace range sliders)
 - [ ] Mobile-optimized layout
 - [ ] Step sequencer functionality
-- [ ] Ambient autoplay mode (generative pleasant sound when not manually playing)
+- [x] Ambient autoplay mode (generative pleasant sound when not manually playing)
 - [ ] Production domain setup
 
 ## Completed
@@ -80,3 +80,6 @@
 - [x] Mobile switch layout fix (play/arp, hold, stop in row 1; mono/poly + bpm in row 2)
 - [x] Android localhost audio fix (AudioWorklet secure context guard, HTTPS dev server)
 - [x] Mobile floating lightning bolt shake button (replaces circle button, dances by logo)
+- [x] Accelerometer shake (DeviceMotionEvent permission flow for iOS/Android)
+- [x] Logo click triggers shake
+- [x] Ambient play mode (30s inactivity, short taps, auto reverb/delay, evolving controls, möbius toggle)

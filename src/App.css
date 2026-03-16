@@ -9,6 +9,8 @@
   gap: 1.25rem;
   min-height: 100vh;
   perspective: 1200px;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .app-header {

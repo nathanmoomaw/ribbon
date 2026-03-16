@@ -103,5 +103,8 @@ volume slider (horizontal)
 [x] remove the chunky colored button strip.  it's doing nothing.  use the design concept of the chunky buttons to restyle each of the 3 osc housings, replacing the "glowing" blue, pink, purple outlines of each with chunky beveled sections that nod to the buttons in that screenshot
 [x] also remove the extra CRT scanline grid that you applied to the console.  instead, turn back to the first screenshot i gave you today and lean into the style of buildings more for the console.
 [x] here is the screenshot I was referencing for the notes on a staff: (<Screenshot 2026-03-15 at 23.55.39.png>)
-
+[x] the staff with the notes should sort of wave like a flag.  use the image i provided for inspiration on that.  note that it seems to waver back and forward.  the notes themselves should move with it.  they should not just go in a straight line heading left.
+[x] replace the blue, pink, purple colors from the oscillators entirely.  replace these with colors and texture styles pulled from the buttons on the screenshot with the console.
+[x] text on the console etc should not be able to accidentally get selected by double clicking
+[x] let's work on getting the arp/hold functionality improved.  first, if hold is selected and it's on play mode it should behave as it does.  however, on arp and poly with hold it should behave differently.  if the user selects arp + poly + hold then triggers the ribbon (even via a shake) additional movement of the mouse should not change the tone like it does during play mode.  the user should be able to click the ribbon again and ADD to the notes being played in the arp this way (like pressing multiple keyboard buttons on the keyboard at once).  for instance if the user is on this mode then taps a C followed by an F followed by a Bb the arp should keep playing cycling those notes.
 

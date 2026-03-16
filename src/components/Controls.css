@@ -133,6 +133,8 @@
   max-width: 800px;
   margin: 0 auto;
   position: relative;
+  user-select: none;
+  -webkit-user-select: none;
   background:
     /* Heavy horizontal panel seams — welded steel plate joins */
     repeating-linear-gradient(
@@ -335,8 +337,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.15em;
-  color: var(--osc-color, var(--cyan));
-  text-shadow: 0 0 8px var(--osc-color, var(--cyan));
+  color: var(--osc-color, var(--osc-red));
+  text-shadow: 0 0 6px color-mix(in srgb, var(--osc-color, var(--osc-red)) 40%, transparent);
   display: block;
   margin-bottom: 0.25rem;
 }

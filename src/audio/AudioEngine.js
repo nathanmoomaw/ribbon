@@ -99,9 +99,10 @@ let gestureListenerAdded = false
 function addGestureListener() {
   if (gestureListenerAdded) return
   gestureListenerAdded = true
-  const events = ['touchstart', 'touchend', 'mousedown', 'click', 'keydown']
+  const events = ['touchstart', 'touchend', 'mousedown', 'pointerdown', 'click', 'keydown']
   const handler = () => {
     ensureResumed()
+    // Keep listening until context is actually running (Android can be stubborn)
     if (ctx && ctx.state === 'running') {
       events.forEach(e => document.removeEventListener(e, handler, true))
     }
@@ -135,7 +136,12 @@ export function init() {
   crushWetGain.connect(postCrushGain)
 
   // Load AudioWorklet for bitcrush (async, wires in when ready)
+  // AudioWorklet requires a secure context (HTTPS) — skip gracefully on HTTP
   function loadCrushWorklet() {
+    if (!ctx.audioWorklet || !window.isSecureContext) {
+      console.warn('AudioWorklet not available (insecure context?) — crunch disabled')
+      return
+    }
     ctx.audioWorklet.addModule('/bitcrush-processor.js').then(() => {
       crushNode = new AudioWorkletNode(ctx, 'bitcrush-processor')
       masterGain.connect(crushNode)

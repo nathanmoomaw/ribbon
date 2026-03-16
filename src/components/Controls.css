@@ -603,4 +603,9 @@
   .controls__knob input[type="range"] {
     width: 100%;
   }
+
+  /* Hide circle shake button on mobile — replaced by floating bolt in header */
+  .controls__shake-btn {
+    display: none;
+  }
 }

@@ -327,6 +327,13 @@ function App() {
 
       <header className="app-header">
         <RibbonLogo />
+        <button
+          className="app-header__shake-bolt"
+          onClick={() => handleShake(0.5)}
+          aria-label="Shake / Randomize"
+        >
+          ⚡
+        </button>
       </header>
 
       <Controls

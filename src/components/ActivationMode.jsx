@@ -64,6 +64,8 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
 
   return (
     <div className="activation">
+      {/* Desktop: all items flow vertically via display:contents rows */}
+      {/* Mobile Row 1: play/arp, hold, stop */}
       <div className="activation__row activation__row--1">
         <RockerSwitch
           leftLabel="Play"
@@ -73,16 +75,6 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
           isRight={mode === 'arp'}
           onToggle={() => setMode(m => m === 'play' ? 'arp' : 'play')}
         />
-        <RockerSwitch
-          leftLabel="Mono"
-          rightLabel="Poly"
-          leftLights={[COLORS.sky]}
-          rightLights={[COLORS.eggplant, COLORS.lime, COLORS.silver]}
-          isRight={poly}
-          onToggle={() => setPoly(p => !p)}
-        />
-      </div>
-      <div className="activation__row activation__row--2">
         <button
           className={`activation__hold ${hold ? 'active' : ''}`}
           onClick={() => setHold(h => !h)}
@@ -99,7 +91,16 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
           Stop <kbd>Space</kbd>
         </button>
       </div>
-      <div className="activation__row activation__row--3">
+      {/* Mobile Row 2: mono/poly, bpm slider */}
+      <div className="activation__row activation__row--2">
+        <RockerSwitch
+          leftLabel="Mono"
+          rightLabel="Poly"
+          leftLights={[COLORS.sky]}
+          rightLights={[COLORS.eggplant, COLORS.lime, COLORS.silver]}
+          isRight={poly}
+          onToggle={() => setPoly(p => !p)}
+        />
         <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
           <label className="activation__tempo-label">
             BPM <span className="activation__tempo-value">{arpBpm}</span>

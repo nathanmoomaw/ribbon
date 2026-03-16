@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-16 — Mobile fixes, Android audio, floating shake bolt
+
+- Fixed mobile switch layout to match spec: row 1 = play/arp + hold + stop, row 2 = mono/poly + bpm slider
+- Fixed Android localhost audio: added secure context guard for AudioWorklet (graceful fallback on HTTP), added `pointerdown` to gesture resume events, added optional HTTPS to Vite dev server via self-signed certs
+- Replaced mobile shake circle button with floating semi-transparent lightning bolt that dances next to the logo; desktop circle button unchanged
+
 ## 2026-03-16 — Mobile layout reorg, stop button refactor
 
 - Reorganized ActivationMode mobile layout: rocker switches side-by-side in row 1, Hold+Stop in row 2, BPM slider full-width in row 3

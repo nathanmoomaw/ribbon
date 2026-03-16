@@ -29,6 +29,9 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
   }, [stepped, octaves, scale])
 
   const onPositionChange = useCallback((pointerId, pos, velocity) => {
+    // In arp+poly+hold, don't track pitch changes on drag — taps add discrete notes
+    if (mode === 'arp' && poly && hold) return
+
     const voiceId = `touch_${pointerId}`
     setPositions(prev => new Map(prev).set(voiceId, pos))
     if (ribbonInteraction) {
@@ -39,7 +42,7 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
     engine.voiceSetFrequency(voiceId, hz)
     if (velocity !== undefined) engine.voiceSetVelocity(voiceId, velocity)
-  }, [getEngine, octaves, stepped, scale, ribbonInteraction])
+  }, [getEngine, mode, poly, hold, octaves, stepped, scale, ribbonInteraction])
 
   const onDown = useCallback((pointerId, pos, velocity) => {
     const engine = getEngine()

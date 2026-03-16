@@ -70,3 +70,7 @@
 - [x] UI stability pattern (disable rather than hide controls)
 - [x] Staff notation visual (scrolling neon notes on wavering staff, replaces waveform)
 - [x] Console restyling (removed CRT scanlines, removed button strip, beveled osc panels)
+- [x] Flag-wave staff animation (notes follow billowing wave path)
+- [x] Osc color scheme: red/gold/green console button palette
+- [x] Prevent accidental text selection on console
+- [x] Arp+poly+hold fix (discrete note taps, no pitch-follow on drag)

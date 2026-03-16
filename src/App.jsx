@@ -35,7 +35,7 @@ function App() {
   const [octaves, setOctaves] = useState(2)
   const [delayParams, setDelayParams] = useState({ time: 0.3, feedback: 0.4, mix: 0 })
   const [reverbMix, setReverbMix] = useState(0)
-  const [crushParams, setCrushParams] = useState({ bitDepth: 16, reduction: 1, mix: 0 })
+  const [crunch, setCrunch] = useState(0)
   const [filterParams, setFilterParams] = useState({ cutoff: 20000, resonance: 0 })
   const [glideSpeed, setGlideSpeed] = useState(0.005)
   const [stepped, setStepped] = useState(false)
@@ -54,10 +54,21 @@ function App() {
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
   const arpStopRef = useRef(null)
+  const lastSpaceRef = useRef(0)
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
-      getEngine().allNotesOff()
+      const now = Date.now()
+      const elapsed = now - lastSpaceRef.current
+      lastSpaceRef.current = now
+
+      if (elapsed < 400) {
+        // Double-tap: kill ALL sound including delay/reverb tails
+        getEngine().killAllSound()
+      } else {
+        // Single tap: normal stop
+        getEngine().allNotesOff()
+      }
       setHold(false)
       setKeyboardPositions(new Map())
       setArpNotes([])
@@ -199,21 +210,9 @@ function App() {
     }
 
     if (shouldNudge()) {
-      const newCrushMix = nudge(crushParams.mix, 0, 1, intensity)
-      setCrushParams(prev => ({ ...prev, mix: newCrushMix }))
-      engine.setCrush({ mix: newCrushMix })
-    }
-
-    if (shouldNudge()) {
-      const newBitDepth = Math.round(nudge(crushParams.bitDepth, 1, 16, intensity))
-      setCrushParams(prev => ({ ...prev, bitDepth: newBitDepth }))
-      engine.setCrush({ bitDepth: newBitDepth })
-    }
-
-    if (shouldNudge()) {
-      const newReduction = Math.round(nudge(crushParams.reduction, 1, 40, intensity))
-      setCrushParams(prev => ({ ...prev, reduction: newReduction }))
-      engine.setCrush({ reduction: newReduction })
+      const newCrunch = nudge(crunch, 0, 1, intensity)
+      setCrunch(newCrunch)
+      engine.setCrunch(newCrunch)
     }
 
     if (shouldNudge()) {
@@ -267,13 +266,14 @@ function App() {
         ribbonInteraction.current.active = false
       }
     }, noteDuration)
-  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crushParams, arpBpm, octaves, stepped, scale, ribbonInteraction])
+  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crunch, arpBpm, octaves, stepped, scale, ribbonInteraction])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
-  // When hold is active and only one voice is playing, global mouse movement controls pitch
+  // When hold is active in play mode, global mouse movement controls pitch
+  // Does NOT apply in arp mode — arp+hold builds note sequences instead
   useEffect(() => {
-    if (!hold) return
+    if (!hold || mode === 'arp') return
     const handleGlobalMove = (e) => {
       const engine = getEngine()
       if (!engine.getIsPlaying()) return
@@ -286,7 +286,7 @@ function App() {
     }
     window.addEventListener('pointermove', handleGlobalMove)
     return () => window.removeEventListener('pointermove', handleGlobalMove)
-  }, [hold, getEngine, octaves, stepped, scale, ribbonInteraction])
+  }, [hold, mode, getEngine, octaves, stepped, scale, ribbonInteraction])
 
   // When hold is toggled off, stop all notes and arp
   const holdRef = useRef(hold)
@@ -304,6 +304,22 @@ function App() {
       }
     }
   }, [hold, getEngine, mode])
+
+  const handleStop = useCallback(() => {
+    getEngine().allNotesOff()
+    setHold(false)
+    setKeyboardPositions(new Map())
+    setArpNotes([])
+    arpStopRef.current?.()
+  }, [getEngine])
+
+  const handleKillAll = useCallback(() => {
+    getEngine().killAllSound()
+    setHold(false)
+    setKeyboardPositions(new Map())
+    setArpNotes([])
+    arpStopRef.current?.()
+  }, [getEngine])
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
@@ -330,8 +346,8 @@ function App() {
         setDelayParams={setDelayParams}
         reverbMix={reverbMix}
         setReverbMix={setReverbMix}
-        crushParams={crushParams}
-        setCrushParams={setCrushParams}
+        crunch={crunch}
+        setCrunch={setCrunch}
         filterParams={filterParams}
         setFilterParams={setFilterParams}
         glideSpeed={glideSpeed}
@@ -345,6 +361,9 @@ function App() {
         setArpBpm={setArpBpm}
         hold={hold}
         setHold={setHold}
+        onStop={handleStop}
+        onKillAll={handleKillAll}
+        onShake={handleShake}
       />
 
       <div className="keys-toggle">

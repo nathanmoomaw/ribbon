@@ -88,7 +88,7 @@ function DJFader({ value, onChange }) {
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const OCTAVE_OPTIONS = [1, 2, 3, 4]
 const SCALE_NAMES = Object.keys(SCALES)
-const OSC_COLORS = ['var(--cyan)', 'var(--magenta)', 'var(--purple)']
+const OSC_COLORS = ['var(--osc-red)', 'var(--osc-gold)', 'var(--osc-green)']
 
 function OscSection({ index, params, getEngine, onUpdate }) {
   const handleWaveform = useCallback((type) => {
@@ -167,8 +167,8 @@ export const Controls = forwardRef(function Controls({
   setDelayParams,
   reverbMix,
   setReverbMix,
-  crushParams,
-  setCrushParams,
+  crunch,
+  setCrunch,
   filterParams,
   setFilterParams,
   glideSpeed,
@@ -182,6 +182,9 @@ export const Controls = forwardRef(function Controls({
   setArpBpm,
   hold,
   setHold,
+  onStop,
+  onKillAll,
+  onShake,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -235,23 +238,11 @@ export const Controls = forwardRef(function Controls({
     getEngine().setFilter({ resonance })
   }, [getEngine, setFilterParams])
 
-  const handleCrushDepth = useCallback((e) => {
-    const bitDepth = parseFloat(e.target.value)
-    setCrushParams((prev) => ({ ...prev, bitDepth }))
-    getEngine().setCrush({ bitDepth })
-  }, [getEngine, setCrushParams])
-
-  const handleCrushReduction = useCallback((e) => {
-    const reduction = parseFloat(e.target.value)
-    setCrushParams((prev) => ({ ...prev, reduction }))
-    getEngine().setCrush({ reduction })
-  }, [getEngine, setCrushParams])
-
-  const handleCrushMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
-    setCrushParams((prev) => ({ ...prev, mix }))
-    getEngine().setCrush({ mix })
-  }, [getEngine, setCrushParams])
+  const handleCrunch = useCallback((e) => {
+    const value = parseFloat(e.target.value)
+    setCrunch(value)
+    getEngine().setCrunch(value)
+  }, [getEngine, setCrunch])
 
   const handleGlideSpeed = useCallback((e) => {
     const value = parseFloat(e.target.value)
@@ -268,11 +259,12 @@ export const Controls = forwardRef(function Controls({
             setMode={setMode}
             poly={poly}
             setPoly={setPoly}
-            getEngine={getEngine}
             arpBpm={arpBpm}
             setArpBpm={setArpBpm}
             hold={hold}
             setHold={setHold}
+            onStop={onStop}
+            onKillAll={onKillAll}
           />
           <DJFader value={volume} onChange={handleVolume} />
         </div>
@@ -391,25 +383,26 @@ export const Controls = forwardRef(function Controls({
             </div>
 
             <div className="controls__section">
-              <label className="controls__label">Crush</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Bits</span>
-                  <input type="range" min="1" max="16" step="1" value={crushParams.bitDepth} onChange={handleCrushDepth} />
-                </div>
-                <div className="controls__knob">
-                  <span>Rate</span>
-                  <input type="range" min="1" max="40" step="1" value={crushParams.reduction} onChange={handleCrushReduction} />
-                </div>
-                <div className="controls__knob">
-                  <span>Mix</span>
-                  <input type="range" min="0" max="1" step="0.01" value={crushParams.mix} onChange={handleCrushMix} />
-                </div>
-              </div>
+              <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={crunch}
+                onChange={handleCrunch}
+              />
             </div>
           </div>
         </div>
       </div>
+      <button
+        className="controls__shake-btn"
+        onClick={() => onShake?.(0.5)}
+        title="Shake / Randomize"
+      >
+        <span className="controls__shake-icon">⚡</span>
+      </button>
     </div>
   )
 })

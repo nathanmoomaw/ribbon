@@ -1,5 +1,19 @@
 # Devlog
 
+## 2026-03-16 — Flag-wave staff, osc recolor, arp+hold fix
+
+- Staff notation now waves like a flag — amplitude increases toward edges, multiple sine waves create organic billowing motion
+  - Notes follow the flag wave path instead of scrolling in a straight line
+  - Lo mode gets a gentler version of the same wave
+- Replaced osc color scheme: cyan/magenta/purple → red/gold/green (console button palette)
+  - Updated CSS variables, Controls.jsx OSC_COLORS, 3D visualizer sphere colors
+  - Osc labels use new colors with softer text-shadow
+- Added `user-select: none` to entire app to prevent accidental text selection on double-click
+- Fixed arp+poly+hold mode:
+  - Mouse movement no longer changes pitch when in arp mode (was only intended for play+hold)
+  - Ribbon drag in arp+poly+hold is suppressed — each tap is a discrete note add/remove
+  - Global pitch-follow effect now correctly skips arp mode entirely
+
 ## 2026-03-16 — Staff notation visual, console restyling
 
 - Replaced waveform display with scrolling musical staff notation visual

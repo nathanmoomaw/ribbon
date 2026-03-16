@@ -10,6 +10,9 @@
   --neon-green: #39ff14;
   --neon-pink: #ff6ec7;
   --neon-yellow: #fff01f;
+  --osc-red: #cc3344;
+  --osc-gold: #ccaa22;
+  --osc-green: #22aa55;
   --text-primary: rgba(255, 255, 255, 0.9);
   --text-muted: rgba(255, 255, 255, 0.75);
   --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;

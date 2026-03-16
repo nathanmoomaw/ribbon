@@ -299,6 +299,19 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       return maxIdx * nyquist / analyser.frequencyBinCount
     }
 
+    // Flag wave function — returns Y offset for a given x position and time
+    // Creates a flag-like undulation that waves back and forth
+    function flagWave(x, time) {
+      // Amplitude increases toward the edges (like a flag on a pole in the center)
+      const centerDist = Math.abs(x / cachedW - 0.5) * 2 // 0 at center, 1 at edges
+      const amp = 8 + centerDist * 18
+      // Multiple sine waves at different frequencies for organic motion
+      const wave1 = Math.sin(x * 0.008 - time * 0.002) * amp
+      const wave2 = Math.sin(x * 0.012 + time * 0.0015) * amp * 0.4
+      const wave3 = Math.sin(x * 0.004 - time * 0.001) * amp * 0.25
+      return wave1 + wave2 + wave3
+    }
+
     function drawStaffNotation(time) {
       const staffTop = cachedH * 0.32
       const staffBottom = cachedH * 0.58
@@ -336,23 +349,17 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         noteSpawnCounter = 0
       }
 
-      // Wavering offset for the whole staff
-      const waver = Math.sin(time * 0.0008) * 3 + Math.sin(time * 0.0013) * 2
-
-      // Draw staff lines — green neon, like the screenshot
+      // Draw staff lines — green neon, waving like a flag
       gl.globalAlpha = 0.35
       gl.lineWidth = 1.5
       for (let i = 0; i < lineCount; i++) {
-        const y = staffTop + i * lineSpacing + waver
-        // Subtle wave per line
-        const lineWaver = Math.sin(time * 0.001 + i * 0.8) * 1.5
+        const baseY = staffTop + i * lineSpacing
         gl.strokeStyle = `rgba(57, 255, 20, ${0.25 + Math.sin(time * 0.002 + i) * 0.08})`
         gl.beginPath()
-        // Draw as a gentle curve rather than straight
-        for (let x = 0; x <= cachedW; x += 40) {
-          const localWave = Math.sin(x * 0.003 + time * 0.0006 + i * 1.2) * 2 + lineWaver
-          if (x === 0) gl.moveTo(x, y + localWave)
-          else gl.lineTo(x, y + localWave)
+        for (let x = 0; x <= cachedW; x += 8) {
+          const waveY = baseY + flagWave(x, time + i * 80)
+          if (x === 0) gl.moveTo(x, waveY)
+          else gl.lineTo(x, waveY)
         }
         gl.stroke()
       }
@@ -361,19 +368,18 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
       gl.globalAlpha = 0.12
       gl.lineWidth = 4
       for (let i = 0; i < lineCount; i++) {
-        const y = staffTop + i * lineSpacing + waver
-        const lineWaver = Math.sin(time * 0.001 + i * 0.8) * 1.5
+        const baseY = staffTop + i * lineSpacing
         gl.strokeStyle = '#39ff14'
         gl.beginPath()
-        for (let x = 0; x <= cachedW; x += 40) {
-          const localWave = Math.sin(x * 0.003 + time * 0.0006 + i * 1.2) * 2 + lineWaver
-          if (x === 0) gl.moveTo(x, y + localWave)
-          else gl.lineTo(x, y + localWave)
+        for (let x = 0; x <= cachedW; x += 8) {
+          const waveY = baseY + flagWave(x, time + i * 80)
+          if (x === 0) gl.moveTo(x, waveY)
+          else gl.lineTo(x, waveY)
         }
         gl.stroke()
       }
 
-      // Update and draw notes — pink/magenta neon
+      // Update and draw notes — pink/magenta neon, following the flag wave
       let writeIdx = 0
       for (let i = 0; i < staffNotes.length; i++) {
         const note = staffNotes[i]
@@ -383,9 +389,10 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         if (note.x < -40) continue // off screen left
         staffNotes[writeIdx++] = note
 
-        // Position on staff (1 = top, 0 = bottom)
-        const noteY = staffBottom - note.staffY * staffHeight + waver
-        const noteWaver = Math.sin(note.x * 0.005 + time * 0.001) * 2
+        // Base staff position + flag wave displacement at this note's x
+        const baseNoteY = staffBottom - note.staffY * staffHeight
+        const waveOffset = flagWave(note.x, time)
+        const noteY = baseNoteY + waveOffset
 
         // Fade in and out
         const fadeIn = Math.min(1, note.age / 15)
@@ -398,52 +405,60 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         gl.globalAlpha = alpha * 0.3
         gl.fillStyle = '#ff00aa'
         gl.beginPath()
-        gl.ellipse(note.x, noteY + noteWaver, sz * 1.8, sz * 1.3, -0.2, 0, Math.PI * 2)
+        gl.ellipse(note.x, noteY, sz * 1.8, sz * 1.3, -0.2, 0, Math.PI * 2)
         gl.fill()
 
         // Note head (filled ellipse)
         gl.globalAlpha = alpha
         gl.fillStyle = '#ff6ec7'
         gl.beginPath()
-        gl.ellipse(note.x, noteY + noteWaver, sz, sz * 0.7, -0.2, 0, Math.PI * 2)
+        gl.ellipse(note.x, noteY, sz, sz * 0.7, -0.2, 0, Math.PI * 2)
         gl.fill()
 
         // Bright center
         gl.globalAlpha = alpha * 0.6
         gl.fillStyle = '#ffaadd'
         gl.beginPath()
-        gl.ellipse(note.x, noteY + noteWaver, sz * 0.5, sz * 0.35, -0.2, 0, Math.PI * 2)
+        gl.ellipse(note.x, noteY, sz * 0.5, sz * 0.35, -0.2, 0, Math.PI * 2)
         gl.fill()
 
-        // Note stem
+        // Note stem — follows wave slope for natural look
         gl.globalAlpha = alpha * 0.7
         gl.strokeStyle = '#ff6ec7'
         gl.lineWidth = 1.5
-        const stemDir = note.staffY > 0.5 ? 1 : -1 // stems down if above middle, up if below
+        const stemDir = note.staffY > 0.5 ? 1 : -1
+        const stemX = note.x + (stemDir > 0 ? -sz : sz) * 0.9
+        const stemTopY = noteY + stemDir * 28
         gl.beginPath()
-        gl.moveTo(note.x + (stemDir > 0 ? -sz : sz) * 0.9, noteY + noteWaver)
-        gl.lineTo(note.x + (stemDir > 0 ? -sz : sz) * 0.9, noteY + noteWaver + stemDir * 28)
+        gl.moveTo(stemX, noteY)
+        gl.lineTo(stemX, stemTopY)
         gl.stroke()
 
         // Flag on the stem (for eighth-note look)
         if (note.velocity > 0.3) {
           gl.globalAlpha = alpha * 0.5
-          gl.beginPath()
-          const flagX = note.x + (stemDir > 0 ? -sz : sz) * 0.9
-          const flagY = noteY + noteWaver + stemDir * 28
-          gl.moveTo(flagX, flagY)
-          gl.quadraticCurveTo(
-            flagX + 10, flagY + stemDir * 5,
-            flagX + 8, flagY + stemDir * 14
-          )
           gl.strokeStyle = '#ff6ec7'
           gl.lineWidth = 1.5
+          gl.beginPath()
+          gl.moveTo(stemX, stemTopY)
+          gl.quadraticCurveTo(
+            stemX + 10, stemTopY + stemDir * 5,
+            stemX + 8, stemTopY + stemDir * 14
+          )
           gl.stroke()
         }
       }
       staffNotes.length = writeIdx
 
       gl.globalAlpha = 1
+    }
+
+    // Gentle flag wave for lo mode (damped version)
+    function loFlagWave(x, time) {
+      const centerDist = Math.abs(x / cachedW - 0.5) * 2
+      const amp = 3 + centerDist * 6
+      return Math.sin(x * 0.008 - time * 0.0015) * amp +
+             Math.sin(x * 0.012 + time * 0.001) * amp * 0.3
     }
 
     function drawLoStaff(time) {
@@ -481,19 +496,22 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         noteSpawnCounter = 0
       }
 
-      // Simple straight staff lines — muted
+      // Staff lines with gentle flag wave — muted
       gl.globalAlpha = 0.15
       gl.lineWidth = 1
       gl.strokeStyle = 'rgba(57, 255, 20, 0.2)'
       for (let i = 0; i < lineCount; i++) {
-        const y = staffTop + i * lineSpacing
+        const baseY = staffTop + i * lineSpacing
         gl.beginPath()
-        gl.moveTo(0, y)
-        gl.lineTo(cachedW, y)
+        for (let x = 0; x <= cachedW; x += 12) {
+          const waveY = baseY + loFlagWave(x, time + i * 80)
+          if (x === 0) gl.moveTo(x, waveY)
+          else gl.lineTo(x, waveY)
+        }
         gl.stroke()
       }
 
-      // Notes — simpler, muted
+      // Notes — follow the wave, simpler muted style
       let writeIdx = 0
       for (let i = 0; i < staffNotes.length; i++) {
         const note = staffNotes[i]
@@ -502,7 +520,9 @@ export function useVisualizer(canvasRef, getEngine, ribbonInteraction, visualMod
         if (note.x < -30) continue
         staffNotes[writeIdx++] = note
 
-        const noteY = staffBottom - note.staffY * staffHeight
+        const baseNoteY = staffBottom - note.staffY * staffHeight
+        const waveOffset = loFlagWave(note.x, time)
+        const noteY = baseNoteY + waveOffset
         const fadeIn = Math.min(1, note.age / 15)
         const fadeOut = note.x < 60 ? note.x / 60 : 1
         const alpha = fadeIn * fadeOut * 0.35

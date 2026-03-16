@@ -26,8 +26,8 @@ const SPHERE_ROTATION_AXES = [
   new THREE.Vector3(1, -0.3, -0.6).normalize(),
 ]
 
-// Colors for each sphere: cyan, magenta, purple
-const SPHERE_COLORS = [0x00f0ff, 0xff00aa, 0x8b5cf6]
+// Colors for each sphere: red, gold, green (console button palette)
+const SPHERE_COLORS = [0xcc3344, 0xccaa22, 0x22aa55]
 
 // Idle drift offsets so spheres aren't perfectly centered on each other
 const SPHERE_IDLE_OFFSETS = [

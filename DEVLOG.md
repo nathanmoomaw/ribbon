@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-17 — Rounded shake icons, ambient play stays on during interaction
+
+- **Rounded mini shake bolt borders**: changed from `border-radius: 3px` (square) to `50%` (circle)
+- **Ambient play no longer stops on user interaction**: removed auto-stop on pointerdown/keydown/touchstart, removed ribbon interaction check, removed shake-triggered stop — ambient now stays on while user plays
+- Removed 30s idle timer tooltip text (was already non-functional)
+- Cleaned up unused `ambientStopRef`, `ambientStopNow`, and `ribbonInteraction` param
+
 ## 2026-03-17 — Fix ambient play, per-section shake bolts
 
 - **Fixed ambient play not producing sound**: `handleAmbientStart` called `engine.setReverbMix()` which doesn't exist — should be `engine.setReverb({ mix })`. This threw a TypeError inside `startPlaying`, preventing the note interval from ever starting. Same fix applied to `handleAmbientTweak`.

@@ -140,3 +140,5 @@ volume slider (horizontal)
 [x] remove the shake icon from the lower right of the console.  this has been effectively replaced by the one hovering next to the logo
 [x] implement this same kind of smaller shake icon on the general ![this is the general panel](<Screenshot 2026-03-17 at 10.51.53.png>).  match the placement of the ones on the osc panels by putting it in the upper right of that general panel and perhaps giving the panel bevel a bit more distinction.  when the user clicks this general panel shake it should also fully randomize the items in that panel.
 [x] at this point let's skip adding a shake to the left side of the console items (the switches and such) with the assumption the user can easily tap those to mess them up themselves.
+[x] make those small shake icons have rounded borders, not square
+[x] ambient play still needs a lot of work.  for now let's leave it disabled by default. remove the 30s timer functionality and require that the user clicks it to activate it.  in fact, for now let's allow it to stay on while the user also interacts with the ribbon or the console

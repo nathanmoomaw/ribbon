@@ -55,7 +55,6 @@ function App() {
   const ribbonRef = useRef(null)
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
-  const ambientStopRef = useRef(null)
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
@@ -145,8 +144,6 @@ function App() {
   const handleShake = useCallback((intensity) => {
     const engine = getEngine()
 
-    // Stop ambient play if active
-    ambientStopRef.current?.()
 
     // 1. Visual shake on controls + ribbon — restart timers on rapid triggers
     setShaking(true)
@@ -325,21 +322,8 @@ function App() {
     engine.setDelay(newDelay)
   }, [getEngine])
 
-  const { isPlaying: ambientIsPlaying, isSleeping: ambientIsSleeping, startNow: ambientStartNow, stopNow: ambientStopNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, ribbonInteraction, handleAmbientTweak, handleAmbientStart)
-  ambientStopRef.current = ambientStopNow
+  const { isPlaying: ambientIsPlaying, isSleeping: ambientIsSleeping, startNow: ambientStartNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, handleAmbientTweak, handleAmbientStart)
 
-  // Stop ambient play when user interacts with controls or ribbon
-  useEffect(() => {
-    if (!ambientIsPlaying) return
-    const handler = (e) => {
-      // Don't stop if clicking the ambient icon itself
-      if (e.target.closest?.('.app-header__ambient')) return
-      ambientStopNow()
-    }
-    const events = ['pointerdown', 'keydown', 'touchstart']
-    events.forEach(ev => window.addEventListener(ev, handler, true))
-    return () => events.forEach(ev => window.removeEventListener(ev, handler, true))
-  }, [ambientIsPlaying, ambientStopNow])
 
   // When hold is active in play mode, global mouse movement controls pitch
   // Does NOT apply in arp mode — arp+hold builds note sequences instead
@@ -406,7 +390,7 @@ function App() {
             })
           }}
           aria-label="Toggle ambient play"
-          title={ambientPlay ? 'Ambient play on (plays after 30s idle)' : 'Ambient play off'}
+          title={ambientPlay ? 'Ambient play on' : 'Ambient play off'}
         >
           <svg className="app-header__ambient-icon" viewBox="0 0 48 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             {/* Möbius strip infinity — two crossing loops with depth */}

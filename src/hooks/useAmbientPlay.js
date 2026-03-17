@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { SCALES } from '../utils/scales'
 
 // Ambient play — generative pleasant tones from the current scale
-// Toggled on/off by user; stops when user interacts with controls, ribbon, or shake
+// Toggled on/off by user; stays active even while user interacts with controls
 
 const BASE_NOTE = 48 // C3 MIDI
 
@@ -28,7 +28,7 @@ function pickNote(scale, octaves, prevMidi) {
   return Math.max(BASE_NOTE, Math.min(BASE_NOTE + semitoneRange, midi))
 }
 
-export function useAmbientPlay(getEngine, enabled, scale, octaves, ribbonInteraction, onAmbientTweak, onAmbientStart) {
+export function useAmbientPlay(getEngine, enabled, scale, octaves, onAmbientTweak, onAmbientStart) {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isSleeping, setIsSleeping] = useState(false)
   const playingRef = useRef(false)
@@ -87,12 +87,6 @@ export function useAmbientPlay(getEngine, enabled, scale, octaves, ribbonInterac
     intervalRef.current = setInterval(() => {
       if (!playingRef.current) return
 
-      // Check if user is playing the ribbon directly
-      if (ribbonInteraction?.current?.active) {
-        stopPlaying()
-        return
-      }
-
       const now = Date.now()
       if (now < nextNoteTimeRef.current) return // not time yet
 
@@ -124,7 +118,7 @@ export function useAmbientPlay(getEngine, enabled, scale, octaves, ribbonInterac
       // Schedule next note 2–5s from now
       nextNoteTimeRef.current = now + 2000 + Math.random() * 3000
     }, 250)
-  }, [stopPlaying, ribbonInteraction])
+  }, [stopPlaying])
 
   // Stop when disabled
   useEffect(() => {

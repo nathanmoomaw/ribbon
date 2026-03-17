@@ -2,26 +2,21 @@ import { useEffect, useRef, useCallback, useState } from 'react'
 import { SCALES } from '../utils/scales'
 
 // Ambient play — generative pleasant tones from the current scale
-// Starts after INACTIVITY_DELAY ms of no user interaction, stops when user plays
+// Toggled on/off by user; stops when user interacts with controls, ribbon, or shake
 
 const BASE_NOTE = 48 // C3 MIDI
-const INACTIVITY_DELAY = 30000 // 30 seconds before ambient kicks in
 
 function midiToFreq(midi) {
   return 440 * Math.pow(2, (midi - 69) / 12)
 }
 
-// Pick a pleasant note from the scale, biased toward small melodic steps
 function pickNote(scale, octaves, prevMidi) {
   const scaleKey = Array.isArray(scale) ? scale[0] : scale
-  // Default to pentatonic for ambient — always sounds nice
   const intervals = SCALES[scaleKey] || SCALES.pentatonic
-  const semitoneRange = octaves * 12
   const oct = Math.floor(Math.random() * octaves)
   const interval = intervals[Math.floor(Math.random() * intervals.length)]
   let midi = BASE_NOTE + oct * 12 + interval
 
-  // Bias toward small melodic steps from previous note
   if (prevMidi > 0) {
     const step = midi - prevMidi
     if (Math.abs(step) > 7) {
@@ -29,132 +24,132 @@ function pickNote(scale, octaves, prevMidi) {
     }
   }
 
+  const semitoneRange = octaves * 12
   return Math.max(BASE_NOTE, Math.min(BASE_NOTE + semitoneRange, midi))
 }
 
 export function useAmbientPlay(getEngine, enabled, scale, octaves, ribbonInteraction, onAmbientTweak, onAmbientStart) {
   const [isPlaying, setIsPlaying] = useState(false)
-  const noteTimerRef = useRef(null)
-  const inactivityTimerRef = useRef(null)
+  const [isSleeping, setIsSleeping] = useState(false)
+  const playingRef = useRef(false)
+  const intervalRef = useRef(null)
   const prevMidiRef = useRef(0)
-  const activeVoicesRef = useRef([])
   const noteCountRef = useRef(0)
-  const enabledRef = useRef(enabled)
+  const nextNoteTimeRef = useRef(0)
+  const sleepTimerRef = useRef(null)
+
+  // Keep all values in refs so the interval callback always reads current state
+  const scaleRef = useRef(scale)
+  const octavesRef = useRef(octaves)
+  const getEngineRef = useRef(getEngine)
   const onAmbientTweakRef = useRef(onAmbientTweak)
   const onAmbientStartRef = useRef(onAmbientStart)
-  enabledRef.current = enabled
+
+  scaleRef.current = scale
+  octavesRef.current = octaves
+  getEngineRef.current = getEngine
   onAmbientTweakRef.current = onAmbientTweak
   onAmbientStartRef.current = onAmbientStart
 
-  const stopAmbient = useCallback(() => {
+  const stopPlaying = useCallback(() => {
+    if (!playingRef.current) return
+    playingRef.current = false
     setIsPlaying(false)
-    if (noteTimerRef.current) {
-      clearTimeout(noteTimerRef.current)
-      noteTimerRef.current = null
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
     }
-    const engine = getEngine()
-    if (engine) {
-      activeVoicesRef.current.forEach(id => engine.voiceOff?.(id))
-    }
-    activeVoicesRef.current = []
     prevMidiRef.current = 0
     noteCountRef.current = 0
-  }, [getEngine])
+    nextNoteTimeRef.current = 0
 
-  const scheduleNext = useCallback(() => {
-    if (!enabledRef.current) return
+    // Trigger sleep shimmer animation
+    setIsSleeping(true)
+    if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current)
+    sleepTimerRef.current = setTimeout(() => setIsSleeping(false), 1500)
+  }, [])
 
-    const engine = getEngine()
-    if (!engine) return
-
-    // If user started playing, stop ambient
-    if (ribbonInteraction?.current?.active) {
-      stopAmbient()
-      return
-    }
-
-    // Pick and play a gentle note
-    const midi = pickNote(scale, octaves, prevMidiRef.current)
-    prevMidiRef.current = midi
-    const hz = midiToFreq(midi)
-    const voiceId = `ambient_${Date.now()}`
-    const velocity = 0.08 + Math.random() * 0.12 // very gentle
-
-    engine.voiceOn(voiceId, hz, velocity)
-    activeVoicesRef.current.push(voiceId)
-
-    // Short taps — brief sustain (0.3–1.2s)
-    const sustain = 300 + Math.random() * 900
-    setTimeout(() => {
-      engine.voiceOff?.(voiceId)
-      activeVoicesRef.current = activeVoicesRef.current.filter(v => v !== voiceId)
-    }, sustain)
-
-    noteCountRef.current++
-
-    // Every 8-12 notes, subtly tweak a control for evolving ambient texture
-    if (noteCountRef.current % (8 + Math.floor(Math.random() * 5)) === 0) {
-      onAmbientTweakRef.current?.()
-    }
-
-    // Unhurried pace — longer gaps between notes (2–5s)
-    const gap = 2000 + Math.random() * 3000
-    noteTimerRef.current = setTimeout(scheduleNext, gap)
-  }, [getEngine, scale, octaves, ribbonInteraction, stopAmbient])
-
-  const startAmbient = useCallback(() => {
-    if (!enabledRef.current) return
+  const startPlaying = useCallback(() => {
+    if (playingRef.current) return
+    playingRef.current = true
     setIsPlaying(true)
-    // Set up ambient-friendly effects (random reverb + delay)
+    setIsSleeping(false)
+    if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current)
+
+    // Set up ambient-friendly effects
     onAmbientStartRef.current?.()
-    // Small delay before first note
-    noteTimerRef.current = setTimeout(scheduleNext, 500)
-  }, [scheduleNext])
 
-  // Reset inactivity timer when user interacts
-  const resetInactivityTimer = useCallback(() => {
-    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
+    // Schedule the first note soon
+    nextNoteTimeRef.current = Date.now() + 400
 
-    // If ambient is playing, stop it
-    if (activeVoicesRef.current.length > 0 || noteTimerRef.current) {
-      stopAmbient()
-    }
+    // Use a polling interval that checks if it's time to play a note
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
+      if (!playingRef.current) return
 
-    if (!enabledRef.current) return
+      // Check if user is playing the ribbon directly
+      if (ribbonInteraction?.current?.active) {
+        stopPlaying()
+        return
+      }
 
-    // Start countdown to ambient play
-    inactivityTimerRef.current = setTimeout(() => {
-      if (enabledRef.current) startAmbient()
-    }, INACTIVITY_DELAY)
-  }, [stopAmbient, startAmbient])
+      const now = Date.now()
+      if (now < nextNoteTimeRef.current) return // not time yet
 
-  // Monitor user activity — reset timer on any interaction
+      const engine = getEngineRef.current()
+      if (!engine) return
+
+      // Play a gentle note
+      const midi = pickNote(scaleRef.current, octavesRef.current, prevMidiRef.current)
+      prevMidiRef.current = midi
+      const hz = midiToFreq(midi)
+      const voiceId = `ambient_${now}`
+      const velocity = 0.12 + Math.random() * 0.13
+
+      engine.voiceOn(voiceId, hz, velocity)
+
+      // Short tap — release after brief sustain
+      const sustain = 300 + Math.random() * 900
+      setTimeout(() => {
+        engine.voiceOff?.(voiceId)
+      }, sustain)
+
+      noteCountRef.current++
+
+      // Every 8-12 notes, subtly tweak a control
+      if (noteCountRef.current % (8 + Math.floor(Math.random() * 5)) === 0) {
+        onAmbientTweakRef.current?.()
+      }
+
+      // Schedule next note 2–5s from now
+      nextNoteTimeRef.current = now + 2000 + Math.random() * 3000
+    }, 250)
+  }, [stopPlaying, ribbonInteraction])
+
+  // Stop when disabled
   useEffect(() => {
-    if (!enabled) {
-      stopAmbient()
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
-      return
-    }
+    if (!enabled) stopPlaying()
+  }, [enabled, stopPlaying])
 
-    const events = ['pointerdown', 'keydown', 'touchstart']
-    const handler = () => resetInactivityTimer()
-
-    events.forEach(e => window.addEventListener(e, handler, true))
-    // Start initial inactivity countdown
-    resetInactivityTimer()
-
+  // Clean up on unmount only
+  useEffect(() => {
     return () => {
-      events.forEach(e => window.removeEventListener(e, handler, true))
-      stopAmbient()
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
+      if (sleepTimerRef.current) clearTimeout(sleepTimerRef.current)
+      playingRef.current = false
     }
-  }, [enabled, resetInactivityTimer, stopAmbient])
+  }, [])
 
-  // Immediately start ambient (called when user clicks the toggle ON)
   const startNow = useCallback(() => {
-    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current)
-    if (!noteTimerRef.current) startAmbient()
-  }, [startAmbient])
+    startPlaying()
+  }, [startPlaying])
 
-  return { isPlaying, startNow }
+  const stopNow = useCallback(() => {
+    stopPlaying()
+  }, [stopPlaying])
+
+  return { isPlaying, isSleeping, startNow, stopNow }
 }

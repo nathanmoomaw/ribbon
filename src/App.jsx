@@ -49,12 +49,13 @@ function App() {
   const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
-  const [ambientPlay, setAmbientPlay] = useState(true)
+  const [ambientPlay, setAmbientPlay] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
+  const ambientStopRef = useRef(null)
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
@@ -143,6 +144,9 @@ function App() {
   // --- Shake/Quake handler ---
   const handleShake = useCallback((intensity) => {
     const engine = getEngine()
+
+    // Stop ambient play if active
+    ambientStopRef.current?.()
 
     // 1. Visual shake on controls + ribbon — restart timers on rapid triggers
     setShaking(true)
@@ -321,7 +325,21 @@ function App() {
     engine.setDelay(newDelay)
   }, [getEngine])
 
-  const { isPlaying: ambientIsPlaying, startNow: ambientStartNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, ribbonInteraction, handleAmbientTweak, handleAmbientStart)
+  const { isPlaying: ambientIsPlaying, isSleeping: ambientIsSleeping, startNow: ambientStartNow, stopNow: ambientStopNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, ribbonInteraction, handleAmbientTweak, handleAmbientStart)
+  ambientStopRef.current = ambientStopNow
+
+  // Stop ambient play when user interacts with controls or ribbon
+  useEffect(() => {
+    if (!ambientIsPlaying) return
+    const handler = (e) => {
+      // Don't stop if clicking the ambient icon itself
+      if (e.target.closest?.('.app-header__ambient')) return
+      ambientStopNow()
+    }
+    const events = ['pointerdown', 'keydown', 'touchstart']
+    events.forEach(ev => window.addEventListener(ev, handler, true))
+    return () => events.forEach(ev => window.removeEventListener(ev, handler, true))
+  }, [ambientIsPlaying, ambientStopNow])
 
   // When hold is active in play mode, global mouse movement controls pitch
   // Does NOT apply in arp mode — arp+hold builds note sequences instead
@@ -380,7 +398,7 @@ function App() {
 
       <header className="app-header">
         <button
-          className={`app-header__ambient ${ambientPlay ? 'app-header__ambient--on' : ''} ${ambientIsPlaying ? 'app-header__ambient--playing' : ''}`}
+          className={`app-header__ambient ${ambientPlay ? 'app-header__ambient--on' : ''} ${ambientIsPlaying ? 'app-header__ambient--playing' : ''} ${ambientIsSleeping ? 'app-header__ambient--sleeping' : ''}`}
           onClick={() => {
             setAmbientPlay(a => {
               if (!a) setTimeout(() => ambientStartNow(), 0)

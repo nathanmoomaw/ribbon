@@ -286,7 +286,7 @@ function App() {
       // Nudge reverb
       setReverbMix(prev => {
         const next = Math.max(0, Math.min(1, prev + (Math.random() - 0.4) * 0.15))
-        engine.setReverbMix(next)
+        engine.setReverb({ mix: next })
         return next
       })
     } else if (choice < 0.55) {
@@ -320,7 +320,7 @@ function App() {
     const newReverb = 0.2 + Math.random() * 0.4 // 0.2–0.6
     const newDelay = { time: 0.2 + Math.random() * 0.3, feedback: 0.2 + Math.random() * 0.3, mix: 0.15 + Math.random() * 0.25 }
     setReverbMix(newReverb)
-    engine.setReverbMix(newReverb)
+    engine.setReverb({ mix: newReverb })
     setDelayParams(newDelay)
     engine.setDelay(newDelay)
   }, [getEngine])
@@ -461,7 +461,6 @@ function App() {
         setHold={setHold}
         onStop={handleStop}
         onKillAll={handleKillAll}
-        onShake={handleShake}
       />
 
       <div className="keys-toggle">

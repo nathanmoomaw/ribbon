@@ -131,3 +131,12 @@ volume slider (horizontal)
 [x] increase the shimmer effect of waking the abmient icon
 [x] ambient play should be OFF by default. if the user clicks it it should start immediately.  presently i'm still not seeing it trigger the ribbon
 [x] ambient play should also always turn off when the user iteracts with any controls or hits shake.  when it turns off it should have a different little shimmer as it goes back to sleep
+
+# Tuesday March 17 ☘️
+
+[x] commit untracked files
+[x] investigate why ambient mode presently makes no sounds (is it just not triggering notes? the code looks like it should be).
+[x] implement more slightly smaller versions of the shake (lightning) bolt on each of the 3 osc sections.  put it in the upper right hand corner of those panels.  it should act to fully randomize just that particular osc when clicked.
+[x] remove the shake icon from the lower right of the console.  this has been effectively replaced by the one hovering next to the logo
+[x] implement this same kind of smaller shake icon on the general ![this is the general panel](<Screenshot 2026-03-17 at 10.51.53.png>).  match the placement of the ones on the osc panels by putting it in the upper right of that general panel and perhaps giving the panel bevel a bit more distinction.  when the user clicks this general panel shake it should also fully randomize the items in that panel.
+[x] at this point let's skip adding a shake to the left side of the console items (the switches and such) with the assumption the user can easily tap those to mess them up themselves.

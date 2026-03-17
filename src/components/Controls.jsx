@@ -90,6 +90,18 @@ const OCTAVE_OPTIONS = [1, 2, 3, 4]
 const SCALE_NAMES = Object.keys(SCALES)
 const OSC_COLORS = ['var(--osc-red)', 'var(--osc-gold)', 'var(--osc-green)']
 
+function MiniShakeBolt({ onClick, title }) {
+  return (
+    <button
+      className="controls__mini-shake"
+      onClick={onClick}
+      title={title || 'Randomize'}
+    >
+      ⚡
+    </button>
+  )
+}
+
 function OscSection({ index, params, getEngine, onUpdate }) {
   const handleWaveform = useCallback((type) => {
     onUpdate(index, { ...params, waveform: type })
@@ -108,9 +120,21 @@ function OscSection({ index, params, getEngine, onUpdate }) {
     getEngine().setOscMix(index, mix)
   }, [index, params, getEngine, onUpdate])
 
+  const handleOscShake = useCallback(() => {
+    const engine = getEngine()
+    const waveform = WAVEFORMS[Math.floor(Math.random() * WAVEFORMS.length)]
+    const mix = Math.random()
+    const detune = Math.round((Math.random() - 0.5) * 2400)
+    onUpdate(index, { waveform, mix, detune })
+    engine.setWaveform(waveform, index)
+    engine.setOscMix(index, mix)
+    engine.setOscDetune(index, detune)
+  }, [index, getEngine, onUpdate])
+
   return (
     <div className="controls__osc" style={{ '--osc-color': OSC_COLORS[index] }}>
       <label className="controls__osc-label">OSC {index + 1}</label>
+      <MiniShakeBolt onClick={handleOscShake} title={`Randomize OSC ${index + 1}`} />
       <div className="controls__section">
         <label className="controls__label">Wave</label>
         <div className="controls__waveforms">
@@ -184,7 +208,6 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
-  onShake,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -283,6 +306,31 @@ export const Controls = forwardRef(function Controls({
           </div>
 
           <div className="controls__shared">
+            <MiniShakeBolt onClick={() => {
+              const engine = getEngine()
+              const newOctaves = OCTAVE_OPTIONS[Math.floor(Math.random() * OCTAVE_OPTIONS.length)]
+              setOctaves(newOctaves)
+              const randomScale = SCALE_NAMES[Math.floor(Math.random() * SCALE_NAMES.length)]
+              setScale([randomScale])
+              if (randomScale !== 'chromatic') setStepped(true)
+              else setStepped(false)
+              const newCutoff = 20 + Math.random() * 19980
+              const newRes = Math.random() * 25
+              setFilterParams({ cutoff: newCutoff, resonance: newRes })
+              engine.setFilter({ cutoff: newCutoff, resonance: newRes })
+              const newSpeed = 0.001 + Math.random() * 0.299
+              setGlideSpeed(newSpeed)
+              engine.setGlideSpeed(newSpeed)
+              const newDelay = { time: 0.05 + Math.random() * 0.95, feedback: Math.random() * 0.9, mix: Math.random() }
+              setDelayParams(newDelay)
+              engine.setDelay(newDelay)
+              const newReverb = Math.random()
+              setReverbMix(newReverb)
+              engine.setReverb({ mix: newReverb })
+              const newCrunch = Math.random()
+              setCrunch(newCrunch)
+              engine.setCrunch(newCrunch)
+            }} title="Randomize general controls" />
             <div className="controls__section">
               <label className="controls__label">Octaves</label>
               <div className="controls__waveforms">
@@ -396,13 +444,6 @@ export const Controls = forwardRef(function Controls({
           </div>
         </div>
       </div>
-      <button
-        className="controls__shake-btn"
-        onClick={() => onShake?.(0.5)}
-        title="Shake / Randomize"
-      >
-        <span className="controls__shake-icon">⚡</span>
-      </button>
     </div>
   )
 })

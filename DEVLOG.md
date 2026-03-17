@@ -1,5 +1,21 @@
 # Devlog
 
+## 2026-03-16 — Ambient play rewrite, default off, sleep animation
+
+- **Rewrote `useAmbientPlay`**: replaced recursive `setTimeout` with `setInterval` polling (250ms) to eliminate stale closure issues; all state read from refs
+- Ambient play now **OFF by default** — user clicks icon to start immediately
+- Ambient stops on **any user interaction**: pointerdown, keydown, touchstart, or shake (except clicking the ambient icon itself)
+- Added **sleep shimmer animation** when ambient goes to sleep: icon fades from cyan to gray with `·` and `✧` particles drifting upward
+- `isSleeping` state exposed from hook; `--sleeping` CSS class with `ambient-sleep` + `sleep-shimmer` keyframes
+- **Known bug**: ambient play still not triggering audible notes — needs further investigation
+
+## 2026-03-16 — Ambient play fix, icon positioning, sparkle polish
+
+- Fixed ambient play not triggering notes: refactored `useAmbientPlay` scheduling to use ref-based pattern, preventing stale closures in recursive `setTimeout` chain
+- Slightly increased ambient note velocity (0.10–0.25) for better audibility
+- Moved ambient and shake icons down 15px each for better visual positioning
+- Enhanced sparkle wake-up animation: larger particles, longer duration (1.8s), added glow text-shadow, more gradual multi-stage fade with brightness filter
+
 ## 2026-03-16 — Desktop bolt, ambient icon polish, sparkle wake
 
 - Lightning bolt shake button now visible on desktop too (was mobile-only), circle button in Controls hidden

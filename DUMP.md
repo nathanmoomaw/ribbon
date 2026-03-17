@@ -126,3 +126,8 @@ volume slider (horizontal)
 [x] adjust the position of the ambient icon to align more vertically centered with the logo
 [x] by default the ambient icon should be disabled.  after 30 seconds of inactivity it should animate "awake" emitting a brief bit of sparkles as it wake up.  then it should be lit up and ambient play should begin.
 [x] if the user clicks the ambient icon ambient play can start immediately (also, show the same awakening animation as if it woke itself up when clicked)
+[x] it doesn't seem to be triggering random light clicks during ambient play mode
+[x] move the ambient and shake icons down a bit each, like 15px
+[x] increase the shimmer effect of waking the abmient icon
+[x] ambient play should be OFF by default. if the user clicks it it should start immediately.  presently i'm still not seeing it trigger the ribbon
+[x] ambient play should also always turn off when the user iteracts with any controls or hits shake.  when it turns off it should have a different little shimmer as it goes back to sleep

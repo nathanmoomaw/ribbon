@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-17 — Fix ambient play, per-section shake bolts
+
+- **Fixed ambient play not producing sound**: `handleAmbientStart` called `engine.setReverbMix()` which doesn't exist — should be `engine.setReverb({ mix })`. This threw a TypeError inside `startPlaying`, preventing the note interval from ever starting. Same fix applied to `handleAmbientTweak`.
+- **Added mini shake bolts** (⚡) to upper-right of each OSC panel — fully randomizes that oscillator's waveform, mix, and detune
+- **Added mini shake bolt to general panel** — randomizes octaves, scale, filter, speed, delay, reverb, and crunch
+- **Removed old console shake button** from lower-right (replaced by header bolt + per-section bolts)
+- Committed untracked files (PLAN-NFT.md, screenshots)
+
 ## 2026-03-16 — Ambient play rewrite, default off, sleep animation
 
 - **Rewrote `useAmbientPlay`**: replaced recursive `setTimeout` with `setInterval` polling (250ms) to eliminate stale closure issues; all state read from refs

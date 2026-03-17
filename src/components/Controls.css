@@ -344,6 +344,7 @@
 }
 
 .controls__shared {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
@@ -427,55 +428,38 @@
   box-shadow: none;
 }
 
-/* Shake trigger button — replaced by header bolt on all sizes */
-.controls__shake-btn {
-  display: none;
+/* Mini shake bolt — per-section randomize */
+.controls__mini-shake {
   position: absolute;
-  bottom: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
   padding: 0;
-  border-radius: 50%;
-  border: 1px solid rgba(100, 90, 140, 0.25);
-  background: linear-gradient(145deg, rgba(60, 55, 90, 0.6), rgba(35, 32, 58, 0.8));
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 0.75rem;
+  border-radius: 3px;
+  border: 1px solid rgba(100, 90, 140, 0.2);
+  background: linear-gradient(145deg, rgba(60, 55, 90, 0.5), rgba(35, 32, 58, 0.7));
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.6rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 2;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, color 0.2s;
-  animation: shake-idle 4s ease-in-out infinite;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.controls__shake-btn:hover {
-  color: rgba(255, 255, 255, 0.8);
-  border-color: rgba(160, 140, 220, 0.4);
-  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.2), 0 0 20px rgba(139, 92, 246, 0.1);
-  animation: none;
-  transform: scale(1.1);
-}
-
-.controls__shake-btn:active {
-  transform: scale(0.9);
-  animation: shake 0.4s ease-out;
-}
-
-.controls__shake-icon {
-  display: block;
+  transition: transform 0.15s, box-shadow 0.15s, color 0.15s;
   line-height: 1;
 }
 
-/* Subtle idle animation — gentle wobble/pulse to draw attention */
-@keyframes shake-idle {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  15% { transform: rotate(-3deg) scale(1.02); }
-  30% { transform: rotate(2deg) scale(0.98); }
-  45% { transform: rotate(-1deg) scale(1.01); }
-  60% { transform: rotate(0deg) scale(1); }
+.controls__mini-shake:hover {
+  color: rgba(255, 255, 255, 0.8);
+  border-color: rgba(160, 140, 220, 0.35);
+  box-shadow: 0 1px 8px rgba(139, 92, 246, 0.2);
+  transform: scale(1.15);
+}
+
+.controls__mini-shake:active {
+  transform: scale(0.85);
+  animation: shake 0.3s ease-out;
 }
 
 

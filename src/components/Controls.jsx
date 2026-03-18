@@ -3,7 +3,7 @@ import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import './Controls.css'
 
-function DJFader({ value, onChange }) {
+function DJFader({ value, onChange, ghostValue }) {
   const trackRef = useRefHook(null)
   const thumbRef = useRefHook(null)
   const valueRef = useRefHook(null)
@@ -71,6 +71,15 @@ function DJFader({ value, onChange }) {
         onPointerCancel={onPointerUp}
       >
         <div className="controls__fader-groove" />
+        {ghostValue != null && (
+          <div
+            className="controls__fader-ghost"
+            style={{
+              '--ghost-top': `calc(${(1 - ghostValue) * 100}% - 5px)`,
+              '--ghost-left': `calc(${ghostValue * 100}% - 5px)`,
+            }}
+          />
+        )}
         <div
           ref={thumbRef}
           className="controls__fader-thumb"
@@ -208,6 +217,7 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
+  ambientGhostVolume,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -289,7 +299,7 @@ export const Controls = forwardRef(function Controls({
             onStop={onStop}
             onKillAll={onKillAll}
           />
-          <DJFader value={volume} onChange={handleVolume} />
+          <DJFader value={volume} onChange={handleVolume} ghostValue={ambientGhostVolume} />
         </div>
 
         <div className="controls__main">

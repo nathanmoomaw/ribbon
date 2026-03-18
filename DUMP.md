@@ -142,3 +142,11 @@ volume slider (horizontal)
 [x] at this point let's skip adding a shake to the left side of the console items (the switches and such) with the assumption the user can easily tap those to mess them up themselves.
 [x] make those small shake icons have rounded borders, not square
 [x] ambient play still needs a lot of work.  for now let's leave it disabled by default. remove the 30s timer functionality and require that the user clicks it to activate it.  in fact, for now let's allow it to stay on while the user also interacts with the ribbon or the console
+[x] make ambient icon larger and more animated when active
+[x] arp/poly/hold mode should allow for clicks on console or shake and apply that as a unit of the arpeggio
+[x] ambient should start in that mode
+[x] volume should show a ghost (ambient) volume when it's initiated and user can adjust from the lower volume
+
+# Wednesday March 18
+
+

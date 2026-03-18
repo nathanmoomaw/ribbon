@@ -80,12 +80,12 @@ function destroyVoice(id) {
   if (!voice) return
   clearTimeout(voice.cleanupTimer)
   voice.oscs.forEach(({ osc, gain }) => {
-    osc.stop()
-    osc.disconnect()
-    gain.disconnect()
+    try { osc.stop() } catch (_) { /* already stopped */ }
+    try { osc.disconnect() } catch (_) {}
+    try { gain.disconnect() } catch (_) {}
   })
-  voice.noteGain.disconnect()
-  voice.filter.disconnect()
+  try { voice.noteGain.disconnect() } catch (_) {}
+  try { voice.filter.disconnect() } catch (_) {}
   voiceMap.delete(id)
 }
 
@@ -339,6 +339,7 @@ export function allNotesOff() {
 }
 
 // Kill ALL sound immediately — voices, delay tails, reverb tails
+let killRestoreTimer = null
 export function killAllSound() {
   // Stop all voices immediately (no fade)
   for (const id of [...voiceMap.keys()]) {
@@ -367,8 +368,11 @@ export function killAllSound() {
     slapbackSend.gain.cancelScheduledValues(ctx.currentTime)
     slapbackSend.gain.setValueAtTime(0, ctx.currentTime)
   }
+  // Cancel any previous restore timer to prevent leaks
+  if (killRestoreTimer) clearTimeout(killRestoreTimer)
   // Restore after tails have died
-  setTimeout(() => {
+  killRestoreTimer = setTimeout(() => {
+    killRestoreTimer = null
     if (!ctx) return
     if (delaySend) delaySend.gain.setValueAtTime(prevDelaySend, ctx.currentTime)
     if (delayFeedback) delayFeedback.gain.setValueAtTime(prevDelayFeedback, ctx.currentTime)

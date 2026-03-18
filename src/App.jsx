@@ -59,6 +59,32 @@ function App() {
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
+  // Refs for handleShake — avoids recreating callback on every state change
+  const filterParamsRef = useRef(filterParams)
+  const glideSpeedRef = useRef(glideSpeed)
+  const delayParamsRef = useRef(delayParams)
+  const reverbMixRef = useRef(reverbMix)
+  const crunchRef = useRef(crunch)
+  const arpBpmRef = useRef(arpBpm)
+  const octavesRef = useRef(octaves)
+  const steppedRef = useRef(stepped)
+  const scaleRef = useRef(scale)
+  const modeRef = useRef(mode)
+  const polyRef = useRef(poly)
+  const holdRef2 = useRef(hold)
+  filterParamsRef.current = filterParams
+  glideSpeedRef.current = glideSpeed
+  delayParamsRef.current = delayParams
+  reverbMixRef.current = reverbMix
+  crunchRef.current = crunch
+  arpBpmRef.current = arpBpm
+  octavesRef.current = octaves
+  steppedRef.current = stepped
+  scaleRef.current = scale
+  modeRef.current = mode
+  polyRef.current = poly
+  holdRef2.current = hold
+
   const keyHandlers = useMemo(() => ({
     Space: () => {
       const now = Date.now()
@@ -141,10 +167,9 @@ function App() {
 
   useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove)
 
-  // --- Shake/Quake handler ---
+  // --- Shake/Quake handler (reads state from refs to avoid dependency churn) ---
   const handleShake = useCallback((intensity) => {
     const engine = getEngine()
-
 
     // 1. Visual shake on controls + ribbon — restart timers on rapid triggers
     setShaking(true)
@@ -164,7 +189,6 @@ function App() {
       if (shouldNudge()) next.waveform = WAVEFORMS[Math.floor(Math.random() * WAVEFORMS.length)]
       if (shouldNudge()) next.mix = nudge(osc.mix, 0, 1, intensity)
       if (shouldNudge()) next.detune = Math.round(nudge(osc.detune, -1200, 1200, intensity))
-      // Apply to engine
       if (next.waveform !== osc.waveform) engine.setWaveform(next.waveform, i)
       if (next.mix !== osc.mix) engine.setOscMix(i, next.mix)
       if (next.detune !== osc.detune) engine.setOscDetune(i, next.detune)
@@ -172,55 +196,55 @@ function App() {
     }))
 
     if (shouldNudge()) {
-      const newCutoff = nudge(filterParams.cutoff, 20, 20000, intensity)
+      const newCutoff = nudge(filterParamsRef.current.cutoff, 20, 20000, intensity)
       setFilterParams(prev => ({ ...prev, cutoff: newCutoff }))
       engine.setFilter({ cutoff: newCutoff })
     }
 
     if (shouldNudge()) {
-      const newRes = nudge(filterParams.resonance, 0, 25, intensity)
+      const newRes = nudge(filterParamsRef.current.resonance, 0, 25, intensity)
       setFilterParams(prev => ({ ...prev, resonance: newRes }))
       engine.setFilter({ resonance: newRes })
     }
 
     if (shouldNudge()) {
-      const newSpeed = nudge(glideSpeed, 0.001, 0.3, intensity)
+      const newSpeed = nudge(glideSpeedRef.current, 0.001, 0.3, intensity)
       setGlideSpeed(newSpeed)
       engine.setGlideSpeed(newSpeed)
     }
 
     if (shouldNudge()) {
-      const newTime = nudge(delayParams.time, 0.05, 1, intensity)
+      const newTime = nudge(delayParamsRef.current.time, 0.05, 1, intensity)
       setDelayParams(prev => ({ ...prev, time: newTime }))
       engine.setDelay({ time: newTime })
     }
 
     if (shouldNudge()) {
-      const newFeedback = nudge(delayParams.feedback, 0, 0.9, intensity)
+      const newFeedback = nudge(delayParamsRef.current.feedback, 0, 0.9, intensity)
       setDelayParams(prev => ({ ...prev, feedback: newFeedback }))
       engine.setDelay({ feedback: newFeedback })
     }
 
     if (shouldNudge()) {
-      const newDelayMix = nudge(delayParams.mix, 0, 1, intensity)
+      const newDelayMix = nudge(delayParamsRef.current.mix, 0, 1, intensity)
       setDelayParams(prev => ({ ...prev, mix: newDelayMix }))
       engine.setDelay({ mix: newDelayMix })
     }
 
     if (shouldNudge()) {
-      const newReverb = nudge(reverbMix, 0, 1, intensity)
+      const newReverb = nudge(reverbMixRef.current, 0, 1, intensity)
       setReverbMix(newReverb)
       engine.setReverb({ mix: newReverb })
     }
 
     if (shouldNudge()) {
-      const newCrunch = nudge(crunch, 0, 1, intensity)
+      const newCrunch = nudge(crunchRef.current, 0, 1, intensity)
       setCrunch(newCrunch)
       engine.setCrunch(newCrunch)
     }
 
     if (shouldNudge()) {
-      const newBpm = Math.round(nudge(arpBpm, 40, 300, intensity))
+      const newBpm = Math.round(nudge(arpBpmRef.current, 40, 300, intensity))
       setArpBpm(newBpm)
     }
 
@@ -250,7 +274,7 @@ function App() {
     // 3. Trigger a random ribbon press — velocity scales with intensity
     const shakePosition = Math.random()
     const shakeVelocity = Math.random() * 0.3 + intensity * 0.5
-    const shakeHz = positionToFrequency(shakePosition, { octaves, stepped, scale })
+    const shakeHz = positionToFrequency(shakePosition, { octaves: octavesRef.current, stepped: steppedRef.current, scale: scaleRef.current })
 
     // Update ribbon interaction ref for visualizer
     if (ribbonInteraction.current) {
@@ -260,7 +284,7 @@ function App() {
     }
 
     // In arp+poly+hold mode, add note to arp sequence instead of one-shot
-    if (mode === 'arp' && poly && hold) {
+    if (modeRef.current === 'arp' && polyRef.current && holdRef2.current) {
       handleArpNoteToggle(shakeHz)
       setTimeout(() => {
         if (ribbonInteraction.current) ribbonInteraction.current.active = false
@@ -269,7 +293,6 @@ function App() {
       const shakeVoiceId = `shake_${Date.now()}`
       engine.voiceOn(shakeVoiceId, shakeHz, shakeVelocity)
 
-      // Short note — release after 150-400ms depending on intensity
       const noteDuration = 150 + (1 - intensity) * 250
       setTimeout(() => {
         engine.voiceOff(shakeVoiceId)
@@ -278,7 +301,7 @@ function App() {
         }
       }, noteDuration)
     }
-  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crunch, arpBpm, octaves, stepped, scale, ribbonInteraction, mode, poly, hold, handleArpNoteToggle])
+  }, [getEngine, handleArpNoteToggle])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
@@ -357,7 +380,7 @@ function App() {
       engine.setAllActiveFrequencies(hz)
       if (ribbonInteraction.current) ribbonInteraction.current.position = pos
     }
-    window.addEventListener('pointermove', handleGlobalMove)
+    window.addEventListener('pointermove', handleGlobalMove, { passive: true })
     return () => window.removeEventListener('pointermove', handleGlobalMove)
   }, [hold, mode, getEngine, octaves, stepped, scale, ribbonInteraction])
 

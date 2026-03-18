@@ -153,3 +153,5 @@ volume slider (horizontal)
 [x] lose the semi rectanglar box around the ambient icon
 [x] the stop button on desktop should be above the bpm slider
 [x] remember this order and maintain it
+[x] improve performance
+[x] debug, create test scripts if necessary

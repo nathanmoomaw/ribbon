@@ -78,6 +78,10 @@
 .app-header__ambient {
   background: none;
   border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   padding: 0 0.4rem;
   opacity: 0.2;

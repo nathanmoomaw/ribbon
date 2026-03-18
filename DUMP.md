@@ -149,4 +149,6 @@ volume slider (horizontal)
 
 # Wednesday March 18
 
+[x] once again, the order of the leftside switches has been screwed up. refer back if you can cuz i don't wanna keep writing this
+[x] lose the semi rectanglar box around the ambient icon
 

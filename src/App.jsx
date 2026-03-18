@@ -50,6 +50,7 @@ function App() {
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const [ambientPlay, setAmbientPlay] = useState(false)
+  const [ambientGhostVolume, setAmbientGhostVolume] = useState(null)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -247,7 +248,6 @@ function App() {
     }
 
     // 3. Trigger a random ribbon press — velocity scales with intensity
-    const shakeVoiceId = `shake_${Date.now()}`
     const shakePosition = Math.random()
     const shakeVelocity = Math.random() * 0.3 + intensity * 0.5
     const shakeHz = positionToFrequency(shakePosition, { octaves, stepped, scale })
@@ -259,17 +259,26 @@ function App() {
       ribbonInteraction.current.active = true
     }
 
-    engine.voiceOn(shakeVoiceId, shakeHz, shakeVelocity)
+    // In arp+poly+hold mode, add note to arp sequence instead of one-shot
+    if (mode === 'arp' && poly && hold) {
+      handleArpNoteToggle(shakeHz)
+      setTimeout(() => {
+        if (ribbonInteraction.current) ribbonInteraction.current.active = false
+      }, 200)
+    } else {
+      const shakeVoiceId = `shake_${Date.now()}`
+      engine.voiceOn(shakeVoiceId, shakeHz, shakeVelocity)
 
-    // Short note — release after 150-400ms depending on intensity
-    const noteDuration = 150 + (1 - intensity) * 250
-    setTimeout(() => {
-      engine.voiceOff(shakeVoiceId)
-      if (ribbonInteraction.current) {
-        ribbonInteraction.current.active = false
-      }
-    }, noteDuration)
-  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crunch, arpBpm, octaves, stepped, scale, ribbonInteraction])
+      // Short note — release after 150-400ms depending on intensity
+      const noteDuration = 150 + (1 - intensity) * 250
+      setTimeout(() => {
+        engine.voiceOff(shakeVoiceId)
+        if (ribbonInteraction.current) {
+          ribbonInteraction.current.active = false
+        }
+      }, noteDuration)
+    }
+  }, [getEngine, filterParams, glideSpeed, delayParams, reverbMix, crunch, arpBpm, octaves, stepped, scale, ribbonInteraction, mode, poly, hold, handleArpNoteToggle])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
@@ -310,7 +319,7 @@ function App() {
     }
   }, [getEngine, setReverbMix, setDelayParams, setFilterParams, setCrunch])
 
-  // When ambient starts, add random reverb + delay so short taps ring out
+  // When ambient starts, add random reverb + delay so short taps ring out, and set arp+poly+hold
   const handleAmbientStart = useCallback(() => {
     const engine = getEngine()
     if (!engine) return
@@ -320,7 +329,16 @@ function App() {
     engine.setReverb({ mix: newReverb })
     setDelayParams(newDelay)
     engine.setDelay(newDelay)
-  }, [getEngine])
+    // Switch to arp+poly+hold so ambient notes build arp sequences
+    setMode('arp')
+    setPoly(true)
+    setHold(true)
+    // Show ghost volume at current level, lower actual volume for gentle ambient
+    setAmbientGhostVolume(volume)
+    const ambientVol = Math.max(0.08, volume * 0.35)
+    setVolume(ambientVol)
+    engine.setVolume(ambientVol)
+  }, [getEngine, volume])
 
   const { isPlaying: ambientIsPlaying, isSleeping: ambientIsSleeping, startNow: ambientStartNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, handleAmbientTweak, handleAmbientStart)
 
@@ -385,7 +403,12 @@ function App() {
           className={`app-header__ambient ${ambientPlay ? 'app-header__ambient--on' : ''} ${ambientIsPlaying ? 'app-header__ambient--playing' : ''} ${ambientIsSleeping ? 'app-header__ambient--sleeping' : ''}`}
           onClick={() => {
             setAmbientPlay(a => {
-              if (!a) setTimeout(() => ambientStartNow(), 0)
+              if (!a) {
+                setTimeout(() => ambientStartNow(), 0)
+              } else {
+                // Turning off ambient — clear ghost volume
+                setAmbientGhostVolume(null)
+              }
               return !a
             })
           }}
@@ -445,6 +468,7 @@ function App() {
         setHold={setHold}
         onStop={handleStop}
         onKillAll={handleKillAll}
+        ambientGhostVolume={ambientGhostVolume}
       />
 
       <div className="keys-toggle">

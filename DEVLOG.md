@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-17 — Ambient UX overhaul: larger icon, arp+poly+hold integration, ghost volume
+
+- **Ambient icon larger and more animated when active**: SVG scales from 40x20 to 56x28 when playing, with multi-phase breathing animation including rotateY and stronger glow
+- **Shake adds to arp in arp+poly+hold mode**: when shake fires during arp+poly+hold, the random note is added to the arp sequence via `handleArpNoteToggle` instead of playing a one-shot
+- **Ambient starts in arp+poly+hold mode**: `handleAmbientStart` now sets mode=arp, poly=true, hold=true so ambient notes build arp sequences
+- **Ghost volume on ambient start**: volume fader shows a translucent green ghost marker at the pre-ambient level, actual volume drops to 35% of current for gentle ambient; ghost pulses and disappears when ambient is toggled off
+
 ## 2026-03-17 — Rounded shake icons, ambient play stays on during interaction
 
 - **Rounded mini shake bolt borders**: changed from `border-radius: 3px` (square) to `50%` (circle)

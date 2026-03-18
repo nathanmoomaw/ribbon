@@ -71,6 +71,26 @@
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
+/* Ghost volume marker — shows previous volume level during ambient play */
+.controls__fader-ghost {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: var(--ghost-top, 0);
+  height: 6px;
+  border-radius: 2px;
+  background: rgba(100, 255, 200, 0.12);
+  border: 1px solid rgba(100, 255, 200, 0.25);
+  box-shadow: 0 0 8px rgba(100, 255, 200, 0.15);
+  pointer-events: none;
+  animation: ghost-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ghost-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; box-shadow: 0 0 12px rgba(100, 255, 200, 0.25); }
+}
+
 .controls__fader-thumb {
   position: absolute;
   left: -6px;
@@ -515,6 +535,15 @@
     width: auto;
     height: 3px;
     transform: translateY(-50%);
+  }
+
+  .controls__fader-ghost {
+    top: 3px;
+    bottom: 3px;
+    left: var(--ghost-left, 0);
+    right: auto;
+    height: auto;
+    width: 6px;
   }
 
   .controls__fader-thumb {

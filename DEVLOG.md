@@ -1,8 +1,13 @@
 # Devlog
 
+## 2026-03-18 — Stop above BPM, switch order saved to memory
+
+- **Moved Stop button above BPM slider on desktop**: swapped source order so desktop flows Play/Arp → Mono/Poly → Hold → Stop → BPM → Vol. Mobile grid placement unchanged (Stop stays in Row 1)
+- **Saved switch order to memory** so it won't be forgotten in future sessions
+
 ## 2026-03-18 — Fix leftside switch order, remove ambient icon box
 
-- **Fixed leftside switch order**: restructured ActivationMode to flat layout — desktop order is now correct: Play/Arp → Mono/Poly → Hold → BPM → Stop (top to bottom). Mobile uses CSS Grid to reflow into Row 1 (Play/Arp, Hold, Stop) and Row 2 (Mono/Poly, BPM)
+- **Fixed leftside switch order**: restructured ActivationMode to flat layout — desktop order is now correct: Play/Arp → Mono/Poly → Hold → Stop → BPM (top to bottom). Mobile uses CSS Grid to reflow into Row 1 (Play/Arp, Hold, Stop) and Row 2 (Mono/Poly, BPM)
 - **Removed ambient icon box**: stripped default button appearance, outline, and tap highlight from ambient toggle button
 
 ## 2026-03-17 — Ambient UX overhaul: larger icon, arp+poly+hold integration, ghost volume

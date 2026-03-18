@@ -151,4 +151,5 @@ volume slider (horizontal)
 
 [x] once again, the order of the leftside switches has been screwed up. refer back if you can cuz i don't wanna keep writing this
 [x] lose the semi rectanglar box around the ambient icon
-
+[x] the stop button on desktop should be above the bpm slider
+[x] remember this order and maintain it

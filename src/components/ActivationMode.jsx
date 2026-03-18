@@ -92,6 +92,12 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
         Hold
         <kbd>4</kbd>
       </button>
+      <button
+        className="activation__stop"
+        onClick={handleStop}
+      >
+        Stop <kbd>Space</kbd>
+      </button>
       <div className={`activation__arp-tempo ${mode !== 'arp' ? 'activation__arp-tempo--inactive' : ''}`}>
         <label className="activation__tempo-label">
           BPM <span className="activation__tempo-value">{arpBpm}</span>
@@ -106,12 +112,6 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
           disabled={mode !== 'arp'}
         />
       </div>
-      <button
-        className="activation__stop"
-        onClick={handleStop}
-      >
-        Stop <kbd>Space</kbd>
-      </button>
     </div>
   )
 }

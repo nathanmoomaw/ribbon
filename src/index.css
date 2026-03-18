@@ -60,8 +60,8 @@ body {
 }
 
 @keyframes scan-line {
-  0% { left: -10%; }
-  100% { left: 110%; }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(calc(100vw + 100%)); }
 }
 
 @keyframes shimmer-border {

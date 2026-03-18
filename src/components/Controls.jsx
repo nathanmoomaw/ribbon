@@ -1,4 +1,4 @@
-import { useCallback, useRef as useRefHook, forwardRef } from 'react'
+import { useCallback, useRef as useRefHook, forwardRef, memo } from 'react'
 import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import './Controls.css'
@@ -10,6 +10,7 @@ function DJFader({ value, onChange, ghostValue }) {
   const dragging = useRefHook(false)
   const cachedRect = useRefHook(null)
   const isHorizontal = useRefHook(false)
+  const rafRef = useRefHook(null)
 
   // Direct DOM update — bypasses React re-render for zero-lag thumb movement
   const applyThumbPosition = useCallback((ratio) => {
@@ -111,7 +112,7 @@ function MiniShakeBolt({ onClick, title }) {
   )
 }
 
-function OscSection({ index, params, getEngine, onUpdate }) {
+const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate }) {
   const handleWaveform = useCallback((type) => {
     onUpdate(index, { ...params, waveform: type })
     getEngine().setWaveform(type, index)
@@ -182,7 +183,7 @@ function OscSection({ index, params, getEngine, onUpdate }) {
       </div>
     </div>
   )
-}
+})
 
 export const Controls = forwardRef(function Controls({
   getEngine,
@@ -227,12 +228,13 @@ export const Controls = forwardRef(function Controls({
     })
   }, [setOscParams])
 
+  const volRafRef = useRefHook(null)
   const handleVolume = useCallback((val) => {
     // Update engine immediately; skip React state to avoid re-rendering entire Controls tree
     getEngine().setVolume(val)
     // Debounced state sync so React value stays roughly current
-    if (handleVolume._raf) cancelAnimationFrame(handleVolume._raf)
-    handleVolume._raf = requestAnimationFrame(() => setVolume(val))
+    if (volRafRef.current) cancelAnimationFrame(volRafRef.current)
+    volRafRef.current = requestAnimationFrame(() => setVolume(val))
   }, [getEngine, setVolume])
 
   const handleDelayTime = useCallback((e) => {

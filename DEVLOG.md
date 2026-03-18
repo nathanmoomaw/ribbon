@@ -1,5 +1,17 @@
 # Devlog
 
+## 2026-03-18 — Performance optimizations, smoke tests
+
+- **handleShake refs pattern**: moved 13 state dependencies to refs — callback now only depends on `getEngine` + `handleArpNoteToggle`, eliminating cascading re-renders on every parameter change
+- **React.memo on OscSection**: prevents all 3 oscillator panels from re-rendering when unrelated Controls state changes
+- **DJFader RAF fix**: volume debounce now uses a proper useRef for requestAnimationFrame ID, preventing accumulation on rapid drags
+- **AudioEngine guards**: try/catch on voice destruction (osc.stop/disconnect) to handle already-stopped oscillators; killAllSound timeout leak fixed with proper timer tracking
+- **CSS scan-line**: changed from `left` (layout-triggering) to `transform: translateX()` for GPU compositing
+- **Conditional CSS animations**: bolt-dance now only runs on hover; moebius-drift only when ambient is enabled
+- **Passive pointermove**: added `{ passive: true }` to global hold-mode pointer listener
+- **Smoke test suite** (`npm test`): 13 tests covering build, source integrity, CSS perf checks, component structure, and switch order verification
+- **Browser debug script** (`tests/debug-audio.js`): paste-in-console script for exercising voice management, parameter setting, and stress testing
+
 ## 2026-03-18 — Stop above BPM, switch order saved to memory
 
 - **Moved Stop button above BPM slider on desktop**: swapped source order so desktop flows Play/Arp → Mono/Poly → Hold → Stop → BPM → Vol. Mobile grid placement unchanged (Stop stays in Row 1)

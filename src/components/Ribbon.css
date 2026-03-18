@@ -54,10 +54,12 @@
   position: absolute;
   top: 0;
   bottom: 0;
+  left: 0;
   width: 40px;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
   animation: scan-line 4s linear infinite;
   pointer-events: none;
+  will-change: transform;
 }
 
 .ribbon__cursor {

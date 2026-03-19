@@ -155,3 +155,5 @@ volume slider (horizontal)
 [x] remember this order and maintain it
 [x] improve performance
 [x] debug, create test scripts if necessary
+[x] the console background still needs more of the effect from the screenshot i referenced (the buildings)
+[x] let's rework the hold functionality for play mode.  presently it adjusts the tone as the mouse moves even if it's off the ribbon.  let's keep this concept and call it "wild mode", but for now let's just make hold work as one would expect.  you press it and click something and it sticks untils space or hold is turned off.  want to get this functionality more honed it.

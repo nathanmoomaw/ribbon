@@ -366,23 +366,8 @@ function App() {
   const { isPlaying: ambientIsPlaying, isSleeping: ambientIsSleeping, startNow: ambientStartNow } = useAmbientPlay(getEngine, ambientPlay, scale, octaves, handleAmbientTweak, handleAmbientStart)
 
 
-  // When hold is active in play mode, global mouse movement controls pitch
-  // Does NOT apply in arp mode — arp+hold builds note sequences instead
-  useEffect(() => {
-    if (!hold || mode === 'arp') return
-    const handleGlobalMove = (e) => {
-      const engine = getEngine()
-      if (!engine.getIsPlaying()) return
-      // Only do global pitch control when a single voice is active
-      if (engine.getActiveVoiceCount() !== 1) return
-      const pos = Math.max(0, Math.min(1, e.clientX / window.innerWidth))
-      const hz = positionToFrequency(pos, { octaves, stepped, scale })
-      engine.setAllActiveFrequencies(hz)
-      if (ribbonInteraction.current) ribbonInteraction.current.position = pos
-    }
-    window.addEventListener('pointermove', handleGlobalMove, { passive: true })
-    return () => window.removeEventListener('pointermove', handleGlobalMove)
-  }, [hold, mode, getEngine, octaves, stepped, scale, ribbonInteraction])
+  // Hold in play mode: note sustains at its original pitch until space or hold toggled off
+  // No global mouse tracking — "wild mode" (global pitch follow) removed for now
 
   // When hold is toggled off, stop all notes and arp
   const holdRef = useRef(hold)

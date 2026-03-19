@@ -156,43 +156,88 @@
   user-select: none;
   -webkit-user-select: none;
   background:
-    /* Heavy horizontal panel seams — welded steel plate joins */
+    /* Building window lights — scattered glowing dots */
+    radial-gradient(circle 1.5px at 28px 22px, rgba(160, 200, 255, 0.12) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 76px 38px, rgba(200, 180, 140, 0.10) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 134px 14px, rgba(160, 200, 255, 0.08) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 182px 46px, rgba(200, 180, 140, 0.11) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 240px 28px, rgba(160, 200, 255, 0.09) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 310px 18px, rgba(200, 180, 140, 0.10) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 370px 52px, rgba(160, 200, 255, 0.07) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 420px 34px, rgba(200, 180, 140, 0.09) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 500px 20px, rgba(160, 200, 255, 0.11) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 560px 42px, rgba(200, 180, 140, 0.08) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 630px 12px, rgba(160, 200, 255, 0.10) 40%, transparent 41%),
+    radial-gradient(circle 1.5px at 700px 50px, rgba(200, 180, 140, 0.09) 40%, transparent 41%),
+    /* Building silhouettes — tall vertical blocks of varying heights */
+    linear-gradient(0deg,
+      rgba(18, 16, 32, 0.7) 0%,
+      rgba(18, 16, 32, 0.7) 65%,
+      transparent 65%
+    ) 0 0 / 42px 100% repeat-x,
+    linear-gradient(0deg,
+      rgba(22, 18, 38, 0.6) 0%,
+      rgba(22, 18, 38, 0.6) 80%,
+      transparent 80%
+    ) 42px 0 / 36px 100% repeat-x,
+    linear-gradient(0deg,
+      rgba(16, 14, 28, 0.65) 0%,
+      rgba(16, 14, 28, 0.65) 50%,
+      transparent 50%
+    ) 78px 0 / 48px 100% repeat-x,
+    linear-gradient(0deg,
+      rgba(24, 20, 40, 0.55) 0%,
+      rgba(24, 20, 40, 0.55) 72%,
+      transparent 72%
+    ) 126px 0 / 32px 100% repeat-x,
+    linear-gradient(0deg,
+      rgba(20, 16, 34, 0.6) 0%,
+      rgba(20, 16, 34, 0.6) 88%,
+      transparent 88%
+    ) 158px 0 / 54px 100% repeat-x,
+    linear-gradient(0deg,
+      rgba(18, 14, 30, 0.7) 0%,
+      rgba(18, 14, 30, 0.7) 58%,
+      transparent 58%
+    ) 212px 0 / 40px 100% repeat-x,
+    /* Heavy horizontal floor lines — stacked building levels */
     repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 58px,
-      rgba(15, 12, 30, 0.6) 58px,
-      rgba(80, 70, 110, 0.1) 59px,
-      rgba(15, 12, 30, 0.5) 60px,
-      transparent 61px
+      transparent 28px,
+      rgba(10, 8, 22, 0.5) 28px,
+      rgba(70, 62, 100, 0.08) 29px,
+      rgba(10, 8, 22, 0.4) 30px,
+      transparent 31px
     ),
-    /* Vertical structural ribs — wide spacing, brutalist */
+    /* Vertical structural edges — building walls */
     repeating-linear-gradient(
       90deg,
       transparent,
-      transparent 148px,
-      rgba(15, 12, 30, 0.45) 148px,
-      rgba(80, 70, 110, 0.08) 149px,
-      rgba(15, 12, 30, 0.4) 150px,
-      transparent 151px
+      transparent 38px,
+      rgba(12, 10, 25, 0.55) 38px,
+      rgba(75, 65, 105, 0.06) 39px,
+      rgba(12, 10, 25, 0.45) 40px,
+      transparent 41px
     ),
-    /* Brushed steel grain — fine horizontal lines */
+    /* Brushed concrete grain — fine texture */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 1px,
-      rgba(140, 130, 170, 0.015) 1px,
-      rgba(140, 130, 170, 0.015) 2px
+      rgba(130, 120, 160, 0.02) 1px,
+      rgba(130, 120, 160, 0.02) 2px
     ),
-    /* Base — heavy blue-purple steel, brutalist building palette */
+    /* Base — dark blue-purple urban night sky */
     linear-gradient(
       178deg,
-      rgba(48, 44, 72, 0.88) 0%,
-      rgba(32, 30, 55, 0.85) 20%,
-      rgba(38, 40, 68, 0.83) 40%,
-      rgba(25, 22, 45, 0.87) 60%,
-      rgba(42, 38, 65, 0.85) 80%,
-      rgba(30, 28, 52, 0.88) 100%
+      rgba(42, 38, 68, 0.9) 0%,
+      rgba(28, 26, 50, 0.88) 15%,
+      rgba(35, 32, 60, 0.85) 30%,
+      rgba(22, 20, 42, 0.9) 50%,
+      rgba(38, 34, 62, 0.87) 70%,
+      rgba(25, 22, 48, 0.9) 85%,
+      rgba(32, 28, 55, 0.88) 100%
     );
   /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
   border: 3px solid rgba(50, 45, 75, 0.6);
@@ -219,26 +264,44 @@
   transform-style: preserve-3d;
 }
 
-/* Rivet strip along edges + scanline overlay */
+/* Building ledge highlights + rivet overlay */
 .controls::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 4px;
   background:
-    /* Bolt/rivet dots along top edge */
+    /* Horizontal ledge highlights — lit edges where building floors catch light */
+    linear-gradient(0deg,
+      transparent 27px, rgba(100, 90, 140, 0.06) 28px, transparent 29px
+    ) 0 0 / 100% 30px repeat,
+    /* Rooftop edge glow — top of buildings catch ambient light */
+    linear-gradient(0deg,
+      transparent 0%, transparent 45%,
+      rgba(80, 70, 130, 0.04) 46%,
+      transparent 47%
+    ) 0 0 / 42px 100% repeat-x,
+    linear-gradient(0deg,
+      transparent 0%, transparent 75%,
+      rgba(90, 80, 140, 0.05) 76%,
+      transparent 77%
+    ) 42px 0 / 36px 100% repeat-x,
+    linear-gradient(0deg,
+      transparent 0%, transparent 35%,
+      rgba(70, 60, 120, 0.04) 36%,
+      transparent 37%
+    ) 78px 0 / 48px 100% repeat-x,
+    /* Bolt/rivet dots along edges */
     radial-gradient(circle 2.5px at 16px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at 56px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
     radial-gradient(circle 2.5px at 96px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 16px) 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 56px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 96px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    /* Bolt dots along bottom edge */
     radial-gradient(circle 2.5px at 16px calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at 56px calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 16px) calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 56px) calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    /* Side bolts */
     radial-gradient(circle 2.5px at 10px 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
     radial-gradient(circle 2.5px at calc(100% - 10px) 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%);
   pointer-events: none;

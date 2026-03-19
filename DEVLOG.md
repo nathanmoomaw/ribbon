@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-18 — Building cityscape console, hold rework
+
+- **Console building effect**: rewrote `.controls` background with building silhouettes (6 vertical blocks of varying heights), scattered window lights (12 warm/cool dots), horizontal floor lines, vertical wall edges, rooftop ledge highlights, and concrete grain texture over a dark urban night-sky base
+- **Hold rework**: removed global pointermove listener that made held notes track mouse position across the entire screen. Hold now simply sustains the note at its original pitch until space/hold-off. Global pitch tracking ("wild mode") preserved as a concept for future implementation.
+
 ## 2026-03-18 — Performance optimizations, smoke tests
 
 - **handleShake refs pattern**: moved 13 state dependencies to refs — callback now only depends on `getEngine` + `handleArpNoteToggle`, eliminating cascading re-renders on every parameter change

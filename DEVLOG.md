@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-03-18 — Boost cityscape visibility
+
+- **Cityscape too faint**: significantly increased visibility of building silhouettes (lightened to rgba 40-55 range), boosted window light opacity (0.22-0.35 with warm halos, added 8 extra windows), strengthened floor/wall structural lines (0.12-0.22), darkened base layer (0.92-0.95) for contrast, and added double-line rooftop glow highlights
+
 ## 2026-03-18 — Building cityscape console, hold rework
 
 - **Console building effect**: rewrote `.controls` background with building silhouettes (6 vertical blocks of varying heights), scattered window lights (12 warm/cool dots), horizontal floor lines, vertical wall edges, rooftop ledge highlights, and concrete grain texture over a dark urban night-sky base

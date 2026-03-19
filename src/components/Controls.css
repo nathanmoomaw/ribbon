@@ -156,88 +156,97 @@
   user-select: none;
   -webkit-user-select: none;
   background:
-    /* Building window lights — scattered glowing dots */
-    radial-gradient(circle 1.5px at 28px 22px, rgba(160, 200, 255, 0.12) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 76px 38px, rgba(200, 180, 140, 0.10) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 134px 14px, rgba(160, 200, 255, 0.08) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 182px 46px, rgba(200, 180, 140, 0.11) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 240px 28px, rgba(160, 200, 255, 0.09) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 310px 18px, rgba(200, 180, 140, 0.10) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 370px 52px, rgba(160, 200, 255, 0.07) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 420px 34px, rgba(200, 180, 140, 0.09) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 500px 20px, rgba(160, 200, 255, 0.11) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 560px 42px, rgba(200, 180, 140, 0.08) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 630px 12px, rgba(160, 200, 255, 0.10) 40%, transparent 41%),
-    radial-gradient(circle 1.5px at 700px 50px, rgba(200, 180, 140, 0.09) 40%, transparent 41%),
-    /* Building silhouettes — tall vertical blocks of varying heights */
+    /* Building window lights — brighter scattered glowing dots with halos */
+    radial-gradient(circle 2px at 28px 22px, rgba(180, 220, 255, 0.35) 30%, rgba(160, 200, 255, 0.08) 70%, transparent 71%),
+    radial-gradient(circle 2px at 76px 38px, rgba(255, 220, 160, 0.30) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 134px 14px, rgba(180, 220, 255, 0.28) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 182px 46px, rgba(255, 220, 160, 0.32) 30%, rgba(200, 180, 140, 0.07) 70%, transparent 71%),
+    radial-gradient(circle 2px at 240px 28px, rgba(180, 220, 255, 0.26) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 310px 18px, rgba(255, 220, 160, 0.30) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 370px 52px, rgba(180, 220, 255, 0.24) 30%, rgba(160, 200, 255, 0.05) 70%, transparent 71%),
+    radial-gradient(circle 2px at 420px 34px, rgba(255, 220, 160, 0.28) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 500px 20px, rgba(180, 220, 255, 0.32) 30%, rgba(160, 200, 255, 0.07) 70%, transparent 71%),
+    radial-gradient(circle 2px at 560px 42px, rgba(255, 220, 160, 0.26) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 630px 12px, rgba(180, 220, 255, 0.30) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
+    radial-gradient(circle 2px at 700px 50px, rgba(255, 220, 160, 0.28) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
+    /* Extra window lights for density */
+    radial-gradient(circle 1.5px at 52px 50px, rgba(180, 220, 255, 0.22) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 110px 30px, rgba(255, 220, 160, 0.20) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 205px 44px, rgba(180, 220, 255, 0.18) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 280px 16px, rgba(255, 220, 160, 0.22) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 345px 36px, rgba(180, 220, 255, 0.20) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 460px 48px, rgba(255, 220, 160, 0.18) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 530px 10px, rgba(180, 220, 255, 0.22) 35%, transparent 36%),
+    radial-gradient(circle 1.5px at 670px 40px, rgba(255, 220, 160, 0.20) 35%, transparent 36%),
+    /* Building silhouettes — lighter against darker base for visible contrast */
     linear-gradient(0deg,
-      rgba(18, 16, 32, 0.7) 0%,
-      rgba(18, 16, 32, 0.7) 65%,
+      rgba(45, 40, 70, 0.9) 0%,
+      rgba(45, 40, 70, 0.9) 65%,
       transparent 65%
     ) 0 0 / 42px 100% repeat-x,
     linear-gradient(0deg,
-      rgba(22, 18, 38, 0.6) 0%,
-      rgba(22, 18, 38, 0.6) 80%,
+      rgba(55, 48, 82, 0.85) 0%,
+      rgba(55, 48, 82, 0.85) 80%,
       transparent 80%
     ) 42px 0 / 36px 100% repeat-x,
     linear-gradient(0deg,
-      rgba(16, 14, 28, 0.65) 0%,
-      rgba(16, 14, 28, 0.65) 50%,
+      rgba(40, 35, 65, 0.88) 0%,
+      rgba(40, 35, 65, 0.88) 50%,
       transparent 50%
     ) 78px 0 / 48px 100% repeat-x,
     linear-gradient(0deg,
-      rgba(24, 20, 40, 0.55) 0%,
-      rgba(24, 20, 40, 0.55) 72%,
+      rgba(50, 44, 78, 0.82) 0%,
+      rgba(50, 44, 78, 0.82) 72%,
       transparent 72%
     ) 126px 0 / 32px 100% repeat-x,
     linear-gradient(0deg,
-      rgba(20, 16, 34, 0.6) 0%,
-      rgba(20, 16, 34, 0.6) 88%,
+      rgba(48, 42, 74, 0.86) 0%,
+      rgba(48, 42, 74, 0.86) 88%,
       transparent 88%
     ) 158px 0 / 54px 100% repeat-x,
     linear-gradient(0deg,
-      rgba(18, 14, 30, 0.7) 0%,
-      rgba(18, 14, 30, 0.7) 58%,
+      rgba(42, 38, 68, 0.9) 0%,
+      rgba(42, 38, 68, 0.9) 58%,
       transparent 58%
     ) 212px 0 / 40px 100% repeat-x,
-    /* Heavy horizontal floor lines — stacked building levels */
+    /* Heavy horizontal floor lines — visible building levels */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 28px,
-      rgba(10, 8, 22, 0.5) 28px,
-      rgba(70, 62, 100, 0.08) 29px,
-      rgba(10, 8, 22, 0.4) 30px,
+      rgba(80, 70, 110, 0.18) 28px,
+      rgba(120, 105, 160, 0.08) 29px,
+      rgba(80, 70, 110, 0.12) 30px,
       transparent 31px
     ),
-    /* Vertical structural edges — building walls */
+    /* Vertical structural edges — building wall dividers */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 38px,
-      rgba(12, 10, 25, 0.55) 38px,
-      rgba(75, 65, 105, 0.06) 39px,
-      rgba(12, 10, 25, 0.45) 40px,
+      rgba(70, 60, 100, 0.22) 38px,
+      rgba(110, 95, 150, 0.06) 39px,
+      rgba(70, 60, 100, 0.15) 40px,
       transparent 41px
     ),
-    /* Brushed concrete grain — fine texture */
+    /* Brushed concrete grain */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 1px,
-      rgba(130, 120, 160, 0.02) 1px,
-      rgba(130, 120, 160, 0.02) 2px
+      rgba(140, 130, 170, 0.03) 1px,
+      rgba(140, 130, 170, 0.03) 2px
     ),
-    /* Base — dark blue-purple urban night sky */
+    /* Base — darker to push buildings forward */
     linear-gradient(
       178deg,
-      rgba(42, 38, 68, 0.9) 0%,
-      rgba(28, 26, 50, 0.88) 15%,
-      rgba(35, 32, 60, 0.85) 30%,
-      rgba(22, 20, 42, 0.9) 50%,
-      rgba(38, 34, 62, 0.87) 70%,
-      rgba(25, 22, 48, 0.9) 85%,
-      rgba(32, 28, 55, 0.88) 100%
+      rgba(18, 16, 35, 0.95) 0%,
+      rgba(14, 12, 30, 0.93) 15%,
+      rgba(20, 18, 38, 0.92) 30%,
+      rgba(12, 10, 28, 0.95) 50%,
+      rgba(18, 16, 35, 0.93) 70%,
+      rgba(14, 12, 30, 0.95) 85%,
+      rgba(16, 14, 32, 0.94) 100%
     );
   /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
   border: 3px solid rgba(50, 45, 75, 0.6);
@@ -273,24 +282,33 @@
   background:
     /* Horizontal ledge highlights — lit edges where building floors catch light */
     linear-gradient(0deg,
-      transparent 27px, rgba(100, 90, 140, 0.06) 28px, transparent 29px
+      transparent 27px, rgba(130, 120, 175, 0.14) 28px, transparent 29px
     ) 0 0 / 100% 30px repeat,
     /* Rooftop edge glow — top of buildings catch ambient light */
     linear-gradient(0deg,
-      transparent 0%, transparent 45%,
-      rgba(80, 70, 130, 0.04) 46%,
+      transparent 0%, transparent 44%,
+      rgba(120, 105, 170, 0.12) 45%,
+      rgba(100, 88, 150, 0.06) 46%,
       transparent 47%
     ) 0 0 / 42px 100% repeat-x,
     linear-gradient(0deg,
-      transparent 0%, transparent 75%,
-      rgba(90, 80, 140, 0.05) 76%,
+      transparent 0%, transparent 74%,
+      rgba(130, 115, 180, 0.14) 75%,
+      rgba(110, 95, 160, 0.07) 76%,
       transparent 77%
     ) 42px 0 / 36px 100% repeat-x,
     linear-gradient(0deg,
-      transparent 0%, transparent 35%,
-      rgba(70, 60, 120, 0.04) 36%,
+      transparent 0%, transparent 34%,
+      rgba(115, 100, 165, 0.12) 35%,
+      rgba(95, 82, 145, 0.06) 36%,
       transparent 37%
     ) 78px 0 / 48px 100% repeat-x,
+    linear-gradient(0deg,
+      transparent 0%, transparent 56%,
+      rgba(125, 110, 175, 0.11) 57%,
+      rgba(105, 92, 155, 0.05) 58%,
+      transparent 59%
+    ) 212px 0 / 40px 100% repeat-x,
     /* Bolt/rivet dots along edges */
     radial-gradient(circle 2.5px at 16px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at 56px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),

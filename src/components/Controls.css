@@ -161,22 +161,38 @@
       0deg,
       transparent,
       transparent 1px,
-      rgba(140, 130, 170, 0.04) 1px,
-      rgba(140, 130, 170, 0.04) 2px
+      rgba(140, 130, 170, 0.12) 1px,
+      rgba(140, 130, 170, 0.12) 2px
+    ),
+    /* Vertical panel seams — wide subtle columns */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 120px,
+      rgba(80, 70, 120, 0.08) 120px,
+      rgba(80, 70, 120, 0.08) 121px
+    ),
+    /* Diagonal cross-hatch — industrial texture */
+    repeating-linear-gradient(
+      135deg,
+      transparent,
+      transparent 8px,
+      rgba(100, 90, 140, 0.03) 8px,
+      rgba(100, 90, 140, 0.03) 9px
     ),
     /* Matte steel panel — clean industrial base */
     linear-gradient(
       180deg,
-      rgba(42, 38, 62, 0.98) 0%,
-      rgba(36, 32, 56, 0.99) 50%,
+      rgba(48, 44, 72, 0.98) 0%,
+      rgba(38, 34, 60, 0.99) 40%,
       rgba(32, 28, 50, 0.99) 100%
     );
   /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
-  border: 3px solid rgba(50, 45, 75, 0.6);
-  border-top-color: rgba(100, 95, 140, 0.25);
-  border-left-color: rgba(90, 85, 130, 0.2);
-  border-bottom-color: rgba(10, 8, 20, 0.8);
-  border-right-color: rgba(15, 12, 28, 0.7);
+  border: 3px solid rgba(60, 55, 90, 0.7);
+  border-top-color: rgba(120, 110, 160, 0.35);
+  border-left-color: rgba(100, 95, 145, 0.3);
+  border-bottom-color: rgba(10, 8, 20, 0.85);
+  border-right-color: rgba(15, 12, 28, 0.75);
   border-radius: 4px;
   backdrop-filter: blur(14px);
   /* Outer frame — like the steel casing around the CRT */
@@ -188,10 +204,10 @@
     0 6px 20px rgba(0, 0, 0, 0.5),
     0 2px 6px rgba(0, 0, 0, 0.4),
     /* Deep inner bevel — recessed panel */
-    0 3px 0 rgba(100, 95, 140, 0.06) inset,
-    0 -3px 0 rgba(0, 0, 0, 0.5) inset,
-    3px 0 0 rgba(80, 75, 110, 0.04) inset,
-    -3px 0 0 rgba(0, 0, 0, 0.3) inset;
+    0 3px 0 rgba(120, 110, 160, 0.12) inset,
+    0 -3px 0 rgba(0, 0, 0, 0.6) inset,
+    3px 0 0 rgba(100, 90, 140, 0.08) inset,
+    -3px 0 0 rgba(0, 0, 0, 0.4) inset;
   animation: float 6s ease-in-out infinite, sphere-light 12s ease-in-out infinite;
   transform-style: preserve-3d;
 }
@@ -204,14 +220,18 @@
   border-radius: 4px;
   background:
     /* Top chamfer highlight */
-    linear-gradient(180deg, rgba(110, 105, 150, 0.1) 0px, transparent 2px),
+    linear-gradient(180deg, rgba(130, 120, 175, 0.18) 0px, transparent 3px),
     /* Left edge highlight */
-    linear-gradient(90deg, rgba(100, 95, 140, 0.05) 0px, transparent 2px),
+    linear-gradient(90deg, rgba(110, 100, 155, 0.1) 0px, transparent 3px),
+    /* Bottom shadow edge */
+    linear-gradient(0deg, rgba(0, 0, 0, 0.25) 0px, transparent 3px),
+    /* Right shadow edge */
+    linear-gradient(270deg, rgba(0, 0, 0, 0.15) 0px, transparent 3px),
     /* Corner rivets */
-    radial-gradient(circle 2px at 12px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2px at calc(100% - 12px) 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2px at 12px calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2px at calc(100% - 12px) calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%);
+    radial-gradient(circle 3px at 12px 10px, rgba(100, 95, 145, 0.35) 45%, transparent 46%),
+    radial-gradient(circle 3px at calc(100% - 12px) 10px, rgba(100, 95, 145, 0.35) 45%, transparent 46%),
+    radial-gradient(circle 3px at 12px calc(100% - 10px), rgba(100, 95, 145, 0.35) 45%, transparent 46%),
+    radial-gradient(circle 3px at calc(100% - 12px) calc(100% - 10px), rgba(100, 95, 145, 0.35) 45%, transparent 46%);
   pointer-events: none;
   z-index: 1;
 }

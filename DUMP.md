@@ -177,3 +177,5 @@ volume slider (horizontal)
 [x] the large screen fix sucks.  ![ looking ok height wise, but it should always fill in the width](<Screenshot 2026-03-23 at 14.36.15.png>)
 [x] the width of the ribbon is still funky, it doesn't reach all the way to the right
 [x] ![crunch slider looks squanched too far to the bottom](<Screenshot 2026-03-23 at 14.40.29.png>)
+[x] crunch slider knob is literally still hanging off the bottom.  would rather see it shorter, next to reverb
+[x] make whatever you did to the console background more apparent

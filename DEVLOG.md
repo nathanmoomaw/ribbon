@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-23 — Crunch merged with Reverb, console texture boost
+
+- **Merged Crunch into Reverb section**: crunch slider was alone on the last grid row hanging off the bottom. Combined it with Reverb as side-by-side knobs ("Reverb / Crunch"), making a clean 2x2 grid (Filter, Glide, Delay, Reverb/Crunch).
+- **Boosted console background**: tripled brushed grain opacity (0.04 → 0.12), added vertical panel seam lines every 120px, diagonal cross-hatch texture, brighter top gradient. Increased border highlight opacity, inner bevel contrast, chamfer/rivet visibility, and added bottom/right shadow edges.
+
 ## 2026-03-23 — Fix crunch slider positioning
 
 - **align-items: start on shared grid**: the 2-column grid was stretching sections to fill row height, pushing the crunch slider (alone on the last row) to the bottom. Adding `align-items: start` keeps each section compact at the top of its grid cell.

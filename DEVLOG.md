@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-23 — Building facade skin (v3)
+
+- **Rebuilt as architectural facade**: replaced abstract geometric plates with actual building wall — 4 overlapping rectangular structures at different heights and depths (tall narrow left, large center, lighter right, dark far-right)
+- **Added windows**: rows of recessed dark rectangles on each building section, with varying sizes for larger accent windows
+- **Floor ledges**: horizontal ledge lines with top highlight + bottom shadow on each building, creating visible floor separations
+- **Structural elements**: protruding cross-brace on main wall, vertical pipe/conduit on right building, panel seam lines
+- **Multi-tone depth**: 4 distinct gradient fills (#5a5580, #4e4975, #656090, #403b62) creating real depth between overlapping structures
+
 ## 2026-03-23 — Industrial hull panel skin (v2)
 
 - **Boosted hull visibility**: dramatically increased opacity on all SVG panel elements (fills 0.6-0.9, strokes 0.3-0.4, rivets 0.3-0.35) so overlapping steel plates are clearly visible against the darker base

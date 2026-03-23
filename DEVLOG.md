@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-03-23 — Full-width app on large screens
+
+- **Removed max-width cap on .app**: the 1000px max-width was making the app float in a narrow column on wide screens. Now the app fills the full viewport width while the controls panel keeps its own 800px max-width.
+
 ## 2026-03-23 — Clean panel, per-section shake, large screen fix
 
 - **Removed cityscape**: stripped all building/facade SVG backgrounds from the console — replaced with clean matte steel panel (brushed metal grain + simple gradient)

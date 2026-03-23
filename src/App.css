@@ -8,7 +8,6 @@
   align-items: center;
   gap: 0.5rem;
   min-height: 100dvh;
-  max-width: 1000px;
   perspective: 1200px;
   user-select: none;
   -webkit-user-select: none;

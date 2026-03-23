@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-23 — Clean panel, per-section shake, large screen fix
+
+- **Removed cityscape**: stripped all building/facade SVG backgrounds from the console — replaced with clean matte steel panel (brushed metal grain + simple gradient)
+- **Per-section shake**: clicking a mini shake bolt now triggers a CSS shake animation on its parent osc/shared panel, not just the whole console
+- **Large screen fix**: replaced `height: 100dvh` + `overflow: hidden` with `min-height: 100dvh` + `max-width: 1000px` so the app doesn't stretch absurdly on wide monitors. Mobile still uses 100dvh with internal scroll.
+
 ## 2026-03-23 — Building facade skin (v3)
 
 - **Rebuilt as architectural facade**: replaced abstract geometric plates with actual building wall — 4 overlapping rectangular structures at different heights and depths (tall narrow left, large center, lighter right, dark far-right)

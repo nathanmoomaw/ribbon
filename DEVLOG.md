@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-23 — Industrial hull panel skin
+
+- **Removed cityscape**: scrapped the gradient-based and SVG-based building skylines — never looked right
+- **Hull panel skin**: replaced with an SVG industrial hull aesthetic inspired by Rock & Rule — angular overlapping steel plates, cross-brace diagonals, structural beams, rivet dots, and a muted blue-purple steel base tone matching the screenshot reference
+
 ## 2026-03-23 — Layout overhaul, cityscape rewrite, shelve ambient play
 
 - **Console layout**: switched shared controls (Octaves/Scale/Filter/Speed/Delay/Reverb/Crunch) from flex-wrap to a clean 2-column CSS grid so sections align properly

@@ -156,38 +156,24 @@
   user-select: none;
   -webkit-user-select: none;
   background:
-    /* Building skyline silhouette — SVG for clean edges */
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23100e22' stop-opacity='0'/%3E%3Cstop offset='0.5' stop-color='%23100e22' stop-opacity='0.3'/%3E%3Cstop offset='1' stop-color='%230a0816' stop-opacity='0.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='200' fill='url(%23sky)'/%3E%3C!-- Back row buildings --%3E%3Cpath d='M0,120 L0,80 L18,80 L18,65 L22,65 L22,80 L45,80 L45,55 L52,55 L52,45 L58,45 L58,55 L72,55 L72,80 L95,80 L95,70 L115,70 L115,50 L125,50 L125,70 L140,70 L140,80 L160,80 L160,60 L168,55 L176,60 L176,80 L195,80 L195,65 L210,65 L210,45 L220,45 L220,65 L235,65 L235,80 L258,80 L258,70 L275,70 L275,55 L282,50 L289,55 L289,70 L305,70 L305,80 L325,80 L325,60 L340,60 L340,75 L360,75 L360,65 L378,65 L378,80 L400,80 L400,120 Z' fill='%23201c38' opacity='0.7'/%3E%3C!-- Front row buildings --%3E%3Cpath d='M0,200 L0,100 L25,100 L25,85 L35,85 L35,100 L55,100 L55,110 L80,110 L80,90 L90,85 L100,90 L100,110 L120,110 L120,95 L145,95 L145,110 L165,110 L165,85 L175,85 L175,75 L185,75 L185,85 L200,85 L200,110 L225,110 L225,100 L245,100 L245,90 L260,90 L260,100 L280,100 L280,110 L300,110 L300,95 L315,95 L315,85 L325,80 L335,85 L335,95 L350,95 L350,110 L375,110 L375,100 L395,100 L395,110 L400,110 L400,200 Z' fill='%232a2548' opacity='0.8'/%3E%3C!-- Window lights --%3E%3Crect x='30' y='104' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.5'/%3E%3Crect x='87' y='94' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.45'/%3E%3Crect x='135' y='100' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.4'/%3E%3Crect x='178' y='80' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.5'/%3E%3Crect x='240' y='95' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.45'/%3E%3Crect x='310' y='90' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.4'/%3E%3Crect x='380' y='105' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.45'/%3E%3Crect x='55' y='60' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.35'/%3E%3Crect x='118' y='55' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.4'/%3E%3Crect x='215' y='50' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.35'/%3E%3Crect x='283' y='56' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.3'/%3E%3Crect x='332' y='64' width='1.5' height='1.5' rx='0.5' fill='%23b4dcff' opacity='0.3'/%3E%3Crect x='170' y='106' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.4'/%3E%3Crect x='250' y='106' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.35'/%3E%3Crect x='355' y='98' width='1.5' height='1.5' rx='0.5' fill='%23ffdc9e' opacity='0.35'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat,
-    /* Horizontal panel lines — industrial floor levels */
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 28px,
-      rgba(80, 70, 110, 0.1) 28px,
-      transparent 30px
-    ),
-    /* Vertical panel seams */
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 38px,
-      rgba(70, 60, 100, 0.08) 38px,
-      transparent 40px
-    ),
-    /* Brushed metal grain */
+    /* Angular hull panels — overlapping steel plate sections */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='400' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='p1' x1='0' y1='0' x2='0.3' y2='1'%3E%3Cstop offset='0' stop-color='%234a4565' stop-opacity='0.4'/%3E%3Cstop offset='1' stop-color='%23302b4a' stop-opacity='0.25'/%3E%3C/linearGradient%3E%3ClinearGradient id='p2' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23585272' stop-opacity='0.3'/%3E%3Cstop offset='1' stop-color='%23383258' stop-opacity='0.2'/%3E%3C/linearGradient%3E%3ClinearGradient id='edge' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%237a72a0' stop-opacity='0.2'/%3E%3Cstop offset='1' stop-color='%23201c38' stop-opacity='0.4'/%3E%3C/linearGradient%3E%3C/defs%3E%3C!-- Large angled hull plate left --%3E%3Cpath d='M0,20 L280,0 L300,160 L20,200 Z' fill='url(%23p1)' stroke='%23605888' stroke-width='1' stroke-opacity='0.2'/%3E%3C!-- Center recessed plate --%3E%3Crect x='140' y='80' width='520' height='240' rx='2' fill='url(%23p2)' stroke='%23706898' stroke-width='0.8' stroke-opacity='0.15'/%3E%3C!-- Right angled hull plate --%3E%3Cpath d='M500,30 L800,10 L790,350 L480,280 Z' fill='url(%23p1)' stroke='%23605888' stroke-width='1' stroke-opacity='0.2'/%3E%3C!-- Cross-brace left diagonal --%3E%3Cline x1='60' y1='10' x2='240' y2='380' stroke='%23706898' stroke-width='1.5' stroke-opacity='0.12'/%3E%3C!-- Cross-brace right diagonal --%3E%3Cline x1='740' y1='10' x2='560' y2='380' stroke='%23706898' stroke-width='1.5' stroke-opacity='0.12'/%3E%3C!-- Horizontal structural beam --%3E%3Crect x='0' y='185' width='800' height='3' fill='%23706898' opacity='0.1'/%3E%3Crect x='0' y='186' width='800' height='1' fill='%23908aB0' opacity='0.08'/%3E%3C!-- Vertical structural beam --%3E%3Crect x='398' y='0' width='3' height='400' fill='%23706898' opacity='0.08'/%3E%3C!-- Small accent panel top-center --%3E%3Crect x='320' y='30' width='160' height='60' rx='2' fill='none' stroke='%23706898' stroke-width='1' stroke-opacity='0.12'/%3E%3C!-- Rivet dots along beams --%3E%3Ccircle cx='100' cy='187' r='2.5' fill='%23605888' opacity='0.18'/%3E%3Ccircle cx='250' cy='187' r='2.5' fill='%23605888' opacity='0.15'/%3E%3Ccircle cx='400' cy='187' r='2.5' fill='%23605888' opacity='0.18'/%3E%3Ccircle cx='550' cy='187' r='2.5' fill='%23605888' opacity='0.15'/%3E%3Ccircle cx='700' cy='187' r='2.5' fill='%23605888' opacity='0.18'/%3E%3C/svg%3E") center / 100% 100% no-repeat,
+    /* Brushed metal grain — fine horizontal scratches */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 1px,
-      rgba(140, 130, 170, 0.025) 1px,
-      rgba(140, 130, 170, 0.025) 2px
+      rgba(130, 120, 160, 0.02) 1px,
+      rgba(130, 120, 160, 0.02) 2px
     ),
-    /* Dark industrial base */
+    /* Steel base — muted blue-purple industrial tone */
     linear-gradient(
-      178deg,
-      rgba(16, 14, 30, 0.97) 0%,
-      rgba(20, 18, 38, 0.95) 40%,
-      rgba(14, 12, 28, 0.97) 100%
+      175deg,
+      rgba(38, 34, 58, 0.97) 0%,
+      rgba(32, 28, 52, 0.98) 30%,
+      rgba(42, 38, 65, 0.96) 50%,
+      rgba(30, 26, 48, 0.98) 70%,
+      rgba(36, 32, 56, 0.97) 100%
     );
   /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
   border: 3px solid rgba(50, 45, 75, 0.6);
@@ -214,28 +200,30 @@
   transform-style: preserve-3d;
 }
 
-/* Rivet dots + subtle top ledge highlight */
+/* Edge highlights + rivet overlay */
 .controls::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 4px;
   background:
-    /* Top edge ledge highlight */
-    linear-gradient(180deg, rgba(100, 95, 145, 0.08) 0px, transparent 2px),
-    /* Bolt/rivet dots along edges */
-    radial-gradient(circle 2.5px at 16px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at 56px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at 96px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 16px) 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 56px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 96px) 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at 16px calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at 56px calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 16px) calc(100% - 10px), rgba(90, 85, 130, 0.2) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 56px) calc(100% - 10px), rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at 10px 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
-    radial-gradient(circle 2.5px at calc(100% - 10px) 50%, rgba(90, 85, 130, 0.15) 45%, transparent 46%);
+    /* Top chamfer highlight — light catching the bevel */
+    linear-gradient(180deg, rgba(110, 105, 150, 0.12) 0px, rgba(90, 85, 130, 0.04) 3px, transparent 4px),
+    /* Left edge highlight */
+    linear-gradient(90deg, rgba(100, 95, 140, 0.06) 0px, transparent 3px),
+    /* Corner rivets — hex bolt pattern */
+    radial-gradient(circle 2.5px at 14px 10px, rgba(85, 80, 120, 0.25) 40%, rgba(60, 55, 90, 0.08) 41%, transparent 70%),
+    radial-gradient(circle 2.5px at 54px 10px, rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at 94px 10px, rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at calc(100% - 14px) 10px, rgba(85, 80, 120, 0.25) 40%, rgba(60, 55, 90, 0.08) 41%, transparent 70%),
+    radial-gradient(circle 2.5px at calc(100% - 54px) 10px, rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at calc(100% - 94px) 10px, rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at 14px calc(100% - 10px), rgba(85, 80, 120, 0.25) 40%, rgba(60, 55, 90, 0.08) 41%, transparent 70%),
+    radial-gradient(circle 2.5px at 54px calc(100% - 10px), rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at calc(100% - 14px) calc(100% - 10px), rgba(85, 80, 120, 0.25) 40%, rgba(60, 55, 90, 0.08) 41%, transparent 70%),
+    radial-gradient(circle 2.5px at calc(100% - 54px) calc(100% - 10px), rgba(85, 80, 120, 0.2) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at 10px 50%, rgba(85, 80, 120, 0.18) 40%, transparent 41%),
+    radial-gradient(circle 2.5px at calc(100% - 10px) 50%, rgba(85, 80, 120, 0.18) 40%, transparent 41%);
   pointer-events: none;
   z-index: 1;
 }

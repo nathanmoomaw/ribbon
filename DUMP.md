@@ -158,3 +158,12 @@ volume slider (horizontal)
 [x] the console background still needs more of the effect from the screenshot i referenced (the buildings)
 [x] let's rework the hold functionality for play mode.  presently it adjusts the tone as the mouse moves even if it's off the ribbon.  let's keep this concept and call it "wild mode", but for now let's just make hold work as one would expect.  you press it and click something and it sticks untils space or hold is turned off.  want to get this functionality more honed it.
 [x] the cityscape view is still far too faint
+
+# Monday March 23
+
+[x] organize the
+![desktop lower console](<Screenshot 2026-03-23 at 10.41.39.png>) better so it fits and looks cleaner
+[x] let's retry to apply the cityscape skin.  it has never looked right.  go back to the original screenshot
+[x] need this app to stay above the fold as much as possible for every screen.  mobile is going to need extra work for this, but i think it can mostly be done
+[x] this version is going to be tagged v2, but it's not ready until i say it is.  once it is ready it will live at /v2 (just like the v1 tag does) and it should have a changelog
+[x] let's shelve the idea of the ambient play mode for now, stash it for a later version implementation.

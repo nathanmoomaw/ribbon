@@ -19,7 +19,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
   min-width: 0;
 }
 
@@ -148,105 +148,46 @@
 .controls {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1.25rem 1.25rem 0.5rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 0.5rem;
   max-width: 800px;
   margin: 0 auto;
   position: relative;
   user-select: none;
   -webkit-user-select: none;
   background:
-    /* Building window lights — brighter scattered glowing dots with halos */
-    radial-gradient(circle 2px at 28px 22px, rgba(180, 220, 255, 0.35) 30%, rgba(160, 200, 255, 0.08) 70%, transparent 71%),
-    radial-gradient(circle 2px at 76px 38px, rgba(255, 220, 160, 0.30) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 134px 14px, rgba(180, 220, 255, 0.28) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 182px 46px, rgba(255, 220, 160, 0.32) 30%, rgba(200, 180, 140, 0.07) 70%, transparent 71%),
-    radial-gradient(circle 2px at 240px 28px, rgba(180, 220, 255, 0.26) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 310px 18px, rgba(255, 220, 160, 0.30) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 370px 52px, rgba(180, 220, 255, 0.24) 30%, rgba(160, 200, 255, 0.05) 70%, transparent 71%),
-    radial-gradient(circle 2px at 420px 34px, rgba(255, 220, 160, 0.28) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 500px 20px, rgba(180, 220, 255, 0.32) 30%, rgba(160, 200, 255, 0.07) 70%, transparent 71%),
-    radial-gradient(circle 2px at 560px 42px, rgba(255, 220, 160, 0.26) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 630px 12px, rgba(180, 220, 255, 0.30) 30%, rgba(160, 200, 255, 0.06) 70%, transparent 71%),
-    radial-gradient(circle 2px at 700px 50px, rgba(255, 220, 160, 0.28) 30%, rgba(200, 180, 140, 0.06) 70%, transparent 71%),
-    /* Extra window lights for density */
-    radial-gradient(circle 1.5px at 52px 50px, rgba(180, 220, 255, 0.22) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 110px 30px, rgba(255, 220, 160, 0.20) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 205px 44px, rgba(180, 220, 255, 0.18) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 280px 16px, rgba(255, 220, 160, 0.22) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 345px 36px, rgba(180, 220, 255, 0.20) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 460px 48px, rgba(255, 220, 160, 0.18) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 530px 10px, rgba(180, 220, 255, 0.22) 35%, transparent 36%),
-    radial-gradient(circle 1.5px at 670px 40px, rgba(255, 220, 160, 0.20) 35%, transparent 36%),
-    /* Building silhouettes — lighter against darker base for visible contrast */
-    linear-gradient(0deg,
-      rgba(45, 40, 70, 0.9) 0%,
-      rgba(45, 40, 70, 0.9) 65%,
-      transparent 65%
-    ) 0 0 / 42px 100% repeat-x,
-    linear-gradient(0deg,
-      rgba(55, 48, 82, 0.85) 0%,
-      rgba(55, 48, 82, 0.85) 80%,
-      transparent 80%
-    ) 42px 0 / 36px 100% repeat-x,
-    linear-gradient(0deg,
-      rgba(40, 35, 65, 0.88) 0%,
-      rgba(40, 35, 65, 0.88) 50%,
-      transparent 50%
-    ) 78px 0 / 48px 100% repeat-x,
-    linear-gradient(0deg,
-      rgba(50, 44, 78, 0.82) 0%,
-      rgba(50, 44, 78, 0.82) 72%,
-      transparent 72%
-    ) 126px 0 / 32px 100% repeat-x,
-    linear-gradient(0deg,
-      rgba(48, 42, 74, 0.86) 0%,
-      rgba(48, 42, 74, 0.86) 88%,
-      transparent 88%
-    ) 158px 0 / 54px 100% repeat-x,
-    linear-gradient(0deg,
-      rgba(42, 38, 68, 0.9) 0%,
-      rgba(42, 38, 68, 0.9) 58%,
-      transparent 58%
-    ) 212px 0 / 40px 100% repeat-x,
-    /* Heavy horizontal floor lines — visible building levels */
+    /* Building skyline silhouette — SVG for clean edges */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='sky' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23100e22' stop-opacity='0'/%3E%3Cstop offset='0.5' stop-color='%23100e22' stop-opacity='0.3'/%3E%3Cstop offset='1' stop-color='%230a0816' stop-opacity='0.6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='400' height='200' fill='url(%23sky)'/%3E%3C!-- Back row buildings --%3E%3Cpath d='M0,120 L0,80 L18,80 L18,65 L22,65 L22,80 L45,80 L45,55 L52,55 L52,45 L58,45 L58,55 L72,55 L72,80 L95,80 L95,70 L115,70 L115,50 L125,50 L125,70 L140,70 L140,80 L160,80 L160,60 L168,55 L176,60 L176,80 L195,80 L195,65 L210,65 L210,45 L220,45 L220,65 L235,65 L235,80 L258,80 L258,70 L275,70 L275,55 L282,50 L289,55 L289,70 L305,70 L305,80 L325,80 L325,60 L340,60 L340,75 L360,75 L360,65 L378,65 L378,80 L400,80 L400,120 Z' fill='%23201c38' opacity='0.7'/%3E%3C!-- Front row buildings --%3E%3Cpath d='M0,200 L0,100 L25,100 L25,85 L35,85 L35,100 L55,100 L55,110 L80,110 L80,90 L90,85 L100,90 L100,110 L120,110 L120,95 L145,95 L145,110 L165,110 L165,85 L175,85 L175,75 L185,75 L185,85 L200,85 L200,110 L225,110 L225,100 L245,100 L245,90 L260,90 L260,100 L280,100 L280,110 L300,110 L300,95 L315,95 L315,85 L325,80 L335,85 L335,95 L350,95 L350,110 L375,110 L375,100 L395,100 L395,110 L400,110 L400,200 Z' fill='%232a2548' opacity='0.8'/%3E%3C!-- Window lights --%3E%3Crect x='30' y='104' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.5'/%3E%3Crect x='87' y='94' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.45'/%3E%3Crect x='135' y='100' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.4'/%3E%3Crect x='178' y='80' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.5'/%3E%3Crect x='240' y='95' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.45'/%3E%3Crect x='310' y='90' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.4'/%3E%3Crect x='380' y='105' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.45'/%3E%3Crect x='55' y='60' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.35'/%3E%3Crect x='118' y='55' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.4'/%3E%3Crect x='215' y='50' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.35'/%3E%3Crect x='283' y='56' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.3'/%3E%3Crect x='332' y='64' width='1.5' height='1.5' rx='0.5' fill='%23b4dcff' opacity='0.3'/%3E%3Crect x='170' y='106' width='2' height='2' rx='0.5' fill='%23b4dcff' opacity='0.4'/%3E%3Crect x='250' y='106' width='2' height='2' rx='0.5' fill='%23ffdc9e' opacity='0.35'/%3E%3Crect x='355' y='98' width='1.5' height='1.5' rx='0.5' fill='%23ffdc9e' opacity='0.35'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat,
+    /* Horizontal panel lines — industrial floor levels */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 28px,
-      rgba(80, 70, 110, 0.18) 28px,
-      rgba(120, 105, 160, 0.08) 29px,
-      rgba(80, 70, 110, 0.12) 30px,
-      transparent 31px
+      rgba(80, 70, 110, 0.1) 28px,
+      transparent 30px
     ),
-    /* Vertical structural edges — building wall dividers */
+    /* Vertical panel seams */
     repeating-linear-gradient(
       90deg,
       transparent,
       transparent 38px,
-      rgba(70, 60, 100, 0.22) 38px,
-      rgba(110, 95, 150, 0.06) 39px,
-      rgba(70, 60, 100, 0.15) 40px,
-      transparent 41px
+      rgba(70, 60, 100, 0.08) 38px,
+      transparent 40px
     ),
-    /* Brushed concrete grain */
+    /* Brushed metal grain */
     repeating-linear-gradient(
       0deg,
       transparent,
       transparent 1px,
-      rgba(140, 130, 170, 0.03) 1px,
-      rgba(140, 130, 170, 0.03) 2px
+      rgba(140, 130, 170, 0.025) 1px,
+      rgba(140, 130, 170, 0.025) 2px
     ),
-    /* Base — darker to push buildings forward */
+    /* Dark industrial base */
     linear-gradient(
       178deg,
-      rgba(18, 16, 35, 0.95) 0%,
-      rgba(14, 12, 30, 0.93) 15%,
-      rgba(20, 18, 38, 0.92) 30%,
-      rgba(12, 10, 28, 0.95) 50%,
-      rgba(18, 16, 35, 0.93) 70%,
-      rgba(14, 12, 30, 0.95) 85%,
-      rgba(16, 14, 32, 0.94) 100%
+      rgba(16, 14, 30, 0.97) 0%,
+      rgba(20, 18, 38, 0.95) 40%,
+      rgba(14, 12, 28, 0.97) 100%
     );
   /* Heavy industrial frame — thick beveled border like a recessed CRT housing */
   border: 3px solid rgba(50, 45, 75, 0.6);
@@ -273,42 +214,15 @@
   transform-style: preserve-3d;
 }
 
-/* Building ledge highlights + rivet overlay */
+/* Rivet dots + subtle top ledge highlight */
 .controls::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 4px;
   background:
-    /* Horizontal ledge highlights — lit edges where building floors catch light */
-    linear-gradient(0deg,
-      transparent 27px, rgba(130, 120, 175, 0.14) 28px, transparent 29px
-    ) 0 0 / 100% 30px repeat,
-    /* Rooftop edge glow — top of buildings catch ambient light */
-    linear-gradient(0deg,
-      transparent 0%, transparent 44%,
-      rgba(120, 105, 170, 0.12) 45%,
-      rgba(100, 88, 150, 0.06) 46%,
-      transparent 47%
-    ) 0 0 / 42px 100% repeat-x,
-    linear-gradient(0deg,
-      transparent 0%, transparent 74%,
-      rgba(130, 115, 180, 0.14) 75%,
-      rgba(110, 95, 160, 0.07) 76%,
-      transparent 77%
-    ) 42px 0 / 36px 100% repeat-x,
-    linear-gradient(0deg,
-      transparent 0%, transparent 34%,
-      rgba(115, 100, 165, 0.12) 35%,
-      rgba(95, 82, 145, 0.06) 36%,
-      transparent 37%
-    ) 78px 0 / 48px 100% repeat-x,
-    linear-gradient(0deg,
-      transparent 0%, transparent 56%,
-      rgba(125, 110, 175, 0.11) 57%,
-      rgba(105, 92, 155, 0.05) 58%,
-      transparent 59%
-    ) 212px 0 / 40px 100% repeat-x,
+    /* Top edge ledge highlight */
+    linear-gradient(180deg, rgba(100, 95, 145, 0.08) 0px, transparent 2px),
     /* Bolt/rivet dots along edges */
     radial-gradient(circle 2.5px at 16px 10px, rgba(90, 85, 130, 0.2) 45%, transparent 46%),
     radial-gradient(circle 2.5px at 56px 10px, rgba(90, 85, 130, 0.15) 45%, transparent 46%),
@@ -406,7 +320,7 @@
   transition: box-shadow 0.3s, transform 0.3s;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
   position: relative;
 }
 
@@ -446,9 +360,9 @@
 
 .controls__shared {
   position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem 1.25rem;
   padding-top: 0.75rem;
   border-top: 3px solid rgba(20, 18, 38, 0.6);
   box-shadow: 0 1px 0 rgba(100, 95, 140, 0.06) inset, 0 -1px 0 rgba(60, 55, 90, 0.15);
@@ -458,7 +372,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  min-width: 100px;
+  min-width: 0;
 }
 
 .controls__label {
@@ -506,7 +420,7 @@
 }
 
 .controls__knob input[type="range"] {
-  width: 90px;
+  width: 80px;
 }
 
 .controls__section > input[type="range"] {
@@ -572,8 +486,8 @@
 /* Mobile responsive */
 @media (max-width: 767px) {
   .controls {
-    padding: 0.75rem;
-    gap: 0.75rem;
+    padding: 0.5rem;
+    gap: 0.4rem;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
@@ -639,12 +553,12 @@
   .controls__oscillators {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .controls__osc {
     flex: none;
-    padding: 0.5rem 0.75rem;
+    padding: 0.35rem 0.5rem;
   }
 
   .controls__osc-label {

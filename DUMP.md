@@ -175,3 +175,5 @@ volume slider (horizontal)
 [x] 100 vh is cool, but this looks like garbage on a large screen like this: ![alt text](<Screenshot 2026-03-23 at 14.18.37.png>)
 [x] remove the cityscape background.  i hate it.  let's try a new direction using the look of this panel and buttons: ![alt text](<Screenshot 2026-03-23 at 14.21.46.png>) ![alt text](<Screenshot 2026-03-23 at 14.22.33.png>)
 [x] the large screen fix sucks.  ![ looking ok height wise, but it should always fill in the width](<Screenshot 2026-03-23 at 14.36.15.png>)
+[x] the width of the ribbon is still funky, it doesn't reach all the way to the right
+[x] 

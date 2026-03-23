@@ -101,10 +101,23 @@ const SCALE_NAMES = Object.keys(SCALES)
 const OSC_COLORS = ['var(--osc-red)', 'var(--osc-gold)', 'var(--osc-green)']
 
 function MiniShakeBolt({ onClick, title }) {
+  const btnRef = useRefHook(null)
+  const handleClick = useCallback(() => {
+    // Shake the parent panel
+    const panel = btnRef.current?.closest('.controls__osc, .controls__shared')
+    if (panel) {
+      panel.classList.remove('controls__section-shake')
+      void panel.offsetWidth // force reflow to restart animation
+      panel.classList.add('controls__section-shake')
+    }
+    onClick()
+  }, [onClick])
+
   return (
     <button
+      ref={btnRef}
       className="controls__mini-shake"
-      onClick={onClick}
+      onClick={handleClick}
       title={title || 'Randomize'}
     >
       ⚡

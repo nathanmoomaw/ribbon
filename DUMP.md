@@ -170,3 +170,4 @@ volume slider (horizontal)
 [x] remove what you did to the console skin.  that "cityscape" looks like garbage
 [x] ![try to skin the console like this](<Screenshot 2026-03-23 at 13.53.12.png>)
 [x] I still don't think the console is looking much like the previous screenshot ![alt text](<Screenshot 2026-03-23 at 13.56.08.png>)
+[x] i can see it better, but it's just kinda random geometric shapes of basically one color.  i want to evoke the style and imagery of the buildings in the screenshot

@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-03-23 — Fix crunch slider positioning
+
+- **align-items: start on shared grid**: the 2-column grid was stretching sections to fill row height, pushing the crunch slider (alone on the last row) to the bottom. Adding `align-items: start` keeps each section compact at the top of its grid cell.
+
 ## 2026-03-23 — Ribbon full-width fix
 
 - **overflow-x: hidden on .app**: the 100vw ribbon was exceeding the viewport by the scrollbar width on some browsers, leaving a gap on the right. Adding overflow-x: hidden clips the excess so the ribbon reaches edge-to-edge.

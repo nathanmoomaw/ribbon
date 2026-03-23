@@ -10,8 +10,9 @@
 - [ ] Rotary knob components (replace range sliders)
 - [ ] Mobile-optimized layout
 - [ ] Step sequencer functionality
-- [x] Ambient autoplay mode (generative pleasant sound when not manually playing)
+- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, revisit in future version)
 - [ ] Production domain setup
+- [ ] v2 tag + changelog (deploy to /v2 when ready)
 
 ## Completed
 - [x] Vite + React project scaffold
@@ -83,3 +84,7 @@
 - [x] Accelerometer shake (DeviceMotionEvent permission flow for iOS/Android)
 - [x] Logo click triggers shake
 - [x] Ambient play mode (30s inactivity, short taps, auto reverb/delay, evolving controls, möbius toggle)
+- [x] Console shared controls grid layout (2-column CSS grid for Octaves/Scale/Filter/Speed/Delay/Reverb/Crunch)
+- [x] SVG cityscape panel background (replaced gradient-based buildings with inline SVG skyline)
+- [x] Above-the-fold viewport fit (100dvh, internal scroll, reduced spacing)
+- [x] Ambient play shelved (UI removed, hook preserved for future version)

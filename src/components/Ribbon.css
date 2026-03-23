@@ -240,7 +240,7 @@
 
 @media (max-width: 767px) {
   .ribbon__track {
-    height: 80px;
+    height: 64px;
   }
 
   .ribbon__key kbd {

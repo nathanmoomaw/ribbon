@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-23 — Layout overhaul, cityscape rewrite, shelve ambient play
+
+- **Console layout**: switched shared controls (Octaves/Scale/Filter/Speed/Delay/Reverb/Crunch) from flex-wrap to a clean 2-column CSS grid so sections align properly
+- **Cityscape rewrite**: replaced 30+ gradient layers with an inline SVG skyline silhouette (two rows of buildings with window lights), much cleaner and actually looks like buildings
+- **Above the fold**: app now uses `100dvh` height with `overflow: hidden`, controls panel scrolls internally if needed. Reduced padding/gaps throughout — tighter header offsets, compact oscillator panels, smaller mobile ribbon (64px)
+- **v2 tag noted**: will be tagged when user says ready, will live at /v2 with a changelog
+- **Ambient play shelved**: removed ambient play UI, state, hooks integration, and ghost volume from App.jsx and Controls. The `useAmbientPlay` hook file remains in codebase for future version
+
 ## 2026-03-18 — Boost cityscape visibility
 
 - **Cityscape too faint**: significantly increased visibility of building silhouettes (lightened to rgba 40-55 range), boosted window light opacity (0.22-0.35 with warm halos, added 8 extra windows), strengthened floor/wall structural lines (0.12-0.22), darkened base layer (0.92-0.95) for contrast, and added double-line rooftop glow highlights

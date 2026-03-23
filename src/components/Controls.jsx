@@ -218,7 +218,6 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
-  ambientGhostVolume,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -301,7 +300,7 @@ export const Controls = forwardRef(function Controls({
             onStop={onStop}
             onKillAll={onKillAll}
           />
-          <DJFader value={volume} onChange={handleVolume} ghostValue={ambientGhostVolume} />
+          <DJFader value={volume} onChange={handleVolume} />
         </div>
 
         <div className="controls__main">

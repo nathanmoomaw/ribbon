@@ -167,3 +167,5 @@ volume slider (horizontal)
 [x] need this app to stay above the fold as much as possible for every screen.  mobile is going to need extra work for this, but i think it can mostly be done
 [x] this version is going to be tagged v2, but it's not ready until i say it is.  once it is ready it will live at /v2 (just like the v1 tag does) and it should have a changelog
 [x] let's shelve the idea of the ambient play mode for now, stash it for a later version implementation.
+[x] remove what you did to the console skin.  that "cityscape" looks like garbage
+[x] ![try to skin the console like this](<Screenshot 2026-03-23 at 13.53.12.png>)

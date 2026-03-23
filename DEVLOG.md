@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-03-23 — Ribbon full-width fix
+
+- **overflow-x: hidden on .app**: the 100vw ribbon was exceeding the viewport by the scrollbar width on some browsers, leaving a gap on the right. Adding overflow-x: hidden clips the excess so the ribbon reaches edge-to-edge.
+
 ## 2026-03-23 — Full-width app on large screens
 
 - **Removed max-width cap on .app**: the 1000px max-width was making the app float in a narrow column on wide screens. Now the app fills the full viewport width while the controls panel keeps its own 800px max-width.

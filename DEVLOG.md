@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-23 — Industrial hull panel skin (v2)
+
+- **Boosted hull visibility**: dramatically increased opacity on all SVG panel elements (fills 0.6-0.9, strokes 0.3-0.4, rivets 0.3-0.35) so overlapping steel plates are clearly visible against the darker base
+- **Added structural detail**: top trapezoid plate, side accent panels, second horizontal beam, edge highlights on plate borders, rivets along both beams
+- **Darkened base**: lowered base gradient to rgba(24-32) so plates stand out with real contrast
+
 ## 2026-03-23 — Industrial hull panel skin
 
 - **Removed cityscape**: scrapped the gradient-based and SVG-based building skylines — never looked right

@@ -169,3 +169,4 @@ volume slider (horizontal)
 [x] let's shelve the idea of the ambient play mode for now, stash it for a later version implementation.
 [x] remove what you did to the console skin.  that "cityscape" looks like garbage
 [x] ![try to skin the console like this](<Screenshot 2026-03-23 at 13.53.12.png>)
+[x] I still don't think the console is looking much like the previous screenshot ![alt text](<Screenshot 2026-03-23 at 13.56.08.png>)

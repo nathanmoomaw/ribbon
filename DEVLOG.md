@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-24 — README, CHANGELOG, memories, roadmap update
+
+- **README.md**: rewrote to reflect current v2 state — triple oscillator, poly/arp/hold modes, 3D spheres, bitcrush, hardware rocker switches, keyboard shortcuts, versions list.
+- **CHANGELOG.md**: created with full v2 feature list (sound engine, play modes, controls, visuals, mobile, infra) and v1 summary.
+- **Memories**: saved 3 new learnings — mobile audio gotchas, React+WebAudio performance patterns, slider color conventions.
+- **Roadmap**: added interactive 3D sphere manipulation as future feature.
+
 ## 2026-03-24 — Increase OSC slider hue differentiation
 
 - Pushed per-OSC hue shifts much further apart (~40% blend toward OSC color).

@@ -102,7 +102,7 @@ volume slider (horizontal)
 [x] in some spare space (perhaps the lower right corner) of the console create a subtle button that animates a bit and acts as a more explicit trigger for the shake functionality
 [x] remove the chunky colored button strip.  it's doing nothing.  use the design concept of the chunky buttons to restyle each of the 3 osc housings, replacing the "glowing" blue, pink, purple outlines of each with chunky beveled sections that nod to the buttons in that screenshot
 [x] also remove the extra CRT scanline grid that you applied to the console.  instead, turn back to the first screenshot i gave you today and lean into the style of buildings more for the console.
-[x] here is the screenshot I was referencing for the notes on a staff: (<Screenshot 2026-03-15 at 23.55.39.png>)
+[x] here is the screenshot I was referencing for the notes on a staff: (<screenshots/Screenshot2026-03-15 at 23.55.39.png>)
 [x] the staff with the notes should sort of wave like a flag.  use the image i provided for inspiration on that.  note that it seems to waver back and forward.  the notes themselves should move with it.  they should not just go in a straight line heading left.
 [x] replace the blue, pink, purple colors from the oscillators entirely.  replace these with colors and texture styles pulled from the buttons on the screenshot with the console.
 [x] text on the console etc should not be able to accidentally get selected by double clicking
@@ -138,7 +138,7 @@ volume slider (horizontal)
 [x] investigate why ambient mode presently makes no sounds (is it just not triggering notes? the code looks like it should be).
 [x] implement more slightly smaller versions of the shake (lightning) bolt on each of the 3 osc sections.  put it in the upper right hand corner of those panels.  it should act to fully randomize just that particular osc when clicked.
 [x] remove the shake icon from the lower right of the console.  this has been effectively replaced by the one hovering next to the logo
-[x] implement this same kind of smaller shake icon on the general ![this is the general panel](<Screenshot 2026-03-17 at 10.51.53.png>).  match the placement of the ones on the osc panels by putting it in the upper right of that general panel and perhaps giving the panel bevel a bit more distinction.  when the user clicks this general panel shake it should also fully randomize the items in that panel.
+[x] implement this same kind of smaller shake icon on the general ![this is the general panel](<screenshots/Screenshot2026-03-17 at 10.51.53.png>).  match the placement of the ones on the osc panels by putting it in the upper right of that general panel and perhaps giving the panel bevel a bit more distinction.  when the user clicks this general panel shake it should also fully randomize the items in that panel.
 [x] at this point let's skip adding a shake to the left side of the console items (the switches and such) with the assumption the user can easily tap those to mess them up themselves.
 [x] make those small shake icons have rounded borders, not square
 [x] ambient play still needs a lot of work.  for now let's leave it disabled by default. remove the 30s timer functionality and require that the user clicks it to activate it.  in fact, for now let's allow it to stay on while the user also interacts with the ribbon or the console
@@ -162,21 +162,21 @@ volume slider (horizontal)
 # Monday March 23
 
 [x] organize the
-![desktop lower console](<Screenshot 2026-03-23 at 10.41.39.png>) better so it fits and looks cleaner
+![desktop lower console](<screenshots/Screenshot2026-03-23 at 10.41.39.png>) better so it fits and looks cleaner
 [x] let's retry to apply the cityscape skin.  it has never looked right.  go back to the original screenshot
 [x] need this app to stay above the fold as much as possible for every screen.  mobile is going to need extra work for this, but i think it can mostly be done
 [x] this version is going to be tagged v2, but it's not ready until i say it is.  once it is ready it will live at /v2 (just like the v1 tag does) and it should have a changelog
 [x] let's shelve the idea of the ambient play mode for now, stash it for a later version implementation.
 [x] remove what you did to the console skin.  that "cityscape" looks like garbage
-[x] ![try to skin the console like this](<Screenshot 2026-03-23 at 13.53.12.png>)
-[x] I still don't think the console is looking much like the previous screenshot ![alt text](<Screenshot 2026-03-23 at 13.56.08.png>)
+[x] ![try to skin the console like this](<screenshots/Screenshot2026-03-23 at 13.53.12.png>)
+[x] I still don't think the console is looking much like the previous screenshot ![alt text](<screenshots/Screenshot2026-03-23 at 13.56.08.png>)
 [x] i can see it better, but it's just kinda random geometric shapes of basically one color.  i want to evoke the style and imagery of the buildings in the screenshot
 [x] for the smaller shake icons in the console, give an animated shake to the particular portion of the console that is getting randomized
-[x] 100 vh is cool, but this looks like garbage on a large screen like this: ![alt text](<Screenshot 2026-03-23 at 14.18.37.png>)
-[x] remove the cityscape background.  i hate it.  let's try a new direction using the look of this panel and buttons: ![alt text](<Screenshot 2026-03-23 at 14.21.46.png>) ![alt text](<Screenshot 2026-03-23 at 14.22.33.png>)
-[x] the large screen fix sucks.  ![ looking ok height wise, but it should always fill in the width](<Screenshot 2026-03-23 at 14.36.15.png>)
+[x] 100 vh is cool, but this looks like garbage on a large screen like this: ![alt text](<screenshots/Screenshot2026-03-23 at 14.18.37.png>)
+[x] remove the cityscape background.  i hate it.  let's try a new direction using the look of this panel and buttons: ![alt text](<screenshots/Screenshot2026-03-23 at 14.21.46.png>) ![alt text](<screenshots/Screenshot2026-03-23 at 14.22.33.png>)
+[x] the large screen fix sucks.  ![ looking ok height wise, but it should always fill in the width](<screenshots/Screenshot2026-03-23 at 14.36.15.png>)
 [x] the width of the ribbon is still funky, it doesn't reach all the way to the right
-[x] ![crunch slider looks squanched too far to the bottom](<Screenshot 2026-03-23 at 14.40.29.png>)
+[x] ![crunch slider looks squanched too far to the bottom](<screenshots/Screenshot2026-03-23 at 14.40.29.png>)
 [x] crunch slider knob is literally still hanging off the bottom.  would rather see it shorter, next to reverb
 [x] make whatever you did to the console background more apparent
 [x] reverb and crunch should be side by side, but not grouped together as reverb / crunch.  they are independent. give them space accordingly
@@ -192,4 +192,6 @@ volume slider (horizontal)
 [x] (March 24, 2026) make v2 whatever stable eod tmrw finish v3 live by eow cryptic crypto and mild ambient play mode
 [x] found a bug when adjusting the bpm slider during a poly arp.  after adjusting it it stopped playing suddenly and i had to make several random clicks to even get sound back
 [x] alternater key combos like command+l should operate normally (not trigger the keyboard shortcut command)
-[x] give the console some bottom space so these bottom sliders don't hang off the bottom ![alt text](<Screenshot 2026-03-24 at 12.20.15.png>)
+[x] give the console some bottom space so these bottom sliders don't hang off the bottom ![alt text](<screenshots/Screenshot2026-03-24 at 12.20.15.png>)
+[x] organize all screenshots in a screenshots folder
+[x] save the idea of this screenshot for v3 design direction ![alt text](<screenshots/Screen Shot 2013-10-06 at 9.36.17 PM.png>)

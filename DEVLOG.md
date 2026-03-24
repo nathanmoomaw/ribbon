@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-23 — Restore shake bolt offset, commit referenced screenshots
+
+- **Restored top: 8px on shake bolt**: the removal was premature — user was seeing stale cache. Offset keeps the bolt visually aligned below the logo text.
+- **Screenshot tracking**: committed all referenced screenshots to git so visual context for DUMP.md prompts is preserved.
+
 ## 2026-03-23 — Clean up shake bolt positioning
 
 - **Removed vertical offset**: shake bolt no longer has `top: 8px` pushing it down — sits naturally aligned with the logo. Already had no background/border.

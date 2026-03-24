@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-24 — Tone down OSC slider colors
+
+- Desaturated all OSC mix/detune slider gradients by ~50% — colors now read as subtle tints rather than bold hues.
+- Halved glow opacity on all OSC slider thumbs (0.5→0.25, 0.25→0.12).
+
 ## 2026-03-24 — OSC-colored slider handles
 
 - Mix and Detune slider thumbs in each OSC section now reflect that OSC's color (red, gold, green).

@@ -175,6 +175,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <div className="controls__section">
         <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
         <input
+          className="slider--pink"
           type="range"
           min="0"
           max="1"
@@ -186,6 +187,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <div className="controls__section">
         <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
         <input
+          className="slider--purple"
           type="range"
           min="-1200"
           max="1200"
@@ -405,11 +407,11 @@ export const Controls = forwardRef(function Controls({
               <div className="controls__knobs">
                 <div className="controls__knob">
                   <span>Cutoff</span>
-                  <input type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
+                  <input className="slider--orange" type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
                 </div>
                 <div className="controls__knob">
                   <span>Res</span>
-                  <input type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
+                  <input className="slider--gold" type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
                 </div>
               </div>
             </div>
@@ -417,6 +419,7 @@ export const Controls = forwardRef(function Controls({
             <div className="controls__section">
               <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
               <input
+                className="slider--lime"
                 type="range"
                 min="0.001"
                 max="0.3"
@@ -428,12 +431,12 @@ export const Controls = forwardRef(function Controls({
 
             <div className="controls__section">
               <label className="controls__label">Reverb <span className="controls__value">{Math.round(reverbMix * 100)}%</span></label>
-              <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+              <input className="slider--teal" type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
             </div>
 
             <div className="controls__section">
               <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
-              <input type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
+              <input className="slider--red" type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
             </div>
 
             <div className="controls__section controls__section--full">
@@ -441,15 +444,15 @@ export const Controls = forwardRef(function Controls({
               <div className="controls__knobs">
                 <div className="controls__knob">
                   <span>Time</span>
-                  <input type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
+                  <input className="slider--blue" type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
                 </div>
                 <div className="controls__knob">
                   <span>Fdbk</span>
-                  <input type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
+                  <input className="slider--lavender" type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
                 </div>
                 <div className="controls__knob">
                   <span>Mix</span>
-                  <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
+                  <input className="slider--silver" type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
                 </div>
               </div>
             </div>

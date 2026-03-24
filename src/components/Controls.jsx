@@ -427,6 +427,16 @@ export const Controls = forwardRef(function Controls({
             </div>
 
             <div className="controls__section">
+              <label className="controls__label">Reverb <span className="controls__value">{Math.round(reverbMix * 100)}%</span></label>
+              <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+            </div>
+
+            <div className="controls__section">
+              <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
+              <input type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
+            </div>
+
+            <div className="controls__section controls__section--full">
               <label className="controls__label">Delay</label>
               <div className="controls__knobs">
                 <div className="controls__knob">
@@ -440,20 +450,6 @@ export const Controls = forwardRef(function Controls({
                 <div className="controls__knob">
                   <span>Mix</span>
                   <input type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
-                </div>
-              </div>
-            </div>
-
-            <div className="controls__section">
-              <label className="controls__label">Reverb / Crunch</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Reverb</span>
-                  <input type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
-                </div>
-                <div className="controls__knob">
-                  <span>Crunch</span>
-                  <input type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
                 </div>
               </div>
             </div>

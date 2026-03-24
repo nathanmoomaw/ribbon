@@ -179,3 +179,6 @@ volume slider (horizontal)
 [x] ![crunch slider looks squanched too far to the bottom](<Screenshot 2026-03-23 at 14.40.29.png>)
 [x] crunch slider knob is literally still hanging off the bottom.  would rather see it shorter, next to reverb
 [x] make whatever you did to the console background more apparent
+[x] reverb and crunch should be side by side, but not grouped together as reverb / crunch.  they are independent. give them space accordingly
+[x] add a nice hover state to all the shake icons
+[x] work on mobile layout to maximize what appears above the fold.  consider cutting the size of each osc in half at that size

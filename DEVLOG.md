@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-23 — Independent Reverb/Crunch, shake hover states, mobile compact
+
+- **Reverb & Crunch independent**: split back into separate sections with own labels/sliders, side by side on the grid. Delay moved to bottom spanning full width (3 knobs benefit from the space).
+- **Shake icon hover states**: header bolt gets warm glow on hover (drop-shadow + higher opacity). Mini console bolts get yellow-gold color, warm glow, subtle background shift, and bolt-dance animation on hover.
+- **Mobile above-the-fold**: oscillator panels use CSS grid (3-col: wave | mix | detune) cutting height roughly in half. Reduced padding, gaps, font sizes, fader height, and toggle spacing throughout mobile breakpoint.
+
 ## 2026-03-23 — Crunch merged with Reverb, console texture boost
 
 - **Merged Crunch into Reverb section**: crunch slider was alone on the last grid row hanging off the bottom. Combined it with Reverb as side-by-side knobs ("Reverb / Crunch"), making a clean 2x2 grid (Filter, Glide, Delay, Reverb/Crunch).

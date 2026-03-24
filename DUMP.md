@@ -184,3 +184,4 @@ volume slider (horizontal)
 [x] work on mobile layout to maximize what appears above the fold.  consider cutting the size of each osc in half at that size
 [x] commit these changes to a new branch named 'nmj/w3'
 [x] merge those changes into main to get it deployed
+[x] move the main shake icon back to the right of the logo and remove its background

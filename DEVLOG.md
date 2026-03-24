@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-03-23 — Clean up shake bolt positioning
+
+- **Removed vertical offset**: shake bolt no longer has `top: 8px` pushing it down — sits naturally aligned with the logo. Already had no background/border.
+
 ## 2026-03-23 — Independent Reverb/Crunch, shake hover states, mobile compact
 
 - **Reverb & Crunch independent**: split back into separate sections with own labels/sliders, side by side on the grid. Delay moved to bottom spanning full width (3 knobs benefit from the space).

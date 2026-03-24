@@ -196,3 +196,4 @@ volume slider (horizontal)
 [x] organize all screenshots in a screenshots folder
 [x] save the idea of this screenshot for v3 design direction ![alt text](<screenshots/Screen Shot 2013-10-06 at 9.36.17 PM.png>)
 [x] that gap on the right side of the ribbon came back ![alt text](<screenshots/Screenshot 2026-03-24 at 13.10.46.png>)
+[x] let's try coloring all the slider handles all differently, following color styles like these buttons: ![alt text](<screenshots/Screenshot 2026-03-23 at 14.22.33.png>)

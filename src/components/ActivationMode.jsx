@@ -103,6 +103,7 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
           BPM <span className="activation__tempo-value">{arpBpm}</span>
         </label>
         <input
+          className="slider--coral"
           type="range"
           min="40"
           max="300"

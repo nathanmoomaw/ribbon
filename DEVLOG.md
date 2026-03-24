@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-24 — Unique colored slider handles
+
+- Each slider now has a distinct colored thumb inspired by the retro arcade button palette from the reference screenshot.
+- Colors: Mix (pink), Detune (purple), Cutoff (orange), Resonance (gold), Speed (lime), Reverb (teal), Crunch (red), Delay Time (blue), Delay Feedback (lavender), Delay Mix (silver), BPM (coral).
+- Both WebKit and Firefox thumb pseudo-elements styled per slider class.
+
 ## 2026-03-24 — Fix ribbon right-side gap
 
 - **Root cause**: ribbon used `width: 100vw` which includes scrollbar width, causing a gap on the right when clipped by `overflow-x: hidden` on the app container.

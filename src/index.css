@@ -200,22 +200,58 @@ input[type="range"]::-moz-range-track {
 
 /* ── Colored slider thumbs ── */
 
-.slider--pink::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #ffc0e0, #ff6ec7, #e0449a, #a02070) !important;
-  box-shadow: 0 0 10px #ff6ec7, 0 0 20px rgba(255, 110, 199, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+/* OSC 1 (red) — mix is warm rose, detune is deeper crimson */
+.slider--osc1-mix::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #ff90a0, #e8556a, #cc3344, #8a1828) !important;
+  box-shadow: 0 0 8px rgba(204, 51, 68, 0.5), 0 0 16px rgba(204, 51, 68, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
-.slider--pink::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #ffc0e0, #ff6ec7, #e0449a, #a02070) !important;
-  box-shadow: 0 0 10px #ff6ec7, 0 0 20px rgba(255, 110, 199, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
+.slider--osc1-mix::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #ff90a0, #e8556a, #cc3344, #8a1828) !important;
+  box-shadow: 0 0 8px rgba(204, 51, 68, 0.5), 0 0 16px rgba(204, 51, 68, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+}
+.slider--osc1-detune::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #e88090, #c03048, #991830, #601020) !important;
+  box-shadow: 0 0 8px rgba(153, 24, 48, 0.5), 0 0 16px rgba(153, 24, 48, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+}
+.slider--osc1-detune::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #e88090, #c03048, #991830, #601020) !important;
+  box-shadow: 0 0 8px rgba(153, 24, 48, 0.5), 0 0 16px rgba(153, 24, 48, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
-.slider--purple::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #d4b0ff, #b06eff, #8a3fdf, #5a1fa0) !important;
-  box-shadow: 0 0 10px #b06eff, 0 0 20px rgba(176, 110, 255, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+/* OSC 2 (gold) — mix is bright amber, detune is deeper bronze */
+.slider--osc2-mix::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #ffe080, #e0b830, #ccaa22, #8a7010) !important;
+  box-shadow: 0 0 8px rgba(204, 170, 34, 0.5), 0 0 16px rgba(204, 170, 34, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
-.slider--purple::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #d4b0ff, #b06eff, #8a3fdf, #5a1fa0) !important;
-  box-shadow: 0 0 10px #b06eff, 0 0 20px rgba(176, 110, 255, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
+.slider--osc2-mix::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #ffe080, #e0b830, #ccaa22, #8a7010) !important;
+  box-shadow: 0 0 8px rgba(204, 170, 34, 0.5), 0 0 16px rgba(204, 170, 34, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+}
+.slider--osc2-detune::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #d8c070, #b89018, #997810, #605008) !important;
+  box-shadow: 0 0 8px rgba(153, 120, 16, 0.5), 0 0 16px rgba(153, 120, 16, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+}
+.slider--osc2-detune::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #d8c070, #b89018, #997810, #605008) !important;
+  box-shadow: 0 0 8px rgba(153, 120, 16, 0.5), 0 0 16px rgba(153, 120, 16, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+}
+
+/* OSC 3 (green) — mix is bright emerald, detune is deeper forest */
+.slider--osc3-mix::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #80e8a0, #40c868, #22aa55, #107838) !important;
+  box-shadow: 0 0 8px rgba(34, 170, 85, 0.5), 0 0 16px rgba(34, 170, 85, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+}
+.slider--osc3-mix::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #80e8a0, #40c868, #22aa55, #107838) !important;
+  box-shadow: 0 0 8px rgba(34, 170, 85, 0.5), 0 0 16px rgba(34, 170, 85, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+}
+.slider--osc3-detune::-webkit-slider-thumb {
+  background: radial-gradient(circle at 38% 38%, #60c080, #288848, #186838, #104828) !important;
+  box-shadow: 0 0 8px rgba(24, 104, 56, 0.5), 0 0 16px rgba(24, 104, 56, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+}
+.slider--osc3-detune::-moz-range-thumb {
+  background: radial-gradient(circle at 38% 38%, #60c080, #288848, #186838, #104828) !important;
+  box-shadow: 0 0 8px rgba(24, 104, 56, 0.5), 0 0 16px rgba(24, 104, 56, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
 .slider--orange::-webkit-slider-thumb {

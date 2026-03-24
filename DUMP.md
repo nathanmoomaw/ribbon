@@ -199,3 +199,4 @@ volume slider (horizontal)
 [x] let's try coloring all the slider handles all differently, following color styles like these buttons: ![alt text](<screenshots/Screenshot 2026-03-23 at 14.22.33.png>)
 [x] let's subtly give gradients to the knobs inside each osc section so the mix/detune knobs have a bit of gradient to reflect the color of each osc section respectively, so they all have subtle variation
 [x] reduce the effect of the last prompt by 50%. it's too drastic now
+[x] still not right.  i want to see more of the original (new today) knob colors for the osc sliders

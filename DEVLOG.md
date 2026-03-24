@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-24 — Restore pink/purple base on OSC sliders
+
+- OSC slider thumbs now use the original pink (mix) and purple (detune) colors as the base, with only a ~20% hue shift per OSC section (warm/amber/cool).
+- Restored full glow intensity to match the other colored sliders.
+
 ## 2026-03-24 — Tone down OSC slider colors
 
 - Desaturated all OSC mix/detune slider gradients by ~50% — colors now read as subtle tints rather than bold hues.

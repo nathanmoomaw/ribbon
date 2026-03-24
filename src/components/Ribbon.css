@@ -1,7 +1,8 @@
 .ribbon {
-  width: 100vw;
+  width: calc(100% + 3rem);
   align-self: center;
-  margin-left: calc(-50vw + 50%);
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -239,6 +240,12 @@
 }
 
 @media (max-width: 767px) {
+  .ribbon {
+    width: calc(100% + 0.5rem);
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+  }
+
   .ribbon__track {
     height: 64px;
   }

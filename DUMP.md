@@ -195,3 +195,4 @@ volume slider (horizontal)
 [x] give the console some bottom space so these bottom sliders don't hang off the bottom ![alt text](<screenshots/Screenshot2026-03-24 at 12.20.15.png>)
 [x] organize all screenshots in a screenshots folder
 [x] save the idea of this screenshot for v3 design direction ![alt text](<screenshots/Screen Shot 2013-10-06 at 9.36.17 PM.png>)
+[x] that gap on the right side of the ribbon came back ![alt text](<screenshots/Screenshot 2026-03-24 at 13.10.46.png>)

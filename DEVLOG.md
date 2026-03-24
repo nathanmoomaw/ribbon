@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-24 — Fix ribbon right-side gap
+
+- **Root cause**: ribbon used `width: 100vw` which includes scrollbar width, causing a gap on the right when clipped by `overflow-x: hidden` on the app container.
+- **Fix**: replaced viewport-based width with parent-relative `calc(100% + 3rem)` and negative margins matching the app's padding (1.5rem each side). Added mobile override for its smaller padding (0.25rem).
+- Moved referenced screenshot into `screenshots/` folder.
+
 ## 2026-03-24 — Organize screenshots, save v3 design direction
 
 - **Screenshots folder**: moved all 12 screenshots from repo root to `screenshots/`, updated all DUMP.md references.

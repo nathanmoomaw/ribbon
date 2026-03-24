@@ -200,58 +200,58 @@ input[type="range"]::-moz-range-track {
 
 /* ── Colored slider thumbs ── */
 
-/* OSC 1 (red) — mix is warm rose, detune is deeper crimson */
+/* OSC 1 (red) — subtle warm tint */
 .slider--osc1-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #ff90a0, #e8556a, #cc3344, #8a1828) !important;
-  box-shadow: 0 0 8px rgba(204, 51, 68, 0.5), 0 0 16px rgba(204, 51, 68, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #e8b8c0, #c89098, #a87078, #785058) !important;
+  box-shadow: 0 0 8px rgba(204, 51, 68, 0.25), 0 0 16px rgba(204, 51, 68, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc1-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #ff90a0, #e8556a, #cc3344, #8a1828) !important;
-  box-shadow: 0 0 8px rgba(204, 51, 68, 0.5), 0 0 16px rgba(204, 51, 68, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #e8b8c0, #c89098, #a87078, #785058) !important;
+  box-shadow: 0 0 8px rgba(204, 51, 68, 0.25), 0 0 16px rgba(204, 51, 68, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc1-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #e88090, #c03048, #991830, #601020) !important;
-  box-shadow: 0 0 8px rgba(153, 24, 48, 0.5), 0 0 16px rgba(153, 24, 48, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #d8a8b0, #b07880, #906068, #684850) !important;
+  box-shadow: 0 0 8px rgba(153, 24, 48, 0.25), 0 0 16px rgba(153, 24, 48, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc1-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #e88090, #c03048, #991830, #601020) !important;
-  box-shadow: 0 0 8px rgba(153, 24, 48, 0.5), 0 0 16px rgba(153, 24, 48, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #d8a8b0, #b07880, #906068, #684850) !important;
+  box-shadow: 0 0 8px rgba(153, 24, 48, 0.25), 0 0 16px rgba(153, 24, 48, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
-/* OSC 2 (gold) — mix is bright amber, detune is deeper bronze */
+/* OSC 2 (gold) — subtle warm tint */
 .slider--osc2-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #ffe080, #e0b830, #ccaa22, #8a7010) !important;
-  box-shadow: 0 0 8px rgba(204, 170, 34, 0.5), 0 0 16px rgba(204, 170, 34, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #e8d8a8, #c8b070, #a89850, #787040) !important;
+  box-shadow: 0 0 8px rgba(204, 170, 34, 0.25), 0 0 16px rgba(204, 170, 34, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc2-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #ffe080, #e0b830, #ccaa22, #8a7010) !important;
-  box-shadow: 0 0 8px rgba(204, 170, 34, 0.5), 0 0 16px rgba(204, 170, 34, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #e8d8a8, #c8b070, #a89850, #787040) !important;
+  box-shadow: 0 0 8px rgba(204, 170, 34, 0.25), 0 0 16px rgba(204, 170, 34, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc2-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #d8c070, #b89018, #997810, #605008) !important;
-  box-shadow: 0 0 8px rgba(153, 120, 16, 0.5), 0 0 16px rgba(153, 120, 16, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #d8c898, #a89050, #887838, #605028) !important;
+  box-shadow: 0 0 8px rgba(153, 120, 16, 0.25), 0 0 16px rgba(153, 120, 16, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc2-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #d8c070, #b89018, #997810, #605008) !important;
-  box-shadow: 0 0 8px rgba(153, 120, 16, 0.5), 0 0 16px rgba(153, 120, 16, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #d8c898, #a89050, #887838, #605028) !important;
+  box-shadow: 0 0 8px rgba(153, 120, 16, 0.25), 0 0 16px rgba(153, 120, 16, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
-/* OSC 3 (green) — mix is bright emerald, detune is deeper forest */
+/* OSC 3 (green) — subtle cool tint */
 .slider--osc3-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #80e8a0, #40c868, #22aa55, #107838) !important;
-  box-shadow: 0 0 8px rgba(34, 170, 85, 0.5), 0 0 16px rgba(34, 170, 85, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #a0d8b8, #70b890, #50986a, #388850) !important;
+  box-shadow: 0 0 8px rgba(34, 170, 85, 0.25), 0 0 16px rgba(34, 170, 85, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc3-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #80e8a0, #40c868, #22aa55, #107838) !important;
-  box-shadow: 0 0 8px rgba(34, 170, 85, 0.5), 0 0 16px rgba(34, 170, 85, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #a0d8b8, #70b890, #50986a, #388850) !important;
+  box-shadow: 0 0 8px rgba(34, 170, 85, 0.25), 0 0 16px rgba(34, 170, 85, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc3-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #60c080, #288848, #186838, #104828) !important;
-  box-shadow: 0 0 8px rgba(24, 104, 56, 0.5), 0 0 16px rgba(24, 104, 56, 0.25), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #88c8a0, #589878, #408060, #306848) !important;
+  box-shadow: 0 0 8px rgba(24, 104, 56, 0.25), 0 0 16px rgba(24, 104, 56, 0.12), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc3-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #60c080, #288848, #186838, #104828) !important;
-  box-shadow: 0 0 8px rgba(24, 104, 56, 0.5), 0 0 16px rgba(24, 104, 56, 0.25), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #88c8a0, #589878, #408060, #306848) !important;
+  box-shadow: 0 0 8px rgba(24, 104, 56, 0.25), 0 0 16px rgba(24, 104, 56, 0.12), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
 .slider--orange::-webkit-slider-thumb {

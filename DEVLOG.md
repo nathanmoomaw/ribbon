@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-24 — Organize screenshots, save v3 design direction
+
+- **Screenshots folder**: moved all 12 screenshots from repo root to `screenshots/`, updated all DUMP.md references.
+- **v3 design direction**: saved glitch/datamosh/chromatic aberration aesthetic from Rock & Rule-era screenshot as project memory for future visual work.
+
 ## 2026-03-24 — Modifier key passthrough, console bottom padding
 
 - **Modifier key passthrough**: Cmd+L, Ctrl+C, Alt+anything etc. now pass through to the browser instead of triggering synth keyboard shortcuts. Added `metaKey/ctrlKey/altKey` guard to useKeyboard, useKeyboardPlay, and useShake.

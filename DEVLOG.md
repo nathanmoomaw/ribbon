@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-24 — OSC-colored slider handles
+
+- Mix and Detune slider thumbs in each OSC section now reflect that OSC's color (red, gold, green).
+- Mix knobs are brighter/lighter, Detune knobs are deeper/darker — subtle variation within each OSC.
+- Replaced generic pink/purple classes with per-OSC dynamic classes (`slider--osc1-mix`, etc.).
+
 ## 2026-03-24 — Unique colored slider handles
 
 - Each slider now has a distinct colored thumb inspired by the retro arcade button palette from the reference screenshot.

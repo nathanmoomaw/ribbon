@@ -175,7 +175,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <div className="controls__section">
         <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
         <input
-          className="slider--pink"
+          className={`slider--osc${index + 1}-mix`}
           type="range"
           min="0"
           max="1"
@@ -187,7 +187,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <div className="controls__section">
         <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
         <input
-          className="slider--purple"
+          className={`slider--osc${index + 1}-detune`}
           type="range"
           min="-1200"
           max="1200"

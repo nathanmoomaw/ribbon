@@ -202,5 +202,6 @@ volume slider (horizontal)
 [x] still not right.  i want to see more of the original (new today) knob colors for the osc sliders
 [x] inscrease the oscillator colored hue shift
 [x] merge these latest changes to the main branch
-[] record these to changelog and readme for the web app
-[] store memories for all the important learnings
+[x] record these to changelog and readme for the web app
+[x] store memories for all the important learnings
+[x] roadmap: add support for grabbing the osc spheres to change settings and or create sound

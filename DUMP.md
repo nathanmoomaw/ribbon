@@ -201,3 +201,6 @@ volume slider (horizontal)
 [x] reduce the effect of the last prompt by 50%. it's too drastic now
 [x] still not right.  i want to see more of the original (new today) knob colors for the osc sliders
 [x] inscrease the oscillator colored hue shift
+[x] merge these latest changes to the main branch
+[] record these to changelog and readme for the web app
+[] store memories for all the important learnings

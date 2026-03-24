@@ -191,3 +191,5 @@ volume slider (horizontal)
 # Tuesday March 24
 [x] (March 24, 2026) make v2 whatever stable eod tmrw finish v3 live by eow cryptic crypto and mild ambient play mode
 [x] found a bug when adjusting the bpm slider during a poly arp.  after adjusting it it stopped playing suddenly and i had to make several random clicks to even get sound back
+[x] alternater key combos like command+l should operate normally (not trigger the keyboard shortcut command)
+[x] give the console some bottom space so these bottom sliders don't hang off the bottom ![alt text](<Screenshot 2026-03-24 at 12.20.15.png>)

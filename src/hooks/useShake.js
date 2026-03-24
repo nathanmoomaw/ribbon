@@ -95,6 +95,7 @@ export function useShake(onShake, controlsRef, ribbonRef) {
     // --- Enter key ---
     function onKeyDown(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
       if (e.code === 'Enter') {
         e.preventDefault()
         triggerShake(0.5)

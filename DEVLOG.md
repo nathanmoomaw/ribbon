@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-24 — Increase OSC slider hue differentiation
+
+- Pushed per-OSC hue shifts much further apart (~40% blend toward OSC color).
+- OSC 1: coral-pink mix / red-magenta detune. OSC 2: peach-salmon mix / amber-purple detune. OSC 3: cool mauve mix / blue-indigo detune.
+- Each OSC's sliders are now clearly distinguishable at a glance.
+
 ## 2026-03-24 — Restore pink/purple base on OSC sliders
 
 - OSC slider thumbs now use the original pink (mix) and purple (detune) colors as the base, with only a ~20% hue shift per OSC section (warm/amber/cool).

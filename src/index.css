@@ -200,58 +200,58 @@ input[type="range"]::-moz-range-track {
 
 /* ── Colored slider thumbs ── */
 
-/* OSC 1 (red) — pink/purple base with warm shift */
+/* OSC 1 (red) — warm coral-pink / red-magenta purple */
 .slider--osc1-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #fbb8d0, #f860a8, #d83878, #961850) !important;
-  box-shadow: 0 0 10px #f860a8, 0 0 20px rgba(248, 96, 168, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #f8a8b0, #f04880, #c82858, #881838) !important;
+  box-shadow: 0 0 10px #f04880, 0 0 20px rgba(240, 72, 128, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc1-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #fbb8d0, #f860a8, #d83878, #961850) !important;
-  box-shadow: 0 0 10px #f860a8, 0 0 20px rgba(248, 96, 168, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #f8a8b0, #f04880, #c82858, #881838) !important;
+  box-shadow: 0 0 10px #f04880, 0 0 20px rgba(240, 72, 128, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc1-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #d0a8f0, #a860e0, #8238c0, #581e90) !important;
-  box-shadow: 0 0 10px #a860e0, 0 0 20px rgba(168, 96, 224, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #cc98e8, #9848d0, #7828a8, #501878) !important;
+  box-shadow: 0 0 10px #9848d0, 0 0 20px rgba(152, 72, 208, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc1-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #d0a8f0, #a860e0, #8238c0, #581e90) !important;
-  box-shadow: 0 0 10px #a860e0, 0 0 20px rgba(168, 96, 224, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #cc98e8, #9848d0, #7828a8, #501878) !important;
+  box-shadow: 0 0 10px #9848d0, 0 0 20px rgba(152, 72, 208, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
-/* OSC 2 (gold) — pink/purple base with amber shift */
+/* OSC 2 (gold) — warm peach-salmon / amber-purple */
 .slider--osc2-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #fcc4c8, #f078b0, #d84c85, #962860) !important;
-  box-shadow: 0 0 10px #f078b0, 0 0 20px rgba(240, 120, 176, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #fcc8a8, #e88880, #c85860, #903840) !important;
+  box-shadow: 0 0 10px #e88880, 0 0 20px rgba(232, 136, 128, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc2-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #fcc4c8, #f078b0, #d84c85, #962860) !important;
-  box-shadow: 0 0 10px #f078b0, 0 0 20px rgba(240, 120, 176, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #fcc8a8, #e88880, #c85860, #903840) !important;
+  box-shadow: 0 0 10px #e88880, 0 0 20px rgba(232, 136, 128, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc2-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #d0b8f0, #b078e0, #8848c0, #5a2890) !important;
-  box-shadow: 0 0 10px #b078e0, 0 0 20px rgba(176, 120, 224, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #d8c0e0, #b888c8, #9058a0, #603878) !important;
+  box-shadow: 0 0 10px #b888c8, 0 0 20px rgba(184, 136, 200, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc2-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #d0b8f0, #b078e0, #8848c0, #5a2890) !important;
-  box-shadow: 0 0 10px #b078e0, 0 0 20px rgba(176, 120, 224, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #d8c0e0, #b888c8, #9058a0, #603878) !important;
+  box-shadow: 0 0 10px #b888c8, 0 0 20px rgba(184, 136, 200, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
-/* OSC 3 (green) — pink/purple base with cool shift */
+/* OSC 3 (green) — cool mauve-pink / blue-indigo purple */
 .slider--osc3-mix::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #f0c8d8, #e878c0, #c8509a, #882870) !important;
-  box-shadow: 0 0 10px #e878c0, 0 0 20px rgba(232, 120, 192, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #d8c0e8, #c068c0, #9840a0, #682870) !important;
+  box-shadow: 0 0 10px #c068c0, 0 0 20px rgba(192, 104, 192, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc3-mix::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #f0c8d8, #e878c0, #c8509a, #882870) !important;
-  box-shadow: 0 0 10px #e878c0, 0 0 20px rgba(232, 120, 192, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #d8c0e8, #c068c0, #9840a0, #682870) !important;
+  box-shadow: 0 0 10px #c068c0, 0 0 20px rgba(192, 104, 192, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 .slider--osc3-detune::-webkit-slider-thumb {
-  background: radial-gradient(circle at 38% 38%, #c4b8f8, #9878f0, #7048d0, #4c2898) !important;
-  box-shadow: 0 0 10px #9878f0, 0 0 20px rgba(152, 120, 240, 0.35), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
+  background: radial-gradient(circle at 38% 38%, #a8b8ff, #7868e8, #5838c0, #382090) !important;
+  box-shadow: 0 0 10px #7868e8, 0 0 20px rgba(120, 104, 232, 0.4), 0 3px 6px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.15) inset !important;
 }
 .slider--osc3-detune::-moz-range-thumb {
-  background: radial-gradient(circle at 38% 38%, #c4b8f8, #9878f0, #7048d0, #4c2898) !important;
-  box-shadow: 0 0 10px #9878f0, 0 0 20px rgba(152, 120, 240, 0.35), 0 3px 6px rgba(0,0,0,0.6) !important;
+  background: radial-gradient(circle at 38% 38%, #a8b8ff, #7868e8, #5838c0, #382090) !important;
+  box-shadow: 0 0 10px #7868e8, 0 0 20px rgba(120, 104, 232, 0.4), 0 3px 6px rgba(0,0,0,0.6) !important;
 }
 
 .slider--orange::-webkit-slider-thumb {

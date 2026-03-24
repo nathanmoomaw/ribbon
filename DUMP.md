@@ -200,3 +200,4 @@ volume slider (horizontal)
 [x] let's subtly give gradients to the knobs inside each osc section so the mix/detune knobs have a bit of gradient to reflect the color of each osc section respectively, so they all have subtle variation
 [x] reduce the effect of the last prompt by 50%. it's too drastic now
 [x] still not right.  i want to see more of the original (new today) knob colors for the osc sliders
+[x] inscrease the oscillator colored hue shift

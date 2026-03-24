@@ -185,3 +185,5 @@ volume slider (horizontal)
 [x] commit these changes to a new branch named 'nmj/w3'
 [x] merge those changes into main to get it deployed
 [x] move the main shake icon back to the right of the logo and remove its background
+[x] add back in the top: 8px on the shake bolt. apparently i was seeing bad cache with the bolt below the logo and i did not like that
+[x] always commit screenshots that i include to reference my prompts

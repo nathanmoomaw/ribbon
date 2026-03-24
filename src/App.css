@@ -51,6 +51,8 @@
   transition: opacity 0.15s, transform 0.15s, filter 0.15s;
   animation: none;
   line-height: 1;
+  position: relative;
+  top: 8px;
 }
 
 .app-header__shake-bolt:hover {

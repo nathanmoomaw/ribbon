@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-24 — Fix BPM slider killing poly arp, project milestones
+
+- **Root cause**: race condition between arp restart and voice gain fade-out. When BPM changed, `arpStop()` triggered a 10ms voice fade, then `playNote()` fired 10ms later while gain was still mid-fade. `voiceOn()` captured the stale intermediate gain value as its starting point, resulting in silence.
+- **Fix 1 — AudioEngine**: `voiceOn()` now forces `setValueAtTime(0)` before ramping up, ensuring a clean attack regardless of previous gain state.
+- **Fix 2 — useArpeggiator**: replaced `setInterval` with chained `setTimeout` so each tick reads live BPM (instant tempo changes). BPM change handler no longer does stop/delay/restart — just clears timers and schedules the next tick directly.
+- **Milestones**: v2 stable by EOD 2026-03-25, v3 live by EOW 2026-03-27 (cryptic crypto + mild ambient play).
+
 ## 2026-03-23 — Restore shake bolt offset, commit referenced screenshots
 
 - **Restored top: 8px on shake bolt**: the removal was premature — user was seeing stale cache. Offset keeps the bolt visually aligned below the logo text.

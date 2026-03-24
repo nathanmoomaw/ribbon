@@ -187,3 +187,7 @@ volume slider (horizontal)
 [x] move the main shake icon back to the right of the logo and remove its background
 [x] add back in the top: 8px on the shake bolt. apparently i was seeing bad cache with the bolt below the logo and i did not like that
 [x] always commit screenshots that i include to reference my prompts
+
+# Tuesday March 24
+[x] (March 24, 2026) make v2 whatever stable eod tmrw finish v3 live by eow cryptic crypto and mild ambient play mode
+[x] found a bug when adjusting the bpm slider during a poly arp.  after adjusting it it stopped playing suddenly and i had to make several random clicks to even get sound back

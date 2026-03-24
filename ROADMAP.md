@@ -10,9 +10,10 @@
 - [ ] Rotary knob components (replace range sliders)
 - [ ] Mobile-optimized layout
 - [ ] Step sequencer functionality
-- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, revisit in future version)
+- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
 - [ ] Production domain setup
-- [ ] v2 tag + changelog (deploy to /v2 when ready)
+- [ ] v2 tag + changelog — stable by EOD 2026-03-25 (deploy to /v2)
+- [ ] v3 — live by EOW 2026-03-27 (cryptic crypto integration + mild ambient play mode)
 
 ## Completed
 - [x] Vite + React project scaffold

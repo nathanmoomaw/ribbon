@@ -15,7 +15,7 @@ export function useArpeggiator(getEngine, mode, bpm, notes = []) {
   const arpStop = useCallback(() => {
     if (!isArpingRef.current) return
     isArpingRef.current = false
-    clearInterval(intervalRef.current)
+    clearTimeout(intervalRef.current)
     clearTimeout(timeoutRef.current)
     intervalRef.current = null
     timeoutRef.current = null
@@ -34,60 +34,41 @@ export function useArpeggiator(getEngine, mode, bpm, notes = []) {
     engine.noteOn()
   }, [getEngine])
 
+  // Schedule the next arp tick using setTimeout (reads live BPM each tick)
+  const scheduleTick = useCallback(() => {
+    const ms = 60000 / bpmRef.current
+    const gate = ms * GATE
+
+    playNote()
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => {
+      if (isArpingRef.current) getEngine().noteOff()
+    }, gate)
+
+    intervalRef.current = setTimeout(() => {
+      if (isArpingRef.current) scheduleTick()
+    }, ms)
+  }, [getEngine, playNote])
+
   const arpStart = useCallback(() => {
     if (isArpingRef.current) arpStop()
     isArpingRef.current = true
     noteIndexRef.current = 0
+    scheduleTick()
+  }, [arpStop, scheduleTick])
 
-    const msPerBeat = 60000 / bpmRef.current
-    const gateDuration = msPerBeat * GATE
-
-    // Immediate first note
-    playNote()
-    timeoutRef.current = setTimeout(() => {
-      if (isArpingRef.current) getEngine().noteOff()
-    }, gateDuration)
-
-    intervalRef.current = setInterval(() => {
-      const ms = 60000 / bpmRef.current
-      const gate = ms * GATE
-      playNote()
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = setTimeout(() => {
-        if (isArpingRef.current) getEngine().noteOff()
-      }, gate)
-    }, msPerBeat)
-  }, [getEngine, arpStop, playNote])
-
-  // Restart interval when BPM changes while arping
+  // Restart when BPM changes while arping — no delay needed since
+  // voiceOn() now forces a clean attack from gain=0
   useEffect(() => {
     if (isArpingRef.current) {
-      // Preserve note index across BPM changes
       const savedIndex = noteIndexRef.current
-      arpStop()
-      // Small delay to let noteOff settle before restarting
-      const restart = setTimeout(() => {
-        isArpingRef.current = true
-        noteIndexRef.current = savedIndex
-        const msPerBeat = 60000 / bpm
-        const gateDuration = msPerBeat * GATE
-
-        playNote()
-        timeoutRef.current = setTimeout(() => {
-          if (isArpingRef.current) getEngine().noteOff()
-        }, gateDuration)
-
-        intervalRef.current = setInterval(() => {
-          const ms = 60000 / bpmRef.current
-          const gate = ms * GATE
-          playNote()
-          clearTimeout(timeoutRef.current)
-          timeoutRef.current = setTimeout(() => {
-            if (isArpingRef.current) getEngine().noteOff()
-          }, gate)
-        }, msPerBeat)
-      }, 10)
-      return () => clearTimeout(restart)
+      // Clear timers without calling noteOff (scheduleTick will immediately play)
+      clearTimeout(intervalRef.current)
+      clearTimeout(timeoutRef.current)
+      intervalRef.current = null
+      timeoutRef.current = null
+      noteIndexRef.current = savedIndex
+      scheduleTick()
     }
   }, [bpm]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -101,7 +82,7 @@ export function useArpeggiator(getEngine, mode, bpm, notes = []) {
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      clearInterval(intervalRef.current)
+      clearTimeout(intervalRef.current)
       clearTimeout(timeoutRef.current)
     }
   }, [])

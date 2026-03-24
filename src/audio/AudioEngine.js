@@ -241,10 +241,10 @@ export function voiceOn(id, hz, velocity = 1) {
     osc.frequency.setTargetAtTime(Math.max(hz, 20), ctx.currentTime, glideTime)
   }
 
-  // Ramp up gain
+  // Ramp up gain — force clean attack from zero to avoid stale fade-out values
   const v = Math.max(0, Math.min(1, velocity))
   voice.noteGain.gain.cancelScheduledValues(ctx.currentTime)
-  voice.noteGain.gain.setValueAtTime(voice.noteGain.gain.value, ctx.currentTime)
+  voice.noteGain.gain.setValueAtTime(0, ctx.currentTime)
   voice.noteGain.gain.linearRampToValueAtTime(v, ctx.currentTime + 0.01)
   voice.active = true
 

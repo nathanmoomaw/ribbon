@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-24 — Modifier key passthrough, console bottom padding
+
+- **Modifier key passthrough**: Cmd+L, Ctrl+C, Alt+anything etc. now pass through to the browser instead of triggering synth keyboard shortcuts. Added `metaKey/ctrlKey/altKey` guard to useKeyboard, useKeyboardPlay, and useShake.
+- **Console bottom padding**: increased from 0.5rem to 1rem so Delay knobs don't hang off the bottom edge.
+
 ## 2026-03-24 — Fix BPM slider killing poly arp, project milestones
 
 - **Root cause**: race condition between arp restart and voice gain fade-out. When BPM changed, `arpStop()` triggered a 10ms voice fade, then `playNote()` fired 10ms later while gain was still mid-fade. `voiceOn()` captured the stale intermediate gain value as its starting point, resulting in silence.

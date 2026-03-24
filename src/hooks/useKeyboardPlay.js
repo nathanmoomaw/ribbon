@@ -11,6 +11,8 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
     function onKeyDown(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.repeat) return
+      // Ignore modifier combos so browser shortcuts (Cmd+L, Ctrl+C, etc.) work normally
+      if (e.metaKey || e.ctrlKey || e.altKey) return
 
       const index = KEYS.indexOf(e.code)
       if (index === -1) return

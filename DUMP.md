@@ -182,3 +182,5 @@ volume slider (horizontal)
 [x] reverb and crunch should be side by side, but not grouped together as reverb / crunch.  they are independent. give them space accordingly
 [x] add a nice hover state to all the shake icons
 [x] work on mobile layout to maximize what appears above the fold.  consider cutting the size of each osc in half at that size
+[x] commit these changes to a new branch named 'nmj/w3'
+[] merge those changes into main to get it deployed

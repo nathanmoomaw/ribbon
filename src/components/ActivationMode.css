@@ -251,6 +251,18 @@
   margin-left: 2rem;
 }
 
+.keys-toggle__midi--err {
+  opacity: 0.5;
+  color: #f66;
+  border-color: rgba(255, 100, 100, 0.15);
+}
+
+.keys-toggle__midi--waiting {
+  opacity: 0.6;
+  color: #fa0;
+  border-color: rgba(255, 170, 0, 0.15);
+}
+
 /* --- Mobile --- */
 
 @media (max-width: 767px) {

@@ -457,11 +457,21 @@ function App() {
           Keys
         </button>
         <button
-          className={`keys-toggle__btn keys-toggle__midi ${midiDevice ? 'active' : ''}`}
+          className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
           onClick={connectMIDI}
-          title={midiDevice ? `MIDI: ${midiDevice}` : 'Connect MIDI controller'}
+          title={
+            midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
+            : midiDevice === 'denied' ? 'MIDI access denied'
+            : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
+            : midiDevice ? `MIDI: ${midiDevice}`
+            : 'Connect MIDI controller'
+          }
         >
-          {midiDevice ? 'MIDI ✓' : 'MIDI'}
+          {midiDevice === 'unsupported' ? 'MIDI ✗'
+           : midiDevice === 'denied' ? 'MIDI ✗'
+           : midiDevice === 'no-device' ? 'MIDI …'
+           : midiDevice ? 'MIDI ✓'
+           : 'MIDI'}
         </button>
       </div>
 

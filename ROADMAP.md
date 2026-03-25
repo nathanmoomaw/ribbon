@@ -9,6 +9,7 @@
 - [ ] Multi-ribbon sessions
 - [ ] Rotary knob components (replace range sliders)
 - [x] Mobile-optimized layout (zoom default, controls reorder)
+- [x] MIDI controller support (Web MIDI API — notes, CCs, pitch bend, sustain pedal)
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
 - [ ] Production domain setup

@@ -224,3 +224,4 @@ volume slider (horizontal)
 # Tuesday March 25
 
 [x] mobile default zoom should be about where the screenshot shows — spheres visible but still large and immersive, roughly the current ribbon-dev.obfusco.us view at zoom ~5.0. Reference: ![mobile zoom reference](<screenshots/Screenshot 2026-03-25 mobile-zoom-ref.png>)
+[x] work with me to implment some way to control this via usb or midi controller

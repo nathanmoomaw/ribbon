@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-03-25 — MIDI controller support
+
+- **Web MIDI API integration**: plug in any USB/Bluetooth MIDI controller and play the ribbon synth.
+- **Note input**: MIDI note on/off maps to polyphonic voices with velocity. Pitch bend supported (+-2 semitones).
+- **CC mapping**: mod wheel (CC1) → filter cutoff, CC7 → volume, CC12-14 → OSC 1-3 mix, CC15-17 → OSC 1-3 detune, CC18 → glide, CC19 → crunch, CC20-22 → delay time/feedback/mix, CC23 → BPM, CC64 → sustain/hold, CC71 → filter resonance, CC74 → filter cutoff, CC91 → reverb.
+- **Mode-aware**: respects play/arp, mono/poly, and hold settings. Arp+poly mode adds notes to arp sequence.
+- **MIDI indicator**: subtle "MIDI" text appears in header when a controller is connected.
+- Hook: `src/hooks/useMIDI.js`
+
 ## 2026-03-25 — Dev branch auto-deploy, mobile UX improvements
 
 - **Dev branch CI/CD**: `nmj/*` branches now auto-deploy to ribbon-dev.obfusco.us via separate S3 bucket + CloudFront distribution. Workflow split into `deploy-prod` and `deploy-dev` jobs.

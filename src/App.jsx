@@ -4,6 +4,7 @@ import { useKeyboard } from './hooks/useKeyboard'
 import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
 import { useShake, requestMotionPermission } from './hooks/useShake'
+import { useMIDI } from './hooks/useMIDI'
 import { SCALES } from './utils/scales'
 import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
@@ -341,6 +342,14 @@ function App() {
 
   useShake(handleShake, controlsRef, ribbonRef)
 
+  const { midiDevice } = useMIDI(getEngine, {
+    setVolume, setFilterParams, setGlideSpeed, setDelayParams,
+    setReverbMix, setCrunch, setOscParams, setArpBpm, setHold,
+    mode, poly, hold, octaves, stepped, scale,
+    handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove,
+    arpStart, arpStop,
+  })
+
   // Hold in play mode: note sustains at its original pitch until space or hold toggled off
   // No global mouse tracking — "wild mode" (global pitch follow) removed for now
 
@@ -400,6 +409,9 @@ function App() {
         >
           ⚡
         </button>
+        {midiDevice && (
+          <span className="app-header__midi" title={`MIDI: ${midiDevice}`}>MIDI</span>
+        )}
       </header>
 
       <Controls

@@ -19,6 +19,7 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 - Real oscillator-based synthesis (Web Audio API OscillatorNode, etc.)
 - Adjustable knobs, switches, and buttons for synth parameters
 - Effects: delay, reverb, bitcrush/digitize
+- MIDI controller support via Web MIDI API (`src/hooks/useMIDI.js`)
 - Goal: layered sounds that let users create real, listenable music
 
 ### Presets & Sharing

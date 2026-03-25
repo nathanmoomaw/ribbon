@@ -76,6 +76,20 @@
   80% { transform: translateY(1px) rotate(-1deg); }
 }
 
+/* MIDI connected indicator */
+.app-header__midi {
+  font-size: 0.55rem;
+  font-family: monospace;
+  color: #5bf;
+  opacity: 0.5;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 6px rgba(85, 187, 255, 0.4);
+  position: absolute;
+  right: 1rem;
+  top: 0.5rem;
+  pointer-events: none;
+}
+
 /* Ambient play toggle — floats left of the logo */
 .app-header__ambient {
   background: none;

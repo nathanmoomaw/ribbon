@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-25 — Dev branch auto-deploy, mobile UX improvements
+
+- **Dev branch CI/CD**: `nmj/*` branches now auto-deploy to ribbon-dev.obfusco.us via separate S3 bucket + CloudFront distribution. Workflow split into `deploy-prod` and `deploy-dev` jobs.
+- **Mobile zoom default**: mobile devices now start zoomed out (5.0 vs 1.8 on desktop) so the 3D spheres are visible from the outside by default.
+- **Mobile controls reorder**: delay and reverb controls now appear higher on screen on mobile via CSS `order`, putting the most-used effects above scales/filter/speed.
+
 ## 2026-03-24 — Preset QR codes
 
 - **Shareable preset QR codes**: added a button (lower-right of console) that generates a multi-colored QR code encoding all current synth settings (oscillators, effects, scales, switches, etc.).

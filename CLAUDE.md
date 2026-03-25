@@ -38,9 +38,11 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 - Controls stay clean and usable; visuals live around/behind them
 
 ## Hosting & Deployment
+- Production: ribbon.obfusco.us (deploys on push to `main`)
+- Dev: ribbon-dev.obfusco.us (deploys on push to `nmj/*` branches)
 - Production domain: TBD (eventually its own domain)
-- Staging: ribbon.obfusco.us
-- Staging deploy: merge current branch into `staging`, push to trigger CI/CD
+- CI/CD: GitHub Actions → S3 + CloudFront (separate distributions for prod and dev)
+- Dev CloudFront distribution ID stored in `DEV_CLOUDFRONT_DISTRIBUTION_ID` GitHub secret
 
 ## Git Workflow
 - Push after every commit

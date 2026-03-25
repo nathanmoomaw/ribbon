@@ -434,17 +434,17 @@ export const Controls = forwardRef(function Controls({
               />
             </div>
 
-            <div className="controls__section">
+            <div className="controls__section controls__section--reverb">
               <label className="controls__label">Reverb <span className="controls__value">{Math.round(reverbMix * 100)}%</span></label>
               <input className="slider--teal" type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
             </div>
 
-            <div className="controls__section">
+            <div className="controls__section controls__section--crunch">
               <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
               <input className="slider--red" type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
             </div>
 
-            <div className="controls__section controls__section--full">
+            <div className="controls__section controls__section--full controls__section--delay">
               <label className="controls__label">Delay</label>
               <div className="controls__knobs">
                 <div className="controls__knob">

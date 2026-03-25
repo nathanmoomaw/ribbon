@@ -8,7 +8,7 @@
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
 - [ ] Rotary knob components (replace range sliders)
-- [ ] Mobile-optimized layout
+- [x] Mobile-optimized layout (zoom default, controls reorder)
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
 - [ ] Production domain setup

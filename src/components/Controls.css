@@ -625,6 +625,11 @@
     gap: 0.4rem 0.75rem;
   }
 
+  /* Move delay and reverb higher on mobile */
+  .controls__section--delay { order: -3; }
+  .controls__section--reverb { order: -2; }
+  .controls__section--crunch { order: -1; }
+
   .controls__section {
     min-width: 0;
   }

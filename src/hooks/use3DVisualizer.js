@@ -37,7 +37,8 @@ const SPHERE_IDLE_OFFSETS = [
 ]
 
 const SPHERE_RADIUS = 3.5
-const DEFAULT_ZOOM = 1.8   // inside the spheres by default
+const IS_MOBILE = typeof window !== 'undefined' && window.innerWidth <= 767
+const DEFAULT_ZOOM = IS_MOBILE ? 5.0 : 1.8   // mobile starts zoomed out; desktop inside spheres
 export const MIN_ZOOM = 0.5
 export const MAX_ZOOM = 25
 export const ZOOM_STEP = 0.8

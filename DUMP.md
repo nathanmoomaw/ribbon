@@ -217,3 +217,6 @@ volume slider (horizontal)
 [x] let's name the v2 Rock & Rumble and create a changelog for it
 [x] merge changes into main and also tag this version as it stands as v2.  v2 build should be what's up at ribbon.obfusco.us and also live permanantly at /v2 now
 [x] let's add a button that creates a unique ribbon-design-styled qr code for all the current settings (slider and button positions as well as present zoom amount and any other variable aspects of the toy).  place it minimally in the lower right corner for now.  when clicked it should show the user a modal of the multi-colored qr code and allow them to easily download it.  give one very minimal field that lets them optionally name it.  when scanned again it should go to ribbon.obfusc.us (or one of the frozen versions like /v2 (if that's where they created it from)) and recall all the settings from when the user clicked the create qr button
+[x] make active dev branch also auto deploying to ribbon-dev.obfusco.us
+[x] make mobile zoom farther away by default
+[x] mobile: order delay and reverb higher on screen

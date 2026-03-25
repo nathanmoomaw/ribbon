@@ -212,3 +212,6 @@ volume slider (horizontal)
 [x] press and hold along the ribbon in arp mode should also change the tone accordingly
 [x] add roadmap item for other these scales: Phrygian dominant, Hirajoshi, Whole tone scale, Prometheus scale, Hungarian minor, Enigmatic scale, Lydian dominant
 [x] add roadmap item for POAP support: https://poap.xyz/
+[x] when double harmonic is active just decativate all the scale buttons (don't show d.harm)
+[x] keep the "double harmonic unlocked" text like it is, but replace the white fill with colored grid patterns
+[x] let's name the v2 Rock & Rumble and create a changelog for it

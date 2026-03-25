@@ -50,7 +50,6 @@ function App() {
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const [easterEgg, setEasterEgg] = useState(false)
-  const [unlockedScales, setUnlockedScales] = useState({})
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -183,9 +182,8 @@ function App() {
     // Easter egg — ~5% chance on shake, unlocks hidden double harmonic scale
     if (Math.random() < 0.05) {
       setEasterEgg(true)
-      // Register hidden scales into SCALES so pitchMap can find them
+      // Register hidden scale into SCALES so pitchMap can find it
       Object.assign(SCALES, HIDDEN_SCALES)
-      setUnlockedScales(prev => ({ ...prev, ...HIDDEN_SCALES }))
       setScale(['double harmonic'])
       setStepped(true)
       clearTimeout(easterEggTimerRef.current)
@@ -405,7 +403,6 @@ function App() {
         setHold={setHold}
         onStop={handleStop}
         onKillAll={handleKillAll}
-        unlockedScales={unlockedScales}
       />
 
       <div className="keys-toggle">

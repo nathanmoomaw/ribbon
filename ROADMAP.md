@@ -12,7 +12,7 @@
 - [ ] Step sequencer functionality
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
 - [ ] Production domain setup
-- [ ] v2 tag + changelog — stable by EOD 2026-03-25 (deploy to /v2)
+- [ ] v2 "Rock & Rumble" tag — stable by EOD 2026-03-25 (deploy to /v2)
 - [ ] v3 — live by EOW 2026-03-27 (cryptic crypto integration + mild ambient play mode)
 - [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant

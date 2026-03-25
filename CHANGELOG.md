@@ -1,6 +1,6 @@
 # Changelog
 
-## v2 (in progress)
+## v2 — "Rock & Rumble"
 
 ### Sound Engine
 - **Third oscillator** — full 3-osc engine with independent waveform, detune, and mix per oscillator
@@ -34,9 +34,18 @@
 - **Compact layout** — ribbon above controls, two-row switch layout, horizontal faders
 - **Audio fixes** — AudioWorklet secure context guard, gesture-based AudioContext resume
 
+### Easter Eggs
+- **Hidden double harmonic scale** — ~5% chance on shake unlocks the Byzantine/Arabic scale (all scale buttons deactivate while active)
+
+### Ribbon Behavior
+- **Real ribbon synth feel** — press and slide continuously changes pitch in play and arp modes
+- **Hold+mono pitch glide** — re-pressing ribbon glides held voice to new pitch instead of re-attacking
+- **Arp drag** — dragging along ribbon in arp mode updates the arpeggiated frequency
+
 ### Infrastructure
 - **CI/CD** — auto-deploy to S3/CloudFront on push to main
 - **Staging** — ribbon.obfusco.us
+- **Möbius strip favicon** — custom SVG icon matching the logo style
 - **v1 preserved** — ribbon.obfusco.us/v1
 
 ---

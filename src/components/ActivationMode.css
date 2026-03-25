@@ -247,6 +247,10 @@
   color: var(--text-primary);
 }
 
+.keys-toggle__midi {
+  margin-left: 2rem;
+}
+
 /* --- Mobile --- */
 
 @media (max-width: 767px) {

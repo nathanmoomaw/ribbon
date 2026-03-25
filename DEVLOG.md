@@ -2,6 +2,7 @@
 
 ## 2026-03-25 — MIDI controller support
 
+- **User-initiated MIDI**: subtle "MIDI" button (styled like Keys, spaced apart) — click to connect. No auto-prompting.
 - **Web MIDI API integration**: plug in any USB/Bluetooth MIDI controller and play the ribbon synth.
 - **Note input**: MIDI note on/off maps to polyphonic voices with velocity. Pitch bend supported (+-2 semitones).
 - **CC mapping**: mod wheel (CC1) → filter cutoff, CC7 → volume, CC12-14 → OSC 1-3 mix, CC15-17 → OSC 1-3 detune, CC18 → glide, CC19 → crunch, CC20-22 → delay time/feedback/mix, CC23 → BPM, CC64 → sustain/hold, CC71 → filter resonance, CC74 → filter cutoff, CC91 → reverb.

@@ -253,13 +253,11 @@ export function useMIDI(getEngine, {
     }
   }, [handleNoteOn, handleNoteOff, handleCC, handlePitchBend])
 
-  useEffect(() => {
+  const connectMIDI = useCallback(() => {
     if (!navigator.requestMIDIAccess) return
-
-    let cancelled = false
+    if (midiAccessRef.current) return // already connected
 
     navigator.requestMIDIAccess({ sysex: false }).then((access) => {
-      if (cancelled) return
       midiAccessRef.current = access
 
       const connectInputs = () => {
@@ -277,18 +275,20 @@ export function useMIDI(getEngine, {
         connectInputs()
       }
     }).catch(() => {
-      // MIDI not available — silently ignore
+      // MIDI not available or user denied
     })
+  }, [handleMIDIMessage])
 
+  // Cleanup on unmount
+  useEffect(() => {
     return () => {
-      cancelled = true
       if (midiAccessRef.current) {
         for (const input of midiAccessRef.current.inputs.values()) {
           input.onmidimessage = null
         }
       }
     }
-  }, [handleMIDIMessage])
+  }, [])
 
-  return { midiDevice }
+  return { midiDevice, connectMIDI }
 }

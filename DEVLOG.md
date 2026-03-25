@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-25 — MIDI feedback + Safari logo fix
+
+- **MIDI button feedback**: shows "MIDI ✓" (connected), "MIDI …" (enabled, no device), "MIDI ✗" (unsupported/denied) with color-coded states.
+- **Safari logo fix**: replaced CSS custom properties (`var(--cyan)` etc.) with hardcoded hex colors in SVG SMIL `<animate>` elements and gradient stops. Safari doesn't resolve CSS variables inside SVG animation attributes.
+
 ## 2026-03-25 — MIDI controller support
 
 - **User-initiated MIDI**: subtle "MIDI" button (styled like Keys, spaced apart) — click to connect. No auto-prompting.

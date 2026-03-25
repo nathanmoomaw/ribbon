@@ -24,41 +24,42 @@ export function RibbonLogo() {
       aria-label="Ribbon"
     >
       <defs>
+        {/* Hardcoded colors for Safari SMIL compatibility */}
         <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="0%"
           gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="var(--cyan)" />
-          <stop offset="25%" stopColor="var(--neon-green)" />
-          <stop offset="50%" stopColor="var(--neon-yellow)" />
-          <stop offset="75%" stopColor="var(--magenta)" />
-          <stop offset="100%" stopColor="var(--cyan)" />
+          <stop offset="0%" stopColor="#00f0ff" />
+          <stop offset="25%" stopColor="#39ff14" />
+          <stop offset="50%" stopColor="#fff01f" />
+          <stop offset="75%" stopColor="#ff00aa" />
+          <stop offset="100%" stopColor="#00f0ff" />
         </linearGradient>
 
         {/* Animated gradient that flows along the ribbon */}
         <linearGradient id="tape-grad-anim" x1="0%" y1="0%" x2="100%" y2="0%"
           gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="var(--cyan)">
+          <stop offset="0%" stopColor="#00f0ff">
             <animate attributeName="stop-color"
-              values="var(--cyan);var(--neon-green);var(--magenta);var(--neon-yellow);var(--cyan)"
+              values="#00f0ff;#39ff14;#ff00aa;#fff01f;#00f0ff"
               dur="4s" repeatCount="indefinite" />
           </stop>
-          <stop offset="25%" stopColor="var(--neon-green)">
+          <stop offset="25%" stopColor="#39ff14">
             <animate attributeName="stop-color"
-              values="var(--neon-green);var(--magenta);var(--neon-yellow);var(--cyan);var(--neon-green)"
+              values="#39ff14;#ff00aa;#fff01f;#00f0ff;#39ff14"
               dur="4s" repeatCount="indefinite" />
           </stop>
-          <stop offset="50%" stopColor="var(--magenta)">
+          <stop offset="50%" stopColor="#ff00aa">
             <animate attributeName="stop-color"
-              values="var(--magenta);var(--neon-yellow);var(--cyan);var(--neon-green);var(--magenta)"
+              values="#ff00aa;#fff01f;#00f0ff;#39ff14;#ff00aa"
               dur="4s" repeatCount="indefinite" />
           </stop>
-          <stop offset="75%" stopColor="var(--neon-yellow)">
+          <stop offset="75%" stopColor="#fff01f">
             <animate attributeName="stop-color"
-              values="var(--neon-yellow);var(--cyan);var(--neon-green);var(--magenta);var(--neon-yellow)"
+              values="#fff01f;#00f0ff;#39ff14;#ff00aa;#fff01f"
               dur="4s" repeatCount="indefinite" />
           </stop>
-          <stop offset="100%" stopColor="var(--cyan)">
+          <stop offset="100%" stopColor="#00f0ff">
             <animate attributeName="stop-color"
-              values="var(--cyan);var(--neon-green);var(--magenta);var(--neon-yellow);var(--cyan)"
+              values="#00f0ff;#39ff14;#ff00aa;#fff01f;#00f0ff"
               dur="4s" repeatCount="indefinite" />
           </stop>
         </linearGradient>
@@ -136,7 +137,7 @@ export function RibbonLogo() {
       />
 
       {/* Crossing bridge — covers the under strand at the fold point */}
-      <ellipse cx="76" cy="44" rx="5" ry="4" fill="var(--bg-deep)" />
+      <ellipse cx="76" cy="44" rx="5" ry="4" fill="#0a0a12" />
 
       {/* OVER strand — the front side of the fold (bright, thicker) */}
       <path
@@ -171,11 +172,11 @@ export function RibbonLogo() {
       {/* Sparkle particles along the ribbon */}
       <g className="sparkles" filter="url(#sparkle-glow)">
         <circle className="sparkle s1" cx="50" cy="34" r="1" fill="white" />
-        <circle className="sparkle s2" cx="88" cy="54" r="0.8" fill="var(--cyan)" />
-        <circle className="sparkle s3" cx="96" cy="38" r="1" fill="var(--magenta)" />
-        <circle className="sparkle s4" cx="64" cy="58" r="0.8" fill="var(--neon-green)" />
+        <circle className="sparkle s2" cx="88" cy="54" r="0.8" fill="#00f0ff" />
+        <circle className="sparkle s3" cx="96" cy="38" r="1" fill="#ff00aa" />
+        <circle className="sparkle s4" cx="64" cy="58" r="0.8" fill="#39ff14" />
         <circle className="sparkle s5" cx="76" cy="44" r="1.2" fill="white" />
-        <circle className="sparkle s6" cx="48" cy="50" r="0.7" fill="var(--neon-yellow)" />
+        <circle className="sparkle s6" cx="48" cy="50" r="0.7" fill="#fff01f" />
       </g>
     </svg>
   )

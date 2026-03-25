@@ -254,7 +254,10 @@ export function useMIDI(getEngine, {
   }, [handleNoteOn, handleNoteOff, handleCC, handlePitchBend])
 
   const connectMIDI = useCallback(() => {
-    if (!navigator.requestMIDIAccess) return
+    if (!navigator.requestMIDIAccess) {
+      setMidiDevice('unsupported')
+      return
+    }
     if (midiAccessRef.current) return // already connected
 
     navigator.requestMIDIAccess({ sysex: false }).then((access) => {
@@ -266,7 +269,7 @@ export function useMIDI(getEngine, {
           input.onmidimessage = handleMIDIMessage
           if (!firstName) firstName = input.name
         }
-        setMidiDevice(firstName)
+        setMidiDevice(firstName || 'no-device')
       }
 
       connectInputs()
@@ -275,7 +278,7 @@ export function useMIDI(getEngine, {
         connectInputs()
       }
     }).catch(() => {
-      // MIDI not available or user denied
+      setMidiDevice('denied')
     })
   }, [handleMIDIMessage])
 

@@ -220,3 +220,7 @@ volume slider (horizontal)
 [x] make active dev branch also auto deploying to ribbon-dev.obfusco.us
 [x] make mobile zoom farther away by default
 [x] mobile: order delay and reverb higher on screen
+
+# Tuesday March 25
+
+[x] mobile default zoom should be about where the screenshot shows — spheres visible but still large and immersive, roughly the current ribbon-dev.obfusco.us view at zoom ~5.0. Reference: ![mobile zoom reference](<screenshots/Screenshot 2026-03-25 mobile-zoom-ref.png>)

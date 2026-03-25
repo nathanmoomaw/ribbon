@@ -205,3 +205,10 @@ volume slider (horizontal)
 [x] record these to changelog and readme for the web app
 [x] store memories for all the important learnings
 [x] roadmap: add support for grabbing the osc spheres to change settings and or create sound
+[x] press and hold and then moving along the ribbon should change the note accordingly, like a real ribbon synthesizer
+[x] create a favicon that mimics the moebius strip style
+[x] want to see more sphere reflections on the console
+[x] implement another hidden easter egg that can occur randomly on shake (or shake of the lower console area where the scales are).  it should be like the hidden 5th octave easter egg, but be for a new scale, that new scale should be double harmonic
+[x] press and hold along the ribbon in arp mode should also change the tone accordingly
+[x] add roadmap item for other these scales: Phrygian dominant, Hirajoshi, Whole tone scale, Prometheus scale, Hungarian minor, Enigmatic scale, Lydian dominant
+[x] add roadmap item for POAP support: https://poap.xyz/

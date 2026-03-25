@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-03-24 — Ribbon pitch following, favicon, sphere reflections, easter egg, arp drag
+
+- **Ribbon hold+mono pitch glide**: in play+hold+mono mode, re-pressing the ribbon now smoothly glides the held voice to the new pitch instead of killing and recreating — behaves like a real ribbon synth.
+- **Arp mode pitch following**: dragging along the ribbon in arp mode now updates the arpeggiated frequency via the mono API (`engine.setFrequency`).
+- **Favicon**: replaced Vite default with custom SVG möbius strip infinity icon matching the logo style (cyan-pink-purple gradient, crossing depth, glow).
+- **Sphere reflections boosted**: console `sphere-light` animation now uses OSC colors (red/gold/green) at 2-3× previous opacity, with inner inset reflections for more visible sphere light casting.
+- **Easter egg**: ~5% chance on shake unlocks hidden "double harmonic" scale (Byzantine/Arabic intervals [0,1,4,5,7,8,11]). Flash overlay with "DOUBLE HARMONIC UNLOCKED" text, scale auto-selects, and a pulsing gold button appears in the scale picker.
+- **Roadmap**: added future scales (Phrygian dominant, Hirajoshi, Whole tone, etc.) and POAP support.
+
 ## 2026-03-24 — README, CHANGELOG, memories, roadmap update
 
 - **README.md**: rewrote to reflect current v2 state — triple oscillator, poly/arp/hold modes, 3D spheres, bitcrush, hardware rocker switches, keyboard shortcuts, versions list.

@@ -42,14 +42,23 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     if (mode === 'arp' && poly && hold) return
 
     const voiceId = `touch_${pointerId}`
-    setPositions(prev => new Map(prev).set(voiceId, pos))
     if (ribbonInteraction) {
       ribbonInteraction.current.position = pos
       if (velocity !== undefined) ribbonInteraction.current.velocity = velocity
     }
     const engine = getEngine()
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
-    engine.voiceSetFrequency(voiceId, hz)
+
+    if (mode === 'arp') {
+      // Arp uses mono API — update frequency so arp plays the new pitch
+      engine.setFrequency(hz)
+    } else if (hold && mode === 'play' && !poly) {
+      // Hold+mono: update all held voices and consolidate cursor position
+      engine.setAllActiveFrequencies(hz)
+    } else {
+      engine.voiceSetFrequency(voiceId, hz)
+    }
+    setPositions(prev => new Map(prev).set(voiceId, pos))
     if (velocity !== undefined) engine.voiceSetVelocity(voiceId, velocity)
   }, [getEngine, mode, poly, hold, octaves, stepped, scale, ribbonInteraction])
 
@@ -61,8 +70,14 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     if (ribbonInteraction) ribbonInteraction.current.active = true
 
     if (mode === 'play') {
-      if (!poly) engine.allNotesOff() // mono: one voice at a time
-      engine.voiceOn(voiceId, hz, velocity)
+      if (hold && !poly && engine.getActiveVoiceCount() > 0) {
+        // Hold+mono: glide existing held voice to new pitch (like a real ribbon synth)
+        engine.setAllActiveFrequencies(hz)
+        setPositions(() => new Map([[voiceId, pos]]))
+      } else {
+        if (!poly) engine.allNotesOff() // mono: one voice at a time
+        engine.voiceOn(voiceId, hz, velocity)
+      }
     } else if (mode === 'arp') {
       if (hold && poly) {
         // Multi-note arp building (arp+hold+poly)
@@ -75,7 +90,7 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     }
 
     // In hold mode (non-arp), ensure voice is on
-    if (hold && mode !== 'arp' && !engine.voiceIsPlaying(voiceId)) {
+    if (hold && mode !== 'arp' && engine.getActiveVoiceCount() === 0) {
       engine.voiceOn(voiceId, hz, velocity)
     }
   }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle])

@@ -62,4 +62,4 @@ Open [localhost:5173](http://localhost:5173) to play.
 ## Versions
 
 - **v1** — [ribbon.obfusco.us/v1](https://ribbon.obfusco.us/v1) — Original dual-oscillator build with latch mode and 2D visuals
-- **v2** — Current — Triple oscillator, poly/arp/hold modes, 3D spheres, staff notation, bitcrush, hardware-style rocker switches, per-section shake, retro industrial panel design
+- **v2 "Rock & Rumble"** — Current — Triple oscillator, poly/arp/hold modes, 3D spheres, staff notation, bitcrush, hardware-style rocker switches, per-section shake, retro industrial panel design

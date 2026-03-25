@@ -411,22 +411,6 @@
   padding: 0.35em 0.7em;
 }
 
-.controls__waveforms button.unlocked-scale {
-  border-color: rgba(204, 170, 34, 0.5);
-  text-shadow: 0 0 6px rgba(204, 170, 34, 0.5);
-  animation: unlocked-pulse 3s ease-in-out infinite;
-}
-
-.controls__waveforms button.unlocked-scale.active {
-  border-color: rgba(204, 170, 34, 0.8);
-  box-shadow: 0 0 12px rgba(204, 170, 34, 0.3), 0 0 24px rgba(204, 51, 68, 0.15);
-}
-
-@keyframes unlocked-pulse {
-  0%, 100% { border-color: rgba(204, 170, 34, 0.3); }
-  50% { border-color: rgba(204, 51, 68, 0.5); }
-}
-
 .controls__knobs {
   display: flex;
   gap: 1rem;

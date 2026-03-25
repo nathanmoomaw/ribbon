@@ -233,7 +233,6 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
-  unlockedScales,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -376,30 +375,34 @@ export const Controls = forwardRef(function Controls({
             <div className="controls__section">
               <label className="controls__label">Scale</label>
               <div className="controls__waveforms">
-                {[...SCALE_NAMES, ...Object.keys(unlockedScales || {})].map((s) => (
-                  <button
-                    key={s}
-                    className={`${scale.includes(s) ? 'active' : ''} ${unlockedScales && s in unlockedScales ? 'unlocked-scale' : ''}`}
-                    onClick={() => {
-                      setScale(prev => {
-                        if (s === 'chromatic') {
-                          setStepped(false)
-                          return ['chromatic']
-                        }
-                        setStepped(true)
-                        const without = prev.filter(x => x !== 'chromatic' && x !== s)
-                        if (prev.includes(s)) {
-                          const remaining = without.length === 0 ? ['chromatic'] : without
-                          if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
-                          return remaining
-                        }
-                        return [...without, s]
-                      })
-                    }}
-                  >
-                    {s === 'double harmonic' ? 'D.HARM' : s.slice(0, 4).toUpperCase()}
-                  </button>
-                ))}
+                {SCALE_NAMES.map((s) => {
+                  const isDoubleHarmonicActive = scale.includes('double harmonic')
+                  const isActive = !isDoubleHarmonicActive && scale.includes(s)
+                  return (
+                    <button
+                      key={s}
+                      className={isActive ? 'active' : ''}
+                      onClick={() => {
+                        setScale(prev => {
+                          if (s === 'chromatic') {
+                            setStepped(false)
+                            return ['chromatic']
+                          }
+                          setStepped(true)
+                          const without = prev.filter(x => x !== 'chromatic' && x !== s && x !== 'double harmonic')
+                          if (prev.includes(s)) {
+                            const remaining = without.length === 0 ? ['chromatic'] : without
+                            if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
+                            return remaining
+                          }
+                          return [...without, s]
+                        })
+                      }}
+                    >
+                      {s.slice(0, 4).toUpperCase()}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 

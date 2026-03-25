@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-24 — v2 "Rock & Rumble" naming, easter egg polish
+
+- **v2 named "Rock & Rumble"**: updated CHANGELOG, README, and ROADMAP with the version name.
+- **Hidden scale UX**: double harmonic scale no longer shows as a visible button — when active, all normal scale buttons appear deactivated. Clicking any scale exits double harmonic mode.
+- **Easter egg text styling**: replaced white fill with layered colored grid patterns (red horizontal lines, cyan vertical lines, gold diagonal lines over a rainbow gradient), all clipped to text with chromatic drop-shadows.
+- **Removed `unlockedScales` state/prop**: simplified since the D.HARM button is hidden — scale is registered directly in SCALES object.
+
 ## 2026-03-24 — Ribbon pitch following, favicon, sphere reflections, easter egg, arp drag
 
 - **Ribbon hold+mono pitch glide**: in play+hold+mono mode, re-pressing the ribbon now smoothly glides the held voice to the new pitch instead of killing and recreating — behaves like a real ribbon synth.

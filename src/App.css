@@ -275,3 +275,49 @@
 }
 
 /* Lo mode — logo animations handled in RibbonLogo.css */
+
+/* Easter egg glitch overlay */
+.easter-egg {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: egg-flash 1.8s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+.easter-egg__glitch {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  color: #fff;
+  text-shadow:
+    3px 0 #ff0040,
+    -3px 0 #00f0ff,
+    0 3px #39ff14,
+    0 0 30px rgba(255, 0, 64, 0.6),
+    0 0 60px rgba(0, 240, 255, 0.4);
+  animation: egg-glitch-text 0.15s steps(2) 6;
+  opacity: 0;
+  animation: egg-text-appear 1.8s ease-out forwards;
+}
+
+@keyframes egg-flash {
+  0% { background: rgba(255, 255, 255, 0.5); }
+  8% { background: rgba(255, 0, 64, 0.15); }
+  16% { background: rgba(0, 240, 255, 0.1); }
+  30% { background: rgba(57, 255, 20, 0.05); }
+  100% { background: transparent; }
+}
+
+@keyframes egg-text-appear {
+  0% { opacity: 1; transform: scale(1.8) skewX(-10deg); }
+  10% { opacity: 1; transform: scale(1) skewX(5deg); }
+  20% { opacity: 1; transform: scale(1.05) skewX(-2deg); }
+  40% { opacity: 0.9; transform: scale(1) skewX(0deg); }
+  70% { opacity: 0.6; transform: scale(1) translateY(-5px); }
+  100% { opacity: 0; transform: scale(0.95) translateY(-15px); }
+}

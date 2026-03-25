@@ -10,6 +10,7 @@ import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { positionToFrequency } from './utils/pitchMap'
+import { HIDDEN_SCALES } from './utils/scales'
 import './App.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -48,11 +49,14 @@ function App() {
   const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
+  const [easterEgg, setEasterEgg] = useState(false)
+  const [unlockedScales, setUnlockedScales] = useState({})
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
+  const easterEggTimerRef = useRef(null)
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
@@ -175,6 +179,18 @@ function App() {
     clearTimeout(undulateTimerRef.current)
     shakeTimerRef.current = setTimeout(() => setShaking(false), 400)
     undulateTimerRef.current = setTimeout(() => setUndulating(false), 500)
+
+    // Easter egg — ~5% chance on shake, unlocks hidden double harmonic scale
+    if (Math.random() < 0.05) {
+      setEasterEgg(true)
+      // Register hidden scales into SCALES so pitchMap can find them
+      Object.assign(SCALES, HIDDEN_SCALES)
+      setUnlockedScales(prev => ({ ...prev, ...HIDDEN_SCALES }))
+      setScale(['double harmonic'])
+      setStepped(true)
+      clearTimeout(easterEggTimerRef.current)
+      easterEggTimerRef.current = setTimeout(() => setEasterEgg(false), 1800)
+    }
 
     // 2. Randomize parameters — chance scales with intensity (20%-50%)
     const nudgeChance = 0.15 + intensity * 0.35
@@ -389,6 +405,7 @@ function App() {
         setHold={setHold}
         onStop={handleStop}
         onKillAll={handleKillAll}
+        unlockedScales={unlockedScales}
       />
 
       <div className="keys-toggle">
@@ -420,6 +437,12 @@ function App() {
         onArpNoteToggle={handleArpNoteToggle}
         arpNotes={arpNotes}
       />
+
+      {easterEgg && (
+        <div className="easter-egg" aria-hidden="true">
+          <div className="easter-egg__glitch">DOUBLE HARMONIC UNLOCKED</div>
+        </div>
+      )}
     </div>
   )
 }

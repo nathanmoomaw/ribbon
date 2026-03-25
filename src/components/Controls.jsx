@@ -233,6 +233,7 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
+  unlockedScales,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -375,10 +376,10 @@ export const Controls = forwardRef(function Controls({
             <div className="controls__section">
               <label className="controls__label">Scale</label>
               <div className="controls__waveforms">
-                {SCALE_NAMES.map((s) => (
+                {[...SCALE_NAMES, ...Object.keys(unlockedScales || {})].map((s) => (
                   <button
                     key={s}
-                    className={scale.includes(s) ? 'active' : ''}
+                    className={`${scale.includes(s) ? 'active' : ''} ${unlockedScales && s in unlockedScales ? 'unlocked-scale' : ''}`}
                     onClick={() => {
                       setScale(prev => {
                         if (s === 'chromatic') {
@@ -396,7 +397,7 @@ export const Controls = forwardRef(function Controls({
                       })
                     }}
                   >
-                    {s.slice(0, 4).toUpperCase()}
+                    {s === 'double harmonic' ? 'D.HARM' : s.slice(0, 4).toUpperCase()}
                   </button>
                 ))}
               </div>

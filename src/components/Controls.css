@@ -248,10 +248,13 @@
       0 -3px 0 rgba(0, 0, 0, 0.5) inset,
       3px 0 0 rgba(80, 75, 110, 0.04) inset,
       -3px 0 0 rgba(0, 0, 0, 0.3) inset,
-      /* Sphere glow — cyan dominant */
-      -30px 15px 80px -20px rgba(0, 200, 220, 0.16),
-      22px -12px 100px -30px rgba(200, 0, 140, 0.07),
-      8px 28px 120px -35px rgba(110, 80, 200, 0.06);
+      /* Sphere glow — red dominant (OSC 1) */
+      -35px 12px 70px -10px rgba(204, 51, 68, 0.35),
+      30px -10px 90px -15px rgba(204, 170, 34, 0.15),
+      10px 30px 100px -20px rgba(34, 170, 85, 0.12),
+      /* Inner reflections */
+      -20px 8px 40px rgba(204, 51, 68, 0.08) inset,
+      15px -6px 35px rgba(204, 170, 34, 0.05) inset;
   }
   33% {
     box-shadow:
@@ -262,10 +265,13 @@
       0 -3px 0 rgba(0, 0, 0, 0.5) inset,
       3px 0 0 rgba(80, 75, 110, 0.04) inset,
       -3px 0 0 rgba(0, 0, 0, 0.3) inset,
-      /* Sphere glow — magenta dominant */
-      26px -22px 80px -20px rgba(0, 200, 220, 0.07),
-      -18px 26px 100px -30px rgba(200, 0, 140, 0.16),
-      -22px -14px 120px -35px rgba(110, 80, 200, 0.06);
+      /* Sphere glow — gold dominant (OSC 2) */
+      28px -18px 70px -10px rgba(204, 51, 68, 0.12),
+      -25px 22px 90px -15px rgba(204, 170, 34, 0.35),
+      -20px -16px 100px -20px rgba(34, 170, 85, 0.15),
+      /* Inner reflections */
+      12px -10px 40px rgba(204, 170, 34, 0.08) inset,
+      -18px 14px 35px rgba(34, 170, 85, 0.05) inset;
   }
   66% {
     box-shadow:
@@ -276,10 +282,13 @@
       0 -3px 0 rgba(0, 0, 0, 0.5) inset,
       3px 0 0 rgba(80, 75, 110, 0.04) inset,
       -3px 0 0 rgba(0, 0, 0, 0.3) inset,
-      /* Sphere glow — purple dominant */
-      14px 24px 80px -20px rgba(0, 200, 220, 0.06),
-      26px 8px 100px -30px rgba(200, 0, 140, 0.07),
-      -28px -20px 120px -35px rgba(110, 80, 200, 0.16);
+      /* Sphere glow — green dominant (OSC 3) */
+      16px 26px 70px -10px rgba(204, 51, 68, 0.12),
+      22px 10px 90px -15px rgba(204, 170, 34, 0.15),
+      -32px -18px 100px -20px rgba(34, 170, 85, 0.35),
+      /* Inner reflections */
+      -14px 16px 40px rgba(34, 170, 85, 0.08) inset,
+      20px 6px 35px rgba(204, 51, 68, 0.05) inset;
   }
 }
 
@@ -400,6 +409,22 @@
 .controls__waveforms button {
   font-size: 0.7rem;
   padding: 0.35em 0.7em;
+}
+
+.controls__waveforms button.unlocked-scale {
+  border-color: rgba(204, 170, 34, 0.5);
+  text-shadow: 0 0 6px rgba(204, 170, 34, 0.5);
+  animation: unlocked-pulse 3s ease-in-out infinite;
+}
+
+.controls__waveforms button.unlocked-scale.active {
+  border-color: rgba(204, 170, 34, 0.8);
+  box-shadow: 0 0 12px rgba(204, 170, 34, 0.3), 0 0 24px rgba(204, 51, 68, 0.15);
+}
+
+@keyframes unlocked-pulse {
+  0%, 100% { border-color: rgba(204, 170, 34, 0.3); }
+  50% { border-color: rgba(204, 51, 68, 0.5); }
 }
 
 .controls__knobs {

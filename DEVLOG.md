@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-24 — v2 "Rock & Rumble" tagged and deployed
+
+- **Tagged v2**: merged nmj/w3 into main and tagged as `v2`.
+- **Permanent /v2 deploy**: added deploy step to CI/CD workflow that syncs build to `s3://ribbon.obfusco.us/v2/` alongside the root deploy.
+- **Live at**: ribbon.obfusco.us (latest) and ribbon.obfusco.us/v2 (permanent snapshot).
+
 ## 2026-03-24 — v2 "Rock & Rumble" naming, easter egg polish
 
 - **v2 named "Rock & Rumble"**: updated CHANGELOG, README, and ROADMAP with the version name.

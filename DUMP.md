@@ -215,3 +215,4 @@ volume slider (horizontal)
 [x] when double harmonic is active just decativate all the scale buttons (don't show d.harm)
 [x] keep the "double harmonic unlocked" text like it is, but replace the white fill with colored grid patterns
 [x] let's name the v2 Rock & Rumble and create a changelog for it
+[x] merge changes into main and also tag this version as it stands as v2.  v2 build should be what's up at ribbon.obfusco.us and also live permanantly at /v2 now

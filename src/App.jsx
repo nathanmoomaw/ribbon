@@ -342,7 +342,7 @@ function App() {
 
   useShake(handleShake, controlsRef, ribbonRef)
 
-  const { midiDevice } = useMIDI(getEngine, {
+  const { midiDevice, connectMIDI } = useMIDI(getEngine, {
     setVolume, setFilterParams, setGlideSpeed, setDelayParams,
     setReverbMix, setCrunch, setOscParams, setArpBpm, setHold,
     mode, poly, hold, octaves, stepped, scale,
@@ -409,9 +409,6 @@ function App() {
         >
           ⚡
         </button>
-        {midiDevice && (
-          <span className="app-header__midi" title={`MIDI: ${midiDevice}`}>MIDI</span>
-        )}
       </header>
 
       <Controls
@@ -458,6 +455,13 @@ function App() {
           title="A-L keys control ribbon"
         >
           Keys
+        </button>
+        <button
+          className={`keys-toggle__btn keys-toggle__midi ${midiDevice ? 'active' : ''}`}
+          onClick={connectMIDI}
+          title={midiDevice ? `MIDI: ${midiDevice}` : 'Connect MIDI controller'}
+        >
+          {midiDevice ? 'MIDI ✓' : 'MIDI'}
         </button>
       </div>
 

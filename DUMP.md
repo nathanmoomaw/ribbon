@@ -225,3 +225,4 @@ volume slider (horizontal)
 
 [x] mobile default zoom should be about where the screenshot shows — spheres visible but still large and immersive, roughly the current ribbon-dev.obfusco.us view at zoom ~5.0. Reference: ![mobile zoom reference](<screenshots/Screenshot 2026-03-25 mobile-zoom-ref.png>)
 [x] work with me to implment some way to control this via usb or midi controller
+[x] ok, don't prompt to implement midi automatically.  this is a special case so just add another subtle button styled like the keys button and place it next to keys, but spaced so they don't seem like they have anything to do with one another.  when this midi button is pressed THEN prompt user for midi control

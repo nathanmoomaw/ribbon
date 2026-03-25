@@ -17,6 +17,7 @@
 - [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
 - [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
+- [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
 
 ## Completed
 - [x] Vite + React project scaffold

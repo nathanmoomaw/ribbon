@@ -1,0 +1,140 @@
+.preset-qr-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: qr-fade-in 0.2s ease-out;
+}
+
+@keyframes qr-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.preset-qr-modal {
+  background: linear-gradient(145deg, #0f0f2a, #0a0a1a);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  box-shadow:
+    0 0 40px rgba(139, 92, 246, 0.15),
+    0 0 80px rgba(0, 240, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: qr-modal-in 0.25s ease-out;
+  max-width: 90vw;
+}
+
+@keyframes qr-modal-in {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.preset-qr-modal__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.preset-qr-modal__close:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.preset-qr-modal__canvas {
+  border-radius: 8px;
+  background: #0a0a1a;
+}
+
+.preset-qr-modal__name {
+  width: 100%;
+  max-width: 260px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: monospace;
+  font-size: 0.8rem;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s;
+}
+
+.preset-qr-modal__name::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.preset-qr-modal__name:focus {
+  border-color: rgba(139, 92, 246, 0.5);
+}
+
+.preset-qr-modal__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.preset-qr-modal__btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: monospace;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.preset-qr-modal__btn:hover {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.preset-qr-modal__btn:active {
+  transform: scale(0.97);
+}
+
+/* QR trigger button — sits in lower right of console */
+.preset-qr-trigger {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.25;
+  padding: 0.25rem;
+  line-height: 1;
+  font-size: 1.1rem;
+  transition: opacity 0.2s, transform 0.2s, filter 0.2s;
+  filter: grayscale(0.5);
+  z-index: 10;
+}
+
+.preset-qr-trigger:hover {
+  opacity: 0.7;
+  filter: grayscale(0) drop-shadow(0 0 4px rgba(139, 92, 246, 0.4));
+  transform: scale(1.1);
+}
+
+.preset-qr-trigger:active {
+  opacity: 1;
+  transform: scale(1.2);
+}

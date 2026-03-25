@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-24 — Preset QR codes
+
+- **Shareable preset QR codes**: added a button (lower-right of console) that generates a multi-colored QR code encoding all current synth settings (oscillators, effects, scales, switches, etc.).
+- **QR modal**: shows the gradient-colored QR code with optional name field, download as PNG, and copy-link functionality.
+- **URL preset restoration**: presets are encoded in the URL hash (`#p=...`); opening a preset URL auto-restores all settings and syncs them to the audio engine.
+- **Compact encoding**: settings serialized as compact JSON arrays with waveform indices, base64-encoded for URL safety.
+- **New dependency**: `qrcode` npm package for client-side QR generation with canvas coloring.
+
 ## 2026-03-24 — v2 "Rock & Rumble" tagged and deployed
 
 - **Tagged v2**: merged nmj/w3 into main and tagged as `v2`.

@@ -9,8 +9,10 @@ import { Visualizer } from './components/Visualizer'
 import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
+import { PresetQR } from './components/PresetQR'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
+import { readPresetFromUrl, buildPresetUrl } from './utils/presets'
 import './App.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -22,34 +24,38 @@ function nudge(current, min, max, intensity) {
   return Math.max(min, Math.min(max, current + delta))
 }
 
+// Read preset from URL hash on initial load (before first render)
+const _urlPreset = readPresetFromUrl()
+
 function App() {
   const getEngine = useAudioEngine()
 
-  const [mode, setMode] = useState('play')
+  const [mode, setMode] = useState(_urlPreset?.mode ?? 'play')
   const [inputMode, setInputMode] = useState('touch')
-  const [oscParams, setOscParams] = useState([
+  const [oscParams, setOscParams] = useState(_urlPreset?.oscParams ?? [
     { waveform: 'sawtooth', detune: 0, mix: 1.0 },
     { waveform: 'sawtooth', detune: 0, mix: 0.0 },
     { waveform: 'sawtooth', detune: 0, mix: 0.0 },
   ])
-  const [volume, setVolume] = useState(0.5)
-  const [octaves, setOctaves] = useState(2)
-  const [delayParams, setDelayParams] = useState({ time: 0.3, feedback: 0.4, mix: 0 })
-  const [reverbMix, setReverbMix] = useState(0)
-  const [crunch, setCrunch] = useState(0)
-  const [filterParams, setFilterParams] = useState({ cutoff: 20000, resonance: 0 })
-  const [glideSpeed, setGlideSpeed] = useState(0.005)
-  const [stepped, setStepped] = useState(false)
-  const [scale, setScale] = useState(['chromatic'])
+  const [volume, setVolume] = useState(_urlPreset?.volume ?? 0.5)
+  const [octaves, setOctaves] = useState(_urlPreset?.octaves ?? 2)
+  const [delayParams, setDelayParams] = useState(_urlPreset?.delayParams ?? { time: 0.3, feedback: 0.4, mix: 0 })
+  const [reverbMix, setReverbMix] = useState(_urlPreset?.reverbMix ?? 0)
+  const [crunch, setCrunch] = useState(_urlPreset?.crunch ?? 0)
+  const [filterParams, setFilterParams] = useState(_urlPreset?.filterParams ?? { cutoff: 20000, resonance: 0 })
+  const [glideSpeed, setGlideSpeed] = useState(_urlPreset?.glideSpeed ?? 0.005)
+  const [stepped, setStepped] = useState(_urlPreset?.stepped ?? false)
+  const [scale, setScale] = useState(_urlPreset?.scale ?? ['chromatic'])
   const [keyboardPositions, setKeyboardPositions] = useState(new Map())
-  const [visualMode, setVisualMode] = useState('party')
-  const [arpBpm, setArpBpm] = useState(120)
-  const [hold, setHold] = useState(false)
-  const [poly, setPoly] = useState(false)
+  const [visualMode, setVisualMode] = useState(_urlPreset?.visualMode ?? 'party')
+  const [arpBpm, setArpBpm] = useState(_urlPreset?.arpBpm ?? 120)
+  const [hold, setHold] = useState(_urlPreset?.hold ?? false)
+  const [poly, setPoly] = useState(_urlPreset?.poly ?? false)
   const [arpNotes, setArpNotes] = useState([])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const [easterEgg, setEasterEgg] = useState(false)
+  const [qrUrl, setQrUrl] = useState(null)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -84,6 +90,25 @@ function App() {
   modeRef.current = mode
   polyRef.current = poly
   holdRef2.current = hold
+
+  // Apply URL preset to audio engine on first mount
+  useEffect(() => {
+    if (!_urlPreset) return
+    const engine = getEngine()
+    _urlPreset.oscParams.forEach((p, i) => {
+      engine.setWaveform(p.waveform, i)
+      engine.setOscMix(i, p.mix)
+      engine.setOscDetune(i, p.detune)
+    })
+    engine.setVolume(_urlPreset.volume)
+    engine.setDelay(_urlPreset.delayParams)
+    engine.setReverb({ mix: _urlPreset.reverbMix })
+    engine.setCrunch(_urlPreset.crunch)
+    engine.setFilter(_urlPreset.filterParams)
+    engine.setGlideSpeed(_urlPreset.glideSpeed)
+    // Clear hash after loading so it doesn't persist on refresh with different settings
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const keyHandlers = useMemo(() => ({
     Space: () => {
@@ -344,6 +369,14 @@ function App() {
     arpStopRef.current?.()
   }, [getEngine])
 
+  const handleQRCreate = useCallback(() => {
+    const url = buildPresetUrl({
+      mode, oscParams, volume, octaves, delayParams, reverbMix, crunch,
+      filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
+    })
+    setQrUrl(url)
+  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode])
+
   const handleKillAll = useCallback(() => {
     getEngine().killAllSound()
     setHold(false)
@@ -403,6 +436,7 @@ function App() {
         setHold={setHold}
         onStop={handleStop}
         onKillAll={handleKillAll}
+        onQRCreate={handleQRCreate}
       />
 
       <div className="keys-toggle">
@@ -439,6 +473,10 @@ function App() {
         <div className="easter-egg" aria-hidden="true">
           <div className="easter-egg__glitch">DOUBLE HARMONIC UNLOCKED</div>
         </div>
+      )}
+
+      {qrUrl && (
+        <PresetQR url={qrUrl} onClose={() => setQrUrl(null)} />
       )}
     </div>
   )

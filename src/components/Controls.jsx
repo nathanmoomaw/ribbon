@@ -233,6 +233,7 @@ export const Controls = forwardRef(function Controls({
   setHold,
   onStop,
   onKillAll,
+  onQRCreate,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -463,6 +464,11 @@ export const Controls = forwardRef(function Controls({
           </div>
         </div>
       </div>
+      {onQRCreate && (
+        <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
+          &#x25A3;
+        </button>
+      )}
     </div>
   )
 })

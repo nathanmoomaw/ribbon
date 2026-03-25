@@ -21,6 +21,12 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 - Effects: delay, reverb, bitcrush/digitize
 - Goal: layered sounds that let users create real, listenable music
 
+### Presets & Sharing
+- QR code preset system: all synth settings encoded in URL hash (`#p=...`)
+- Multi-colored gradient QR codes generated client-side with `qrcode` library
+- Preset URLs restore all settings on load (oscillators, effects, scales, switches)
+- Serialization in `src/utils/presets.js`
+
 ### Composition
 - Users can save their compositions
 - Consider multi-ribbon sessions (multiple instances per session)

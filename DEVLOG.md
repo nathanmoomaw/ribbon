@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-26 — Wizard: soap bubbles, pacing, party/lo fix
+
+- **Soap bubble tooltips**: replaced dark panel tooltips with iridescent soap bubble style — rounded shape, rainbow shimmer border animation, radial highlight "shine" spot, gentle floating motion, scale-in rise and pop-burst exit.
+- **Slower pacing**: increased step durations from 2000-2500ms to 3500-4000ms so users can read each tooltip comfortably.
+- **Party/Lo toggle fix**: demo-visual action timers now tracked via refs and cleaned up on step transitions, preventing stuck toggle loops. All demo action timeouts are properly cancelled on cleanup.
+
 ## 2026-03-26 — Fix help wizard demo cursor
 
 - **Wizard cursor fix**: replaced static `<-∞` text with an SVG pointer arrow that has a möbius strip ribbon loop at its tail. Fixed animation bug where cursor wouldn't move between targets (stale closure in `animateCursorTo` — now uses a ref to track position). The ribbon path on the cursor animates with a flowing dash effect.

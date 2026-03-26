@@ -96,65 +96,107 @@ const HELP_SECTIONS = [
   { title: 'MIDI', body: 'Connect a USB or Bluetooth MIDI controller. Click the MIDI button to enable.' },
 ]
 
+// SVG cursor — pointer arrow with möbius strip loop at the tail
+function WizardCursorSVG() {
+  return (
+    <svg className="wizard-cursor__svg" width="36" height="44" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="wizard-grad" x1="0" y1="0" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#00f0ff" />
+          <stop offset="33%" stopColor="#ff00aa" />
+          <stop offset="66%" stopColor="#39ff14" />
+          <stop offset="100%" stopColor="#fff01f" />
+        </linearGradient>
+        <filter id="wizard-glow">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <g filter="url(#wizard-glow)">
+        {/* Pointer arrow */}
+        <path
+          d="M4 2 L4 28 L10 22 L16 32 L20 30 L14 20 L22 20 Z"
+          fill="url(#wizard-grad)"
+          stroke="rgba(255,255,255,0.4)"
+          strokeWidth="0.8"
+        />
+        {/* Möbius strip loop at tail — figure-8 flowing from arrow base */}
+        <path
+          d="M6 28 C6 34, 14 34, 14 32 C14 30, 6 30, 6 36 C6 42, 14 42, 14 38 C14 34, 6 36, 6 28"
+          fill="none"
+          stroke="url(#wizard-grad)"
+          strokeWidth="2"
+          strokeLinecap="round"
+          className="wizard-cursor__ribbon-path"
+        />
+      </g>
+    </svg>
+  )
+}
+
 export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCreate, setVisualMode }) {
   const [step, setStep] = useState(0)
-  const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 })
+  const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 })
-  const [bubbleState, setBubbleState] = useState('rising') // rising, visible, popping
+  const [bubbleState, setBubbleState] = useState('rising')
   const [showModal, setShowModal] = useState(false)
   const stepTimerRef = useRef(null)
   const cursorAnimRef = useRef(null)
+  const cursorPosRef = useRef({ x: -100, y: -100 })
 
   // Find target element for current step
   const getTargetRect = useCallback((selector) => {
     if (!selector) return null
-    // Handle comma-separated selectors (pick first visible)
     const selectors = selector.split(',').map(s => s.trim())
     for (const sel of selectors) {
       const el = document.querySelector(sel)
       if (el && el.offsetParent !== null) return el.getBoundingClientRect()
     }
-    // Fallback: try first selector even if hidden
     const el = document.querySelector(selectors[0])
     return el ? el.getBoundingClientRect() : null
   }, [])
 
-  // Animate cursor to target
+  // Animate cursor to target — uses ref to avoid stale closures
   const animateCursorTo = useCallback((rect) => {
     if (!rect) return
     const targetX = rect.left + rect.width / 2
     const targetY = rect.top + rect.height * 0.3
-    setCursorPos(prev => {
-      // If first position, jump immediately
-      if (prev.x === 0 && prev.y === 0) return { x: targetX, y: targetY }
-      return prev
-    })
-    // Smooth animate via RAF
-    const startX = cursorPos.x || targetX
-    const startY = cursorPos.y || targetY
+
+    // If cursor hasn't been placed yet, jump immediately
+    if (cursorPosRef.current.x < 0) {
+      cursorPosRef.current = { x: targetX, y: targetY }
+      setCursorPos({ x: targetX, y: targetY })
+      return
+    }
+
+    const startX = cursorPosRef.current.x
+    const startY = cursorPosRef.current.y
     const startTime = performance.now()
     const duration = 600
+
+    cancelAnimationFrame(cursorAnimRef.current)
 
     const animate = (now) => {
       const t = Math.min(1, (now - startTime) / duration)
       const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
-      setCursorPos({
-        x: startX + (targetX - startX) * ease,
-        y: startY + (targetY - startY) * ease,
-      })
+      const x = startX + (targetX - startX) * ease
+      const y = startY + (targetY - startY) * ease
+      cursorPosRef.current = { x, y }
+      setCursorPos({ x, y })
       if (t < 1) cursorAnimRef.current = requestAnimationFrame(animate)
     }
-    cancelAnimationFrame(cursorAnimRef.current)
     cursorAnimRef.current = requestAnimationFrame(animate)
-  }, [cursorPos])
+  }, [])
 
   // Run step actions
   const runAction = useCallback((action) => {
     const engine = getEngine()
     switch (action) {
       case 'demo-ribbon': {
-        // Play a quick ascending sequence
-        const notes = [261.63, 329.63, 392.00, 523.25] // C4 E4 G4 C5
+        const notes = [261.63, 329.63, 392.00, 523.25]
         notes.forEach((hz, i) => {
           setTimeout(() => {
             const id = `wizard_${i}`
@@ -165,7 +207,6 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
         break
       }
       case 'demo-arp': {
-        // Quick arp demo — just play a few notes rapidly
         const notes = [261.63, 329.63, 392.00]
         notes.forEach((hz, i) => {
           setTimeout(() => {
@@ -177,8 +218,7 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
         break
       }
       case 'demo-osc': {
-        // Play a fat chord to show oscillator layering
-        const chord = [130.81, 164.81, 196.00] // C3 E3 G3
+        const chord = [130.81, 164.81, 196.00]
         chord.forEach((hz, i) => {
           const id = `wizard_osc_${i}`
           engine.voiceOn(id, hz, 0.3)
@@ -187,19 +227,16 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
         break
       }
       case 'demo-effects': {
-        // Play a note with some delay/reverb to show effects
         engine.voiceOn('wizard_fx', 440, 0.4)
         setTimeout(() => engine.voiceOff('wizard_fx'), 400)
         break
       }
       case 'demo-visual': {
-        // Flash to Lo mode briefly, then back to Party
         setVisualMode('lo')
         setTimeout(() => setVisualMode('party'), 1200)
         break
       }
       case 'demo-zoom': {
-        // Simulate zoom button clicks
         const zoomOut = document.querySelector('.zoom-controls button:last-child')
         const zoomIn = document.querySelector('.zoom-controls button:first-child')
         zoomOut?.click()
@@ -227,7 +264,6 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
     const currentStep = STEPS[step]
     const rect = getTargetRect(currentStep.target)
 
-    // Animate cursor
     if (rect) {
       animateCursorTo(rect)
       setTooltipPos({
@@ -236,17 +272,14 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
       })
     }
 
-    // Bubble animation
     setBubbleState('rising')
     const visibleTimer = setTimeout(() => setBubbleState('visible'), 300)
     const popTimer = setTimeout(() => setBubbleState('popping'), currentStep.duration - 400)
 
-    // Run action
     if (currentStep.action) {
       setTimeout(() => runAction(currentStep.action), 500)
     }
 
-    // Advance to next step
     stepTimerRef.current = setTimeout(() => {
       setStep(s => s + 1)
     }, currentStep.duration)
@@ -263,7 +296,8 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
     if (active) {
       setStep(0)
       setShowModal(false)
-      setCursorPos({ x: 0, y: 0 })
+      cursorPosRef.current = { x: -100, y: -100 }
+      setCursorPos({ x: -100, y: -100 })
     }
   }, [active])
 
@@ -303,12 +337,12 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
 
   return (
     <div className="wizard-overlay" onClick={() => setShowModal(true)}>
-      {/* Wizard cursor — möbius strip pointer */}
+      {/* Wizard cursor — pointer arrow with möbius strip tail */}
       <div
         className="wizard-cursor"
         style={{ left: cursorPos.x, top: cursorPos.y }}
       >
-        <span className="wizard-cursor__icon">&lt;-∞</span>
+        <WizardCursorSVG />
       </div>
 
       {/* Tooltip bubble */}

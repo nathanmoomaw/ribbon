@@ -39,30 +39,34 @@
   pointer-events: none;
 }
 
-/* Wizard cursor — animated möbius pointer */
+/* Wizard cursor — SVG pointer with möbius strip tail */
 .wizard-cursor {
   position: fixed;
   z-index: 9996;
   pointer-events: none;
-  transform: translate(-50%, -50%);
-  transition: left 0.1s, top 0.1s;
+  /* Offset so the arrow tip sits at the exact position */
+  transform: translate(-4px, -2px);
 }
 
-.wizard-cursor__icon {
-  font-size: 1.6rem;
-  font-weight: bold;
-  line-height: 1;
-  background: linear-gradient(135deg, #00f0ff, #ff00aa, #39ff14, #fff01f);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.wizard-cursor__svg {
+  display: block;
   filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.4));
   animation: cursor-pulse 1.5s ease-in-out infinite;
 }
 
+/* Animate the möbius ribbon path with a flowing dash */
+.wizard-cursor__ribbon-path {
+  stroke-dasharray: 8 4;
+  animation: ribbon-flow 1s linear infinite;
+}
+
 @keyframes cursor-pulse {
   0%, 100% { transform: scale(1); filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.4)); }
-  50% { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(255, 0, 170, 0.5)); }
+  50% { transform: scale(1.05); filter: drop-shadow(0 0 10px rgba(255, 0, 170, 0.5)); }
+}
+
+@keyframes ribbon-flow {
+  to { stroke-dashoffset: -24; }
 }
 
 /* Tooltip bubble — rises, shows text, then pops */

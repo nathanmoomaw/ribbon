@@ -242,3 +242,7 @@ volume slider (horizontal)
 [x] the soap bubbles should actually pop like real soap bubbles after they've display the text
 [x] the cursor is still getting stuck turning party on and off like a child with a lightswitch
 [x] can the cursor actually act to trigger the items like it's a real cursor?  it would be especially helpful for the clicks that trigger the sounds
+[x] let's skip showing the party/lo click cuz it's still freezing here
+[x] the text on the bubbles looks wonky.  let's try it in comic sans so it's even wonkier.
+[x] get rid of the wizard dots on the bottom, maybe have a little progress bar there instead with single word description of what action is being demo'd
+[x] the bubble popping animation still needs work.  it should also spawn confetti when they explode

@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-26 — Wizard: confetti pop, comic sans, progress bar
+
+- **Party/Lo step removed**: skipped the visual toggle demo step entirely to fix the freeze loop.
+- **Comic Sans bubble text**: bubble tooltip text now uses Comic Sans MS for a playful wonky feel. Progress bar label matches.
+- **Progress bar**: replaced dot indicators with a slim gradient progress bar and a single-word label showing the current demo action.
+- **Confetti pop**: bubble pop now spawns 12 colorful confetti rectangles that tumble outward in all directions alongside the 8 soap drop fragments.
+
 ## 2026-03-26 — Wizard: real cursor clicks, bubble pop, party/lo fix
 
 - **Real cursor interaction**: wizard cursor now dispatches real DOM events (pointer/click) on target elements instead of calling engine/state directly. Ribbon taps trigger actual notes, party/lo toggles click real buttons, shake clicks the bolt element.

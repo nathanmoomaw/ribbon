@@ -11,6 +11,7 @@ import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
+import { HelpWizard, WizardTrigger } from './components/HelpWizard'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl, buildPresetUrl } from './utils/presets'
@@ -57,6 +58,7 @@ function App() {
   const [undulating, setUndulating] = useState(false)
   const [easterEgg, setEasterEgg] = useState(false)
   const [qrUrl, setQrUrl] = useState(null)
+  const [wizardActive, setWizardActive] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -409,6 +411,14 @@ function App() {
         >
           ⚡
         </button>
+        <button
+          className="app-header__qr-mobile"
+          onClick={handleQRCreate}
+          title="Create preset QR code"
+          aria-label="Create preset QR code"
+        >
+          &#x25A3;
+        </button>
       </header>
 
       <Controls
@@ -504,6 +514,16 @@ function App() {
       {qrUrl && (
         <PresetQR url={qrUrl} onClose={() => setQrUrl(null)} />
       )}
+
+      <WizardTrigger onClick={() => setWizardActive(w => !w)} />
+      <HelpWizard
+        active={wizardActive}
+        onClose={() => setWizardActive(false)}
+        getEngine={getEngine}
+        handleShake={handleShake}
+        handleQRCreate={handleQRCreate}
+        setVisualMode={setVisualMode}
+      />
     </div>
   )
 }

@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-26 — Help wizard + mobile QR button
+
+- **Help wizard**: interactive demo triggered by a subtle "?" button (bottom-left). A branded cursor (`<-∞`) animates between UI elements while tooltip bubbles rise, display, and pop with explanations. Demos ribbon play, arp, oscillators, effects, party/lo toggle, zoom, shake, and QR — ~30s total. Clicking "?" during the demo opens a written help modal with all controls documented.
+- **Mobile QR button**: QR preset button now appears in the header on mobile (above the fold), hidden on desktop where it stays in the controls panel.
+
 ## 2026-03-25 — MIDI feedback + Safari logo fix
 
 - **MIDI button feedback**: shows "MIDI ✓" (connected), "MIDI …" (enabled, no device), "MIDI ✗" (unsupported/denied) with color-coded states.

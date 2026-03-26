@@ -7,74 +7,74 @@ const STEPS = [
     id: 'welcome',
     target: '.app-header__logo',
     text: 'Welcome to Ribbon! Let me show you around...',
-    duration: 2500,
+    duration: 3500,
   },
   {
     id: 'ribbon-touch',
     target: '.ribbon',
     text: 'This is your ribbon — touch or drag to play notes!',
-    duration: 2000,
+    duration: 4000,
     action: 'demo-ribbon',
   },
   {
     id: 'play-mode',
     target: '.rocker:first-child',
     text: 'Play mode for free play, Arp for arpeggiation',
-    duration: 2500,
+    duration: 4000,
     action: 'demo-arp',
   },
   {
     id: 'hold',
     target: '.activation__hold',
     text: 'Hold sustains your notes — try it with Arp!',
-    duration: 2000,
+    duration: 3500,
   },
   {
     id: 'oscillators',
     target: '.controls__oscillators',
     text: 'Three oscillators — mix waveforms and detune for thick sounds',
-    duration: 2500,
+    duration: 4000,
     action: 'demo-osc',
   },
   {
     id: 'effects',
     target: '.controls__section--delay',
     text: 'Delay, reverb, and crunch — shape your sound',
-    duration: 2000,
+    duration: 3500,
     action: 'demo-effects',
   },
   {
     id: 'party-lo',
     target: '.visualizer__visuals',
     text: 'Party mode for full visuals, Lo for a clean view',
-    duration: 2000,
+    duration: 3500,
     action: 'demo-visual',
   },
   {
     id: 'zoom',
     target: '.visualizer__zoom',
     text: 'Zoom in and out of the 3D spheres!',
-    duration: 2000,
+    duration: 3500,
     action: 'demo-zoom',
   },
   {
     id: 'shake',
     target: '.app-header__shake-bolt',
     text: 'Shake it up! Randomizes everything ⚡',
-    duration: 2500,
+    duration: 4000,
     action: 'demo-shake',
   },
   {
     id: 'qr',
     target: '.preset-qr-trigger, .app-header__qr-mobile',
     text: 'Save & share your sound as a QR code!',
-    duration: 2000,
+    duration: 3500,
   },
   {
     id: 'help-hint',
     target: '.wizard-trigger',
     text: 'Click ? again during the demo for written instructions!',
-    duration: 2500,
+    duration: 3500,
   },
 ]
 
@@ -146,6 +146,7 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
   const stepTimerRef = useRef(null)
   const cursorAnimRef = useRef(null)
   const cursorPosRef = useRef({ x: -100, y: -100 })
+  const actionTimersRef = useRef([])
 
   // Find target element for current step
   const getTargetRect = useCallback((selector) => {
@@ -191,6 +192,19 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
     cursorAnimRef.current = requestAnimationFrame(animate)
   }, [])
 
+  // Helper to schedule a timeout and track it for cleanup
+  const scheduleAction = useCallback((fn, delay) => {
+    const id = setTimeout(fn, delay)
+    actionTimersRef.current.push(id)
+    return id
+  }, [])
+
+  // Clear all pending action timers
+  const clearActionTimers = useCallback(() => {
+    actionTimersRef.current.forEach(id => clearTimeout(id))
+    actionTimersRef.current = []
+  }, [])
+
   // Run step actions
   const runAction = useCallback((action) => {
     const engine = getEngine()
@@ -198,10 +212,10 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
       case 'demo-ribbon': {
         const notes = [261.63, 329.63, 392.00, 523.25]
         notes.forEach((hz, i) => {
-          setTimeout(() => {
+          scheduleAction(() => {
             const id = `wizard_${i}`
             engine.voiceOn(id, hz, 0.4)
-            setTimeout(() => engine.voiceOff(id), 300)
+            scheduleAction(() => engine.voiceOff(id), 300)
           }, i * 350)
         })
         break
@@ -209,10 +223,10 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
       case 'demo-arp': {
         const notes = [261.63, 329.63, 392.00]
         notes.forEach((hz, i) => {
-          setTimeout(() => {
+          scheduleAction(() => {
             const id = `wizard_arp_${i}`
             engine.voiceOn(id, hz, 0.3)
-            setTimeout(() => engine.voiceOff(id), 150)
+            scheduleAction(() => engine.voiceOff(id), 150)
           }, i * 200)
         })
         break
@@ -222,36 +236,37 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
         chord.forEach((hz, i) => {
           const id = `wizard_osc_${i}`
           engine.voiceOn(id, hz, 0.3)
-          setTimeout(() => engine.voiceOff(id), 1500)
+          scheduleAction(() => engine.voiceOff(id), 1500)
         })
         break
       }
       case 'demo-effects': {
         engine.voiceOn('wizard_fx', 440, 0.4)
-        setTimeout(() => engine.voiceOff('wizard_fx'), 400)
+        scheduleAction(() => engine.voiceOff('wizard_fx'), 400)
         break
       }
       case 'demo-visual': {
+        // One-shot: switch to Lo briefly, then back to Party
         setVisualMode('lo')
-        setTimeout(() => setVisualMode('party'), 1200)
+        scheduleAction(() => setVisualMode('party'), 1800)
         break
       }
       case 'demo-zoom': {
         const zoomOut = document.querySelector('.zoom-controls button:last-child')
         const zoomIn = document.querySelector('.zoom-controls button:first-child')
         zoomOut?.click()
-        setTimeout(() => zoomOut?.click(), 400)
-        setTimeout(() => zoomIn?.click(), 1200)
-        setTimeout(() => zoomIn?.click(), 1600)
+        scheduleAction(() => zoomOut?.click(), 500)
+        scheduleAction(() => zoomIn?.click(), 1800)
+        scheduleAction(() => zoomIn?.click(), 2200)
         break
       }
       case 'demo-shake': {
         handleShake(0.6)
-        setTimeout(() => handleShake(0.4), 1500)
+        scheduleAction(() => handleShake(0.4), 2000)
         break
       }
     }
-  }, [getEngine, handleShake, setVisualMode])
+  }, [getEngine, handleShake, setVisualMode, scheduleAction])
 
   // Advance through steps
   useEffect(() => {
@@ -277,7 +292,8 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
     const popTimer = setTimeout(() => setBubbleState('popping'), currentStep.duration - 400)
 
     if (currentStep.action) {
-      setTimeout(() => runAction(currentStep.action), 500)
+      const actionTimer = setTimeout(() => runAction(currentStep.action), 500)
+      actionTimersRef.current.push(actionTimer)
     }
 
     stepTimerRef.current = setTimeout(() => {
@@ -288,8 +304,9 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
       clearTimeout(stepTimerRef.current)
       clearTimeout(visibleTimer)
       clearTimeout(popTimer)
+      clearActionTimers()
     }
-  }, [active, step, showModal, getTargetRect, animateCursorTo, runAction, onClose])
+  }, [active, step, showModal, getTargetRect, animateCursorTo, runAction, onClose, clearActionTimers])
 
   // Reset when activated
   useEffect(() => {

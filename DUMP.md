@@ -228,3 +228,4 @@ volume slider (horizontal)
 [x] ok, don't prompt to implement midi automatically.  this is a special case so just add another subtle button styled like the keys button and place it next to keys, but spaced so they don't seem like they have anything to do with one another.  when this midi button is pressed THEN prompt user for midi control
 [x] when i press that midi button it doesn't trigger the midi permission dialog
 [x] on safari the logo doesn't look complete at all: ![alt text](<screenshots/Screenshot 2026-03-25 at 16.36.36.png>)
+[x] let's merge all this into main and then continue work on this dev branch

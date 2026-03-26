@@ -7,12 +7,14 @@ const STEPS = [
     id: 'welcome',
     target: '.app-header__logo',
     text: 'Welcome to Ribbon! Let me show you around...',
+    label: 'Welcome',
     duration: 3500,
   },
   {
     id: 'ribbon-touch',
     target: '.ribbon',
     text: 'This is your ribbon — touch or drag to play notes!',
+    label: 'Ribbon',
     duration: 4000,
     action: 'click-ribbon',
   },
@@ -20,6 +22,7 @@ const STEPS = [
     id: 'play-mode',
     target: '.rocker:first-child',
     text: 'Play mode for free play, Arp for arpeggiation',
+    label: 'Modes',
     duration: 4000,
     action: 'click-ribbon',
   },
@@ -27,12 +30,14 @@ const STEPS = [
     id: 'hold',
     target: '.activation__hold',
     text: 'Hold sustains your notes — try it with Arp!',
+    label: 'Hold',
     duration: 3500,
   },
   {
     id: 'oscillators',
     target: '.controls__oscillators',
     text: 'Three oscillators — mix waveforms and detune for thick sounds',
+    label: 'Oscillators',
     duration: 4000,
     action: 'click-ribbon',
   },
@@ -40,27 +45,23 @@ const STEPS = [
     id: 'effects',
     target: '.controls__section--delay',
     text: 'Delay, reverb, and crunch — shape your sound',
+    label: 'Effects',
     duration: 3500,
     action: 'click-ribbon',
-  },
-  {
-    id: 'party-lo',
-    target: '.visualizer__visuals',
-    text: 'Party mode for full visuals, Lo for a clean view',
-    duration: 3500,
-    action: 'click-visual-toggle',
   },
   {
     id: 'zoom',
     target: '.visualizer__zoom',
     text: 'Zoom in and out of the 3D spheres!',
+    label: 'Zoom',
     duration: 3500,
     action: 'click-zoom',
   },
   {
     id: 'shake',
     target: '.app-header__shake-bolt',
-    text: 'Shake it up! Randomizes everything ⚡',
+    text: 'Shake it up! Randomizes everything',
+    label: 'Shake',
     duration: 4000,
     action: 'click-shake',
   },
@@ -68,12 +69,14 @@ const STEPS = [
     id: 'qr',
     target: '.preset-qr-trigger, .app-header__qr-mobile',
     text: 'Save & share your sound as a QR code!',
+    label: 'QR',
     duration: 3500,
   },
   {
     id: 'help-hint',
     target: '.wizard-trigger',
     text: 'Click ? again during the demo for written instructions!',
+    label: 'Help',
     duration: 3500,
   },
 ]
@@ -244,15 +247,6 @@ export function HelpWizard({ active, onClose }) {
         })
         break
       }
-      case 'click-visual-toggle': {
-        // Click the Lo button, then click Party back — using actual DOM buttons
-        const buttons = document.querySelectorAll('.visualizer__visuals button')
-        const loBtn = buttons[1]  // Lo is second button
-        const partyBtn = buttons[0]  // Party is first
-        if (loBtn) simulateClick(loBtn)
-        if (partyBtn) scheduleAction(() => simulateClick(partyBtn), 1800)
-        break
-      }
       case 'click-zoom': {
         const zoomIn = document.querySelector('.visualizer__zoom button:first-child')
         const zoomOut = document.querySelector('.visualizer__zoom button:last-child')
@@ -371,21 +365,30 @@ export function HelpWizard({ active, onClose }) {
         style={{ left: tooltipPos.x, top: tooltipPos.y }}
       >
         <span className="wizard-bubble__text">{currentStep.text}</span>
-        {/* Pop fragments — only visible during popping state */}
+        {/* Pop fragments + confetti — only visible during popping state */}
         {bubbleState === 'popping' && (
           <div className="wizard-bubble__pop-fragments">
+            {/* Soap drop fragments */}
             {Array.from({ length: 8 }).map((_, i) => (
-              <span key={i} className="wizard-bubble__fragment" style={{ '--frag-i': i }} />
+              <span key={`frag-${i}`} className="wizard-bubble__fragment" />
+            ))}
+            {/* Confetti pieces */}
+            {Array.from({ length: 12 }).map((_, i) => (
+              <span key={`conf-${i}`} className="wizard-bubble__confetti" />
             ))}
           </div>
         )}
       </div>
 
-      {/* Step indicator */}
-      <div className="wizard-progress">
-        {STEPS.map((_, i) => (
-          <div key={i} className={`wizard-progress__dot ${i === step ? 'active' : i < step ? 'done' : ''}`} />
-        ))}
+      {/* Progress bar with label */}
+      <div className="wizard-progressbar">
+        <div className="wizard-progressbar__track">
+          <div
+            className="wizard-progressbar__fill"
+            style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+          />
+        </div>
+        <span className="wizard-progressbar__label">{currentStep.label}</span>
       </div>
     </div>
   )

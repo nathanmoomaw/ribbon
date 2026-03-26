@@ -119,7 +119,8 @@
 }
 
 .wizard-bubble__text {
-  font-size: 0.8rem;
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+  font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.95);
   line-height: 1.4;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -200,34 +201,79 @@
 @keyframes frag-270 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-50%,30px) scale(0.2); } }
 @keyframes frag-315 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(21px,21px) scale(0.2); } }
 
-/* Progress dots */
-.wizard-progress {
+/* Confetti pieces — colorful rectangles that tumble outward on pop */
+.wizard-bubble__confetti {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 8px;
+  border-radius: 1px;
+  opacity: 0;
+  animation: confetti-burst 0.6s ease-out forwards;
+}
+
+.wizard-bubble__confetti:nth-child(9)  { background: #00f0ff; animation-name: conf-0;   animation-delay: 0.02s; }
+.wizard-bubble__confetti:nth-child(10) { background: #ff00aa; animation-name: conf-30;  animation-delay: 0.04s; }
+.wizard-bubble__confetti:nth-child(11) { background: #39ff14; animation-name: conf-60;  animation-delay: 0.01s; }
+.wizard-bubble__confetti:nth-child(12) { background: #fff01f; animation-name: conf-90;  animation-delay: 0.05s; }
+.wizard-bubble__confetti:nth-child(13) { background: #8b5cf6; animation-name: conf-120; animation-delay: 0.03s; }
+.wizard-bubble__confetti:nth-child(14) { background: #ff6b35; animation-name: conf-150; animation-delay: 0.00s; }
+.wizard-bubble__confetti:nth-child(15) { background: #00f0ff; animation-name: conf-180; animation-delay: 0.06s; }
+.wizard-bubble__confetti:nth-child(16) { background: #ff00aa; animation-name: conf-210; animation-delay: 0.02s; }
+.wizard-bubble__confetti:nth-child(17) { background: #39ff14; animation-name: conf-240; animation-delay: 0.04s; }
+.wizard-bubble__confetti:nth-child(18) { background: #fff01f; animation-name: conf-270; animation-delay: 0.01s; }
+.wizard-bubble__confetti:nth-child(19) { background: #8b5cf6; animation-name: conf-300; animation-delay: 0.05s; }
+.wizard-bubble__confetti:nth-child(20) { background: #ff6b35; animation-name: conf-330; animation-delay: 0.03s; }
+
+/* 12 confetti directions (every 30deg), with tumble rotation */
+@keyframes conf-0   { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(50px,-10px) rotate(200deg); } }
+@keyframes conf-30  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(43px,-35px) rotate(180deg); } }
+@keyframes conf-60  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(25px,-53px) rotate(260deg); } }
+@keyframes conf-90  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(0px,-60px) rotate(150deg); } }
+@keyframes conf-120 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-25px,-53px) rotate(220deg); } }
+@keyframes conf-150 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-43px,-35px) rotate(300deg); } }
+@keyframes conf-180 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-50px,-10px) rotate(170deg); } }
+@keyframes conf-210 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-43px,25px) rotate(240deg); } }
+@keyframes conf-240 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-25px,43px) rotate(190deg); } }
+@keyframes conf-270 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(0px,50px) rotate(280deg); } }
+@keyframes conf-300 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(25px,43px) rotate(160deg); } }
+@keyframes conf-330 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(43px,25px) rotate(250deg); } }
+
+/* Progress bar with label */
+.wizard-progressbar {
   position: fixed;
-  bottom: 1rem;
+  bottom: 0.75rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
   z-index: 9995;
   pointer-events: none;
 }
 
-.wizard-progress__dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  transition: background 0.2s, transform 0.2s;
+.wizard-progressbar__track {
+  width: 120px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
 }
 
-.wizard-progress__dot.active {
-  background: #8b5cf6;
-  transform: scale(1.3);
-  box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+.wizard-progressbar__fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #00f0ff, #8b5cf6, #ff00aa);
+  transition: width 0.4s ease-out;
 }
 
-.wizard-progress__dot.done {
-  background: rgba(139, 92, 246, 0.4);
+.wizard-progressbar__label {
+  font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.03em;
 }
 
 /* Help modal — written instructions */

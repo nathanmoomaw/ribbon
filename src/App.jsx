@@ -519,10 +519,6 @@ function App() {
       <HelpWizard
         active={wizardActive}
         onClose={() => setWizardActive(false)}
-        getEngine={getEngine}
-        handleShake={handleShake}
-        handleQRCreate={handleQRCreate}
-        setVisualMode={setVisualMode}
       />
     </div>
   )

@@ -153,10 +153,52 @@
 
 .wizard-bubble--popping {
   opacity: 0;
-  transform: translate(-50%, -110%) scale(1.3);
-  transition: opacity 0.25s ease-in, transform 0.25s ease-in;
+  transform: translate(-50%, -100%) scale(1.5);
+  transition: opacity 0.15s ease-in, transform 0.2s ease-out;
   animation: none;
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
 }
+
+/* Soap bubble pop fragments — tiny iridescent drops flying outward */
+.wizard-bubble__pop-fragments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.wizard-bubble__fragment {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(0, 240, 255, 0.4) 50%, transparent 100%);
+  box-shadow: 0 0 4px rgba(139, 92, 246, 0.5);
+  opacity: 0;
+  animation: fragment-burst 0.4s ease-out forwards;
+}
+
+/* 8 fragments flying in 8 directions (every 45deg) */
+.wizard-bubble__fragment:nth-child(1) { animation-name: frag-0; }
+.wizard-bubble__fragment:nth-child(2) { animation-name: frag-45; }
+.wizard-bubble__fragment:nth-child(3) { animation-name: frag-90; }
+.wizard-bubble__fragment:nth-child(4) { animation-name: frag-135; }
+.wizard-bubble__fragment:nth-child(5) { animation-name: frag-180; }
+.wizard-bubble__fragment:nth-child(6) { animation-name: frag-225; }
+.wizard-bubble__fragment:nth-child(7) { animation-name: frag-270; }
+.wizard-bubble__fragment:nth-child(8) { animation-name: frag-315; }
+
+@keyframes frag-0   { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(30px,-50%) scale(0.2); } }
+@keyframes frag-45  { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(21px,-71px) scale(0.2); } }
+@keyframes frag-90  { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-50%,-80px) scale(0.2); } }
+@keyframes frag-135 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-71px,-71px) scale(0.2); } }
+@keyframes frag-180 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-80px,-50%) scale(0.2); } }
+@keyframes frag-225 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-71px,21px) scale(0.2); } }
+@keyframes frag-270 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-50%,30px) scale(0.2); } }
+@keyframes frag-315 { 0% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(21px,21px) scale(0.2); } }
 
 /* Progress dots */
 .wizard-progress {

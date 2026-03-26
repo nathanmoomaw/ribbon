@@ -230,3 +230,4 @@ volume slider (horizontal)
 [x] on safari the logo doesn't look complete at all: ![alt text](<screenshots/Screenshot 2026-03-25 at 16.36.36.png>)
 [x] let's merge all this into main and then continue work on this dev branch
 [x] remember this style of working with branches for all projects.  when i say merge to main or merge to staging, do that and then switch back to the currently active dev branch
+[x] let's zoom the default mobile view back two notches

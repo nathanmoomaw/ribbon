@@ -231,3 +231,4 @@ volume slider (horizontal)
 [x] let's merge all this into main and then continue work on this dev branch
 [x] remember this style of working with branches for all projects.  when i say merge to main or merge to staging, do that and then switch back to the currently active dev branch
 [x] let's zoom the default mobile view back two notches
+[x] make sure for all projects you're able to view these across browsers and see that they visually match.  i'm talking about that safari bug that came up.  let's try to avoid that from the start

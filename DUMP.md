@@ -221,7 +221,7 @@ volume slider (horizontal)
 [x] make mobile zoom farther away by default
 [x] mobile: order delay and reverb higher on screen
 
-# Tuesday March 25
+# Wednesday March 25
 
 [x] mobile default zoom should be about where the screenshot shows — spheres visible but still large and immersive, roughly the current ribbon-dev.obfusco.us view at zoom ~5.0. Reference: ![mobile zoom reference](<screenshots/Screenshot 2026-03-25 mobile-zoom-ref.png>)
 [x] work with me to implment some way to control this via usb or midi controller
@@ -232,3 +232,8 @@ volume slider (horizontal)
 [x] remember this style of working with branches for all projects.  when i say merge to main or merge to staging, do that and then switch back to the currently active dev branch
 [x] let's zoom the default mobile view back two notches
 [x] make sure for all projects you're able to view these across browsers and see that they visually match.  i'm talking about that safari bug that came up.  let's try to avoid that from the start
+
+# Thursday March 26
+
+[x] on mobile the qr button should be available in a logical spot above the fold
+[x] let's add a little playful help wizard that points out components and their uses, actually demoing the app a bit to the user when it's activated.  this should cover first play/play modes, trigger some notes and adjust some controls while the user watches (and optionally plays along).  the wizard should not fully take control from the user.  once playing is demonstrated party/lo mode toggle should be shown, but always return user to party mode because it's so fun.  then the zoom functionality should be shown and demo'd.  then demo the shake functionality a few times and finally show the qr feature.  the whole wizard should be quick and easy with cutely styled tooltips that follow the demo's mouse.  let's make the tooltips be a kind of bubble, bubbling up, showing the text clearly and then popping.  the demo should not take over the user's mouse, it should have its own special mouse pointer, independent of the user's pointer. the wizard pointer should be a ribbon branded looking pointer employing the moebius strip with a pointer at the end, think '<-8'.  it should be multicolored and sorta animated.  the wizard should be triggered by a nicely ribbon branded, but somewhat discreet ? icon somewhere appropriate.  the demo wizard should maybe be about 30 seconds long and cover all those points (let me know if this doesn't seem long enough).  the last thing it should show is that clicking the ? again while in demo mode will launch a simpler modal window with actual written instructions on the functions of this toy.  the whole experience should be fun and playful.

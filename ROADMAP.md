@@ -19,6 +19,7 @@
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
 - [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
 - [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
+- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal
 
 ## Completed
 - [x] Vite + React project scaffold

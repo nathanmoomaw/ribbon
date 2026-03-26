@@ -14,14 +14,14 @@ const STEPS = [
     target: '.ribbon',
     text: 'This is your ribbon — touch or drag to play notes!',
     duration: 4000,
-    action: 'demo-ribbon',
+    action: 'click-ribbon',
   },
   {
     id: 'play-mode',
     target: '.rocker:first-child',
     text: 'Play mode for free play, Arp for arpeggiation',
     duration: 4000,
-    action: 'demo-arp',
+    action: 'click-ribbon',
   },
   {
     id: 'hold',
@@ -34,35 +34,35 @@ const STEPS = [
     target: '.controls__oscillators',
     text: 'Three oscillators — mix waveforms and detune for thick sounds',
     duration: 4000,
-    action: 'demo-osc',
+    action: 'click-ribbon',
   },
   {
     id: 'effects',
     target: '.controls__section--delay',
     text: 'Delay, reverb, and crunch — shape your sound',
     duration: 3500,
-    action: 'demo-effects',
+    action: 'click-ribbon',
   },
   {
     id: 'party-lo',
     target: '.visualizer__visuals',
     text: 'Party mode for full visuals, Lo for a clean view',
     duration: 3500,
-    action: 'demo-visual',
+    action: 'click-visual-toggle',
   },
   {
     id: 'zoom',
     target: '.visualizer__zoom',
     text: 'Zoom in and out of the 3D spheres!',
     duration: 3500,
-    action: 'demo-zoom',
+    action: 'click-zoom',
   },
   {
     id: 'shake',
     target: '.app-header__shake-bolt',
     text: 'Shake it up! Randomizes everything ⚡',
     duration: 4000,
-    action: 'demo-shake',
+    action: 'click-shake',
   },
   {
     id: 'qr',
@@ -137,7 +137,7 @@ function WizardCursorSVG() {
   )
 }
 
-export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCreate, setVisualMode }) {
+export function HelpWizard({ active, onClose }) {
   const [step, setStep] = useState(0)
   const [cursorPos, setCursorPos] = useState({ x: -100, y: -100 })
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 })
@@ -205,68 +205,71 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
     actionTimersRef.current = []
   }, [])
 
-  // Run step actions
+  // Simulate a pointer click on a DOM element (dispatches real events)
+  const simulateClick = useCallback((el) => {
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const x = rect.left + rect.width / 2
+    const y = rect.top + rect.height / 2
+    const opts = { bubbles: true, cancelable: true, clientX: x, clientY: y }
+    el.dispatchEvent(new PointerEvent('pointerdown', opts))
+    el.dispatchEvent(new PointerEvent('pointerup', opts))
+    el.dispatchEvent(new MouseEvent('click', opts))
+  }, [])
+
+  // Simulate a pointer down + move + up on the ribbon at a given fraction (0-1) of its width
+  const simulateRibbonTap = useCallback((fraction) => {
+    const ribbon = document.querySelector('.ribbon__track') || document.querySelector('.ribbon')
+    if (!ribbon) return
+    const rect = ribbon.getBoundingClientRect()
+    const x = rect.left + rect.width * fraction
+    const y = rect.top + rect.height / 2
+    const opts = { bubbles: true, cancelable: true, clientX: x, clientY: y, pointerId: 9999 }
+    try { ribbon.setPointerCapture?.(9999) } catch {}
+    ribbon.dispatchEvent(new PointerEvent('pointerdown', opts))
+    setTimeout(() => {
+      ribbon.dispatchEvent(new PointerEvent('pointerup', { ...opts }))
+      try { ribbon.releasePointerCapture?.(9999) } catch {}
+    }, 200)
+  }, [])
+
+  // Run step actions — clicks real DOM elements so the cursor feels like a real pointer
   const runAction = useCallback((action) => {
-    const engine = getEngine()
     switch (action) {
-      case 'demo-ribbon': {
-        const notes = [261.63, 329.63, 392.00, 523.25]
-        notes.forEach((hz, i) => {
-          scheduleAction(() => {
-            const id = `wizard_${i}`
-            engine.voiceOn(id, hz, 0.4)
-            scheduleAction(() => engine.voiceOff(id), 300)
-          }, i * 350)
+      case 'click-ribbon': {
+        // Tap the ribbon at a few different positions to trigger real notes
+        const positions = [0.3, 0.5, 0.7, 0.85]
+        positions.forEach((frac, i) => {
+          scheduleAction(() => simulateRibbonTap(frac), i * 400)
         })
         break
       }
-      case 'demo-arp': {
-        const notes = [261.63, 329.63, 392.00]
-        notes.forEach((hz, i) => {
-          scheduleAction(() => {
-            const id = `wizard_arp_${i}`
-            engine.voiceOn(id, hz, 0.3)
-            scheduleAction(() => engine.voiceOff(id), 150)
-          }, i * 200)
-        })
+      case 'click-visual-toggle': {
+        // Click the Lo button, then click Party back — using actual DOM buttons
+        const buttons = document.querySelectorAll('.visualizer__visuals button')
+        const loBtn = buttons[1]  // Lo is second button
+        const partyBtn = buttons[0]  // Party is first
+        if (loBtn) simulateClick(loBtn)
+        if (partyBtn) scheduleAction(() => simulateClick(partyBtn), 1800)
         break
       }
-      case 'demo-osc': {
-        const chord = [130.81, 164.81, 196.00]
-        chord.forEach((hz, i) => {
-          const id = `wizard_osc_${i}`
-          engine.voiceOn(id, hz, 0.3)
-          scheduleAction(() => engine.voiceOff(id), 1500)
-        })
+      case 'click-zoom': {
+        const zoomIn = document.querySelector('.visualizer__zoom button:first-child')
+        const zoomOut = document.querySelector('.visualizer__zoom button:last-child')
+        if (zoomOut) simulateClick(zoomOut)
+        scheduleAction(() => { if (zoomOut) simulateClick(zoomOut) }, 500)
+        scheduleAction(() => { if (zoomIn) simulateClick(zoomIn) }, 1800)
+        scheduleAction(() => { if (zoomIn) simulateClick(zoomIn) }, 2200)
         break
       }
-      case 'demo-effects': {
-        engine.voiceOn('wizard_fx', 440, 0.4)
-        scheduleAction(() => engine.voiceOff('wizard_fx'), 400)
-        break
-      }
-      case 'demo-visual': {
-        // One-shot: switch to Lo briefly, then back to Party
-        setVisualMode('lo')
-        scheduleAction(() => setVisualMode('party'), 1800)
-        break
-      }
-      case 'demo-zoom': {
-        const zoomOut = document.querySelector('.zoom-controls button:last-child')
-        const zoomIn = document.querySelector('.zoom-controls button:first-child')
-        zoomOut?.click()
-        scheduleAction(() => zoomOut?.click(), 500)
-        scheduleAction(() => zoomIn?.click(), 1800)
-        scheduleAction(() => zoomIn?.click(), 2200)
-        break
-      }
-      case 'demo-shake': {
-        handleShake(0.6)
-        scheduleAction(() => handleShake(0.4), 2000)
+      case 'click-shake': {
+        const bolt = document.querySelector('.app-header__shake-bolt')
+        if (bolt) simulateClick(bolt)
+        scheduleAction(() => { if (bolt) simulateClick(bolt) }, 2000)
         break
       }
     }
-  }, [getEngine, handleShake, setVisualMode, scheduleAction])
+  }, [scheduleAction, simulateClick, simulateRibbonTap])
 
   // Advance through steps
   useEffect(() => {
@@ -368,6 +371,14 @@ export function HelpWizard({ active, onClose, getEngine, handleShake, handleQRCr
         style={{ left: tooltipPos.x, top: tooltipPos.y }}
       >
         <span className="wizard-bubble__text">{currentStep.text}</span>
+        {/* Pop fragments — only visible during popping state */}
+        {bubbleState === 'popping' && (
+          <div className="wizard-bubble__pop-fragments">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <span key={i} className="wizard-bubble__fragment" style={{ '--frag-i': i }} />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Step indicator */}

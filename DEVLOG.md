@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-26 — Wizard: real cursor clicks, bubble pop, party/lo fix
+
+- **Real cursor interaction**: wizard cursor now dispatches real DOM events (pointer/click) on target elements instead of calling engine/state directly. Ribbon taps trigger actual notes, party/lo toggles click real buttons, shake clicks the bolt element.
+- **Bubble pop effect**: soap bubbles burst with 8 iridescent fragments that fly outward in all directions when the tooltip exits, mimicking a real soap bubble popping.
+- **Party/Lo fix**: removed direct `setVisualMode` calls that caused re-trigger loops. Now clicks the actual Lo/Party buttons via DOM events — single click each, properly sequenced.
+
 ## 2026-03-26 — Wizard: soap bubbles, pacing, party/lo fix
 
 - **Soap bubble tooltips**: replaced dark panel tooltips with iridescent soap bubble style — rounded shape, rainbow shimmer border animation, radial highlight "shine" spot, gentle floating motion, scale-in rise and pop-burst exit.

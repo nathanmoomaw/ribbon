@@ -1,5 +1,6 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import QRCode from 'qrcode'
+import { buildPresetUrl } from '../utils/presets'
 import './PresetQR.css'
 
 // Ribbon gradient colors for the QR code
@@ -24,7 +25,6 @@ function lerpColor(stops, t) {
 
 function drawColoredQR(canvas, url) {
   const size = 280
-  const margin = 16
 
   // Generate QR modules
   QRCode.toCanvas(canvas, url, {
@@ -57,11 +57,18 @@ function drawColoredQR(canvas, url) {
   })
 }
 
-export function PresetQR({ url, onClose }) {
+export function PresetQR({ settings, initialName, onClose }) {
   const canvasRef = useRef(null)
-  const [name, setName] = useState('')
+  const [name, setName] = useState(initialName || '')
   const [copied, setCopied] = useState(false)
 
+  // Build URL with current name
+  const url = useMemo(
+    () => buildPresetUrl(settings, name.trim() || undefined),
+    [settings, name]
+  )
+
+  // Redraw QR when URL changes (including name changes)
   useEffect(() => {
     if (canvasRef.current && url) {
       drawColoredQR(canvasRef.current, url)

@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-27 — Roadmap reorganization + crypto options doc
+
+- Moved ambient play, interactive 3D, step sequencer, help wizard, camera input from v3 to Future Features in roadmap
+- Slimmed v3.md to focus on crypto, visual overhaul, scales, and UX polish
+- Created `docs/crypto-options.md` — analysis of NFT preset minting vs POAP vs hybrid approach
+
 ## 2026-03-27 — Version files + v2 tag update
 
 - Created `versions/v1.md`, `versions/v2.md`, `versions/v3.md` with feature lists

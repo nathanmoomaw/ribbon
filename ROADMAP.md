@@ -1,26 +1,22 @@
 # Roadmap
 
-## Up Next
+## Up Next (v3)
+- [ ] v3 — cryptic crypto integration, glitch/datamosh visual overhaul
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
-- [x] Scale selection UI (multi-select combination scales)
-- [x] Bitcrush effect (AudioWorklet)
+- [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
+- [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
+- [ ] Production domain setup
+- [ ] Rotary knob components (replace range sliders)
+
+## Future Features
+- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)
+- [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
+- [ ] Step sequencer functionality
+- [ ] Help wizard — interactive demo with branded cursor, bubble tooltips (partially implemented, shelved)
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
-- [ ] Rotary knob components (replace range sliders)
-- [x] Mobile-optimized layout (zoom default, controls reorder)
-- [x] MIDI controller support (Web MIDI API — notes, CCs, pitch bend, sustain pedal)
-- [ ] Step sequencer functionality
-- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
-- [ ] Production domain setup
-- [x] v2 "Rock & Rumble" tag — tagged and deployed to /v2
-- [ ] v3 — live by EOW 2026-03-27 (cryptic crypto integration + mild ambient play mode)
-- [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
-- [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
-- [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
 - [ ] Future versions: Puddle (oil spill theme), Smash (broken glass theme)
-- [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
-- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved for now)
 
 ## Completed
 - [x] Vite + React project scaffold
@@ -96,3 +92,10 @@
 - [x] SVG cityscape panel background (replaced gradient-based buildings with inline SVG skyline)
 - [x] Above-the-fold viewport fit (100dvh, internal scroll, reduced spacing)
 - [x] Ambient play shelved (UI removed, hook preserved for future version)
+- [x] Scale selection UI (multi-select combination scales)
+- [x] Bitcrush effect (AudioWorklet)
+- [x] Mobile-optimized layout (zoom default, controls reorder)
+- [x] MIDI controller support (Web MIDI API — notes, CCs, pitch bend, sustain pedal)
+- [x] v2 "Rock & Rumble" tag — tagged and deployed to /v2
+- [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
+- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved)

@@ -262,4 +262,5 @@ volume slider (horizontal)
 [x] change the default filename for them from ribbon-preset-xx to simply ribbon-xx where xx is the name
 [x] create version files for both v1 and v2 and create one for v3 as well with intended features
 [x] merge the current build to main and also add it to the v2 tag and thusly /v2 locked at this particular build.  update version files
-
+[x] let's move some stuff out of v3 and into future features in the roadmap: ambient play, interactive 3d, step sequencer, help wizard, camera input
+[x] give me plans to implement nft/eft gain vs poap and weigh options

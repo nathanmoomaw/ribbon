@@ -150,6 +150,11 @@ export function HelpWizard({ active, onClose }) {
   const cursorAnimRef = useRef(null)
   const cursorPosRef = useRef({ x: -100, y: -100 })
   const actionTimersRef = useRef([])
+  // Stabilize onClose so parent re-renders (e.g. from shake randomizing controls)
+  // don't cause the step effect to re-run and re-trigger actions
+  const onCloseRef = useRef(onClose)
+  onCloseRef.current = onClose
+  const stableOnClose = useCallback(() => onCloseRef.current(), [])
 
   // Find target element for current step
   const getTargetRect = useCallback((selector) => {
@@ -250,10 +255,12 @@ export function HelpWizard({ active, onClose }) {
       case 'click-zoom': {
         const zoomIn = document.querySelector('.visualizer__zoom button:first-child')
         const zoomOut = document.querySelector('.visualizer__zoom button:last-child')
+        // Zoom out first to show the spheres (the cool part), then zoom back in
         if (zoomOut) simulateClick(zoomOut)
-        scheduleAction(() => { if (zoomOut) simulateClick(zoomOut) }, 500)
-        scheduleAction(() => { if (zoomIn) simulateClick(zoomIn) }, 1800)
+        scheduleAction(() => { if (zoomOut) simulateClick(zoomOut) }, 400)
+        scheduleAction(() => { if (zoomOut) simulateClick(zoomOut) }, 800)
         scheduleAction(() => { if (zoomIn) simulateClick(zoomIn) }, 2200)
+        scheduleAction(() => { if (zoomIn) simulateClick(zoomIn) }, 2600)
         break
       }
       case 'click-shake': {
@@ -269,7 +276,7 @@ export function HelpWizard({ active, onClose }) {
   useEffect(() => {
     if (!active || showModal) return
     if (step >= STEPS.length) {
-      onClose()
+      stableOnClose()
       return
     }
 
@@ -303,7 +310,7 @@ export function HelpWizard({ active, onClose }) {
       clearTimeout(popTimer)
       clearActionTimers()
     }
-  }, [active, step, showModal, getTargetRect, animateCursorTo, runAction, onClose, clearActionTimers])
+  }, [active, step, showModal, getTargetRect, animateCursorTo, runAction, stableOnClose, clearActionTimers])
 
   // Reset when activated
   useEffect(() => {
@@ -314,6 +321,19 @@ export function HelpWizard({ active, onClose }) {
       setCursorPos({ x: -100, y: -100 })
     }
   }, [active])
+
+  // Spacebar cancels the wizard
+  useEffect(() => {
+    if (!active) return
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault()
+        stableOnClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [active, stableOnClose])
 
   // Cleanup
   useEffect(() => {

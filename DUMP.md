@@ -246,3 +246,10 @@ volume slider (horizontal)
 [x] the text on the bubbles looks wonky.  let's try it in comic sans so it's even wonkier.
 [x] get rid of the wizard dots on the bottom, maybe have a little progress bar there instead with single word description of what action is being demo'd
 [x] the bubble popping animation still needs work.  it should also spawn confetti when they explode
+[x] when demoing the zoom functionality, make it zoom out to show the spheres cuz they're what's cool
+[x] it seems to get stuck showing the shake functionality
+[x] the bubbles should be circular not all weird and oblong
+[x] pressing spacebar should cancel the wizard
+[x] the confetti should explode out of the bubbles more and stay on the screen for a bit
+[x] add versions to roadmap: puddle (oil spill), smash (broken glass)
+[x] bubbles are not spherical yet..

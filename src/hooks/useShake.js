@@ -92,15 +92,7 @@ export function useShake(onShake, controlsRef, ribbonRef) {
   }, [])
 
   useEffect(() => {
-    // --- Enter key ---
-    function onKeyDown(e) {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
-      if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.code === 'Enter') {
-        e.preventDefault()
-        triggerShake(0.5)
-      }
-    }
+    // Enter key moved to looper (useLooper) — toggles recording
 
     // --- Click outside controls/ribbon ---
     function onClick(e) {
@@ -131,11 +123,9 @@ export function useShake(onShake, controlsRef, ribbonRef) {
       gestureEvents.forEach(e => document.addEventListener(e, onFirstGesture, true))
     }
 
-    window.addEventListener('keydown', onKeyDown)
     window.addEventListener('click', onClick)
 
     return () => {
-      window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('click', onClick)
       if (motionListenerRef.current && typeof motionListenerRef.current === 'function') {
         window.removeEventListener('devicemotion', motionListenerRef.current)

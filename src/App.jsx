@@ -5,13 +5,21 @@ import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
 import { useShake, requestMotionPermission } from './hooks/useShake'
 import { useMIDI } from './hooks/useMIDI'
+import { useLooper } from './hooks/useLooper'
+import { useGoop } from './hooks/useGoop'
+import { LooperControls } from './components/LooperControls'
+import { GoopOverlay } from './components/GoopOverlay'
+import { WalletButton } from './components/WalletButton'
+import { MilestoneToast, useMilestoneToast } from './components/MilestoneToast'
+import { checkMilestone, incrementMilestone } from './crypto/milestones'
 import { SCALES } from './utils/scales'
-import { Visualizer } from './components/Visualizer'
-import { Ribbon } from './components/Ribbon'
+import { Puddle } from './components/Puddle'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
-import { HelpWizard, WizardTrigger } from './components/HelpWizard'
+import { VCFControl } from './components/VCFControl'
+// HelpWizard shelved — partially implemented, targeting future version
+// import { HelpWizard, WizardTrigger } from './components/HelpWizard'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
@@ -47,6 +55,9 @@ function App() {
   const [reverbMix, setReverbMix] = useState(_urlPreset?.reverbMix ?? 0)
   const [crunch, setCrunch] = useState(_urlPreset?.crunch ?? 0)
   const [filterParams, setFilterParams] = useState(_urlPreset?.filterParams ?? { cutoff: 20000, resonance: 0 })
+  const [vcfCutoff, setVcfCutoff] = useState(_urlPreset?.vcfCutoff ?? 2000)
+  const [vcfResonance, setVcfResonance] = useState(_urlPreset?.vcfResonance ?? 8)
+  const [vcfRouting, setVcfRouting] = useState(_urlPreset?.vcfRouting ?? [false, false, false])
   const [glideSpeed, setGlideSpeed] = useState(_urlPreset?.glideSpeed ?? 0.005)
   const [stepped, setStepped] = useState(_urlPreset?.stepped ?? false)
   const [scale, setScale] = useState(_urlPreset?.scale ?? ['chromatic'])
@@ -138,7 +149,8 @@ function App() {
     Digit3: () => setPoly(p => !p),
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
-  }), [mode, hold, getEngine])
+    Enter: () => toggleRecording(),
+  }), [mode, hold, getEngine, toggleRecording])
 
   useKeyboard(keyHandlers)
 
@@ -196,6 +208,46 @@ function App() {
   }, [mode, poly])
 
   useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove)
+
+  // --- Looper ---
+  const replayCallbacksRef = useRef({})
+  const {
+    recording, playing, hasLoop,
+    recordEvent, toggleRecording, togglePlayback,
+    getLoopData, loadLoopData,
+  } = useLooper(replayCallbacksRef)
+
+  // Wire replay callbacks (called during loop playback)
+  useEffect(() => {
+    replayCallbacksRef.current = {
+      voice_on: ({ hz, velocity }) => {
+        const id = `loop_${Date.now()}`
+        getEngine().voiceOn(id, hz, velocity)
+        setTimeout(() => getEngine().voiceOff(id), 200)
+      },
+      knob: ({ param, value }) => {
+        const engine = getEngine()
+        const setters = {
+          cutoff: (v) => { setFilterParams(p => ({ ...p, cutoff: v })); engine.setFilter({ cutoff: v }) },
+          resonance: (v) => { setFilterParams(p => ({ ...p, resonance: v })); engine.setFilter({ resonance: v }) },
+          reverb: (v) => { setReverbMix(v); engine.setReverb({ mix: v }) },
+          crunch: (v) => { setCrunch(v); engine.setCrunch(v) },
+          glide: (v) => { setGlideSpeed(v); engine.setGlideSpeed(v) },
+        }
+        if (setters[param]) setters[param](value)
+      },
+      shake: ({ intensity }) => handleShake(intensity),
+    }
+  })
+
+  // --- Goop/Liquid ---
+  const {
+    goopLevels, shakeClean, getGoopData, loadGoopData,
+    startDragging, stopDragging, addGoop,
+  } = useGoop()
+
+  // --- Milestone tracking ---
+  const { current: currentMilestone, show: showMilestone, dismiss: dismissMilestone } = useMilestoneToast()
 
   // --- Shake/Quake handler (reads state from refs to avoid dependency churn) ---
   const handleShake = useCallback((intensity) => {
@@ -312,7 +364,14 @@ function App() {
       setHold(h => !h)
     }
 
-    // 3. Trigger a random ribbon press — velocity scales with intensity
+    // 3. Clean goop from controls
+    shakeClean()
+
+    // 3b. Milestone: shake counter
+    const shakeMilestone = incrementMilestone('shake_master', 100)
+    if (shakeMilestone) showMilestone(shakeMilestone)
+
+    // 4. Trigger a random ribbon press — velocity scales with intensity
     const shakePosition = Math.random()
     const shakeVelocity = Math.random() * 0.3 + intensity * 0.5
     const shakeHz = positionToFrequency(shakePosition, { octaves: octavesRef.current, stepped: steppedRef.current, scale: scaleRef.current })
@@ -342,7 +401,7 @@ function App() {
         }
       }, noteDuration)
     }
-  }, [getEngine, handleArpNoteToggle])
+  }, [getEngine, handleArpNoteToggle, shakeClean, showMilestone])
 
   useShake(handleShake, controlsRef, ribbonRef)
 
@@ -382,12 +441,23 @@ function App() {
     arpStopRef.current?.()
   }, [getEngine])
 
+  const handleVcfRoutingToggle = useCallback((oscIndex, enabled) => {
+    setVcfRouting(prev => {
+      const next = [...prev]
+      next[oscIndex] = enabled
+      return next
+    })
+  }, [])
+
   const handleQRCreate = useCallback(() => {
     setQrSettings({
       mode, oscParams, volume, octaves, delayParams, reverbMix, crunch,
-      filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
+      filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
     })
-  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode])
+    // Milestone: shared preset
+    const m = checkMilestone('shared_preset')
+    if (m) showMilestone(m)
+  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode, showMilestone])
 
   const handleKillAll = useCallback(() => {
     getEngine().killAllSound()
@@ -398,8 +468,9 @@ function App() {
   }, [getEngine])
 
   return (
-    <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
-      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
+    <div className={`app app--puddle ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
+      {/* Moving grid background */}
+      <div className="app__grid-bg" />
 
       <header className="app-header">
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
@@ -412,6 +483,14 @@ function App() {
         >
           ⚡
         </button>
+        <WalletButton />
+        <LooperControls
+          recording={recording}
+          playing={playing}
+          hasLoop={hasLoop}
+          onToggleRecord={toggleRecording}
+          onTogglePlay={togglePlayback}
+        />
         <button
           className="app-header__qr-mobile"
           onClick={handleQRCreate}
@@ -419,53 +498,6 @@ function App() {
           aria-label="Create preset QR code"
         >
           &#x25A3;
-        </button>
-      </header>
-
-      <Controls
-        ref={controlsRef}
-        getEngine={getEngine}
-        oscParams={oscParams}
-        setOscParams={setOscParams}
-        volume={volume}
-        setVolume={setVolume}
-        octaves={octaves}
-        setOctaves={setOctaves}
-        stepped={stepped}
-        setStepped={setStepped}
-        scale={scale}
-        setScale={setScale}
-        delayParams={delayParams}
-        setDelayParams={setDelayParams}
-        reverbMix={reverbMix}
-        setReverbMix={setReverbMix}
-        crunch={crunch}
-        setCrunch={setCrunch}
-        filterParams={filterParams}
-        setFilterParams={setFilterParams}
-        glideSpeed={glideSpeed}
-        setGlideSpeed={setGlideSpeed}
-        shaking={shaking}
-        mode={mode}
-        setMode={setMode}
-        poly={poly}
-        setPoly={setPoly}
-        arpBpm={arpBpm}
-        setArpBpm={setArpBpm}
-        hold={hold}
-        setHold={setHold}
-        onStop={handleStop}
-        onKillAll={handleKillAll}
-        onQRCreate={handleQRCreate}
-      />
-
-      <div className="keys-toggle">
-        <button
-          className={`keys-toggle__btn ${inputMode === 'keys' ? 'active' : ''}`}
-          onClick={() => setInputMode(inputMode === 'keys' ? 'touch' : 'keys')}
-          title="A-L keys control ribbon"
-        >
-          Keys
         </button>
         <button
           className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
@@ -484,27 +516,75 @@ function App() {
            : midiDevice ? 'MIDI ✓'
            : 'MIDI'}
         </button>
-      </div>
+      </header>
 
-      <Ribbon
-        ref={ribbonRef}
-        getEngine={getEngine}
-        mode={mode}
-        inputMode={inputMode}
-        octaves={octaves}
-        stepped={stepped}
-        scale={scale}
-        externalPositions={keyboardPositions}
-        ribbonInteraction={ribbonInteraction}
-        arpStart={arpStart}
-        arpStop={arpStop}
-        hold={hold}
-        poly={poly}
-        shaking={shaking}
-        undulating={undulating}
-        onArpNoteToggle={handleArpNoteToggle}
-        arpNotes={arpNotes}
-      />
+      <div className="app__stage" style={{ position: 'relative' }}>
+        <GoopOverlay goopLevels={goopLevels} />
+        <Puddle
+          ref={ribbonRef}
+          getEngine={getEngine}
+          mode={mode}
+          octaves={octaves}
+          stepped={stepped}
+          scale={scale}
+          ribbonInteraction={ribbonInteraction}
+          arpStart={arpStart}
+          arpStop={arpStop}
+          hold={hold}
+          poly={poly}
+          shaking={shaking}
+          undulating={undulating}
+          onArpNoteToggle={handleArpNoteToggle}
+          arpNotes={arpNotes}
+        />
+
+        <VCFControl
+          vcfCutoff={vcfCutoff}
+          vcfResonance={vcfResonance}
+          vcfRouting={vcfRouting}
+          getEngine={getEngine}
+          onCutoffChange={setVcfCutoff}
+          onResonanceChange={setVcfResonance}
+          onRoutingToggle={handleVcfRoutingToggle}
+        />
+
+        <Controls
+          ref={controlsRef}
+          getEngine={getEngine}
+          oscParams={oscParams}
+          setOscParams={setOscParams}
+          volume={volume}
+          setVolume={setVolume}
+          octaves={octaves}
+          setOctaves={setOctaves}
+          stepped={stepped}
+          setStepped={setStepped}
+          scale={scale}
+          setScale={setScale}
+          delayParams={delayParams}
+          setDelayParams={setDelayParams}
+          reverbMix={reverbMix}
+          setReverbMix={setReverbMix}
+          crunch={crunch}
+          setCrunch={setCrunch}
+          filterParams={filterParams}
+          setFilterParams={setFilterParams}
+          glideSpeed={glideSpeed}
+          setGlideSpeed={setGlideSpeed}
+          shaking={shaking}
+          mode={mode}
+          setMode={setMode}
+          poly={poly}
+          setPoly={setPoly}
+          arpBpm={arpBpm}
+          setArpBpm={setArpBpm}
+          hold={hold}
+          setHold={setHold}
+          onStop={handleStop}
+          onKillAll={handleKillAll}
+          onQRCreate={handleQRCreate}
+        />
+      </div>
 
       {easterEgg && (
         <div className="easter-egg" aria-hidden="true">
@@ -516,12 +596,7 @@ function App() {
         <PresetQR settings={qrSettings} initialName={_urlPresetName} onClose={() => setQrSettings(null)} />
       )}
 
-      {/* Help wizard shelved — partially implemented, targeting future version */}
-      {/* <WizardTrigger onClick={() => setWizardActive(w => !w)} />
-      <HelpWizard
-        active={wizardActive}
-        onClose={() => setWizardActive(false)}
-      /> */}
+      <MilestoneToast milestone={currentMilestone} onDismiss={dismissMilestone} />
     </div>
   )
 }

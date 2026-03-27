@@ -433,6 +433,21 @@
   width: 80px;
 }
 
+/* Rotary knob row — horizontal alignment for grouped knobs */
+.controls__rotary-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+/* Osc section knob pair — mix + detune side by side */
+.controls__osc-knobs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  padding-top: 0.15rem;
+}
+
 .controls__section > input[type="range"] {
   width: 100%;
 }

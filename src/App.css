@@ -14,6 +14,70 @@
   -webkit-user-select: none;
 }
 
+/* v3 Puddle layout — grid background, puddle center stage */
+.app--puddle {
+  overflow: hidden;
+}
+
+.app__grid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 29px,
+      rgba(80, 160, 255, 0.03) 29px,
+      rgba(80, 160, 255, 0.03) 30px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 29px,
+      rgba(80, 160, 255, 0.03) 29px,
+      rgba(80, 160, 255, 0.03) 30px
+    ),
+    radial-gradient(circle at 50% 40%, rgba(15, 15, 30, 1), rgba(4, 4, 12, 1));
+  animation: bg-grid-drift 30s linear infinite;
+}
+
+@keyframes bg-grid-drift {
+  0% { background-position: 0 0, 0 0, center; }
+  100% { background-position: 30px 30px, 30px 30px, center; }
+}
+
+.app__stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 900px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Desktop: puddle + controls side by side */
+@media (min-width: 768px) {
+  .app__stage {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .app__stage .puddle {
+    flex-shrink: 0;
+  }
+
+  .app__stage .controls {
+    flex: 1;
+    min-width: 0;
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
+  }
+}
+
 .app-header {
   display: flex;
   flex-direction: row;
@@ -277,20 +341,7 @@
   100% { opacity: 0; transform: scale(0.3) translate(4px, -10px); }
 }
 
-/* On desktop, order controls and ribbon */
-@media (min-width: 768px) {
-  .app .controls {
-    order: 4;
-  }
-  .app .keys-toggle {
-    order: 5;
-  }
-  .app .ribbon {
-    order: 6;
-  }
-}
-
-/* Mobile: tighter spacing, full width controls, ribbon on top */
+/* Mobile: tighter spacing */
 @media (max-width: 767px) {
   .app {
     padding: 0.5rem 0.25rem;
@@ -300,22 +351,10 @@
 
   .app-header {
     align-self: center;
-    order: 1;
     flex-shrink: 0;
   }
 
-  .app .ribbon {
-    order: 2;
-    flex-shrink: 0;
-  }
-
-  .app .keys-toggle {
-    order: 3;
-    flex-shrink: 0;
-  }
-
-  .app .controls {
-    order: 4;
+  .app__stage {
     flex: 1;
     min-height: 0;
     overflow-y: auto;

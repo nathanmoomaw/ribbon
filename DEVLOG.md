@@ -1,5 +1,16 @@
 # Devlog
 
+## 2026-03-27 — v3 "Puddle" implementation
+
+- **Puddle surface**: Three.js custom shaders for iridescent oil-spill effect with ripple physics, Asteroids-style confetti with firework bursts, moving grid background
+- **Rotary knobs**: Replaced all range sliders with rotary knob components featuring ghost slider overlay during interaction
+- **VCF control**: Per-oscillator voltage-controlled filter with cutoff/resonance knobs and routing buttons
+- **Capture/looper**: Event-based looper with 33.3s max, layering support, Return key toggle
+- **Goop/liquid control**: Per-control goop levels with SVG blob overlay, shake to clean (~13 shakes)
+- **Crypto integration**: RainbowKit + wagmi wallet connection on Base L2, POAP milestone tracking with toast notifications
+- **Layout restructure**: Puddle center stage with controls arranged around it, responsive desktop/mobile grid
+- New files: Puddle.jsx, RotaryKnob.jsx, VCFControl.jsx, LooperControls.jsx, GoopOverlay.jsx, WalletButton.jsx, MilestoneToast.jsx, usePuddle.js, usePuddleRenderer.js, useLooper.js, useGoop.js, crypto/config.js, crypto/milestones.js
+
 ## 2026-03-27 — Roadmap reorganization + crypto options doc
 
 - Moved ambient play, interactive 3D, step sequencer, help wizard, camera input from v3 to Future Features in roadmap

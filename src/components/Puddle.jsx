@@ -1,0 +1,274 @@
+import { useState, useCallback, useEffect, useMemo, useRef, forwardRef } from 'react'
+import { usePuddle } from '../hooks/usePuddle'
+import { usePuddleRenderer } from '../hooks/usePuddleRenderer'
+import { positionToFrequency, frequencyToPosition, getStepPositions } from '../utils/pitchMap'
+import './Puddle.css'
+
+/**
+ * Puddle — 2D kaos pad surface replacing the Ribbon.
+ * X axis controls pitch, Y axis controls velocity.
+ * Renders an iridescent oil-spill blob via Three.js shaders.
+ * Includes confetti particles (Asteroids-style unfilled geometry).
+ */
+export const Puddle = forwardRef(function Puddle({
+  getEngine, mode, octaves, stepped, scale,
+  ribbonInteraction, arpStart, arpStop, hold, poly,
+  shaking, undulating, onArpNoteToggle, arpNotes,
+}, ref) {
+  const [positions, setPositions] = useState(new Map())
+  const [activePointers, setActivePointers] = useState(new Set())
+  const threeContainerRef = useRef(null)
+  const confettiCanvasRef = useRef(null)
+  const confettiParticles = useRef([])
+  const confettiFrame = useRef(0)
+
+  const arpMarkerPositions = useMemo(() => {
+    if (mode !== 'arp' || !poly || !hold || arpNotes.length === 0) return []
+    return arpNotes.map(hz => ({
+      hz,
+      pos: frequencyToPosition(hz, { octaves }),
+    }))
+  }, [arpNotes, mode, poly, hold, octaves])
+
+  const onPositionChange = useCallback((pointerId, x, y) => {
+    if (mode === 'arp' && poly && hold) return
+
+    const voiceId = `touch_${pointerId}`
+    if (ribbonInteraction) {
+      ribbonInteraction.current.position = x
+      ribbonInteraction.current.velocity = y
+    }
+    const engine = getEngine()
+    const hz = positionToFrequency(x, { octaves, stepped, scale })
+
+    if (mode === 'arp') {
+      engine.setFrequency(hz)
+    } else if (hold && mode === 'play' && !poly) {
+      engine.setAllActiveFrequencies(hz)
+    } else {
+      engine.voiceSetFrequency(voiceId, hz)
+    }
+    if (y !== undefined) engine.voiceSetVelocity(voiceId, y)
+    setPositions(prev => new Map(prev).set(voiceId, { x, y }))
+  }, [getEngine, mode, poly, hold, octaves, stepped, scale, ribbonInteraction])
+
+  const onDown = useCallback((pointerId, x, y) => {
+    const engine = getEngine()
+    const voiceId = `touch_${pointerId}`
+    const hz = positionToFrequency(x, { octaves, stepped, scale })
+    setActivePointers(prev => new Set(prev).add(voiceId))
+    if (ribbonInteraction) ribbonInteraction.current.active = true
+
+    // Spawn confetti burst
+    spawnConfetti(x, y)
+
+    if (mode === 'play') {
+      if (hold && !poly && engine.getActiveVoiceCount() > 0) {
+        engine.setAllActiveFrequencies(hz)
+        setPositions(() => new Map([[voiceId, { x, y }]]))
+      } else {
+        if (!poly) engine.allNotesOff()
+        engine.voiceOn(voiceId, hz, y)
+      }
+    } else if (mode === 'arp') {
+      if (hold && poly) {
+        onArpNoteToggle(hz)
+      } else {
+        engine.setFrequency(hz)
+        arpStart()
+      }
+    }
+
+    if (hold && mode !== 'arp' && engine.getActiveVoiceCount() === 0) {
+      engine.voiceOn(voiceId, hz, y)
+    }
+  }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle])
+
+  const onUp = useCallback((pointerId) => {
+    const voiceId = `touch_${pointerId}`
+    const engine = getEngine()
+    setActivePointers(prev => {
+      const next = new Set(prev)
+      next.delete(voiceId)
+      if (next.size === 0 && ribbonInteraction) {
+        ribbonInteraction.current.active = false
+      }
+      return next
+    })
+
+    if (hold) return
+
+    if (mode === 'play') {
+      engine.voiceOff(voiceId)
+    } else if (mode === 'arp') {
+      arpStop()
+    }
+
+    if (!hold) {
+      setPositions(prev => {
+        const next = new Map(prev)
+        next.delete(voiceId)
+        return next
+      })
+    }
+  }, [getEngine, mode, hold, ribbonInteraction, arpStop])
+
+  const { puddleRef, ripples, handlers } = usePuddle(onPositionChange, onDown, onUp)
+
+  // Three.js renderer
+  usePuddleRenderer(threeContainerRef, ripples, getEngine)
+
+  // --- Asteroids-style confetti system ---
+  const SHAPES = ['triangle', 'square', 'pentagon', 'diamond']
+
+  function spawnConfetti(nx, ny) {
+    const count = 8 + Math.floor(Math.random() * 8)
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2
+      const speed = 1 + Math.random() * 3
+      confettiParticles.current.push({
+        x: nx, y: 1 - ny, // flip Y for canvas coords
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        shape: SHAPES[Math.floor(Math.random() * SHAPES.length)],
+        size: 4 + Math.random() * 8,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.2,
+        color: `hsl(${Math.random() * 360}, 80%, 65%)`,
+        life: 1.0,
+        decay: 0.008 + Math.random() * 0.012,
+      })
+    }
+  }
+
+  // Confetti render loop
+  useEffect(() => {
+    const canvas = confettiCanvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+
+    function drawShape(ctx, shape, size) {
+      ctx.beginPath()
+      if (shape === 'triangle') {
+        for (let i = 0; i < 3; i++) {
+          const a = (i / 3) * Math.PI * 2 - Math.PI / 2
+          const method = i === 0 ? 'moveTo' : 'lineTo'
+          ctx[method](Math.cos(a) * size, Math.sin(a) * size)
+        }
+        ctx.closePath()
+      } else if (shape === 'square') {
+        ctx.rect(-size, -size, size * 2, size * 2)
+      } else if (shape === 'diamond') {
+        ctx.moveTo(0, -size)
+        ctx.lineTo(size, 0)
+        ctx.lineTo(0, size)
+        ctx.lineTo(-size, 0)
+        ctx.closePath()
+      } else if (shape === 'pentagon') {
+        for (let i = 0; i < 5; i++) {
+          const a = (i / 5) * Math.PI * 2 - Math.PI / 2
+          const method = i === 0 ? 'moveTo' : 'lineTo'
+          ctx[method](Math.cos(a) * size, Math.sin(a) * size)
+        }
+        ctx.closePath()
+      }
+    }
+
+    function animate() {
+      confettiFrame.current = requestAnimationFrame(animate)
+
+      const w = canvas.clientWidth
+      const h = canvas.clientHeight
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w
+        canvas.height = h
+      }
+
+      ctx.clearRect(0, 0, w, h)
+
+      const particles = confettiParticles.current
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]
+        p.x += p.vx / w
+        p.y += p.vy / h
+        p.vy += 0.03 // gravity
+        p.vx *= 0.99
+        p.vy *= 0.99
+        p.rotation += p.rotSpeed
+        p.life -= p.decay
+
+        if (p.life <= 0) {
+          particles.splice(i, 1)
+          continue
+        }
+
+        ctx.save()
+        ctx.translate(p.x * w, p.y * h)
+        ctx.rotate(p.rotation)
+        ctx.globalAlpha = p.life
+        ctx.strokeStyle = p.color
+        ctx.lineWidth = 1.5
+        drawShape(ctx, p.shape, p.size)
+        ctx.stroke()
+        ctx.restore()
+      }
+    }
+    animate()
+
+    return () => cancelAnimationFrame(confettiFrame.current)
+  }, [])
+
+  const allPositions = [...positions.entries()]
+
+  return (
+    <div
+      className={`puddle ${activePointers.size > 0 ? 'puddle--active' : ''} ${shaking ? 'puddle--shaking' : ''}`}
+      ref={(el) => {
+        puddleRef.current = el
+        if (typeof ref === 'function') ref(el)
+        else if (ref) ref.current = el
+      }}
+      {...handlers}
+      style={{ touchAction: 'none' }}
+    >
+      {/* Three.js iridescent oil surface */}
+      <div className="puddle__three" ref={threeContainerRef} />
+
+      {/* Confetti canvas overlay */}
+      <canvas className="puddle__confetti" ref={confettiCanvasRef} />
+
+      {/* Touch cursors */}
+      {allPositions.map(([id, { x, y }]) => (
+        <div
+          key={id}
+          className="puddle__cursor"
+          style={{ left: `${x * 100}%`, top: `${(1 - y) * 100}%` }}
+        />
+      ))}
+
+      {/* Arp note markers */}
+      {arpMarkerPositions.length > 0 && (
+        <div className="puddle__arp-markers">
+          {arpMarkerPositions.map(({ hz, pos }) => (
+            <div
+              key={hz}
+              className="puddle__arp-marker"
+              style={{ left: `${pos * 100}%` }}
+              onPointerDown={(e) => {
+                e.stopPropagation()
+                onArpNoteToggle(hz)
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Hz display */}
+      <div className="puddle__label">
+        {allPositions.length > 0
+          ? `${Math.round(positionToFrequency(allPositions[allPositions.length - 1][1].x, { octaves, stepped, scale }))} Hz`
+          : 'touch puddle to play'}
+      </div>
+    </div>
+  )
+})

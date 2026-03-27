@@ -69,15 +69,19 @@
   to { stroke-dashoffset: -24; }
 }
 
-/* Tooltip bubble — soap bubble style: iridescent, round, floating */
+/* Tooltip bubble — soap bubble style: iridescent, spherical, floating */
 .wizard-bubble {
   position: fixed;
   z-index: 9995;
   pointer-events: none;
   transform: translate(-50%, -100%);
-  max-width: 280px;
-  padding: 0.75rem 1.2rem;
-  border-radius: 50% / 45%;
+  /* Force a circle: fixed size, square aspect ratio */
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background:
     radial-gradient(ellipse at 30% 20%, rgba(255, 255, 255, 0.18) 0%, transparent 50%),
     radial-gradient(ellipse at 70% 80%, rgba(0, 240, 255, 0.08) 0%, transparent 40%),
@@ -120,11 +124,14 @@
 
 .wizard-bubble__text {
   font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', cursive;
-  font-size: 0.85rem;
+  font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.95);
-  line-height: 1.4;
+  line-height: 1.35;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   text-align: center;
+  /* Inscribe text area inside the circle — ~70% of diameter */
+  max-width: 112px;
+  padding: 0;
 }
 
 @keyframes bubble-shimmer {
@@ -210,7 +217,7 @@
   height: 8px;
   border-radius: 1px;
   opacity: 0;
-  animation: confetti-burst 0.6s ease-out forwards;
+  animation: confetti-burst 1.4s ease-out forwards;
 }
 
 .wizard-bubble__confetti:nth-child(9)  { background: #00f0ff; animation-name: conf-0;   animation-delay: 0.02s; }
@@ -226,19 +233,19 @@
 .wizard-bubble__confetti:nth-child(19) { background: #8b5cf6; animation-name: conf-300; animation-delay: 0.05s; }
 .wizard-bubble__confetti:nth-child(20) { background: #ff6b35; animation-name: conf-330; animation-delay: 0.03s; }
 
-/* 12 confetti directions (every 30deg), with tumble rotation */
-@keyframes conf-0   { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(50px,-10px) rotate(200deg); } }
-@keyframes conf-30  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(43px,-35px) rotate(180deg); } }
-@keyframes conf-60  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(25px,-53px) rotate(260deg); } }
-@keyframes conf-90  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(0px,-60px) rotate(150deg); } }
-@keyframes conf-120 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-25px,-53px) rotate(220deg); } }
-@keyframes conf-150 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-43px,-35px) rotate(300deg); } }
-@keyframes conf-180 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-50px,-10px) rotate(170deg); } }
-@keyframes conf-210 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-43px,25px) rotate(240deg); } }
-@keyframes conf-240 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(-25px,43px) rotate(190deg); } }
-@keyframes conf-270 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(0px,50px) rotate(280deg); } }
-@keyframes conf-300 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(25px,43px) rotate(160deg); } }
-@keyframes conf-330 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }   100% { opacity:0; transform:translate(43px,25px) rotate(250deg); } }
+/* 12 confetti directions (every 30deg), with tumble rotation — explode far and linger */
+@keyframes conf-0   { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(120px,-25px) rotate(520deg); } }
+@keyframes conf-30  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(104px,-85px) rotate(480deg); } }
+@keyframes conf-60  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(60px,-128px) rotate(600deg); } }
+@keyframes conf-90  { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(0px,-145px) rotate(420deg); } }
+@keyframes conf-120 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(-60px,-128px) rotate(560deg); } }
+@keyframes conf-150 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(-104px,-85px) rotate(700deg); } }
+@keyframes conf-180 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(-120px,-25px) rotate(450deg); } }
+@keyframes conf-210 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(-104px,60px) rotate(580deg); } }
+@keyframes conf-240 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(-60px,104px) rotate(490deg); } }
+@keyframes conf-270 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(0px,120px) rotate(640deg); } }
+@keyframes conf-300 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(60px,104px) rotate(430deg); } }
+@keyframes conf-330 { 0% { opacity:1; transform:translate(-50%,-50%) rotate(0deg); }  60% { opacity:1; } 100% { opacity:0; transform:translate(104px,60px) rotate(570deg); } }
 
 /* Progress bar with label */
 .wizard-progressbar {
@@ -365,12 +372,13 @@
   }
 
   .wizard-bubble {
-    max-width: 220px;
-    padding: 0.5rem 0.75rem;
+    width: 140px;
+    height: 140px;
   }
 
   .wizard-bubble__text {
-    font-size: 0.7rem;
+    font-size: 0.6rem;
+    max-width: 98px;
   }
 
   .wizard-modal {

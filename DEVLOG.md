@@ -1,5 +1,19 @@
 # Devlog
 
+## 2026-03-26 — Wizard: truly spherical bubbles
+
+- **Spherical bubbles**: fixed width/height to 160px with `border-radius: 50%` and flex centering. Text inscribed at ~70% of diameter. Mobile: 140px. No more oblong shapes.
+
+## 2026-03-26 — Wizard fixes: zoom, shake, bubbles, spacebar, confetti
+
+- **Zoom demo**: now zooms out 3 times to reveal the spheres before zooming back in
+- **Shake freeze fix**: stabilized `onClose` ref to prevent re-render loops when shake randomizes controls
+- **Circular bubbles**: fixed `border-radius: 50% / 45%` → `50%` (was creating oblong ellipses)
+- **Spacebar cancel**: pressing space during wizard now cancels it immediately
+- **Confetti linger**: doubled travel distances, increased duration to 1.4s, confetti stays visible longer before fading
+- **Roadmap**: added future version themes — Puddle (oil spill), Smash (broken glass)
+- Routed from LIFE /pdump
+
 ## 2026-03-26 — Wizard: confetti pop, comic sans, progress bar
 
 - **Party/Lo step removed**: skipped the visual toggle demo step entirely to fix the freeze loop.

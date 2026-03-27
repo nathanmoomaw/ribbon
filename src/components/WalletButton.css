@@ -1,0 +1,41 @@
+.wallet-btn {
+  display: inline-flex;
+}
+
+.wallet-btn__trigger {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(30, 28, 50, 0.8);
+  border: 1px solid rgba(100, 90, 140, 0.3);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, color 0.2s;
+  letter-spacing: 0.05em;
+}
+
+.wallet-btn__trigger:hover {
+  border-color: rgba(224, 64, 251, 0.4);
+  color: var(--text-primary);
+  box-shadow: 0 0 8px rgba(224, 64, 251, 0.15);
+}
+
+.wallet-btn__trigger--connected {
+  border-color: rgba(34, 170, 85, 0.4);
+  color: #22aa55;
+}
+
+.wallet-btn__trigger--connected:hover {
+  border-color: rgba(34, 170, 85, 0.6);
+  box-shadow: 0 0 8px rgba(34, 170, 85, 0.2);
+}
+
+.wallet-btn__address {
+  font-size: 0.55rem;
+}
+
+.wallet-btn__connect {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

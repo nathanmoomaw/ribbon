@@ -1,6 +1,7 @@
 import { useCallback, useRef as useRefHook, forwardRef, memo } from 'react'
 import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
+import { RotaryKnob } from './RotaryKnob'
 import './Controls.css'
 
 function DJFader({ value, onChange, ghostValue }) {
@@ -131,14 +132,14 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
     getEngine().setWaveform(type, index)
   }, [index, params, getEngine, onUpdate])
 
-  const handleDetune = useCallback((e) => {
-    const detune = parseInt(e.target.value)
+  const handleDetune = useCallback((val) => {
+    const detune = Math.round(val)
     onUpdate(index, { ...params, detune })
     getEngine().setOscDetune(index, detune)
   }, [index, params, getEngine, onUpdate])
 
-  const handleMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
+  const handleMix = useCallback((val) => {
+    const mix = val
     onUpdate(index, { ...params, mix })
     getEngine().setOscMix(index, mix)
   }, [index, params, getEngine, onUpdate])
@@ -160,7 +161,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <MiniShakeBolt onClick={handleOscShake} title={`Randomize OSC ${index + 1}`} />
       <div className="controls__section">
         <label className="controls__label">Wave</label>
-        <div className="controls__waveforms">
+        <div className="controls__waveforms controls__waveforms--circular">
           {WAVEFORMS.map((w) => (
             <button
               key={w}
@@ -172,28 +173,26 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
           ))}
         </div>
       </div>
-      <div className="controls__section">
-        <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
-        <input
-          className={`slider--osc${index + 1}-mix`}
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
+      <div className="controls__osc-knobs">
+        <RotaryKnob
           value={params.mix}
+          min={0}
+          max={1}
+          step={0.01}
           onChange={handleMix}
+          color={OSC_COLORS[index]}
+          label={`Mix ${Math.round(params.mix * 100)}%`}
+          size={42}
         />
-      </div>
-      <div className="controls__section">
-        <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
-        <input
-          className={`slider--osc${index + 1}-detune`}
-          type="range"
-          min="-1200"
-          max="1200"
-          step="1"
+        <RotaryKnob
           value={params.detune}
+          min={-1200}
+          max={1200}
+          step={1}
           onChange={handleDetune}
+          color={OSC_COLORS[index]}
+          label={`Det ${params.detune}¢`}
+          size={42}
         />
       </div>
     </div>
@@ -252,52 +251,44 @@ export const Controls = forwardRef(function Controls({
     volRafRef.current = requestAnimationFrame(() => setVolume(val))
   }, [getEngine, setVolume])
 
-  const handleDelayTime = useCallback((e) => {
-    const time = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, time }))
-    getEngine().setDelay({ time })
+  const handleDelayTime = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, time: val }))
+    getEngine().setDelay({ time: val })
   }, [getEngine, setDelayParams])
 
-  const handleDelayFeedback = useCallback((e) => {
-    const feedback = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, feedback }))
-    getEngine().setDelay({ feedback })
+  const handleDelayFeedback = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, feedback: val }))
+    getEngine().setDelay({ feedback: val })
   }, [getEngine, setDelayParams])
 
-  const handleDelayMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, mix }))
-    getEngine().setDelay({ mix })
+  const handleDelayMix = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, mix: val }))
+    getEngine().setDelay({ mix: val })
   }, [getEngine, setDelayParams])
 
-  const handleReverbMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
-    setReverbMix(mix)
-    getEngine().setReverb({ mix })
+  const handleReverbMix = useCallback((val) => {
+    setReverbMix(val)
+    getEngine().setReverb({ mix: val })
   }, [getEngine, setReverbMix])
 
-  const handleCutoff = useCallback((e) => {
-    const cutoff = parseFloat(e.target.value)
-    setFilterParams((prev) => ({ ...prev, cutoff }))
-    getEngine().setFilter({ cutoff })
+  const handleCutoff = useCallback((val) => {
+    setFilterParams((prev) => ({ ...prev, cutoff: val }))
+    getEngine().setFilter({ cutoff: val })
   }, [getEngine, setFilterParams])
 
-  const handleResonance = useCallback((e) => {
-    const resonance = parseFloat(e.target.value)
-    setFilterParams((prev) => ({ ...prev, resonance }))
-    getEngine().setFilter({ resonance })
+  const handleResonance = useCallback((val) => {
+    setFilterParams((prev) => ({ ...prev, resonance: val }))
+    getEngine().setFilter({ resonance: val })
   }, [getEngine, setFilterParams])
 
-  const handleCrunch = useCallback((e) => {
-    const value = parseFloat(e.target.value)
-    setCrunch(value)
-    getEngine().setCrunch(value)
+  const handleCrunch = useCallback((val) => {
+    setCrunch(val)
+    getEngine().setCrunch(val)
   }, [getEngine, setCrunch])
 
-  const handleGlideSpeed = useCallback((e) => {
-    const value = parseFloat(e.target.value)
-    setGlideSpeed(value)
-    getEngine().setGlideSpeed(value)
+  const handleGlideSpeed = useCallback((val) => {
+    setGlideSpeed(val)
+    getEngine().setGlideSpeed(val)
   }, [getEngine, setGlideSpeed])
 
   return (
@@ -409,56 +400,33 @@ export const Controls = forwardRef(function Controls({
 
             <div className="controls__section">
               <label className="controls__label">Filter</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Cutoff</span>
-                  <input className="slider--orange" type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
-                </div>
-                <div className="controls__knob">
-                  <span>Res</span>
-                  <input className="slider--gold" type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
-                </div>
+              <div className="controls__rotary-row">
+                <RotaryKnob value={filterParams.cutoff} min={20} max={20000} step={1} onChange={handleCutoff} color="#ff8c42" label="Cutoff" size={40} />
+                <RotaryKnob value={filterParams.resonance} min={0} max={25} step={0.1} onChange={handleResonance} color="#ffd700" label="Res" size={40} />
               </div>
             </div>
 
             <div className="controls__section">
               <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
-              <input
-                className="slider--lime"
-                type="range"
-                min="0.001"
-                max="0.3"
-                step="0.001"
-                value={glideSpeed}
-                onChange={handleGlideSpeed}
-              />
+              <RotaryKnob value={glideSpeed} min={0.001} max={0.3} step={0.001} onChange={handleGlideSpeed} color="#39ff14" size={40} />
             </div>
 
             <div className="controls__section controls__section--reverb">
               <label className="controls__label">Reverb <span className="controls__value">{Math.round(reverbMix * 100)}%</span></label>
-              <input className="slider--teal" type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+              <RotaryKnob value={reverbMix} min={0} max={1} step={0.01} onChange={handleReverbMix} color="#00e5cc" size={40} />
             </div>
 
             <div className="controls__section controls__section--crunch">
               <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
-              <input className="slider--red" type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
+              <RotaryKnob value={crunch} min={0} max={1} step={0.01} onChange={handleCrunch} color="#ff3366" size={40} />
             </div>
 
             <div className="controls__section controls__section--full controls__section--delay">
               <label className="controls__label">Delay</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Time</span>
-                  <input className="slider--blue" type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
-                </div>
-                <div className="controls__knob">
-                  <span>Fdbk</span>
-                  <input className="slider--lavender" type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
-                </div>
-                <div className="controls__knob">
-                  <span>Mix</span>
-                  <input className="slider--silver" type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
-                </div>
+              <div className="controls__rotary-row">
+                <RotaryKnob value={delayParams.time} min={0.05} max={1} step={0.01} onChange={handleDelayTime} color="#4d8bff" label="Time" size={40} />
+                <RotaryKnob value={delayParams.feedback} min={0} max={0.9} step={0.01} onChange={handleDelayFeedback} color="#9b8bff" label="Fdbk" size={40} />
+                <RotaryKnob value={delayParams.mix} min={0} max={1} step={0.01} onChange={handleDelayMix} color="#c8d0e0" label="Mix" size={40} />
               </div>
             </div>
           </div>

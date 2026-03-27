@@ -1,12 +1,11 @@
 # Roadmap
 
-## Up Next (v3)
-- [ ] v3 — cryptic crypto integration, glitch/datamosh visual overhaul
+## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
-- [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
 - [ ] Production domain setup
-- [ ] Rotary knob components (replace range sliders)
+- [ ] Wire first_sound milestone to Puddle touch events
+- [ ] Update presets.js to serialize VCF, loop, and goop state in QR codes
 
 ## Future Features
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)
@@ -16,7 +15,7 @@
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
-- [ ] Future versions: Puddle (oil spill theme), Smash (broken glass theme)
+- [ ] Future versions: Smash (broken glass theme)
 
 ## Completed
 - [x] Vite + React project scaffold
@@ -99,3 +98,10 @@
 - [x] v2 "Rock & Rumble" tag — tagged and deployed to /v2
 - [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
 - [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved)
+- [x] v3 "Puddle" — iridescent oil-spill kaos pad surface with Three.js custom shaders
+- [x] Rotary knob components (replace range sliders) with ghost slider overlay
+- [x] VCF control — per-oscillator voltage-controlled filter with routing buttons
+- [x] Capture/looper — event-based recording/playback with 33.3s max, layering
+- [x] Goop/liquid control — per-control goop levels with SVG blob overlay, shake to clean
+- [x] Crypto integration — RainbowKit + wagmi wallet connection, POAP milestone tracking
+- [x] POAP support — localStorage-based milestone tracking with toast notifications

@@ -20,7 +20,7 @@
 - [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
 - [ ] Future versions: Puddle (oil spill theme), Smash (broken glass theme)
 - [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
-- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal
+- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved for now)
 
 ## Completed
 - [x] Vite + React project scaffold

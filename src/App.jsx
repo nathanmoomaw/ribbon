@@ -515,11 +515,12 @@ function App() {
         <PresetQR url={qrUrl} onClose={() => setQrUrl(null)} />
       )}
 
-      <WizardTrigger onClick={() => setWizardActive(w => !w)} />
+      {/* Help wizard shelved — partially implemented, targeting future version */}
+      {/* <WizardTrigger onClick={() => setWizardActive(w => !w)} />
       <HelpWizard
         active={wizardActive}
         onClose={() => setWizardActive(false)}
-      />
+      /> */}
     </div>
   )
 }

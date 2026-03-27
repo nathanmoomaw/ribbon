@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-27 — Shelve help wizard
+
+- Commented out WizardTrigger and HelpWizard from App.jsx
+- Code preserved in HelpWizard.jsx/css for future version
+- Marked as partially implemented in roadmap
+
 ## 2026-03-26 — Wizard: truly spherical bubbles
 
 - **Spherical bubbles**: fixed width/height to 160px with `border-radius: 50%` and flex centering. Text inscribed at ~70% of diameter. Mobile: 140px. No more oblong shapes.

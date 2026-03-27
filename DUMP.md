@@ -256,5 +256,5 @@ volume slider (horizontal)
 
 # Friday March 27
 
-[] let's shelve demo mode for now and note and keep its functionality as partially implemented feature
+[x] let's shelve demo mode for now and note and keep its functionality as partially implemented feature
 

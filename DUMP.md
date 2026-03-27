@@ -253,3 +253,8 @@ volume slider (horizontal)
 [x] the confetti should explode out of the bubbles more and stay on the screen for a bit
 [x] add versions to roadmap: puddle (oil spill), smash (broken glass)
 [x] bubbles are not spherical yet..
+
+# Friday March 27
+
+[] let's shelve demo mode for now and note and keep its functionality as partially implemented feature
+

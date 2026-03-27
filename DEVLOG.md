@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-27 — Version files + v2 tag update
+
+- Created `versions/v1.md`, `versions/v2.md`, `versions/v3.md` with feature lists
+- v2 tag updated to current build (includes QR preset names, help wizard code, MIDI, etc.)
+- Merged to main for production deploy
+
 ## 2026-03-27 — QR: name printed on code + filename cleanup
 
 - Preset name now rendered directly on the QR code in a gradient-colored text band across the center

@@ -260,3 +260,6 @@ volume slider (horizontal)
 [x] in the qr modal when the user types a name can that be incorporated into the qr code?
 [x] is it possible to actually get the text printed into the qr in some way?
 [x] change the default filename for them from ribbon-preset-xx to simply ribbon-xx where xx is the name
+[x] create version files for both v1 and v2 and create one for v3 as well with intended features
+[x] merge the current build to main and also add it to the v2 tag and thusly /v2 locked at this particular build.  update version files
+

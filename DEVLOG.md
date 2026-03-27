@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-27 — QR: name printed on code + filename cleanup
+
+- Preset name now rendered directly on the QR code in a gradient-colored text band across the center
+- Uses error correction level 'H' when name is present to keep QR scannable despite the overlay
+- Download filename changed from `ribbon-preset-xx` to `ribbon-xx` (or `ribbon-preset` when unnamed)
+
 ## 2026-03-27 — QR preset name encoded in URL
 
 - Preset name now encoded in the QR code URL as `&n=<name>` parameter

@@ -23,15 +23,18 @@ function lerpColor(stops, t) {
   return stops[stops.length - 1].color
 }
 
-function drawColoredQR(canvas, url) {
+function drawColoredQR(canvas, url, name) {
   const size = 280
+
+  // Use higher error correction when embedding text so the QR stays scannable
+  const ecLevel = name ? 'H' : 'M'
 
   // Generate QR modules
   QRCode.toCanvas(canvas, url, {
     width: size,
     margin: 2,
     color: { dark: '#000000', light: '#00000000' },
-    errorCorrectionLevel: 'M',
+    errorCorrectionLevel: ecLevel,
   }, () => {
     const ctx = canvas.getContext('2d')
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
@@ -54,6 +57,50 @@ function drawColoredQR(canvas, url) {
       }
     }
     ctx.putImageData(imageData, 0, 0)
+
+    // Overlay preset name in a cleared band across the center of the QR
+    if (name) {
+      const trimmed = name.trim()
+      if (trimmed) {
+        const fontSize = Math.min(20, Math.max(12, Math.floor(size / (trimmed.length * 0.7))))
+        ctx.font = `bold ${fontSize}px monospace`
+        const textMetrics = ctx.measureText(trimmed)
+        const textW = textMetrics.width + 12
+        const textH = fontSize + 8
+        const cx = canvas.width / 2
+        const cy = canvas.height / 2
+
+        // Clear a rounded band behind the text
+        ctx.fillStyle = 'rgba(10, 10, 26, 0.85)'
+        const rx = cx - textW / 2
+        const ry = cy - textH / 2
+        const r = 4
+        ctx.beginPath()
+        ctx.moveTo(rx + r, ry)
+        ctx.lineTo(rx + textW - r, ry)
+        ctx.quadraticCurveTo(rx + textW, ry, rx + textW, ry + r)
+        ctx.lineTo(rx + textW, ry + textH - r)
+        ctx.quadraticCurveTo(rx + textW, ry + textH, rx + textW - r, ry + textH)
+        ctx.lineTo(rx + r, ry + textH)
+        ctx.quadraticCurveTo(rx, ry + textH, rx, ry + textH - r)
+        ctx.lineTo(rx, ry + r)
+        ctx.quadraticCurveTo(rx, ry, rx + r, ry)
+        ctx.closePath()
+        ctx.fill()
+
+        // Draw the text with the same gradient
+        const grad = ctx.createLinearGradient(cx - textW / 2, cy, cx + textW / 2, cy)
+        grad.addColorStop(0, 'rgb(0, 240, 255)')
+        grad.addColorStop(0.25, 'rgb(139, 92, 246)')
+        grad.addColorStop(0.5, 'rgb(255, 110, 199)')
+        grad.addColorStop(0.75, 'rgb(255, 170, 50)')
+        grad.addColorStop(1, 'rgb(57, 255, 20)')
+        ctx.fillStyle = grad
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(trimmed, cx, cy)
+      }
+    }
   })
 }
 
@@ -68,12 +115,12 @@ export function PresetQR({ settings, initialName, onClose }) {
     [settings, name]
   )
 
-  // Redraw QR when URL changes (including name changes)
+  // Redraw QR when URL or name changes
   useEffect(() => {
     if (canvasRef.current && url) {
-      drawColoredQR(canvasRef.current, url)
+      drawColoredQR(canvasRef.current, url, name)
     }
-  }, [url])
+  }, [url, name])
 
   const handleDownload = useCallback(() => {
     const canvas = canvasRef.current
@@ -102,7 +149,7 @@ export function PresetQR({ settings, initialName, onClose }) {
     }
 
     const link = document.createElement('a')
-    link.download = `ribbon-preset${name ? '-' + name.replace(/\s+/g, '-').toLowerCase() : ''}.png`
+    link.download = `ribbon${name ? '-' + name.trim().replace(/\s+/g, '-').toLowerCase() : '-preset'}.png`
     link.href = dlCanvas.toDataURL('image/png')
     link.click()
   }, [name])

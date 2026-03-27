@@ -257,4 +257,4 @@ volume slider (horizontal)
 # Friday March 27
 
 [x] let's shelve demo mode for now and note and keep its functionality as partially implemented feature
-
+[x] in the qr modal when the user types a name can that be incorporated into the qr code?

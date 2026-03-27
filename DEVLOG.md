@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-27 — QR preset name encoded in URL
+
+- Preset name now encoded in the QR code URL as `&n=<name>` parameter
+- QR code regenerates live as user types a name in the modal
+- Name is restored when scanning/loading a preset URL
+- Refactored PresetQR to accept settings instead of pre-built URL
+
 ## 2026-03-27 — Shelve help wizard
 
 - Commented out WizardTrigger and HelpWizard from App.jsx

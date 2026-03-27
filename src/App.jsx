@@ -14,7 +14,7 @@ import { PresetQR } from './components/PresetQR'
 import { HelpWizard, WizardTrigger } from './components/HelpWizard'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
-import { readPresetFromUrl, buildPresetUrl } from './utils/presets'
+import { readPresetFromUrl } from './utils/presets'
 import './App.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -27,7 +27,9 @@ function nudge(current, min, max, intensity) {
 }
 
 // Read preset from URL hash on initial load (before first render)
-const _urlPreset = readPresetFromUrl()
+const _urlPresetData = readPresetFromUrl()
+const _urlPreset = _urlPresetData?.settings ?? null
+const _urlPresetName = _urlPresetData?.name ?? ''
 
 function App() {
   const getEngine = useAudioEngine()
@@ -57,7 +59,7 @@ function App() {
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const [easterEgg, setEasterEgg] = useState(false)
-  const [qrUrl, setQrUrl] = useState(null)
+  const [qrSettings, setQrSettings] = useState(null)
   const [wizardActive, setWizardActive] = useState(false)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
@@ -381,11 +383,10 @@ function App() {
   }, [getEngine])
 
   const handleQRCreate = useCallback(() => {
-    const url = buildPresetUrl({
+    setQrSettings({
       mode, oscParams, volume, octaves, delayParams, reverbMix, crunch,
       filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
     })
-    setQrUrl(url)
   }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode])
 
   const handleKillAll = useCallback(() => {
@@ -511,8 +512,8 @@ function App() {
         </div>
       )}
 
-      {qrUrl && (
-        <PresetQR url={qrUrl} onClose={() => setQrUrl(null)} />
+      {qrSettings && (
+        <PresetQR settings={qrSettings} initialName={_urlPresetName} onClose={() => setQrSettings(null)} />
       )}
 
       {/* Help wizard shelved — partially implemented, targeting future version */}

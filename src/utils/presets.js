@@ -82,19 +82,32 @@ export function deserializePreset(encoded) {
 
 /**
  * Build a full shareable URL with the preset encoded in the hash.
+ * Optionally includes a preset name.
  */
-export function buildPresetUrl(settings) {
+export function buildPresetUrl(settings, name) {
   const encoded = serializePreset(settings)
   const base = window.location.origin + window.location.pathname
-  return `${base}#p=${encoded}`
+  let url = `${base}#p=${encoded}`
+  if (name) url += `&n=${encodeURIComponent(name)}`
+  return url
 }
 
 /**
  * Try to read a preset from the current URL hash.
- * Returns deserialized settings or null.
+ * Returns { settings, name } or null.
  */
 export function readPresetFromUrl() {
   const hash = window.location.hash
   if (!hash.startsWith('#p=')) return null
-  return deserializePreset(hash.slice(3))
+  const parts = hash.slice(1).split('&')
+  let encoded = null
+  let name = ''
+  for (const part of parts) {
+    if (part.startsWith('p=')) encoded = part.slice(2)
+    if (part.startsWith('n=')) name = decodeURIComponent(part.slice(2))
+  }
+  if (!encoded) return null
+  const settings = deserializePreset(encoded)
+  if (!settings) return null
+  return { settings, name }
 }

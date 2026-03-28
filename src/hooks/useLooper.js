@@ -18,6 +18,7 @@ export function useLooper(replayCallbacks) {
   const loopDurationRef = useRef(0)
   const recordStartRef = useRef(0)
   const playbackTimersRef = useRef([])
+  const replayPassRef = useRef(null)
 
   // Record a single event
   const recordEvent = useCallback((type, data) => {
@@ -27,7 +28,7 @@ export function useLooper(replayCallbacks) {
     eventsRef.current.push({ t, type, data })
   }, [recording])
 
-  // Start recording
+  // Start recording — also engages playback immediately
   const startRecording = useCallback(() => {
     if (recording) {
       // Stop recording
@@ -35,9 +36,11 @@ export function useLooper(replayCallbacks) {
       loopDurationRef.current = duration
       setRecording(false)
       setHasLoop(eventsRef.current.length > 0)
-      // If not already playing, start playback
+      // If not already playing, start playback of what was just recorded
       if (!playing && eventsRef.current.length > 0) {
-        startPlayback()
+        setPlaying(true)
+        // Defer replay to next tick so state is settled
+        setTimeout(() => replayPassRef.current?.(), 0)
       }
       return
     }
@@ -50,6 +53,8 @@ export function useLooper(replayCallbacks) {
 
     recordStartRef.current = performance.now()
     setRecording(true)
+    // Also engage play state so user sees it's active
+    setPlaying(true)
   }, [recording, playing])
 
   // Replay a single pass of events
@@ -79,6 +84,8 @@ export function useLooper(replayCallbacks) {
 
     playbackTimersRef.current = timers
   }, [replayCallbacks])
+
+  replayPassRef.current = replayPass
 
   // Start playback
   const startPlayback = useCallback(() => {

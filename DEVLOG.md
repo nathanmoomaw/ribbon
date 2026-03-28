@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-03-27 — Organic puddle shape + looper record fix
+
+- Puddle shape now organic blob via CSS clip-path polygon (irregular oil-spill silhouette, not a circle)
+- Three.js blob geometry uses multi-harmonic warping with lobe protrusions for natural puddle feel
+- Replaced box-shadow with drop-shadow filter to work with clip-path
+- Looper: clicking record now also engages play button immediately; playback starts after recording stops
+
 ## 2026-03-27 — Bug fixes + puddle-style QR code
 
 - Fixed `toggleRecording` TDZ crash: moved useLooper hook above keyHandlers useMemo

@@ -130,15 +130,24 @@ export function usePuddleRenderer(containerRef, ripples, getEngine) {
     // Puddle mesh — subdivided plane
     const geometry = new THREE.PlaneGeometry(2, 2, 96, 96)
 
-    // Make it blob-shaped by warping vertices into an ellipse
+    // Warp vertices into an organic oil-puddle blob — irregular, not circular
     const posAttr = geometry.attributes.position
     for (let i = 0; i < posAttr.count; i++) {
       const x = posAttr.getX(i)
       const y = posAttr.getY(i)
       const dist = Math.sqrt(x * x + y * y)
-      // Organic blob boundary with some noise
       const angle = Math.atan2(y, x)
-      const blobRadius = 0.85 + 0.1 * Math.sin(angle * 3) + 0.05 * Math.cos(angle * 5 + 1)
+      // Irregular blob boundary — multiple harmonics for organic feel
+      const blobRadius = 0.78
+        + 0.12 * Math.sin(angle * 2 + 0.5)
+        + 0.08 * Math.cos(angle * 3 - 0.8)
+        + 0.06 * Math.sin(angle * 5 + 2.1)
+        + 0.04 * Math.cos(angle * 7 + 0.3)
+        + 0.03 * Math.sin(angle * 11 - 1.5) // high-freq wobble
+        // Small lobe protrusions at specific angles (like the sketch)
+        + 0.10 * Math.max(0, Math.cos(angle - 0.8)) // upper-right lobe
+        + 0.08 * Math.max(0, Math.cos(angle + 2.5)) // lower-left bump
+        + 0.06 * Math.max(0, Math.cos(angle + 0.5)) // upper-left bump
       if (dist > blobRadius) {
         const scale = blobRadius / dist
         posAttr.setXY(i, x * scale, y * scale)

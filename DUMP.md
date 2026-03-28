@@ -299,3 +299,5 @@ fetchRemoteFeatures @ core-NBHA5TBC.js?v=ceb213f8:9690
 pulse.walletconnect.org/e?projectId=ribbon-puddle-v3&st=appkit&sv=html-core-1.7.8:1  Failed to load resource: the server responded with a status of 400 ()
 [x] for v3 let's also adjust the look/feel of the qr itself.  it should resemble the puddle (with current smears, etc, as it presently stands), so maybe spill out of the qr square some to acheive this.
 [x] when a user puts text into the qr i would like to see the letters in a more abstracted way than the standard font they currently render.  ideally, if the user typed the qr name as "bombastic" it should render into the qr code in a way that resembles warped recaptcha lettering.  less emphasis on legibility, more on puddly weird asthetic.
+[x] getting this console error: config.js:7 Uncaught ReferenceError: process is not defined
+    at config.js:7:34

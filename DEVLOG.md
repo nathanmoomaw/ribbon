@@ -3,6 +3,7 @@
 ## 2026-03-27 — Bug fixes + puddle-style QR code
 
 - Fixed `toggleRecording` TDZ crash: moved useLooper hook above keyHandlers useMemo
+- Fixed `process is not defined` error: use `import.meta.env` instead of `process.env` (Vite)
 - Made WalletConnect projectId configurable via `VITE_WALLETCONNECT_PROJECT_ID` env var
 - QR code now uses oil-spill iridescent gradient (swirling radial+angular, thin-film palette)
 - QR code has organic spill drips extending beyond the square boundary

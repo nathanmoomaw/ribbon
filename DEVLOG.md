@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-27 — Bug fixes + puddle-style QR code
+
+- Fixed `toggleRecording` TDZ crash: moved useLooper hook above keyHandlers useMemo
+- Made WalletConnect projectId configurable via `VITE_WALLETCONNECT_PROJECT_ID` env var
+- QR code now uses oil-spill iridescent gradient (swirling radial+angular, thin-film palette)
+- QR code has organic spill drips extending beyond the square boundary
+- Preset name text renders in warped recaptcha style: per-character rotation, scale, skew, jitter
+
 ## 2026-03-27 — v3 "Puddle" implementation
 
 - **Puddle surface**: Three.js custom shaders for iridescent oil-spill effect with ripple physics, Asteroids-style confetti with firework bursts, moving grid background

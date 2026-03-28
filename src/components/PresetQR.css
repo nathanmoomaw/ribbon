@@ -58,7 +58,9 @@
 
 .preset-qr-modal__canvas {
   border-radius: 8px;
-  background: #0a0a1a;
+  background: transparent;
+  max-width: 100%;
+  height: auto;
 }
 
 .preset-qr-modal__name {

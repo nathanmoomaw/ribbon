@@ -126,6 +126,14 @@ function App() {
     if (window.location.hash) history.replaceState(null, '', window.location.pathname)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // --- Looper ---
+  const replayCallbacksRef = useRef({})
+  const {
+    recording, playing, hasLoop,
+    recordEvent, toggleRecording, togglePlayback,
+    getLoopData, loadLoopData,
+  } = useLooper(replayCallbacksRef)
+
   const keyHandlers = useMemo(() => ({
     Space: () => {
       const now = Date.now()
@@ -209,13 +217,6 @@ function App() {
 
   useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove)
 
-  // --- Looper ---
-  const replayCallbacksRef = useRef({})
-  const {
-    recording, playing, hasLoop,
-    recordEvent, toggleRecording, togglePlayback,
-    getLoopData, loadLoopData,
-  } = useLooper(replayCallbacksRef)
 
   // Wire replay callbacks (called during loop playback)
   useEffect(() => {

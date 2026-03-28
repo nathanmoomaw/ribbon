@@ -3,13 +3,16 @@ import QRCode from 'qrcode'
 import { buildPresetUrl } from '../utils/presets'
 import './PresetQR.css'
 
-// Ribbon gradient colors for the QR code
+// Oil-spill iridescent gradient — thin-film interference palette
 const GRADIENT_STOPS = [
-  { offset: 0, color: [0, 240, 255] },      // cyan
-  { offset: 0.25, color: [139, 92, 246] },   // purple
-  { offset: 0.5, color: [255, 110, 199] },   // pink
-  { offset: 0.75, color: [255, 170, 50] },   // orange
-  { offset: 1, color: [57, 255, 20] },       // green
+  { offset: 0, color: [180, 40, 255] },     // deep violet
+  { offset: 0.15, color: [0, 200, 255] },    // cyan
+  { offset: 0.3, color: [20, 255, 160] },    // teal-green
+  { offset: 0.45, color: [255, 200, 0] },    // gold
+  { offset: 0.6, color: [255, 60, 180] },    // magenta
+  { offset: 0.75, color: [100, 0, 255] },    // violet
+  { offset: 0.9, color: [0, 220, 255] },     // cyan again (wrap)
+  { offset: 1, color: [180, 40, 255] },      // back to violet
 ]
 
 function lerpColor(stops, t) {
@@ -23,31 +26,179 @@ function lerpColor(stops, t) {
   return stops[stops.length - 1].color
 }
 
+// Seeded pseudo-random for consistent spill shapes per URL
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed)
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t
+    return ((t ^ t >>> 14) >>> 0) / 4294967296
+  }
+}
+
+function hashString(str) {
+  let h = 0
+  for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0
+  return h
+}
+
+// Draw organic spill drips extending beyond QR boundary
+function drawSpillEdges(ctx, w, h, rng) {
+  const spillCount = 8 + Math.floor(rng() * 6)
+  for (let i = 0; i < spillCount; i++) {
+    const side = Math.floor(rng() * 4) // 0=top, 1=right, 2=bottom, 3=left
+    const t = 0.15 + rng() * 0.7 // position along edge (avoid corners)
+    const spillLen = 8 + rng() * 18
+    const spillWidth = 4 + rng() * 10
+
+    let sx, sy, ex, ey, cp1x, cp1y, cp2x, cp2y
+    if (side === 0) { // top
+      sx = t * w; sy = 0; ex = sx + (rng() - 0.5) * spillWidth; ey = -spillLen
+    } else if (side === 1) { // right
+      sx = w; sy = t * h; ex = w + spillLen; ey = sy + (rng() - 0.5) * spillWidth
+    } else if (side === 2) { // bottom
+      sx = t * w; sy = h; ex = sx + (rng() - 0.5) * spillWidth; ey = h + spillLen
+    } else { // left
+      sx = 0; sy = t * h; ex = -spillLen; ey = sy + (rng() - 0.5) * spillWidth
+    }
+
+    cp1x = sx + (ex - sx) * 0.3 + (rng() - 0.5) * spillWidth
+    cp1y = sy + (ey - sy) * 0.3 + (rng() - 0.5) * spillWidth
+    cp2x = sx + (ex - sx) * 0.7 + (rng() - 0.5) * spillWidth * 0.5
+    cp2y = sy + (ey - sy) * 0.7 + (rng() - 0.5) * spillWidth * 0.5
+
+    const gradT = (sx + sy) / (w + h)
+    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT)
+
+    ctx.beginPath()
+    ctx.moveTo(sx, sy)
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, ex, ey)
+
+    // Draw as a tapered blob
+    const bx = ex + (rng() - 0.5) * 4
+    const by = ey + (rng() - 0.5) * 4
+    ctx.bezierCurveTo(bx + spillWidth * 0.3, by + spillWidth * 0.3, cp1x + spillWidth * 0.2, cp1y + spillWidth * 0.2, sx + (side % 2 === 0 ? spillWidth * 0.4 : 0), sy + (side % 2 === 1 ? spillWidth * 0.4 : 0))
+    ctx.closePath()
+
+    ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.5 + rng() * 0.4})`
+    ctx.fill()
+  }
+}
+
+// Draw warped recaptcha-style text — per-character distortion
+function drawWarpedText(ctx, text, cx, cy, size, rng) {
+  const fontSize = Math.min(22, Math.max(11, Math.floor(size / (text.length * 0.65))))
+  const chars = text.split('')
+
+  // Measure total width for centering
+  ctx.font = `bold ${fontSize}px monospace`
+  const charWidths = chars.map(c => ctx.measureText(c).width)
+  const totalW = charWidths.reduce((a, b) => a + b, 0) + chars.length * 1
+  const bandH = fontSize + 14
+
+  // Semi-transparent dark band behind text
+  ctx.fillStyle = 'rgba(10, 10, 26, 0.7)'
+  const rx = cx - totalW / 2 - 6
+  const ry = cy - bandH / 2
+  ctx.beginPath()
+  // Wobbly band shape
+  ctx.moveTo(rx + 3, ry + rng() * 3)
+  ctx.lineTo(rx + totalW + 12 - 3, ry + rng() * 3)
+  ctx.quadraticCurveTo(rx + totalW + 12, ry, rx + totalW + 12, ry + 3)
+  ctx.lineTo(rx + totalW + 12 + rng() * 2, ry + bandH - 3)
+  ctx.quadraticCurveTo(rx + totalW + 12, ry + bandH, rx + totalW + 9, ry + bandH + rng() * 2)
+  ctx.lineTo(rx + 3, ry + bandH + rng() * 2)
+  ctx.quadraticCurveTo(rx, ry + bandH, rx - rng() * 2, ry + bandH - 3)
+  ctx.lineTo(rx - rng() * 2, ry + 3)
+  ctx.quadraticCurveTo(rx, ry, rx + 3, ry + rng() * 3)
+  ctx.closePath()
+  ctx.fill()
+
+  // Draw each character with individual distortion
+  let xPos = cx - totalW / 2
+  for (let i = 0; i < chars.length; i++) {
+    const charW = charWidths[i]
+    const angle = (rng() - 0.5) * 0.35  // rotation: ±~20°
+    const scaleX = 0.85 + rng() * 0.35   // horizontal stretch
+    const scaleY = 0.85 + rng() * 0.35   // vertical stretch
+    const yOff = (rng() - 0.5) * 5       // vertical jitter
+    const skewX = (rng() - 0.5) * 0.2    // horizontal skew
+
+    const gradT = (xPos + cy) / (size * 2)
+    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT % 1)
+
+    ctx.save()
+    ctx.translate(xPos + charW / 2, cy + yOff)
+    ctx.rotate(angle)
+    ctx.transform(scaleX, skewX, 0, scaleY, 0, 0)
+    ctx.font = `bold ${fontSize}px monospace`
+    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(chars[i], 0, 0)
+
+    // Subtle glow on some chars
+    if (rng() > 0.6) {
+      ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`
+      ctx.shadowBlur = 4
+      ctx.fillText(chars[i], 0, 0)
+      ctx.shadowBlur = 0
+    }
+    ctx.restore()
+
+    xPos += charW + 1
+  }
+}
+
 function drawColoredQR(canvas, url, name) {
-  const size = 280
+  const qrSize = 280
+  const spill = 24 // extra space for spill effects
+  const size = qrSize + spill * 2
+
+  canvas.width = size
+  canvas.height = size
 
   // Use higher error correction when embedding text so the QR stays scannable
   const ecLevel = name ? 'H' : 'M'
 
-  // Generate QR modules
-  QRCode.toCanvas(canvas, url, {
-    width: size,
+  // Create a temp canvas for the raw QR
+  const tmpCanvas = document.createElement('canvas')
+
+  QRCode.toCanvas(tmpCanvas, url, {
+    width: qrSize,
     margin: 2,
     color: { dark: '#000000', light: '#00000000' },
     errorCorrectionLevel: ecLevel,
   }, () => {
     const ctx = canvas.getContext('2d')
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, size, size)
+
+    const rng = mulberry32(hashString(url))
+
+    // Draw spill edges first (behind QR)
+    ctx.save()
+    ctx.translate(spill, spill)
+    drawSpillEdges(ctx, qrSize, qrSize, rng)
+    ctx.restore()
+
+    // Draw the QR onto main canvas with offset
+    ctx.drawImage(tmpCanvas, spill, spill)
+
+    // Apply iridescent oil-spill gradient to QR modules
+    const imageData = ctx.getImageData(spill, spill, qrSize, qrSize)
     const data = imageData.data
 
-    // Apply gradient to dark modules
-    for (let y = 0; y < canvas.height; y++) {
-      for (let x = 0; x < canvas.width; x++) {
-        const idx = (y * canvas.width + x) * 4
+    for (let y = 0; y < qrSize; y++) {
+      for (let x = 0; x < qrSize; x++) {
+        const idx = (y * qrSize + x) * 4
         const alpha = data[idx + 3]
         if (alpha > 128) {
-          // This pixel is a dark module — apply diagonal gradient
-          const t = (x + y) / (canvas.width + canvas.height)
+          // Swirling iridescence — use radial+angular gradient for oil-spill look
+          const cx = x / qrSize - 0.5
+          const cy = y / qrSize - 0.5
+          const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
+          const dist = Math.sqrt(cx * cx + cy * cy) * 2
+          const t = (angle * 0.6 + dist * 0.4 + (x + y) / (qrSize * 3)) % 1
           const [r, g, b] = lerpColor(GRADIENT_STOPS, t)
           data[idx] = r
           data[idx + 1] = g
@@ -56,49 +207,34 @@ function drawColoredQR(canvas, url, name) {
         }
       }
     }
-    ctx.putImageData(imageData, 0, 0)
+    ctx.putImageData(imageData, spill, spill)
 
-    // Overlay preset name in a cleared band across the center of the QR
+    // Add subtle iridescent glow around QR edges
+    ctx.save()
+    ctx.translate(spill, spill)
+    const glowGrad = ctx.createRadialGradient(qrSize / 2, qrSize / 2, qrSize * 0.3, qrSize / 2, qrSize / 2, qrSize * 0.6)
+    glowGrad.addColorStop(0, 'rgba(180, 40, 255, 0)')
+    glowGrad.addColorStop(0.7, 'rgba(0, 200, 255, 0.04)')
+    glowGrad.addColorStop(1, 'rgba(255, 60, 180, 0.08)')
+    ctx.globalCompositeOperation = 'screen'
+    ctx.fillStyle = glowGrad
+    ctx.fillRect(-spill, -spill, size, size)
+    ctx.globalCompositeOperation = 'source-over'
+    ctx.restore()
+
+    // Draw more spill drips on top (overlapping QR edges)
+    ctx.save()
+    ctx.translate(spill, spill)
+    ctx.globalAlpha = 0.4
+    drawSpillEdges(ctx, qrSize, qrSize, rng)
+    ctx.globalAlpha = 1
+    ctx.restore()
+
+    // Warped recaptcha-style text overlay
     if (name) {
       const trimmed = name.trim()
       if (trimmed) {
-        const fontSize = Math.min(20, Math.max(12, Math.floor(size / (trimmed.length * 0.7))))
-        ctx.font = `bold ${fontSize}px monospace`
-        const textMetrics = ctx.measureText(trimmed)
-        const textW = textMetrics.width + 12
-        const textH = fontSize + 8
-        const cx = canvas.width / 2
-        const cy = canvas.height / 2
-
-        // Clear a rounded band behind the text
-        ctx.fillStyle = 'rgba(10, 10, 26, 0.85)'
-        const rx = cx - textW / 2
-        const ry = cy - textH / 2
-        const r = 4
-        ctx.beginPath()
-        ctx.moveTo(rx + r, ry)
-        ctx.lineTo(rx + textW - r, ry)
-        ctx.quadraticCurveTo(rx + textW, ry, rx + textW, ry + r)
-        ctx.lineTo(rx + textW, ry + textH - r)
-        ctx.quadraticCurveTo(rx + textW, ry + textH, rx + textW - r, ry + textH)
-        ctx.lineTo(rx + r, ry + textH)
-        ctx.quadraticCurveTo(rx, ry + textH, rx, ry + textH - r)
-        ctx.lineTo(rx, ry + r)
-        ctx.quadraticCurveTo(rx, ry, rx + r, ry)
-        ctx.closePath()
-        ctx.fill()
-
-        // Draw the text with the same gradient
-        const grad = ctx.createLinearGradient(cx - textW / 2, cy, cx + textW / 2, cy)
-        grad.addColorStop(0, 'rgb(0, 240, 255)')
-        grad.addColorStop(0.25, 'rgb(139, 92, 246)')
-        grad.addColorStop(0.5, 'rgb(255, 110, 199)')
-        grad.addColorStop(0.75, 'rgb(255, 170, 50)')
-        grad.addColorStop(1, 'rgb(57, 255, 20)')
-        ctx.fillStyle = grad
-        ctx.textAlign = 'center'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(trimmed, cx, cy)
+        drawWarpedText(ctx, trimmed, size / 2, size / 2, qrSize, rng)
       }
     }
   })

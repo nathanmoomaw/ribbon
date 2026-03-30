@@ -263,6 +263,23 @@
   border-color: rgba(255, 170, 0, 0.15);
 }
 
+/* Desktop: horizontal layout in top bar */
+@media (min-width: 768px) {
+  .activation {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .activation__hold,
+  .activation__stop,
+  .activation__arp-tempo {
+    align-self: auto;
+  }
+}
+
 /* --- Mobile --- */
 
 @media (max-width: 767px) {

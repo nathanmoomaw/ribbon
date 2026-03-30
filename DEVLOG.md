@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-30 — Surround layout, oil spill shaders, wallet QR integration
+
+- **Controls surround puddle**: Desktop layout restructured from side-by-side to CSS grid with controls surrounding the puddle — toggles top, oscillators left, effects right, VCF below center. Uses `display: contents` on Controls wrapper so children participate directly in the grid.
+- **Enhanced oil spill default**: Fragment shader now shows visible rainbow iridescence even when idle — multi-layer thickness variation with slow-moving large swirls, fine detail streaks, and position-dependent color patches. Increased ambient vertex undulation for more surface movement.
+- **Wallet in QR codes**: Connected wallet address now encoded in preset QR URLs. Loop data also included (if under 3KB). QR modal shows creator wallet address badge and "loop included" indicator.
+- **VCF in presets**: VCF cutoff, resonance, and per-oscillator routing now serialized in QR preset URLs and restored on load.
+- **Activation mode horizontal**: Desktop mode controls (Play/Arp, Mono/Poly, Hold, Stop, BPM) now lay out horizontally in the top bar.
+
 ## 2026-03-27 — Organic puddle shape + looper record fix
 
 - Puddle shape now organic blob via CSS clip-path polygon (irregular oil-spill silhouette, not a circle)

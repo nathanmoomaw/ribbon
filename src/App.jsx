@@ -23,6 +23,7 @@ import { VCFControl } from './components/VCFControl'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
+import { useAccount } from 'wagmi'
 import './App.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -38,9 +39,11 @@ function nudge(current, min, max, intensity) {
 const _urlPresetData = readPresetFromUrl()
 const _urlPreset = _urlPresetData?.settings ?? null
 const _urlPresetName = _urlPresetData?.name ?? ''
+const _urlLoopData = _urlPresetData?.loopData ?? null
 
 function App() {
   const getEngine = useAudioEngine()
+  const { address: walletAddress } = useAccount()
 
   const [mode, setMode] = useState(_urlPreset?.mode ?? 'play')
   const [inputMode, setInputMode] = useState('touch')
@@ -122,6 +125,18 @@ function App() {
     engine.setCrunch(_urlPreset.crunch)
     engine.setFilter(_urlPreset.filterParams)
     engine.setGlideSpeed(_urlPreset.glideSpeed)
+    // Restore VCF settings if present
+    if (_urlPreset.vcfCutoff != null) {
+      engine.setVcfCutoff(_urlPreset.vcfCutoff)
+      engine.setVcfResonance(_urlPreset.vcfResonance)
+      if (_urlPreset.vcfRouting) {
+        _urlPreset.vcfRouting.forEach((enabled, i) => engine.setVcfRouting(i, enabled))
+      }
+    }
+    // Load loop data if present (deferred to let looper hooks settle)
+    if (_urlLoopData) {
+      setTimeout(() => loadLoopData(_urlLoopData), 100)
+    }
     // Clear hash after loading so it doesn't persist on refresh with different settings
     if (window.location.hash) history.replaceState(null, '', window.location.pathname)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -454,11 +469,13 @@ function App() {
     setQrSettings({
       mode, oscParams, volume, octaves, delayParams, reverbMix, crunch,
       filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
+      loopData: getLoopData(),
+      walletAddress,
     })
     // Milestone: shared preset
     const m = checkMilestone('shared_preset')
     if (m) showMilestone(m)
-  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode, showMilestone])
+  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode, showMilestone, getLoopData, walletAddress])
 
   const handleKillAll = useCallback(() => {
     getEngine().killAllSound()

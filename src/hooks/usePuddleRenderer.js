@@ -33,8 +33,10 @@ void main() {
     totalDisp += disp;
   }
 
-  // Gentle ambient undulation
-  totalDisp += sin(uv.x * 6.0 + uTime * 0.8) * cos(uv.y * 5.0 + uTime * 0.6) * 0.01;
+  // Ambient undulation — slow organic surface movement
+  totalDisp += sin(uv.x * 6.0 + uTime * 0.8) * cos(uv.y * 5.0 + uTime * 0.6) * 0.018;
+  totalDisp += sin(uv.x * 3.0 + uv.y * 4.0 + uTime * 0.3) * 0.008;
+  totalDisp += cos(uv.x * 5.0 - uv.y * 2.0 + uTime * 0.2) * 0.006;
 
   pos.z += totalDisp;
   vDisplacement = totalDisp;
@@ -69,10 +71,16 @@ void main() {
   float fresnel = 1.0 - abs(dot(vNormal, viewDir));
   fresnel = pow(fresnel, 1.5);
 
-  // Oil film thickness varies across surface + time
+  // Multi-layer oil film thickness — realistic swirl patterns
   float thickness = 1.0
     + sin(vUv.x * 8.0 + uTime * 0.3) * 0.3
     + cos(vUv.y * 7.0 - uTime * 0.4) * 0.25
+    // Slow-moving large swirls (characteristic oil spill bands)
+    + sin(vUv.x * 3.0 + vUv.y * 4.0 + uTime * 0.15) * 0.4
+    + cos(vUv.x * 5.0 - vUv.y * 3.0 + uTime * 0.2) * 0.35
+    // Fine detail streaks
+    + sin((vUv.x + vUv.y) * 12.0 + uTime * 0.1) * 0.15
+    + cos((vUv.x - vUv.y) * 10.0 - uTime * 0.12) * 0.12
     + vDisplacement * 8.0;
 
   vec3 iriColor = iridescence(fresnel, thickness);
@@ -80,12 +88,17 @@ void main() {
   // Dark oil base — more visible in calm areas
   vec3 baseColor = vec3(0.02, 0.02, 0.04);
 
-  // Blend iridescence with base — more color at edges and ripples
-  float iriStrength = 0.3 + fresnel * 0.5 + abs(vDisplacement) * 4.0;
+  // Stronger base iridescence — visible rainbow even when calm
+  float iriStrength = 0.55 + fresnel * 0.35 + abs(vDisplacement) * 4.0;
+
+  // Position-dependent color patches — some areas more colorful (like real oil films)
+  float colorPatch = 0.5 + 0.5 * sin(vUv.x * 4.0 + vUv.y * 3.0 + uTime * 0.08);
+  iriStrength *= 0.7 + colorPatch * 0.4;
+
   vec3 color = mix(baseColor, iriColor, clamp(iriStrength, 0.0, 1.0));
 
   // Specular highlight
-  float spec = pow(fresnel, 4.0) * 0.4;
+  float spec = pow(fresnel, 4.0) * 0.3;
   color += vec3(spec);
 
   // Edge glow

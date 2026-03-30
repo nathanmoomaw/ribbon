@@ -5,7 +5,7 @@
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
 - [ ] Production domain setup
 - [ ] Wire first_sound milestone to Puddle touch events
-- [ ] Update presets.js to serialize VCF, loop, and goop state in QR codes
+- [ ] Serialize goop state in QR codes
 
 ## Future Features
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)
@@ -105,3 +105,7 @@
 - [x] Goop/liquid control — per-control goop levels with SVG blob overlay, shake to clean
 - [x] Crypto integration — RainbowKit + wagmi wallet connection, POAP milestone tracking
 - [x] POAP support — localStorage-based milestone tracking with toast notifications
+- [x] Controls surround puddle layout (CSS grid with display:contents)
+- [x] Enhanced oil spill default shader (multi-layer thickness, position-dependent color patches)
+- [x] Wallet address + loop data in QR preset URLs
+- [x] VCF settings serialized in QR presets

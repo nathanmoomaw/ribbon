@@ -321,6 +321,19 @@ export function PresetQR({ settings, initialName, onClose }) {
           autoFocus
         />
 
+        {(settings.walletAddress || settings.loopData) && (
+          <div className="preset-qr-modal__meta">
+            {settings.walletAddress && (
+              <span className="preset-qr-modal__wallet">
+                {settings.walletAddress.slice(0, 6)}...{settings.walletAddress.slice(-4)}
+              </span>
+            )}
+            {settings.loopData && settings.loopData.events && settings.loopData.events.length > 0 && (
+              <span className="preset-qr-modal__loop-badge">loop included</span>
+            )}
+          </div>
+        )}
+
         <div className="preset-qr-modal__actions">
           <button className="preset-qr-modal__btn" onClick={handleDownload}>
             Save

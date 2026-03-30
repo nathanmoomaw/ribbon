@@ -113,6 +113,36 @@
   transform: scale(0.97);
 }
 
+.preset-qr-modal__meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.preset-qr-modal__wallet {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(224, 64, 251, 0.8);
+  background: rgba(224, 64, 251, 0.1);
+  border: 1px solid rgba(224, 64, 251, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.preset-qr-modal__loop-badge {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(0, 240, 255, 0.8);
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
 /* QR trigger button — sits in lower right of console */
 .preset-qr-trigger {
   position: absolute;

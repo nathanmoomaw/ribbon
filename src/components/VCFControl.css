@@ -58,6 +58,17 @@
   color: var(--text-primary);
 }
 
+/* Desktop: grid position below puddle */
+@media (min-width: 768px) {
+  .vcf-control {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: center;
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+}
+
 .vcf-control__route-btn.active {
   border-color: var(--route-color, var(--cyan));
   background: color-mix(in srgb, var(--route-color, var(--cyan)) 20%, rgba(30, 28, 50, 0.8));

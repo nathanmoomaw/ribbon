@@ -40,6 +40,18 @@ export function serializePreset(settings) {
     bpm: settings.arpBpm,
     vm: settings.visualMode === 'lo' ? 1 : 0,
   }
+
+  // VCF settings
+  if (settings.vcfCutoff != null) {
+    preset.vc = [Math.round(settings.vcfCutoff), round3(settings.vcfResonance)]
+    preset.vr = settings.vcfRouting
+  }
+
+  // Creator wallet address
+  if (settings.walletAddress) {
+    preset.wa = settings.walletAddress
+  }
+
   const json = JSON.stringify(preset)
   return btoa(unescape(encodeURIComponent(json)))
 }
@@ -74,6 +86,10 @@ export function deserializePreset(encoded) {
       hold: p.hd === 1,
       arpBpm: p.bpm,
       visualMode: p.vm === 1 ? 'lo' : 'party',
+      vcfCutoff: p.vc ? p.vc[0] : undefined,
+      vcfResonance: p.vc ? p.vc[1] : undefined,
+      vcfRouting: p.vr || undefined,
+      walletAddress: p.wa || undefined,
     }
   } catch {
     return null
@@ -89,6 +105,20 @@ export function buildPresetUrl(settings, name) {
   const base = window.location.origin + window.location.pathname
   let url = `${base}#p=${encoded}`
   if (name) url += `&n=${encodeURIComponent(name)}`
+
+  // Include loop data if present and URL stays under QR capacity
+  if (settings.loopData && settings.loopData.events && settings.loopData.events.length > 0) {
+    const loopJson = JSON.stringify({
+      ev: settings.loopData.events.map(e => [Math.round(e.t), e.type, e.data]),
+      d: Math.round(settings.loopData.duration),
+    })
+    const loopEncoded = btoa(unescape(encodeURIComponent(loopJson)))
+    const withLoop = url + `&l=${loopEncoded}`
+    if (withLoop.length < 3000) {
+      url = withLoop
+    }
+  }
+
   return url
 }
 
@@ -102,12 +132,28 @@ export function readPresetFromUrl() {
   const parts = hash.slice(1).split('&')
   let encoded = null
   let name = ''
+  let loopEncoded = null
   for (const part of parts) {
     if (part.startsWith('p=')) encoded = part.slice(2)
     if (part.startsWith('n=')) name = decodeURIComponent(part.slice(2))
+    if (part.startsWith('l=')) loopEncoded = part.slice(2)
   }
   if (!encoded) return null
   const settings = deserializePreset(encoded)
   if (!settings) return null
-  return { settings, name }
+
+  // Parse loop data if present
+  let loopData = null
+  if (loopEncoded) {
+    try {
+      const loopJson = decodeURIComponent(escape(atob(loopEncoded)))
+      const lp = JSON.parse(loopJson)
+      loopData = {
+        events: lp.ev.map(e => ({ t: e[0], type: e[1], data: e[2] })),
+        duration: lp.d,
+      }
+    } catch { /* ignore invalid loop data */ }
+  }
+
+  return { settings, name, loopData }
 }

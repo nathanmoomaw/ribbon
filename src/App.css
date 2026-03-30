@@ -58,23 +58,15 @@
   min-height: 0;
 }
 
-/* Desktop: puddle + controls side by side */
+/* Desktop: controls surround the puddle in a grid */
 @media (min-width: 768px) {
   .app__stage {
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 1.5rem;
-  }
-
-  .app__stage .puddle {
-    flex-shrink: 0;
-  }
-
-  .app__stage .controls {
-    flex: 1;
-    min-width: 0;
-    max-height: calc(100dvh - 120px);
-    overflow-y: auto;
+    display: grid;
+    grid-template-columns: minmax(200px, 280px) 1fr minmax(200px, 280px);
+    gap: 0.75rem;
+    align-items: start;
+    max-width: 1200px;
+    width: 100%;
   }
 }
 

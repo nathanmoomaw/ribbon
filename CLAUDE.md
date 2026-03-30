@@ -12,9 +12,11 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 ### Puddle Surface (v3)
 - 2D kaos pad replacing the ribbon strip — X=pitch, Y=velocity
 - Three.js custom shaders: iridescent oil-spill surface with thin-film interference
+- Multi-layer thickness variation for realistic rainbow swirls even when idle
 - Ripple physics: vertex displacement from touch origins in a ring buffer with exponential decay
 - Asteroids-style confetti: unfilled stroke-only geometry with firework bursts
 - Moving grid background with drift animation
+- Desktop layout: CSS grid with controls surrounding puddle (display:contents on Controls wrapper)
 
 ### Rotary Knobs (v3)
 - Replace all range sliders (except volume fader) with rotary knob components
@@ -54,8 +56,10 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 
 ### Presets & Sharing
 - QR code preset system: all synth settings encoded in URL hash (`#p=...`)
+- Includes VCF settings, wallet address (`&wa=`), and loop data (`&l=`) in preset URLs
 - Multi-colored gradient QR codes generated client-side with `qrcode` library
-- Preset URLs restore all settings on load (oscillators, effects, scales, switches)
+- Preset URLs restore all settings on load (oscillators, effects, VCF, scales, switches, loops)
+- Loop data included conditionally (only if URL stays under 3KB for QR readability)
 - Serialization in `src/utils/presets.js`
 
 ### Composition

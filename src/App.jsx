@@ -23,6 +23,7 @@ import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
 import { MobileSplash } from './components/MobileSplash'
+import { PresetSplash } from './components/PresetSplash'
 import { useAccount } from 'wagmi'
 import './App.css'
 
@@ -40,6 +41,8 @@ const _urlPresetData = readPresetFromUrl()
 const _urlPreset = _urlPresetData?.settings ?? null
 const _urlPresetName = _urlPresetData?.name ?? ''
 const _urlLoopData = _urlPresetData?.loopData ?? null
+// Capture the full preset URL before the hash is cleared on mount
+const _urlPresetHref = _urlPreset ? window.location.href : null
 
 function App() {
   const getEngine = useAudioEngine()
@@ -75,6 +78,7 @@ function App() {
   const [easterEgg, setEasterEgg] = useState(false)
   const [qrSettings, setQrSettings] = useState(null)
   const [wizardActive, setWizardActive] = useState(false)
+  const [presetSplashDone, setPresetSplashDone] = useState(!_urlPreset)
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
@@ -133,14 +137,6 @@ function App() {
         _urlPreset.vcfRouting.forEach((enabled, i) => engine.setVcfRouting(i, enabled))
       }
     }
-    // Load loop data if present (deferred to let looper hooks settle)
-    if (_urlLoopData) {
-      setTimeout(() => loadLoopData(_urlLoopData), 100)
-    }
-    // Auto-start arp if preset was saved with arp+hold active and has notes
-    if (_urlPreset.mode === 'arp' && _urlPreset.hold && _urlPreset.arpNotes?.length > 0) {
-      setTimeout(() => arpStart(), 200)
-    }
     // Clear hash after loading so it doesn't persist on refresh with different settings
     if (window.location.hash) history.replaceState(null, '', window.location.pathname)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -189,6 +185,16 @@ function App() {
 
   const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm, arpNotes)
   arpStopRef.current = arpStop
+
+  // Called when user clicks Play on the preset splash screen
+  const handlePresetEnter = useCallback(() => {
+    getEngine() // resume AudioContext via user gesture
+    if (_urlLoopData) loadLoopData(_urlLoopData)
+    if (_urlPreset?.mode === 'arp' && _urlPreset?.hold && _urlPreset?.arpNotes?.length > 0) {
+      setTimeout(() => arpStart(), 100)
+    }
+    setPresetSplashDone(true)
+  }, [getEngine, arpStart, loadLoopData]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Toggle a note in/out of the arp sequence (arp+hold+poly mode)
   const handleArpNoteToggle = useCallback((hz) => {
@@ -515,7 +521,10 @@ function App() {
 
   return (
     <div className={`app app--puddle ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
-      <MobileSplash onEnter={() => getEngine()} />
+      {!presetSplashDone
+        ? <PresetSplash presetUrl={_urlPresetHref} onEnter={handlePresetEnter} />
+        : <MobileSplash onEnter={() => getEngine()} />
+      }
       {/* Moving grid background */}
       <div className="app__grid-bg" />
 

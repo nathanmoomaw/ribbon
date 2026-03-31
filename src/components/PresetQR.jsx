@@ -150,7 +150,7 @@ function drawWarpedText(ctx, text, cx, cy, size, rng) {
   }
 }
 
-function drawColoredQR(canvas, url, name) {
+export function drawColoredQR(canvas, url, name) {
   const qrSize = 280
   const spill = 24 // extra space for spill effects
   const size = qrSize + spill * 2

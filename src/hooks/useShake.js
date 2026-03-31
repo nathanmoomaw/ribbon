@@ -101,7 +101,7 @@ export function useShake(onShake, controlsRef, ribbonRef) {
       if (controls && controls.contains(e.target)) return
       if (ribbon && ribbon.contains(e.target)) return
       if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
-      if (e.target.closest('button') || e.target.closest('input')) return
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.vcf-control')) return
       triggerShake(0.4)
     }
 

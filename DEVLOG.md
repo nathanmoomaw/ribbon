@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-31 — Preset splash screen + VCF shake fix
+
+- **PresetSplash**: When the app is opened via a preset link/QR, a full-screen splash shows the QR code and a play button. Clicking play resumes AudioContext (required by browsers), loads loop data, auto-starts arp if the preset has arp+hold+notes, then dismisses the splash. Regular fresh visits still get MobileSplash on mobile.
+- **VCF shake fix**: Clicking or dragging VCF knobs was triggering shake (they render outside `controlsRef`). Added `.vcf-control` to the exclusion list in `useShake`'s click handler.
+
 ## 2026-03-31 — Fix showMilestone TDZ crash
 
 - **Bug**: `Cannot access 'showMilestone' before initialization` at App.jsx:290 — `useMilestoneToast()` was called after an effect that used `showMilestone`, causing a temporal dead zone crash on every render.

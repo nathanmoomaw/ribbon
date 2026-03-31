@@ -14,6 +14,7 @@ export const Puddle = forwardRef(function Puddle({
   getEngine, mode, octaves, stepped, scale,
   ribbonInteraction, arpStart, arpStop, hold, poly,
   shaking, undulating, onArpNoteToggle, arpNotes,
+  recordEvent,
 }, ref) {
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -62,6 +63,9 @@ export const Puddle = forwardRef(function Puddle({
     // Spawn confetti burst
     spawnConfetti(x, y)
 
+    // Record for looper
+    if (recordEvent) recordEvent('voice_on', { hz, velocity: y })
+
     if (mode === 'play') {
       if (hold && !poly && engine.getActiveVoiceCount() > 0) {
         engine.setAllActiveFrequencies(hz)
@@ -82,7 +86,7 @@ export const Puddle = forwardRef(function Puddle({
     if (hold && mode !== 'arp' && engine.getActiveVoiceCount() === 0) {
       engine.voiceOn(voiceId, hz, y)
     }
-  }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle])
+  }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle, recordEvent])
 
   const onUp = useCallback((pointerId) => {
     const voiceId = `touch_${pointerId}`

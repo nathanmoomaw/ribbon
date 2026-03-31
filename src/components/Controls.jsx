@@ -364,7 +364,7 @@ export const Controls = forwardRef(function Controls({
               </div>
             </div>
 
-            <div className="controls__section">
+            <div className="controls__section controls__section--full">
               <label className="controls__label">Scale</label>
               <div className="controls__waveforms">
                 {SCALE_NAMES.map((s) => {

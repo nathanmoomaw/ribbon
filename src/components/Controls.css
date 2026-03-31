@@ -403,6 +403,7 @@
 
 .controls__waveforms {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 

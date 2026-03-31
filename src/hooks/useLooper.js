@@ -36,8 +36,8 @@ export function useLooper(replayCallbacks) {
       loopDurationRef.current = duration
       setRecording(false)
       setHasLoop(eventsRef.current.length > 0)
-      // If not already playing, start playback of what was just recorded
-      if (!playing && eventsRef.current.length > 0) {
+      // Start playback of what was just recorded
+      if (eventsRef.current.length > 0) {
         setPlaying(true)
         // Defer replay to next tick so state is settled
         setTimeout(() => replayPassRef.current?.(), 0)

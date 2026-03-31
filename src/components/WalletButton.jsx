@@ -22,7 +22,7 @@ export function WalletButton() {
               {connected ? (
                 <span className="wallet-btn__address">{account.displayName}</span>
               ) : (
-                <span className="wallet-btn__connect">Wallet</span>
+                <span className="wallet-btn__connect">0x</span>
               )}
             </button>
           )

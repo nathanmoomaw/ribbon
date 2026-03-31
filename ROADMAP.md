@@ -109,3 +109,5 @@
 - [x] Enhanced oil spill default shader (multi-layer thickness, position-dependent color patches)
 - [x] Wallet address + loop data in QR preset URLs
 - [x] VCF settings serialized in QR presets
+- [x] Spacebar stops looper playback
+- [x] Mobile fullscreen splash screen (tap to enter, once per session)

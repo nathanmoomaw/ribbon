@@ -1,5 +1,17 @@
 # Devlog
 
+## 2026-03-30 — Spacebar loop stop + mobile fullscreen splash
+
+- **Spacebar stops loops**: Pressing Space now also stops any playing loop (in addition to killing notes/arp)
+- **Mobile fullscreen splash**: New `MobileSplash` component — shows "ribbon / tap to enter" overlay on mobile, requests fullscreen on tap, only shows once per session (sessionStorage)
+
+## 2026-03-30 — UI polish + looper fix
+
+- **Wallet button subtle**: Reduced opacity to 0.2 (fades in on hover), label changed from "Wallet" to "0x", transparent background — no longer seems required
+- **Scale buttons wrap**: Added `flex-wrap: wrap` to button rows and made Scale section full-width in shared grid so buttons don't overflow the panel
+- **Knob stability**: Added `min-width` and `font-variant-numeric: tabular-nums` to rotary knob labels to prevent layout shifts when values change
+- **Looper wired up**: `recordEvent` was never called — wired into Puddle `onDown` to record `voice_on` events. Fixed playback start: always begins replay after recording stops regardless of existing play state
+
 ## 2026-03-30 — Surround layout, oil spill shaders, wallet QR integration
 
 - **Controls surround puddle**: Desktop layout restructured from side-by-side to CSS grid with controls surrounding the puddle — toggles top, oscillators left, effects right, VCF below center. Uses `display: contents` on Controls wrapper so children participate directly in the grid.

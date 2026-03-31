@@ -23,6 +23,7 @@ import { VCFControl } from './components/VCFControl'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
+import { MobileSplash } from './components/MobileSplash'
 import { useAccount } from 'wagmi'
 import './App.css'
 
@@ -166,6 +167,8 @@ function App() {
       setKeyboardPositions(new Map())
       setArpNotes([])
       arpStopRef.current?.()
+      // Stop looper playback
+      if (playing) togglePlayback()
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('arp'),
@@ -173,7 +176,7 @@ function App() {
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
     Enter: () => toggleRecording(),
-  }), [mode, hold, getEngine, toggleRecording])
+  }), [mode, hold, getEngine, toggleRecording, playing, togglePlayback])
 
   useKeyboard(keyHandlers)
 
@@ -487,6 +490,7 @@ function App() {
 
   return (
     <div className={`app app--puddle ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
+      <MobileSplash onEnter={() => getEngine()} />
       {/* Moving grid background */}
       <div className="app__grid-bg" />
 
@@ -554,6 +558,7 @@ function App() {
           undulating={undulating}
           onArpNoteToggle={handleArpNoteToggle}
           arpNotes={arpNotes}
+          recordEvent={recordEvent}
         />
 
         <VCFControl

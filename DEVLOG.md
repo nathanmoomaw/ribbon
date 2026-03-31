@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-03-31 — Fix showMilestone TDZ crash
+
+- **Bug**: `Cannot access 'showMilestone' before initialization` at App.jsx:290 — `useMilestoneToast()` was called after an effect that used `showMilestone`, causing a temporal dead zone crash on every render.
+- **Fix**: Moved `useMilestoneToast()` declaration above all effects that reference it.
+
 ## 2026-03-31 — Fix staging deploy (npm 11 vs npm 10 lock file incompatibility)
 
 - **Root cause**: local npm 11.7.0 (Node 25) deduplicates nested zod@3 entries that npm 10.9.4 (Node 22, used by CI) expects explicitly in the lock file. npm ci on CI was failing with "Missing: zod@3.25.76 from lock file" for 5 separate `@reown/appkit-*` and `@walletconnect/utils` paths.

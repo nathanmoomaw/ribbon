@@ -278,6 +278,9 @@ function App() {
     updatePuddleActivity(intensity)
   }, [updatePuddleActivity])
 
+  // --- Milestone tracking ---
+  const { current: currentMilestone, show: showMilestone, dismiss: dismissMilestone } = useMilestoneToast()
+
   // Goop artist milestone — 5+ controls gooped
   const prevGoopCountRef = useRef(0)
   useEffect(() => {
@@ -288,9 +291,6 @@ function App() {
     }
     prevGoopCountRef.current = count
   }, [goopLevels, showMilestone])
-
-  // --- Milestone tracking ---
-  const { current: currentMilestone, show: showMilestone, dismiss: dismissMilestone } = useMilestoneToast()
 
   // --- Shake/Quake handler (reads state from refs to avoid dependency churn) ---
   const handleShake = useCallback((intensity) => {

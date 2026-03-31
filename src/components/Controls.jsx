@@ -1,4 +1,4 @@
-import { useCallback, useRef as useRefHook, forwardRef, memo } from 'react'
+import { useCallback, useRef as useRefHook, useEffect, forwardRef, memo } from 'react'
 import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import { RotaryKnob } from './RotaryKnob'
@@ -92,6 +92,79 @@ function DJFader({ value, onChange, ghostValue }) {
         />
       </div>
       <span ref={valueRef} className="controls__fader-value">{pct}</span>
+    </div>
+  )
+}
+
+/**
+ * GoopableSection — wraps a control section, registers it for goop hit-testing,
+ * and renders a goop visual overlay when gooped.
+ */
+function GoopableSection({ id, registerControl, goopLevel, puddleActivity, children, className }) {
+  const elRef = useRefHook(null)
+
+  useEffect(() => {
+    if (registerControl && id) {
+      registerControl(id, elRef.current)
+      return () => registerControl(id, null)
+    }
+  }, [id, registerControl])
+
+  const hasGoop = goopLevel > 0.01
+  const isActive = puddleActivity > 0 && hasGoop
+
+  return (
+    <div
+      ref={elRef}
+      className={`${className || ''} ${hasGoop ? 'gooped' : ''} ${isActive ? 'gooped--active' : ''}`}
+      style={hasGoop ? {
+        position: 'relative',
+        '--goop-level': goopLevel,
+        '--goop-opacity': Math.min(0.7, goopLevel * 0.8),
+      } : undefined}
+    >
+      {children}
+      {hasGoop && (
+        <div className="goop-effect" style={{ '--goop-level': goopLevel }}>
+          <svg viewBox="0 0 100 60" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+            <defs>
+              <radialGradient id={`goop-grad-${id}`} cx="40%" cy="40%" r="60%">
+                <stop offset="0%" stopColor="rgba(180, 100, 255, 0.4)" />
+                <stop offset="50%" stopColor="rgba(100, 200, 255, 0.2)" />
+                <stop offset="100%" stopColor="transparent" />
+              </radialGradient>
+            </defs>
+            <ellipse
+              cx="50" cy="30"
+              rx={25 + goopLevel * 20}
+              ry={12 + goopLevel * 12}
+              fill={`url(#goop-grad-${id})`}
+              stroke={`rgba(120, 80, 200, ${goopLevel * 0.5})`}
+              strokeWidth="1.5"
+            />
+            {goopLevel > 0.3 && (
+              <ellipse
+                cx={35 + goopLevel * 15}
+                cy={18 + goopLevel * 8}
+                rx={10 + goopLevel * 8}
+                ry={6 + goopLevel * 6}
+                fill={`rgba(180, 100, 255, ${goopLevel * 0.15})`}
+                stroke={`rgba(180, 100, 255, ${goopLevel * 0.4})`}
+                strokeWidth="1"
+              />
+            )}
+            {goopLevel > 0.6 && (
+              <circle
+                cx="65" cy="40"
+                r={5 + goopLevel * 6}
+                fill={`rgba(100, 200, 255, ${goopLevel * 0.1})`}
+                stroke={`rgba(100, 200, 255, ${goopLevel * 0.3})`}
+                strokeWidth="1"
+              />
+            )}
+          </svg>
+        </div>
+      )}
     </div>
   )
 }
@@ -233,6 +306,9 @@ export const Controls = forwardRef(function Controls({
   onStop,
   onKillAll,
   onQRCreate,
+  goopLevels,
+  puddleActivity,
+  registerControl,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -313,17 +389,31 @@ export const Controls = forwardRef(function Controls({
         <div className="controls__main">
           <div className="controls__oscillators">
             {oscParams.map((params, i) => (
-              <OscSection
+              <GoopableSection
                 key={i}
-                index={i}
-                params={params}
-                getEngine={getEngine}
-                onUpdate={handleOscUpdate}
-              />
+                id={`osc-${i}`}
+                registerControl={registerControl}
+                goopLevel={(goopLevels && goopLevels[`osc-${i}`]) || 0}
+                puddleActivity={puddleActivity || 0}
+                className="controls__osc-goopable"
+              >
+                <OscSection
+                  index={i}
+                  params={params}
+                  getEngine={getEngine}
+                  onUpdate={handleOscUpdate}
+                />
+              </GoopableSection>
             ))}
           </div>
 
-          <div className="controls__shared">
+          <GoopableSection
+            id="filter"
+            registerControl={registerControl}
+            goopLevel={(goopLevels && goopLevels['filter']) || 0}
+            puddleActivity={puddleActivity || 0}
+            className="controls__shared"
+          >
             <MiniShakeBolt onClick={() => {
               const engine = getEngine()
               const newOctaves = OCTAVE_OPTIONS[Math.floor(Math.random() * OCTAVE_OPTIONS.length)]
@@ -429,7 +519,7 @@ export const Controls = forwardRef(function Controls({
                 <RotaryKnob value={delayParams.mix} min={0} max={1} step={0.01} onChange={handleDelayMix} color="#c8d0e0" label="Mix" size={40} />
               </div>
             </div>
-          </div>
+          </GoopableSection>
         </div>
       </div>
       {onQRCreate && (

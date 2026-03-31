@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-03-31 — Goop fix, shader rainbow, puddle shape, deploy fix, arp QR, wallet auto-connect off
+
+- **Wallet auto-connect disabled**: Added `reconnectOnMount: false` to wagmi config — no longer aggressively reconnects on load
+- **Oil-spill rainbow shader**: Replaced broken iridescence function with physically-based thin-film interference — `thinFilmColor()` uses optical path difference (n=1.5 oil, varying thickness, cos(theta) view modulation) across 3 wavelength bands + second interference layer for rich rainbow swirls even when idle
+- **Puddle shape from sketch**: Warped geometry to match hand-drawn amoeba sketch — wider 3:2 aspect ratio with three distinct OSC lobes (top-center OSC1, top-right OSC2, bottom-center OSC3) and flatter left edge for controls
+- **Dev deploy fix**: `npm install` regenerated `package-lock.json` — was failing CI with typescript version mismatch and missing zod entries
+- **Goop mechanic fixed**: Rewrote core goop system — pointer capture was blocking drag-escape events, callbacks were never wired up, overlay had no position data. Now: escape from puddle triggers `startDragging`, document-level hit-testing deposits goop on controls, `GoopableSection` renders iridescent overlay with puddle-reactive wobble animation
+- **Arp QR auto-play**: `arpNotes` now serialized in preset URLs (`an` key). On load, if preset has mode=arp + hold=true + notes, arp auto-starts after 200ms. Pass `arpNotes` when creating QR settings.
+
 ## 2026-03-30 — Spacebar loop stop + mobile fullscreen splash
 
 - **Spacebar stops loops**: Pressing Space now also stops any playing loop (in addition to killing notes/arp)

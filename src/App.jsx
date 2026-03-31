@@ -8,7 +8,6 @@ import { useMIDI } from './hooks/useMIDI'
 import { useLooper } from './hooks/useLooper'
 import { useGoop } from './hooks/useGoop'
 import { LooperControls } from './components/LooperControls'
-import { GoopOverlay } from './components/GoopOverlay'
 import { WalletButton } from './components/WalletButton'
 import { MilestoneToast, useMilestoneToast } from './components/MilestoneToast'
 import { checkMilestone, incrementMilestone } from './crypto/milestones'
@@ -70,7 +69,7 @@ function App() {
   const [arpBpm, setArpBpm] = useState(_urlPreset?.arpBpm ?? 120)
   const [hold, setHold] = useState(_urlPreset?.hold ?? false)
   const [poly, setPoly] = useState(_urlPreset?.poly ?? false)
-  const [arpNotes, setArpNotes] = useState([])
+  const [arpNotes, setArpNotes] = useState(_urlPreset?.arpNotes ?? [])
   const [shaking, setShaking] = useState(false)
   const [undulating, setUndulating] = useState(false)
   const [easterEgg, setEasterEgg] = useState(false)
@@ -137,6 +136,10 @@ function App() {
     // Load loop data if present (deferred to let looper hooks settle)
     if (_urlLoopData) {
       setTimeout(() => loadLoopData(_urlLoopData), 100)
+    }
+    // Auto-start arp if preset was saved with arp+hold active and has notes
+    if (_urlPreset.mode === 'arp' && _urlPreset.hold && _urlPreset.arpNotes?.length > 0) {
+      setTimeout(() => arpStart(), 200)
     }
     // Clear hash after loading so it doesn't persist on refresh with different settings
     if (window.location.hash) history.replaceState(null, '', window.location.pathname)
@@ -261,9 +264,30 @@ function App() {
 
   // --- Goop/Liquid ---
   const {
-    goopLevels, shakeClean, getGoopData, loadGoopData,
-    startDragging, stopDragging, addGoop,
+    goopLevels, puddleActivity, shakeClean, getGoopData, loadGoopData,
+    startDragging, stopDragging, registerControl, updatePuddleActivity,
   } = useGoop()
+
+  // When a drag escapes the puddle, signal the goop system
+  const handleDragEscape = useCallback((pointerId) => {
+    startDragging(pointerId)
+  }, [startDragging])
+
+  // Puddle activity broadcast (for gooped control reactions)
+  const handlePuddleActivity = useCallback((intensity) => {
+    updatePuddleActivity(intensity)
+  }, [updatePuddleActivity])
+
+  // Goop artist milestone — 5+ controls gooped
+  const prevGoopCountRef = useRef(0)
+  useEffect(() => {
+    const count = Object.keys(goopLevels).length
+    if (count >= 5 && prevGoopCountRef.current < 5) {
+      const m = checkMilestone('goop_artist')
+      if (m) showMilestone(m)
+    }
+    prevGoopCountRef.current = count
+  }, [goopLevels, showMilestone])
 
   // --- Milestone tracking ---
   const { current: currentMilestone, show: showMilestone, dismiss: dismissMilestone } = useMilestoneToast()
@@ -472,6 +496,7 @@ function App() {
     setQrSettings({
       mode, oscParams, volume, octaves, delayParams, reverbMix, crunch,
       filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode,
+      arpNotes,
       loopData: getLoopData(),
       walletAddress,
     })
@@ -541,7 +566,7 @@ function App() {
       </header>
 
       <div className="app__stage" style={{ position: 'relative' }}>
-        <GoopOverlay goopLevels={goopLevels} />
+        {/* Goop visuals now rendered directly on control elements via GoopableSection */}
         <Puddle
           ref={ribbonRef}
           getEngine={getEngine}
@@ -559,6 +584,8 @@ function App() {
           onArpNoteToggle={handleArpNoteToggle}
           arpNotes={arpNotes}
           recordEvent={recordEvent}
+          onDragEscape={handleDragEscape}
+          onPuddleActivity={handlePuddleActivity}
         />
 
         <VCFControl
@@ -606,6 +633,9 @@ function App() {
           onStop={handleStop}
           onKillAll={handleKillAll}
           onQRCreate={handleQRCreate}
+          goopLevels={goopLevels}
+          puddleActivity={puddleActivity}
+          registerControl={registerControl}
         />
       </div>
 

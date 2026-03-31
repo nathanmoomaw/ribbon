@@ -14,7 +14,7 @@ export const Puddle = forwardRef(function Puddle({
   getEngine, mode, octaves, stepped, scale,
   ribbonInteraction, arpStart, arpStop, hold, poly,
   shaking, undulating, onArpNoteToggle, arpNotes,
-  recordEvent,
+  recordEvent, onDragEscape, onPuddleActivity,
 }, ref) {
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -117,7 +117,21 @@ export const Puddle = forwardRef(function Puddle({
     }
   }, [getEngine, mode, hold, ribbonInteraction, arpStop])
 
-  const { puddleRef, ripples, handlers } = usePuddle(onPositionChange, onDown, onUp)
+  const handleDragEscape = useCallback((pointerId) => {
+    onDragEscape?.(pointerId)
+  }, [onDragEscape])
+
+  // Broadcast puddle activity intensity when touching
+  const prevActivityRef = useRef(false)
+  useEffect(() => {
+    const hasActivity = activePointers.size > 0
+    if (hasActivity !== prevActivityRef.current) {
+      prevActivityRef.current = hasActivity
+      onPuddleActivity?.(hasActivity ? 1 : 0)
+    }
+  }, [activePointers, onPuddleActivity])
+
+  const { puddleRef, ripples, handlers } = usePuddle(onPositionChange, onDown, onUp, handleDragEscape)
 
   // Three.js renderer
   usePuddleRenderer(threeContainerRef, ripples, getEngine)

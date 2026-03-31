@@ -39,6 +39,7 @@ export function serializePreset(settings) {
     hd: settings.hold ? 1 : 0,
     bpm: settings.arpBpm,
     vm: settings.visualMode === 'lo' ? 1 : 0,
+    an: settings.arpNotes?.length > 0 ? settings.arpNotes.map(Math.round) : undefined,
   }
 
   // VCF settings
@@ -90,6 +91,7 @@ export function deserializePreset(encoded) {
       vcfResonance: p.vc ? p.vc[1] : undefined,
       vcfRouting: p.vr || undefined,
       walletAddress: p.wa || undefined,
+      arpNotes: p.an || [],
     }
   } catch {
     return null

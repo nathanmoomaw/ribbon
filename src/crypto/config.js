@@ -11,4 +11,5 @@ export const wagmiConfig = getDefaultConfig({
   projectId: WALLETCONNECT_PROJECT_ID,
   chains: [base],
   ssr: false,
+  reconnectOnMount: false,
 })

@@ -6,6 +6,7 @@
 - [ ] Production domain setup
 - [ ] Wire first_sound milestone to Puddle touch events
 - [ ] Serialize goop state in QR codes
+- [ ] Puddle shape fine-tuning (lobe positions may need visual verification)
 
 ## Future Features
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)

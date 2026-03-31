@@ -297,6 +297,51 @@
   gap: 0.75rem;
 }
 
+.controls__osc-goopable {
+  flex: 1;
+  position: relative;
+}
+
+/* --- Goop visual overlay --- */
+.goop-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 5;
+  overflow: hidden;
+  opacity: var(--goop-opacity, 0.3);
+  box-shadow: inset 0 0 12px rgba(180, 100, 255, calc(var(--goop-level, 0) * 0.4));
+  animation: goop-idle-wobble 3s ease-in-out infinite;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+
+/* Idle wobble — subtle shift even when puddle is not active */
+@keyframes goop-idle-wobble {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(1px, -0.5px) scale(1.005); }
+  50% { transform: translate(-0.5px, 1px) scale(0.995); }
+  75% { transform: translate(0.5px, -1px) scale(1.002); }
+}
+
+/* Active puddle interaction — gooped controls react more strongly */
+.gooped--active .goop-effect {
+  animation: goop-active-wobble 0.6s ease-in-out infinite;
+}
+
+@keyframes goop-active-wobble {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(2px, -1.5px) scale(1.02); }
+  50% { transform: translate(-1.5px, 2px) scale(0.98); }
+  75% { transform: translate(1.5px, -2px) scale(1.01); }
+}
+
+.gooped {
+  /* Slight iridescent border glow */
+  box-shadow: 0 0 8px rgba(120, 80, 200, calc(var(--goop-level, 0) * 0.3)),
+              inset 0 0 4px rgba(100, 200, 255, calc(var(--goop-level, 0) * 0.15));
+}
+
 .controls__osc {
   flex: 1;
   padding: 0.75rem;
@@ -551,6 +596,10 @@
     height: 60px;
   }
 
+  .controls__osc-goopable {
+    flex: 1;
+  }
+
   .controls__oscillators {
     grid-column: 1;
     grid-row: 2;
@@ -650,6 +699,10 @@
     right: auto;
     height: auto;
     width: 10px;
+  }
+
+  .controls__osc-goopable {
+    flex: none;
   }
 
   .controls__oscillators {

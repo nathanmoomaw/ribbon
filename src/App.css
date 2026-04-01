@@ -344,6 +344,11 @@
   .app-header {
     align-self: center;
     flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+
+  .app-header .ribbon-logo {
+    width: 140px;
   }
 
   .app__stage {

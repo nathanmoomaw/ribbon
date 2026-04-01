@@ -48,9 +48,10 @@ function RockerSwitch({ leftLabel, rightLabel, leftLights, rightLights, isRight,
 
 function MarbleVisual({ marble, size, style, onPointerDown, className = '' }) {
   if (!marble) return null
+  const patternClass = marble.pattern ? `marble-visual--${marble.pattern}` : ''
   return (
     <div
-      className={`marble-visual ${className}`}
+      className={`marble-visual ${patternClass} ${className}`}
       style={{
         '--marble-color': marble.color,
         '--marble-highlight': marble.highlight,

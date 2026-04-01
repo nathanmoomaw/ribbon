@@ -96,6 +96,7 @@ function App() {
     removeFromPuddle: removeMarbleFromPuddle,
     applyImpulse: applyMarbleImpulse,
     clearAllMarbles,
+    restoreMarbles,
   } = useMarbles(ribbonRef)
 
   // Marble depressions ref for shader (updated whenever puddleMarbles changes)
@@ -221,6 +222,10 @@ function App() {
   const handlePresetEnter = useCallback(() => {
     getEngine() // resume AudioContext via user gesture
     if (_urlLoopData) loadLoopData(_urlLoopData)
+    // Restore marble positions from preset
+    if (_urlPreset?.marbles?.length > 0) {
+      restoreMarbles(_urlPreset.marbles)
+    }
     if (_urlPreset?.mode === 'arp' && _urlPreset?.hold && _urlPreset?.arpNotes?.length > 0) {
       setTimeout(() => arpStart(), 100)
     }
@@ -641,6 +646,7 @@ function App() {
       arpNotes,
       loopData: getLoopData(),
       walletAddress,
+      marbles: puddleMarbles.map(m => ({ id: m.id, x: m.x, y: m.y })),
     })
     // Milestone: shared preset
     const m = checkMilestone('shared_preset')

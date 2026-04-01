@@ -127,6 +127,59 @@
   to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
 }
 
+/* --- Puddle marble patterns --- */
+
+.puddle__marble--cat-eye::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 38%;
+  width: 24%;
+  height: 70%;
+  border-radius: 50% / 30%;
+  background: radial-gradient(
+    ellipse at center,
+    var(--marble-highlight) 0%,
+    rgba(255,255,255,0.15) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0.7;
+  z-index: 1;
+}
+
+.puddle__marble--swirl {
+  background:
+    repeating-conic-gradient(
+      from 30deg,
+      var(--marble-highlight) 0deg 18deg,
+      transparent 18deg 50deg,
+      var(--marble-shadow) 50deg 68deg,
+      transparent 68deg 100deg
+    ),
+    radial-gradient(
+      circle at 32% 28%,
+      var(--marble-highlight) 0%,
+      var(--marble-color) 50%,
+      var(--marble-shadow) 100%
+    ) !important;
+  background-blend-mode: overlay, normal;
+}
+
+.puddle__marble--galaxy {
+  background:
+    radial-gradient(circle at 60% 35%, rgba(255,255,255,0.25) 0%, transparent 20%),
+    radial-gradient(circle at 30% 65%, rgba(255,255,255,0.15) 0%, transparent 15%),
+    radial-gradient(circle at 70% 70%, rgba(255,255,255,0.2) 0%, transparent 12%),
+    radial-gradient(circle at 45% 50%, var(--marble-highlight) 0%, transparent 30%),
+    radial-gradient(
+      circle at 32% 28%,
+      var(--marble-highlight) 0%,
+      var(--marble-color) 50%,
+      var(--marble-shadow) 100%
+    ) !important;
+}
+
 .puddle__cursor {
   position: absolute;
   width: 12px;

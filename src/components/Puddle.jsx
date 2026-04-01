@@ -301,7 +301,7 @@ export const Puddle = forwardRef(function Puddle({
       {puddleMarbles?.map(m => (
         <div
           key={m.id}
-          className="puddle__marble"
+          className={`puddle__marble${m.pattern ? ` puddle__marble--${m.pattern}` : ''}`}
           style={{
             left: `${m.x * 100}%`,
             top: `${(1 - m.y) * 100}%`,

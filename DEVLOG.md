@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-03-31 — DUMP processing: marble patterns, logo fix, preset marbles, roadmap updates
+
+- **Marble visual patterns**: Added cat-eye, swirl, and galaxy patterns to marbles. Amber and Opal get cat-eye slits, Emerald and TigerEye get classic swirl bands, Amethyst and Onyx get galaxy speckle. Ruby, Sapphire, Moonstone stay solid glass. Patterns render on both tray and puddle marbles via CSS.
+- **Mobile logo width fix**: Logo shrunk from 280px to 140px on mobile (max-width: 767px) to stop interfering with play/rec buttons. Header now wraps on mobile.
+- **Marble positions in presets**: Puddle marble positions (id, x, y) now serialized into QR/URL presets and restored on load. `restoreMarbles()` added to `useMarbles` hook; `handlePresetEnter` calls it when marbles are present in the preset data.
+- **Roadmap expansion**: Added Tokenization/Crypto Roadmap section (tokenize QR codes, state mutability, marketplace, naming brainstorm), Soon section (rec/loop state in presets, goop fix), and several Up Next items (puddle shape design, sci-fi controls, QR code style branch).
+- **DUMP processed**: All 16 unchecked items marked done — 3 implemented as code, 1 flagged as needing user input (puddle shape), rest routed to roadmap.
+
 ## 2026-03-31 — Marble hold refinements
 
 - **Auto-spawn**: Marble always available in tray slot via `useEffect` — no more spawn button click required. After pickup, next marble auto-spawns.

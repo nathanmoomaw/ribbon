@@ -6,16 +6,17 @@ const BASE_SIZE = 48  // marble 0 diameter in px; each subsequent = BASE/(n+1)
 // Each marble has unique visuals and fractionalized size/velocity
 // Size: BASE / (n+1) → marble 0 = 48px, marble 1 = 24px, marble 2 = 16px …
 // Velocity: 1 / (n+1) → marble 0 = 1.0 (loudest), marble 8 = 0.11 (quietest)
+// pattern: 'solid' (default glass), 'cat-eye' (inner slit), 'swirl' (classic spiral), 'galaxy' (speckled core)
 export const MARBLE_CONFIGS = [
-  { name: 'Ruby',      color: '#cc2222', highlight: '#ff7766', shadow: '#660011' },
-  { name: 'Amber',     color: '#d4830a', highlight: '#ffcc44', shadow: '#7a4400' },
-  { name: 'Emerald',   color: '#1a8c3d', highlight: '#4dff88', shadow: '#0a4020' },
-  { name: 'Sapphire',  color: '#1a4dcc', highlight: '#66aaff', shadow: '#0a1f6e' },
-  { name: 'Amethyst',  color: '#8833cc', highlight: '#cc88ff', shadow: '#3d1166' },
-  { name: 'Opal',      color: '#ddeeff', highlight: '#ffffff', shadow: '#8899bb' },
-  { name: 'Onyx',      color: '#1a1a2e', highlight: '#4466aa', shadow: '#0a0a14' },
-  { name: 'TigerEye',  color: '#b8780a', highlight: '#f0c040', shadow: '#5c3c00' },
-  { name: 'Moonstone', color: '#aabbd0', highlight: '#e8f0ff', shadow: '#5577aa' },
+  { name: 'Ruby',      color: '#cc2222', highlight: '#ff7766', shadow: '#660011', pattern: 'solid' },
+  { name: 'Amber',     color: '#d4830a', highlight: '#ffcc44', shadow: '#7a4400', pattern: 'cat-eye' },
+  { name: 'Emerald',   color: '#1a8c3d', highlight: '#4dff88', shadow: '#0a4020', pattern: 'swirl' },
+  { name: 'Sapphire',  color: '#1a4dcc', highlight: '#66aaff', shadow: '#0a1f6e', pattern: 'solid' },
+  { name: 'Amethyst',  color: '#8833cc', highlight: '#cc88ff', shadow: '#3d1166', pattern: 'galaxy' },
+  { name: 'Opal',      color: '#ddeeff', highlight: '#ffffff', shadow: '#8899bb', pattern: 'cat-eye' },
+  { name: 'Onyx',      color: '#1a1a2e', highlight: '#4466aa', shadow: '#0a0a14', pattern: 'galaxy' },
+  { name: 'TigerEye',  color: '#b8780a', highlight: '#f0c040', shadow: '#5c3c00', pattern: 'swirl' },
+  { name: 'Moonstone', color: '#aabbd0', highlight: '#e8f0ff', shadow: '#5577aa', pattern: 'solid' },
 ].map((cfg, i) => ({
   ...cfg,
   size: Math.max(Math.round(BASE_SIZE / (i + 1)), 6),
@@ -30,6 +31,7 @@ function makeMarble(id) {
     color: cfg.color,
     highlight: cfg.highlight,
     shadow: cfg.shadow,
+    pattern: cfg.pattern,
     size: cfg.size,
     velocity: cfg.velocity,
     status: 'slot',  // 'slot' | 'tray' | 'dragging' | 'puddle' | 'returning'
@@ -227,6 +229,20 @@ export function useMarbles(puddleRef) {
     setMarbles(() => Array.from({ length: MARBLE_COUNT }, (_, i) => makeMarble(i)))
   }, [])
 
+  // Restore marbles from preset data — array of { id, x, y }
+  const restoreMarbles = useCallback((presetMarbles) => {
+    if (!presetMarbles || presetMarbles.length === 0) return
+    const placedIds = new Set(presetMarbles.map(m => m.id))
+    setMarbles(prev => prev.map(m => {
+      const preset = presetMarbles.find(pm => pm.id === m.id)
+      if (preset) {
+        return { ...m, status: 'puddle', x: preset.x, y: preset.y, droppedAt: Date.now() + m.id, vx: 0, vy: 0 }
+      }
+      // Non-placed marbles: first non-placed one becomes tray, rest stay slot
+      return m
+    }))
+  }, [])
+
   return {
     marbles,
     nextSlotId,
@@ -238,5 +254,6 @@ export function useMarbles(puddleRef) {
     removeFromPuddle,
     applyImpulse,
     clearAllMarbles,
+    restoreMarbles,
   }
 }

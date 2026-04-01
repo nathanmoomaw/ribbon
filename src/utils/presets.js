@@ -48,6 +48,11 @@ export function serializePreset(settings) {
     preset.vr = settings.vcfRouting
   }
 
+  // Marble positions on puddle (id, x, y — only placed marbles)
+  if (settings.marbles && settings.marbles.length > 0) {
+    preset.mb = settings.marbles.map(m => [m.id, round3(m.x), round3(m.y)])
+  }
+
   // Creator wallet address
   if (settings.walletAddress) {
     preset.wa = settings.walletAddress
@@ -92,6 +97,7 @@ export function deserializePreset(encoded) {
       vcfRouting: p.vr || undefined,
       walletAddress: p.wa || undefined,
       arpNotes: p.an || [],
+      marbles: p.mb ? p.mb.map(arr => ({ id: arr[0], x: arr[1], y: arr[2] })) : [],
     }
   } catch {
     return null

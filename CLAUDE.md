@@ -56,7 +56,7 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 
 ### Presets & Sharing
 - QR code preset system: all synth settings encoded in URL hash (`#p=...`)
-- Includes VCF settings, wallet address (`&wa=`), and loop data (`&l=`) in preset URLs
+- Includes VCF settings, wallet address (`&wa=`), loop data (`&l=`), and marble positions in preset URLs
 - Multi-colored gradient QR codes generated client-side with `qrcode` library
 - Preset URLs restore all settings on load (oscillators, effects, VCF, scales, switches, loops)
 - Loop data included conditionally (only if URL stays under 3KB for QR readability)

@@ -6,7 +6,21 @@
 - [ ] Production domain setup
 - [ ] Wire first_sound milestone to Puddle touch events
 - [ ] Serialize goop state in QR codes
-- [ ] Puddle shape fine-tuning (lobe positions may need visual verification)
+- [ ] Puddle shape design — draw a less jagged, more natural puddle silhouette (needs user input on desired shape)
+- [ ] Focus on marble puddle with splashing and tighter controls — sci-fi controls lining the edge of a nice puddle-shaped center, splashes and movement on touch
+- [ ] QR code style: branch to a subtler style where letters don't blow out against the QR grain (less visible text)
+
+## Tokenization / Crypto Roadmap
+- [ ] Define tokenization strategy for v1/v2/... scheme — each version could implement tokenization differently, tied to the abstract /v1 /v2 versioning
+- [ ] Tokenize QR codes — the QR preset code represents a unique "state" (working name) that can be minted/owned
+- [ ] QR state mutability: settings can be mutated by the owner, QR auto-regenerates on change, name can only change when settings change. Original creator retains until sold/traded
+- [ ] Marketplace: owners can put their state back on marketplace (for a price or free) after making changes, adding marbles, changing modes, etc.
+- [ ] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR
+- [ ] Explore what actions are possible after linking a Base account (currently wallet connects but no downstream actions)
+
+## Soon
+- [ ] Save rec/loop function state in presets for playback from QR/URL
+- [ ] Goop functionality — needs dedicated attention, not currently working correctly
 
 ## Future Features
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)

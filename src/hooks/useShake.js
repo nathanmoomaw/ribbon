@@ -96,14 +96,20 @@ export function useShake(onShake, controlsRef, ribbonRef) {
 
     // --- Click outside controls/ribbon ---
     function onClick(e) {
+      // If the clicked element was removed from the DOM before this handler ran
+      // (e.g. a modal close button that unmounts its parent), we can't safely
+      // determine whether it was in an excluded zone — skip shake entirely.
+      if (!document.body.contains(e.target)) return
+
       const controls = controlsRef?.current
       const ribbon = ribbonRef?.current
       if (controls && controls.contains(e.target)) return
       if (ribbon && ribbon.contains(e.target)) return
       if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
       if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.vcf-control')) return
-      // Don't shake when interacting with modals/overlays
+      // Don't shake when interacting with modals/overlays (including RainbowKit wallet portal)
       if (e.target.closest('.preset-splash') || e.target.closest('.preset-qr-overlay') || e.target.closest('.milestone-toast')) return
+      if (e.target.closest('[data-rk]')) return
       triggerShake(0.4)
     }
 

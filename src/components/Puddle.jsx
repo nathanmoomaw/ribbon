@@ -233,6 +233,8 @@ export const Puddle = forwardRef(function Puddle({
       ctx.clearRect(0, 0, w, h)
 
       const particles = confettiParticles.current
+      if (particles.length === 0) return  // skip draw work when empty
+
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i]
         p.x += p.vx / w

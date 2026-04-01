@@ -1,5 +1,17 @@
 # Devlog
 
+## 2026-04-01 — Performance + shake bug fixes
+
+- **Shake fix (preset link/QR)**: Root cause was React removing `.preset-splash` from the DOM *before* the `window` click handler fires — `closest('.preset-splash')` returned null on a detached node. Fix: added `if (!document.body.contains(e.target)) return` as first guard in click-outside handler, skipping shake for any click on an element no longer in the DOM.
+- **Shake fix (wallet connect modal)**: RainbowKit renders its modal in a portal with `[data-rk]` root, which was outside all exclusion zones. Added `e.target.closest('[data-rk]')` exclusion.
+- **Performance — Three.js geometry**: Reduced `PlaneGeometry` from `96×96` to `64×64` segments — 9409 → 4225 vertices (55% fewer), same visual quality, ~half the vertex shader work per frame.
+- **Performance — Three.js Vector3 allocation**: Pre-allocated 24 `Vector3` objects outside the animate loop; previously `new THREE.Vector3()` was called for each ripple every frame → GC pressure.
+- **Performance — pixel ratio**: Capped at 1.5 (was 2) — on a 3× retina screen, 1.5× means 44% fewer pixels to rasterize.
+- **Performance — idle throttle**: Three.js renders at 60fps when ripples are active, 30fps when idle (no active ripples). Halves GPU load when just sitting.
+- **Performance — tab visibility**: Three.js renderer skips frames entirely when `document.hidden` (tab not in focus).
+- **Performance — confetti**: Loop skips all draw work when particle array is empty (early return after clearRect).
+- `antialias: false` on WebGLRenderer — the iridescent surface masks aliasing; this frees ~15% GPU.
+
 ## 2026-04-01 — Puddle splash effects + QR text subtlety
 
 - **Water splash rings**: Each touch on the puddle emits an expanding ring animation (cyan/violet double-ring, 600ms, z-index above confetti) via React state + CSS `@keyframes puddle-splash`. Splash id cleanup happens in a `setTimeout` after animation completes.

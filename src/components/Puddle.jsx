@@ -15,7 +15,7 @@ export const Puddle = forwardRef(function Puddle({
   ribbonInteraction, arpStart, arpStop, hold, poly,
   shaking, undulating, onArpNoteToggle, arpNotes,
   recordEvent, onDragEscape, onPuddleActivity,
-  puddleMarbles, onMarbleRemove, onMarbleImpulse, marbleDepressions,
+  puddleMarbles, onMarbleRemove, onMarblePuddlePickUp, onMarbleImpulse, marbleDepressions,
 }, ref) {
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -297,7 +297,7 @@ export const Puddle = forwardRef(function Puddle({
         </div>
       )}
 
-      {/* Puddle marbles */}
+      {/* Puddle marbles — drag to reposition, click (no drag) to remove */}
       {puddleMarbles?.map(m => (
         <div
           key={m.id}
@@ -312,7 +312,31 @@ export const Puddle = forwardRef(function Puddle({
           }}
           onPointerDown={(e) => {
             e.stopPropagation()
-            onMarbleRemove?.(m.id)
+            const startX = e.clientX
+            const startY = e.clientY
+            let dragged = false
+
+            const onMove = (me) => {
+              if (dragged) return
+              if (Math.abs(me.clientX - startX) + Math.abs(me.clientY - startY) > 6) {
+                dragged = true
+                document.removeEventListener('pointermove', onMove)
+                document.removeEventListener('pointerup', onUp)
+                onMarblePuddlePickUp?.(m.id, me.clientX, me.clientY)
+              }
+            }
+
+            const onUp = () => {
+              document.removeEventListener('pointermove', onMove)
+              document.removeEventListener('pointerup', onUp)
+              if (!dragged) {
+                // Pure click — remove marble back to tray
+                onMarbleRemove?.(m.id)
+              }
+            }
+
+            document.addEventListener('pointermove', onMove)
+            document.addEventListener('pointerup', onUp)
           }}
         />
       ))}

@@ -1,5 +1,17 @@
 # Devlog
 
+## 2026-03-31 — Marble hold refinements
+
+- **Auto-spawn**: Marble always available in tray slot via `useEffect` — no more spawn button click required. After pickup, next marble auto-spawns.
+- **Fractionalized sizes/velocities**: MARBLE_CONFIGS now uses `size = max(48/(n+1), 6)` and `velocity = 1/(n+1)` — marble 0 is 48px at full volume, marble 8 is tiny and quiet.
+- **Stop clears marbles**: `handleStop` and `handleKillAll` now call `clearAllMarbles()` (full reset to slot). Hold toggle no longer clears marbles.
+- **Hold off → notes stop, marbles stay**: Turning hold off stops all marble voices but leaves marbles on the puddle surface.
+- **Hold on → marble notes restart**: Toggling hold on with existing puddle marbles restarts their voices (or injects into arpNotes in arp+poly+hold mode).
+- **Hold off + marble drop = one-shot tap**: Placing a marble while hold is off plays a 400ms tap instead of a sustained voice.
+- **Auto-activate hold on marble grab**: Picking up a marble from the tray automatically activates hold if it isn't already on.
+- **Drag puddle marble to reposition**: Puddle marbles now detect drag vs click — dragging moves the marble to a new puddle position (new pitch), clicking removes it.
+- **Spawn button removed**: ActivationMode no longer shows ◉ spawn button; tray slot always shows the next marble (auto-spawned).
+
 ## 2026-03-31 — Marble hold, QR warp, DUMP meta fix
 
 - **Marble hold**: Hold button split into left (traditional hold) + right (marble dispenser). Up to 9 marbles (Ruby, Amber, Emerald, Sapphire, Amethyst, Opal, Onyx, TigerEye, Moonstone), each with unique CSS 3D appearance. Drag from tray → drop on puddle to lock in pitch. Dropping outside puddle animates marble back. Click puddle marble to recall it. Marble size = velocity/loudness. In arp+hold+poly mode, marble freqs inject into arpNotes in drop order. Finger touches apply physics impulses. Marble-marble elastic collision physics. Three.js depression uniforms for puddle surface displacement at marble positions. Turning off hold clears all puddle marbles.

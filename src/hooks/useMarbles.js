@@ -1,19 +1,26 @@
 import { useState, useRef, useCallback, useMemo } from 'react'
 
 const MARBLE_COUNT = 9
+const BASE_SIZE = 48  // marble 0 diameter in px; each subsequent = BASE/(n+1)
 
-// Each marble has unique visuals — ruby through moonstone
+// Each marble has unique visuals and fractionalized size/velocity
+// Size: BASE / (n+1) → marble 0 = 48px, marble 1 = 24px, marble 2 = 16px …
+// Velocity: 1 / (n+1) → marble 0 = 1.0 (loudest), marble 8 = 0.11 (quietest)
 export const MARBLE_CONFIGS = [
-  { name: 'Ruby',      color: '#cc2222', highlight: '#ff7766', shadow: '#660011', size: 22 },
-  { name: 'Amber',     color: '#d4830a', highlight: '#ffcc44', shadow: '#7a4400', size: 24 },
-  { name: 'Emerald',   color: '#1a8c3d', highlight: '#4dff88', shadow: '#0a4020', size: 26 },
-  { name: 'Sapphire',  color: '#1a4dcc', highlight: '#66aaff', shadow: '#0a1f6e', size: 28 },
-  { name: 'Amethyst',  color: '#8833cc', highlight: '#cc88ff', shadow: '#3d1166', size: 30 },
-  { name: 'Opal',      color: '#ddeeff', highlight: '#ffffff', shadow: '#8899bb', size: 32 },
-  { name: 'Onyx',      color: '#1a1a2e', highlight: '#4466aa', shadow: '#0a0a14', size: 34 },
-  { name: 'TigerEye',  color: '#b8780a', highlight: '#f0c040', shadow: '#5c3c00', size: 36 },
-  { name: 'Moonstone', color: '#aabbd0', highlight: '#e8f0ff', shadow: '#5577aa', size: 38 },
-]
+  { name: 'Ruby',      color: '#cc2222', highlight: '#ff7766', shadow: '#660011' },
+  { name: 'Amber',     color: '#d4830a', highlight: '#ffcc44', shadow: '#7a4400' },
+  { name: 'Emerald',   color: '#1a8c3d', highlight: '#4dff88', shadow: '#0a4020' },
+  { name: 'Sapphire',  color: '#1a4dcc', highlight: '#66aaff', shadow: '#0a1f6e' },
+  { name: 'Amethyst',  color: '#8833cc', highlight: '#cc88ff', shadow: '#3d1166' },
+  { name: 'Opal',      color: '#ddeeff', highlight: '#ffffff', shadow: '#8899bb' },
+  { name: 'Onyx',      color: '#1a1a2e', highlight: '#4466aa', shadow: '#0a0a14' },
+  { name: 'TigerEye',  color: '#b8780a', highlight: '#f0c040', shadow: '#5c3c00' },
+  { name: 'Moonstone', color: '#aabbd0', highlight: '#e8f0ff', shadow: '#5577aa' },
+].map((cfg, i) => ({
+  ...cfg,
+  size: Math.max(Math.round(BASE_SIZE / (i + 1)), 6),
+  velocity: Math.max(1 / (i + 1), 0.1),
+}))
 
 function makeMarble(id) {
   const cfg = MARBLE_CONFIGS[id]
@@ -24,8 +31,7 @@ function makeMarble(id) {
     highlight: cfg.highlight,
     shadow: cfg.shadow,
     size: cfg.size,
-    // velocity = size normalized to 0.6–1.0 range
-    velocity: 0.6 + (id / (MARBLE_COUNT - 1)) * 0.4,
+    velocity: cfg.velocity,
     status: 'slot',  // 'slot' | 'tray' | 'dragging' | 'puddle' | 'returning'
     x: null,         // puddle-normalized 0–1
     y: null,
@@ -214,15 +220,11 @@ export function useMarbles(puddleRef) {
     startPhysics()
   }, [startPhysics])
 
-  // Clear all puddle marbles back to tray
+  // Clear all marbles completely — resets everything back to slot state (for Stop button)
   const clearAllMarbles = useCallback(() => {
     cancelAnimationFrame(physicsFrameRef.current)
     physicsActiveRef.current = false
-    setMarbles(prev => prev.map(m =>
-      m.status === 'puddle'
-        ? { ...m, status: 'tray', x: null, y: null, droppedAt: null, vx: 0, vy: 0 }
-        : m
-    ))
+    setMarbles(() => Array.from({ length: MARBLE_COUNT }, (_, i) => makeMarble(i)))
   }, [])
 
   return {

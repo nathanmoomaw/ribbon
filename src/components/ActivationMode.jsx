@@ -120,7 +120,7 @@ export function ActivationMode({
         <div className="rocker__divider" />
         <div
           className={`activation__hold-right ${hasMarbles ? 'has-marbles' : ''}`}
-          title={nextSlotId === -1 ? 'All 9 marbles placed' : 'Pick up a marble'}
+          title={nextSlotId === -1 && !trayMarble ? 'All 9 marbles placed' : 'Drag a marble onto the puddle'}
         >
           {trayMarble ? (
             <MarbleVisual
@@ -131,20 +131,8 @@ export function ActivationMode({
                 onMarblePickUp?.(trayMarble.id, e.clientX, e.clientY)
               }}
             />
-          ) : nextSlotId !== -1 ? (
-            // No tray marble yet — show spawn button
-            <button
-              className="activation__marble-spawn"
-              onClick={onMarblePickUp ? undefined : undefined}
-              onPointerDown={(e) => {
-                e.preventDefault()
-                onMarblePickUp?.(-1, e.clientX, e.clientY)
-              }}
-              title="Spawn a marble"
-            >
-              ◉
-            </button>
           ) : (
+            // All marbles are on the puddle
             <span className="activation__marble-full">✦</span>
           )}
         </div>

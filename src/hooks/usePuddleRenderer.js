@@ -259,9 +259,19 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
       const count = Math.min(rips.length, 24)
       material.uniforms.uRippleCount.value = count
 
+      // UV remapping: canvas position (0-1, y-up) → shader UV coordinates
+      // Camera z=1.8, FOV=45°, plane stretched 1.4x horiz, squished 0.9x vert
+      // Visible UV range: X=[0.234, 0.766], Y=[0.086, 0.914]
+      const UV_X_SCALE = 0.5326, UV_X_OFF = 0.2337
+      const UV_Y_SCALE = 0.8284, UV_Y_OFF = 0.0858
+
       for (let i = 0; i < count; i++) {
         const r = rips[rips.length - count + i]
-        material.uniforms.uRipples.value[i] = new THREE.Vector3(r.x, r.y, 0)
+        material.uniforms.uRipples.value[i] = new THREE.Vector3(
+          r.x * UV_X_SCALE + UV_X_OFF,
+          r.y * UV_Y_SCALE + UV_Y_OFF,
+          0
+        )
         material.uniforms.uRippleIntensities.value[i] = r.intensity
         material.uniforms.uRippleTimes.value[i] = (r.t - startTime.current) / 1000
       }
@@ -271,7 +281,11 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
       const depCount = Math.min(deps.length, 9)
       material.uniforms.uDepressionCount.value = depCount
       for (let i = 0; i < depCount; i++) {
-        material.uniforms.uDepressions.value[i].set(deps[i].x, deps[i].y, deps[i].radius)
+        material.uniforms.uDepressions.value[i].set(
+          deps[i].x * UV_X_SCALE + UV_X_OFF,
+          deps[i].y * UV_Y_SCALE + UV_Y_OFF,
+          deps[i].radius * (UV_X_SCALE + UV_Y_SCALE) / 2
+        )
       }
 
       // Gentle camera bob

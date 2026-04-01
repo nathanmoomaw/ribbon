@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-01 — DUMP processing: marble UV fix, scale labels, hold/mode bug, double-spacebar marbles
+
+- **Marble UV coordinate fix**: Ripples and marble depressions in the Three.js shader were being passed raw normalized 0-1 coordinates, but the visible UV range of the warped plane (camera z=1.8, FOV=45°, plane stretched 1.4x horiz / squished 0.9x vert) is actually [0.234,0.766] × [0.086,0.914]. Added UV remapping in `usePuddleRenderer.js` so ripple origins and marble depression positions align with where they visually appear on screen.
+- **Scale button single-letter labels**: Removed pentatonic, added Phrygian (P). Scale display now uses `SCALE_LABELS` map: C=chromatic, M=major, m=minor, b=blues, P=phrygian, egg=double harmonic. Exported from `scales.js`.
+- **Arp→play mode hold fix**: `useArpeggiator` now accepts `hold` param. On mode change away from arp, if hold is on it stops the arp timer/scheduling but skips `noteOff()` so notes keep sounding. If hold is off, behavior is unchanged.
+- **Double-spacebar clears marbles**: Double-tap spacebar now also calls `clearAllMarbles()` in addition to `killAllSound()`. Added `clearAllMarbles` to `keyHandlers` dependency array.
+- **Roadmap expansion**: Added v3 Polish Plan section (logo, shake modal, QR), Puddle Fork section (puddle.obfusco.us, mutation trail, token marketplace). Moved rec/loop to top of Soon section.
+
 ## 2026-03-31 — DUMP processing: marble patterns, logo fix, preset marbles, roadmap updates
 
 - **Marble visual patterns**: Added cat-eye, swirl, and galaxy patterns to marbles. Amber and Opal get cat-eye slits, Emerald and TigerEye get classic swirl bands, Amethyst and Onyx get galaxy speckle. Ruby, Sapphire, Moonstone stay solid glass. Patterns render on both tray and puddle marbles via CSS.

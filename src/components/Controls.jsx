@@ -1,5 +1,5 @@
 import { useCallback, useRef as useRefHook, useEffect, forwardRef, memo } from 'react'
-import { SCALES } from '../utils/scales'
+import { SCALES, SCALE_LABELS } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import { RotaryKnob } from './RotaryKnob'
 import './Controls.css'
@@ -489,7 +489,7 @@ export const Controls = forwardRef(function Controls({
                         })
                       }}
                     >
-                      {s.slice(0, 4).toUpperCase()}
+                      {SCALE_LABELS[s] ?? s.slice(0, 4).toUpperCase()}
                     </button>
                   )
                 })}

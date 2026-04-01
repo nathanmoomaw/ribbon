@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from 'react'
 
 const GATE = 0.5
 
-export function useArpeggiator(getEngine, mode, bpm, notes = []) {
+export function useArpeggiator(getEngine, mode, bpm, notes = [], hold = false) {
   const intervalRef = useRef(null)
   const timeoutRef = useRef(null)
   const isArpingRef = useRef(false)
@@ -73,9 +73,22 @@ export function useArpeggiator(getEngine, mode, bpm, notes = []) {
   }, [bpm]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Stop arp when mode changes away from arp
+  // If hold is on, stop the timer/scheduling but keep notes sounding
+  const holdRef = useRef(hold)
+  holdRef.current = hold
   useEffect(() => {
-    if (mode !== 'arp') {
-      arpStop()
+    if (mode !== 'arp' && isArpingRef.current) {
+      if (holdRef.current) {
+        // Hold is on — stop arp scheduling but don't cut the note
+        isArpingRef.current = false
+        clearTimeout(intervalRef.current)
+        clearTimeout(timeoutRef.current)
+        intervalRef.current = null
+        timeoutRef.current = null
+        noteIndexRef.current = 0
+      } else {
+        arpStop()
+      }
     }
   }, [mode, arpStop])
 

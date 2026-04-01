@@ -18,8 +18,23 @@
 - [ ] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR
 - [ ] Explore what actions are possible after linking a Base account (currently wallet connects but no downstream actions)
 
+## v3 Polish Plan (priority this week)
+- [ ] Puddle logo — "puddle" wordmark with möbius strip through the dd
+- [ ] Logo toggle — click ribbon logo to switch to puddle logo (and vice versa), both trigger shake
+- [ ] Logo shake flip animation — möbius-strip flip effect, electrons scatter across screen then spring back, all controls scrambled except main volume
+- [ ] QR/token shake randomization — shake icon in the shake modal randomizes QR pattern/style; outside clicks remember last shake state
+- [ ] QR visual state integration — use current puddle visuals (marbles, ripples) to influence generated QR style options
+
+## Puddle Fork (post-v3)
+- [ ] Fork ribbon into puddle.obfusco.us as a separate project
+- [ ] Ambient/marble-focused play: tone clips and moods without needing arp or poly
+- [ ] Mutation trail: each project version forks to create new themed variants (Smash, etc.)
+- [ ] Branch unlock easter egg — unlock mode that gives access to a secured branch to design from
+- [ ] Design concepts evolution file — an overarching mutation log that is itself a living document
+- [ ] QR token marketplace — make/trade/sell/auction/buy tokens (QR = token outside of visual context)
+
 ## Soon
-- [ ] Save rec/loop function state in presets for playback from QR/URL
+- [ ] Save rec/loop function state in presets for playback from QR/URL (shelved — UI preserved)
 - [ ] Goop functionality — needs dedicated attention, not currently working correctly
 
 ## Future Features
@@ -131,3 +146,7 @@
 - [x] VCF knob shake fix — VCF interactions no longer trigger shake detection
 - [x] Marble hold — 9 draggable marbles (Ruby→Moonstone) that persist sound on the puddle, with physics, shader depressions, arp cycling by drop order, and voice-per-marble audio
 - [x] QR CAPTCHA text — more aggressive wave baseline, per-char font mixing, ghost echoes, stronger glow
+- [x] Scale buttons single-letter labels — C/M/m/b/P (Phrygian replaces Pentatonic), "egg" for double harmonic easter egg
+- [x] Marble UV fix — shader ripples/depressions now correctly mapped to screen position (camera FOV + plane scale correction)
+- [x] Arp→play hold fix — switching mode no longer cuts sound when hold is on
+- [x] Double-spacebar clears marbles from puddle

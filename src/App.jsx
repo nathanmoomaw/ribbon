@@ -188,8 +188,9 @@ function App() {
       lastSpaceRef.current = now
 
       if (elapsed < 400) {
-        // Double-tap: kill ALL sound including delay/reverb tails
+        // Double-tap: kill ALL sound including delay/reverb tails, remove all marbles
         getEngine().killAllSound()
+        clearAllMarbles()
       } else {
         // Single tap: normal stop
         getEngine().allNotesOff()
@@ -207,7 +208,7 @@ function App() {
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
     Enter: () => toggleRecording(),
-  }), [mode, hold, getEngine, toggleRecording, playing, togglePlayback])
+  }), [mode, hold, getEngine, toggleRecording, playing, togglePlayback, clearAllMarbles])
 
   useKeyboard(keyHandlers)
 
@@ -215,7 +216,7 @@ function App() {
     setKeyboardPositions(posMap)
   }, [])
 
-  const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm, arpNotes)
+  const { arpStart, arpStop } = useArpeggiator(getEngine, mode, arpBpm, arpNotes, hold)
   arpStopRef.current = arpStop
 
   // Called when user clicks Play on the preset splash screen

@@ -12,7 +12,7 @@
 
 ## Tokenization / Crypto Roadmap
 - [ ] Define tokenization strategy for v1/v2/... scheme — each version could implement tokenization differently, tied to the abstract /v1 /v2 versioning
-- [ ] Tokenize QR codes — the QR preset code represents a unique "state" (working name) that can be minted/owned
+- [x] Tokenize QR codes — the QR preset code represents a unique "state" (working name) that can be minted/owned
 - [ ] QR state mutability: settings can be mutated by the owner, QR auto-regenerates on change, name can only change when settings change. Original creator retains until sold/traded
 - [ ] Marketplace: owners can put their state back on marketplace (for a price or free) after making changes, adding marbles, changing modes, etc.
 - [ ] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR
@@ -150,3 +150,4 @@
 - [x] Marble UV fix — shader ripples/depressions now correctly mapped to screen position (camera FOV + plane scale correction)
 - [x] Arp→play hold fix — switching mode no longer cuts sound when hold is on
 - [x] Double-spacebar clears marbles from puddle
+- [x] Puddle tokenization Phase 1 — ERC-721 `RibbonPuddle.sol` on Base, mint/own QR presets, IPFS metadata, ownership badges, `first_mint` milestone

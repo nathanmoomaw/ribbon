@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import QRCode from 'qrcode'
-import { buildPresetUrl } from '../utils/presets'
+import { useAccount } from 'wagmi'
+import { buildPresetUrl, computePresetHash } from '../utils/presets'
+import { useMintPuddle, usePuddleOwner, PUDDLE_CONTRACT_ADDRESS } from '../crypto/contract'
+import { pinPuddleMetadata } from '../crypto/ipfs'
+import { checkMilestone } from '../crypto/milestones'
 import './PresetQR.css'
 
 // Oil-spill iridescent gradient — thin-film interference palette
@@ -283,10 +287,23 @@ export function drawColoredQR(canvas, url, name) {
   })
 }
 
-export function PresetQR({ settings, initialName, onClose }) {
+export function PresetQR({ settings, initialName, onClose, onMilestone }) {
   const canvasRef = useRef(null)
   const [name, setName] = useState(initialName || '')
   const [copied, setCopied] = useState(false)
+  const [mintStep, setMintStep] = useState('idle') // 'idle'|'pinning'|'confirm'|'done'
+
+  const { address: walletAddress, isConnected } = useAccount()
+
+  // Stable content hash of the current settings (excludes wallet/visual/loop)
+  const contentHash = useMemo(() => computePresetHash(settings), [settings])
+
+  // Check on-chain ownership for this preset
+  const { owner, tokenId: ownedTokenId, isMinted, isLoading: ownerLoading, refetch: refetchOwner } =
+    usePuddleOwner(contentHash)
+
+  // Mint hook
+  const { mint, status: mintStatus, tokenId: freshTokenId, error: mintError } = useMintPuddle()
 
   // Build URL with current name
   const url = useMemo(
@@ -340,6 +357,56 @@ export function PresetQR({ settings, initialName, onClose }) {
     })
   }, [url])
 
+  const handleMint = useCallback(async () => {
+    if (!isConnected || !PUDDLE_CONTRACT_ADDRESS) return
+    setMintStep('pinning')
+
+    // Optional: pin metadata to IPFS first (no-ops if VITE_PINATA_JWT unset)
+    await pinPuddleMetadata({
+      settings,
+      name: name.trim() || 'Unnamed Puddle',
+      contentHash,
+      presetUrl: url,
+      canvas: canvasRef.current,
+    })
+
+    setMintStep('confirm')
+    mint(contentHash, name.trim())
+  }, [isConnected, contentHash, name, url, settings, mint])
+
+  // Watch for mint success — refetch ownership and fire milestone
+  useEffect(() => {
+    if (mintStatus === 'success') {
+      setMintStep('done')
+      refetchOwner()
+      const ms = checkMilestone('first_mint')
+      if (ms) onMilestone?.(ms)
+    }
+    if (mintStatus === 'error') setMintStep('idle')
+  }, [mintStatus, refetchOwner, onMilestone])
+
+  // Derive ownership display info
+  const displayedTokenId = freshTokenId ?? ownedTokenId
+  const isOwnedByMe = isMinted && walletAddress &&
+    owner?.toLowerCase() === walletAddress.toLowerCase()
+  const isOwnedByOther = isMinted && !isOwnedByMe
+
+  // Mint button label
+  let mintLabel = 'Mint as Puddle'
+  if (!PUDDLE_CONTRACT_ADDRESS)      mintLabel = 'Contract not deployed'
+  else if (!isConnected)             mintLabel = 'Connect wallet to mint'
+  else if (mintStep === 'pinning')   mintLabel = 'Uploading…'
+  else if (mintStep === 'confirm')   mintLabel = 'Confirm in wallet…'
+  else if (mintStatus === 'pending') mintLabel = 'Signing…'
+  else if (mintStatus === 'confirming') mintLabel = 'Confirming…'
+  else if (mintStep === 'done')      mintLabel = `Puddle #${displayedTokenId} minted! ✦`
+  else if (isOwnedByMe)              mintLabel = `Your Puddle #${displayedTokenId}`
+  else if (isOwnedByOther)           mintLabel = `Owned by ${owner?.slice(0,6)}…${owner?.slice(-4)}`
+
+  const mintDisabled = !isConnected || !PUDDLE_CONTRACT_ADDRESS || isMinted ||
+    mintStep === 'pinning' || mintStep === 'confirm' ||
+    mintStatus === 'pending' || mintStatus === 'confirming' || mintStep === 'done'
+
   // Close on Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
@@ -364,18 +431,24 @@ export function PresetQR({ settings, initialName, onClose }) {
           autoFocus
         />
 
-        {(settings.walletAddress || settings.loopData) && (
-          <div className="preset-qr-modal__meta">
-            {settings.walletAddress && (
-              <span className="preset-qr-modal__wallet">
-                {settings.walletAddress.slice(0, 6)}...{settings.walletAddress.slice(-4)}
-              </span>
-            )}
-            {settings.loopData && settings.loopData.events && settings.loopData.events.length > 0 && (
-              <span className="preset-qr-modal__loop-badge">loop included</span>
-            )}
-          </div>
-        )}
+        {/* Ownership / wallet / loop metadata */}
+        <div className="preset-qr-modal__meta">
+          {isMinted && !ownerLoading && (
+            <span className={`preset-qr-modal__puddle-badge ${isOwnedByMe ? 'preset-qr-modal__puddle-badge--mine' : ''}`}>
+              {isOwnedByMe
+                ? `✦ Puddle #${displayedTokenId}`
+                : `Puddle #${displayedTokenId} · ${owner?.slice(0,6)}…${owner?.slice(-4)}`}
+            </span>
+          )}
+          {settings.walletAddress && (
+            <span className="preset-qr-modal__wallet">
+              {settings.walletAddress.slice(0, 6)}...{settings.walletAddress.slice(-4)}
+            </span>
+          )}
+          {settings.loopData && settings.loopData.events && settings.loopData.events.length > 0 && (
+            <span className="preset-qr-modal__loop-badge">loop included</span>
+          )}
+        </div>
 
         <div className="preset-qr-modal__actions">
           <button className="preset-qr-modal__btn" onClick={handleDownload}>
@@ -383,6 +456,14 @@ export function PresetQR({ settings, initialName, onClose }) {
           </button>
           <button className="preset-qr-modal__btn" onClick={handleCopy}>
             {copied ? 'Copied!' : 'Copy Link'}
+          </button>
+          <button
+            className={`preset-qr-modal__btn preset-qr-modal__btn--mint ${mintStep === 'done' || isOwnedByMe ? 'preset-qr-modal__btn--minted' : ''}`}
+            onClick={handleMint}
+            disabled={mintDisabled}
+            title={mintError ? String(mintError.shortMessage ?? mintError.message) : undefined}
+          >
+            {mintLabel}
           </button>
         </div>
       </div>

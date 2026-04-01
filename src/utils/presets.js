@@ -3,6 +3,8 @@
  * Encodes all synth settings into a compact URL-safe string.
  */
 
+import { keccak256, stringToHex } from 'viem'
+
 const PRESET_VERSION = 1
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -12,6 +14,49 @@ function indexToWaveform(i) { return WAVEFORMS[i] || 'sawtooth' }
 
 function round3(n) {
   return Math.round(n * 1000) / 1000
+}
+
+/**
+ * Compute a deterministic keccak256 hash of the musical settings.
+ * Excludes wallet address, visual mode, and loop data — those are
+ * not part of the sound identity. Returns a 0x-prefixed hex string
+ * suitable for use as the on-chain content hash when minting a Puddle.
+ */
+export function computePresetHash(settings) {
+  // Canonical object — fixed key insertion order, no undefined values
+  const canonical = {
+    v:   PRESET_VERSION,
+    m:   settings.mode,
+    o:   settings.oscParams.map(p => [waveformToIndex(p.waveform), Math.round(p.detune), round3(p.mix)]),
+    oct: settings.octaves,
+    dl:  [round3(settings.delayParams.time), round3(settings.delayParams.feedback), round3(settings.delayParams.mix)],
+    rv:  round3(settings.reverbMix),
+    cr:  round3(settings.crunch),
+    fl:  [Math.round(settings.filterParams.cutoff), round3(settings.filterParams.resonance)],
+    gs:  round3(settings.glideSpeed),
+    st:  settings.stepped ? 1 : 0,
+    sc:  settings.scale,
+    py:  settings.poly ? 1 : 0,
+    hd:  settings.hold ? 1 : 0,
+    bpm: settings.arpBpm,
+  }
+
+  // Optional fields — only include when non-empty so identical sounds hash identically
+  if (settings.arpNotes?.length > 0) {
+    canonical.an = settings.arpNotes.map(Math.round).sort((a, b) => a - b)
+  }
+  if (settings.vcfCutoff != null) {
+    canonical.vc = [Math.round(settings.vcfCutoff), round3(settings.vcfResonance)]
+    canonical.vr = settings.vcfRouting
+  }
+  if (settings.marbles?.length > 0) {
+    // Sort by id for determinism regardless of drop order
+    canonical.mb = [...settings.marbles]
+      .sort((a, b) => a.id - b.id)
+      .map(m => [m.id, round3(m.x), round3(m.y)])
+  }
+
+  return keccak256(stringToHex(JSON.stringify(canonical)))
 }
 
 /**

@@ -143,6 +143,50 @@
   letter-spacing: 0.05em;
 }
 
+/* Puddle ownership badge */
+.preset-qr-modal__puddle-badge {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(139, 92, 246, 0.85);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.06em;
+}
+
+.preset-qr-modal__puddle-badge--mine {
+  color: rgba(0, 240, 255, 0.9);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+/* Mint button — accent variant */
+.preset-qr-modal__btn--mint {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.35);
+  color: rgba(180, 140, 255, 0.9);
+}
+
+.preset-qr-modal__btn--mint:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.6);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+}
+
+.preset-qr-modal__btn--mint:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.preset-qr-modal__btn--minted {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.25);
+  color: rgba(0, 240, 255, 0.8);
+}
+
 /* QR trigger button — sits in lower right of console */
 .preset-qr-trigger {
   position: absolute;

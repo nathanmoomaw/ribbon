@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-04-01 — Phase 1 Puddle tokenization (ERC-721 on Base)
+
+- **`RibbonPuddle.sol`**: ERC-721 contract (OpenZeppelin) — first-minter-wins via `_hashToToken` mapping, stores `contentHash + name + creator + mintedAt` per token. Deployed target: Base mainnet (testnet via `VITE_USE_TESTNET=true`).
+- **`computePresetHash()`**: Deterministic `keccak256` of canonical preset JSON in `presets.js`. Excludes wallet/visual/loop fields; sorts arpNotes and marbles by id. Uses viem's `keccak256` + `stringToHex`.
+- **`src/crypto/contract.js`**: `usePuddleOwner(contentHash)` and `useMintPuddle()` hooks — wagmi v2 `useReadContract`/`useWriteContract`/`useWaitForTransactionReceipt`. Extracts tokenId from Minted event log topics.
+- **`src/crypto/ipfs.js`**: Optional Pinata IPFS pinning — pins canvas PNG + OpenSea-compatible metadata JSON. No-ops gracefully when `VITE_PINATA_JWT` is unset.
+- **`src/components/PresetQR.jsx`**: Full mint flow — IPFS pin → `mint(contentHash, name)` → ownership badge (purple=owned, cyan=own token). Fires `first_mint` milestone on success.
+- **`src/crypto/config.js`**: Added `PUDDLE_CONTRACT_ADDRESS` + `PINATA_JWT` env exports, testnet chain support.
+- **`src/crypto/milestones.js`**: Added `first_mint` milestone ("Puddle Maker ✦").
+
 ## 2026-04-01 — DUMP processing: marble UV fix, scale labels, hold/mode bug, double-spacebar marbles
 
 - **Marble UV coordinate fix**: Ripples and marble depressions in the Three.js shader were being passed raw normalized 0-1 coordinates, but the visible UV range of the warped plane (camera z=1.8, FOV=45°, plane stretched 1.4x horiz / squished 0.9x vert) is actually [0.234,0.766] × [0.086,0.914]. Added UV remapping in `usePuddleRenderer.js` so ripple origins and marble depression positions align with where they visually appear on screen.

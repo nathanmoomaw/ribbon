@@ -42,6 +42,12 @@ export const MILESTONES = {
     description: 'Routed all 3 oscillators through the VCF',
     icon: '🎛️',
   },
+  first_mint: {
+    id: 'first_mint',
+    name: 'Puddle Maker',
+    description: 'Minted your first Puddle token on Base',
+    icon: '✦',
+  },
 }
 
 // Load milestone state from localStorage

@@ -808,7 +808,7 @@ function App() {
       )}
 
       {qrSettings && (
-        <PresetQR settings={qrSettings} initialName={_urlPresetName} onClose={() => setQrSettings(null)} />
+        <PresetQR settings={qrSettings} initialName={_urlPresetName} onClose={() => setQrSettings(null)} onMilestone={showMilestone} />
       )}
 
       <MilestoneToast milestone={currentMilestone} onDismiss={dismissMilestone} />

@@ -23,8 +23,10 @@ import { readPresetFromUrl } from './utils/presets'
 import { MobileSplash } from './components/MobileSplash'
 import { PresetSplash } from './components/PresetSplash'
 import { useMarbles } from './hooks/useMarbles'
-import { useAccount } from 'wagmi'
+import { useAccount, useReconnect } from 'wagmi'
 import './App.css'
+
+const WALLET_FLAG_KEY = 'ribbon_wallet_ever_connected'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 
@@ -45,7 +47,22 @@ const _urlPresetHref = _urlPreset ? window.location.href : null
 
 function App() {
   const getEngine = useAudioEngine()
-  const { address: walletAddress } = useAccount()
+  const { address: walletAddress, isConnected } = useAccount()
+  const { reconnect } = useReconnect()
+
+  // Silently reconnect on mount if user has connected before
+  useEffect(() => {
+    if (localStorage.getItem(WALLET_FLAG_KEY)) {
+      reconnect()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track connection state — set flag on connect, clear on explicit disconnect
+  useEffect(() => {
+    if (isConnected) {
+      localStorage.setItem(WALLET_FLAG_KEY, '1')
+    }
+  }, [isConnected])
 
   const [mode, setMode] = useState(_urlPreset?.mode ?? 'play')
   const [inputMode, setInputMode] = useState('touch')

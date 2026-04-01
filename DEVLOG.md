@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-01 — Wallet seamless reconnect + multi-LLM fallback clarification
+
+- **Wallet localStorage flag** (`ribbon_wallet_ever_connected`): Users who have connected before get a silent `reconnect()` on mount via wagmi's `useReconnect` — no modal, just restores their session. First-time visitors see nothing wallet-related until they open the QR modal and click Mint.
+- **Multi-LLM fallback clarification**: `/fallback` skill works mid-session (Claude orchestrates curl calls to OpenAI/Gemini). At actual token exhaustion, Claude can't run anything — the right tool is `/resume` with a checkpoint. `~/.claude/scripts/llm.sh` exists as a standalone CLI for use when Claude is fully down; both `OPENAI_API_KEY` and `GEMINI_API_KEY` are set. Run `ln -s ~/.claude/scripts/llm.sh /usr/local/bin/llm` to put it in PATH.
+
 ## 2026-04-01 — Wallet connection UX: non-intrusive integration
 
 - **Wallet button removed from main header**: No longer shows a persistent "0x" connect prompt on every visit — wallet connection is fully optional and only surfaced in the QR modal mint flow

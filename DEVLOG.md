@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-01 — Puddle splash effects + QR text subtlety
+
+- **Water splash rings**: Each touch on the puddle emits an expanding ring animation (cyan/violet double-ring, 600ms, z-index above confetti) via React state + CSS `@keyframes puddle-splash`. Splash id cleanup happens in a `setTimeout` after animation completes.
+- **Sci-fi puddle edge**: Replaced flat `drop-shadow` with layered `drop-shadow` stack — tight 2px cyan outline + mid-range blue glow + wide violet bloom. Active state adds a 1.2s breathing pulse (`puddle-active-pulse`) that intensifies the entire edge.
+- **QR text subtlety**: `drawWarpedText` overhauled from aggressive CAPTCHA-style to subtle watermark — rotation ±12° (was ±37°), no ghost echoes, band opacity 0.38 (was 0.78), fill alpha 0.55–0.75, gentle wave amp 2–6px (was 6–14px). Text now blends with the iridescent QR grain rather than blowing out against it.
+
 ## 2026-04-01 — Wallet seamless reconnect + multi-LLM fallback clarification
 
 - **Wallet localStorage flag** (`ribbon_wallet_ever_connected`): Users who have connected before get a silent `reconnect()` on mount via wagmi's `useReconnect` — no modal, just restores their session. First-time visitors see nothing wallet-related until they open the QR modal and click Mint.

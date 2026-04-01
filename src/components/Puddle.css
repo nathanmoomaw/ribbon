@@ -38,9 +38,11 @@
   background-size: 20px 20px, 20px 20px, 100% 100%;
   animation: puddle-grid-drift 20s linear infinite;
 
-  /* Outer glow via filter (works with clip-path) */
-  filter: drop-shadow(0 0 12px rgba(100, 200, 255, 0.1))
-          drop-shadow(0 0 30px rgba(180, 100, 255, 0.06));
+  /* Sci-fi edge glow — layered drops following the blob shape */
+  filter:
+    drop-shadow(0 0 2px rgba(0, 220, 255, 0.45))
+    drop-shadow(0 0 8px rgba(100, 200, 255, 0.18))
+    drop-shadow(0 0 22px rgba(180, 100, 255, 0.1));
 }
 
 @keyframes puddle-grid-drift {
@@ -49,12 +51,26 @@
 }
 
 .puddle--active {
-  filter: drop-shadow(0 0 20px rgba(100, 200, 255, 0.18))
-          drop-shadow(0 0 50px rgba(180, 100, 255, 0.1));
+  filter:
+    drop-shadow(0 0 3px rgba(0, 220, 255, 0.7))
+    drop-shadow(0 0 14px rgba(100, 200, 255, 0.35))
+    drop-shadow(0 0 45px rgba(180, 100, 255, 0.18));
+  animation: puddle-grid-drift 20s linear infinite, puddle-active-pulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes puddle-active-pulse {
+  from { filter:
+    drop-shadow(0 0 3px rgba(0, 220, 255, 0.7))
+    drop-shadow(0 0 14px rgba(100, 200, 255, 0.35))
+    drop-shadow(0 0 45px rgba(180, 100, 255, 0.18)); }
+  to   { filter:
+    drop-shadow(0 0 4px rgba(0, 240, 255, 0.9))
+    drop-shadow(0 0 20px rgba(120, 220, 255, 0.5))
+    drop-shadow(0 0 60px rgba(200, 80, 255, 0.25)); }
 }
 
 .puddle--shaking {
-  animation: shake 0.4s ease-out, puddle-grid-drift 20s linear infinite;
+  animation: shake 0.4s ease-out, puddle-grid-drift 20s linear infinite !important;
 }
 
 .puddle__three {
@@ -178,6 +194,43 @@
       var(--marble-color) 50%,
       var(--marble-shadow) 100%
     ) !important;
+}
+
+/* Water splash ring — expands and fades on touch */
+.puddle__splash {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 6;
+  transform: translate(-50%, -50%);
+  animation: puddle-splash 0.6s ease-out forwards;
+}
+
+@keyframes puddle-splash {
+  0% {
+    width: 8px;
+    height: 8px;
+    box-shadow:
+      0 0 0 2px rgba(0, 220, 255, 0.9),
+      0 0 0 4px rgba(180, 80, 255, 0.5);
+    opacity: 1;
+  }
+  40% {
+    box-shadow:
+      0 0 0 3px rgba(0, 220, 255, 0.5),
+      0 0 0 8px rgba(180, 80, 255, 0.2);
+    opacity: 0.8;
+  }
+  100% {
+    width: 72px;
+    height: 72px;
+    box-shadow:
+      0 0 0 1px rgba(0, 220, 255, 0.05),
+      0 0 0 2px rgba(180, 80, 255, 0.03);
+    opacity: 0;
+  }
 }
 
 .puddle__cursor {

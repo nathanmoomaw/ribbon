@@ -19,6 +19,8 @@ export const Puddle = forwardRef(function Puddle({
 }, ref) {
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
+  const [splashes, setSplashes] = useState([])
+  const splashIdRef = useRef(0)
   const threeContainerRef = useRef(null)
   const confettiCanvasRef = useRef(null)
   const confettiParticles = useRef([])
@@ -76,8 +78,9 @@ export const Puddle = forwardRef(function Puddle({
       }
     }
 
-    // Spawn confetti burst
+    // Spawn confetti burst + water splash ring
     spawnConfetti(x, y)
+    addSplash(x, y)
 
     // Record for looper
     if (recordEvent) recordEvent('voice_on', { hz, velocity: y })
@@ -151,6 +154,15 @@ export const Puddle = forwardRef(function Puddle({
 
   // Three.js renderer
   usePuddleRenderer(threeContainerRef, ripples, getEngine, marbleDepressions)
+
+  // --- Water splash rings ---
+  function addSplash(nx, ny) {
+    const id = splashIdRef.current++
+    setSplashes(prev => [...prev, { id, x: nx, y: ny }])
+    setTimeout(() => {
+      setSplashes(prev => prev.filter(s => s.id !== id))
+    }, 600)
+  }
 
   // --- Asteroids-style confetti system ---
   const SHAPES = ['triangle', 'square', 'pentagon', 'diamond']
@@ -270,6 +282,15 @@ export const Puddle = forwardRef(function Puddle({
 
       {/* Confetti canvas overlay */}
       <canvas className="puddle__confetti" ref={confettiCanvasRef} />
+
+      {/* Water splash rings on touch */}
+      {splashes.map(s => (
+        <div
+          key={s.id}
+          className="puddle__splash"
+          style={{ left: `${s.x * 100}%`, top: `${(1 - s.y) * 100}%` }}
+        />
+      ))}
 
       {/* Touch cursors */}
       {allPositions.map(([id, { x, y }]) => (

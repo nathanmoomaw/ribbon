@@ -7,8 +7,8 @@
 - [ ] Wire first_sound milestone to Puddle touch events
 - [ ] Serialize goop state in QR codes
 - [ ] Puddle shape design — draw a less jagged, more natural puddle silhouette (needs user input on desired shape)
-- [ ] Focus on marble puddle with splashing and tighter controls — sci-fi controls lining the edge of a nice puddle-shaped center, splashes and movement on touch
-- [ ] QR code style: branch to a subtler style where letters don't blow out against the QR grain (less visible text)
+- [x] Focus on marble puddle with splashing and tighter controls — sci-fi controls lining the edge of a nice puddle-shaped center, splashes and movement on touch
+- [x] QR code style: branch to a subtler style where letters don't blow out against the QR grain (less visible text)
 
 ## Tokenization / Crypto Roadmap
 - [ ] Define tokenization strategy for v1/v2/... scheme — each version could implement tokenization differently, tied to the abstract /v1 /v2 versioning

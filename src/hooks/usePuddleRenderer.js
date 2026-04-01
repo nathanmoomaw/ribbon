@@ -8,6 +8,8 @@ uniform vec3 uRipples[24];
 uniform float uRippleIntensities[24];
 uniform float uRippleTimes[24];
 uniform int uRippleCount;
+uniform vec3 uDepressions[9];
+uniform int uDepressionCount;
 
 varying vec2 vUv;
 varying vec3 vNormal;
@@ -31,6 +33,14 @@ void main() {
     float decay = exp(-age * 1.5) * uRippleIntensities[i];
     float disp = ring * decay * 0.15;
     totalDisp += disp;
+  }
+
+  // Marble depressions — static bowl-shaped downward displacement
+  for (int i = 0; i < 9; i++) {
+    if (i >= uDepressionCount) break;
+    float dDist = distance(uv, uDepressions[i].xy);
+    float dRadius = uDepressions[i].z;
+    totalDisp -= smoothstep(dRadius, 0.0, dDist) * 0.07;
   }
 
   // Ambient undulation — slow organic surface movement
@@ -133,7 +143,7 @@ void main() {
 }
 `
 
-export function usePuddleRenderer(containerRef, ripples, getEngine) {
+export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepressions) {
   const sceneRef = useRef(null)
   const rendererRef = useRef(null)
   const cameraRef = useRef(null)
@@ -207,10 +217,12 @@ export function usePuddleRenderer(containerRef, ripples, getEngine) {
       fragmentShader,
       uniforms: {
         uTime: { value: 0 },
-        uRipples: { value: new Array(24).fill(new THREE.Vector3(0, 0, 0)) },
+        uRipples: { value: new Array(24).fill(null).map(() => new THREE.Vector3(0, 0, 0)) },
         uRippleIntensities: { value: new Float32Array(24) },
         uRippleTimes: { value: new Float32Array(24) },
         uRippleCount: { value: 0 },
+        uDepressions: { value: new Array(9).fill(null).map(() => new THREE.Vector3(0, 0, 0)) },
+        uDepressionCount: { value: 0 },
       },
       transparent: true,
       side: THREE.DoubleSide,
@@ -252,6 +264,14 @@ export function usePuddleRenderer(containerRef, ripples, getEngine) {
         material.uniforms.uRipples.value[i] = new THREE.Vector3(r.x, r.y, 0)
         material.uniforms.uRippleIntensities.value[i] = r.intensity
         material.uniforms.uRippleTimes.value[i] = (r.t - startTime.current) / 1000
+      }
+
+      // Update marble depression uniforms
+      const deps = marbleDepressions?.current ?? []
+      const depCount = Math.min(deps.length, 9)
+      material.uniforms.uDepressionCount.value = depCount
+      for (let i = 0; i < depCount; i++) {
+        material.uniforms.uDepressions.value[i].set(deps[i].x, deps[i].y, deps[i].radius)
       }
 
       // Gentle camera bob

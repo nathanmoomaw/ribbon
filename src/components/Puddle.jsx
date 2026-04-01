@@ -15,6 +15,7 @@ export const Puddle = forwardRef(function Puddle({
   ribbonInteraction, arpStart, arpStop, hold, poly,
   shaking, undulating, onArpNoteToggle, arpNotes,
   recordEvent, onDragEscape, onPuddleActivity,
+  puddleMarbles, onMarbleRemove, onMarbleImpulse, marbleDepressions,
 }, ref) {
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
@@ -59,6 +60,21 @@ export const Puddle = forwardRef(function Puddle({
     const hz = positionToFrequency(x, { octaves, stepped, scale })
     setActivePointers(prev => new Set(prev).add(voiceId))
     if (ribbonInteraction) ribbonInteraction.current.active = true
+
+    // Apply physics impulse to any marble near this touch
+    if (onMarbleImpulse && puddleMarbles?.length > 0) {
+      for (const m of puddleMarbles) {
+        const dx = x - m.x
+        const dy = y - m.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        const hitRadius = m.size / 400
+        if (dist < hitRadius && dist > 0.00001) {
+          const nx = -dx / dist
+          const ny = -dy / dist
+          onMarbleImpulse(m.id, nx * 0.015, ny * 0.015)
+        }
+      }
+    }
 
     // Spawn confetti burst
     spawnConfetti(x, y)
@@ -134,7 +150,7 @@ export const Puddle = forwardRef(function Puddle({
   const { puddleRef, ripples, handlers } = usePuddle(onPositionChange, onDown, onUp, handleDragEscape)
 
   // Three.js renderer
-  usePuddleRenderer(threeContainerRef, ripples, getEngine)
+  usePuddleRenderer(threeContainerRef, ripples, getEngine, marbleDepressions)
 
   // --- Asteroids-style confetti system ---
   const SHAPES = ['triangle', 'square', 'pentagon', 'diamond']
@@ -280,6 +296,26 @@ export const Puddle = forwardRef(function Puddle({
           ))}
         </div>
       )}
+
+      {/* Puddle marbles */}
+      {puddleMarbles?.map(m => (
+        <div
+          key={m.id}
+          className="puddle__marble"
+          style={{
+            left: `${m.x * 100}%`,
+            top: `${(1 - m.y) * 100}%`,
+            '--marble-color': m.color,
+            '--marble-highlight': m.highlight,
+            '--marble-shadow': m.shadow,
+            '--marble-size': `${m.size}px`,
+          }}
+          onPointerDown={(e) => {
+            e.stopPropagation()
+            onMarbleRemove?.(m.id)
+          }}
+        />
+      ))}
 
       {/* Hz display */}
       <div className="puddle__label">

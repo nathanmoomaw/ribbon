@@ -309,6 +309,10 @@ export const Controls = forwardRef(function Controls({
   goopLevels,
   puddleActivity,
   registerControl,
+  trayMarble,
+  draggingMarble,
+  onMarblePickUp,
+  nextSlotId,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -382,6 +386,10 @@ export const Controls = forwardRef(function Controls({
             setHold={setHold}
             onStop={onStop}
             onKillAll={onKillAll}
+            trayMarble={trayMarble}
+            draggingMarble={draggingMarble}
+            onMarblePickUp={onMarblePickUp}
+            nextSlotId={nextSlotId}
           />
           <DJFader value={volume} onChange={handleVolume} />
         </div>

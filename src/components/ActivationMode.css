@@ -109,7 +109,157 @@
   box-shadow: 0 0 10px var(--light-color), 0 0 4px var(--light-color), inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
-/* --- Hold button --- */
+/* --- Hold split (left = traditional hold, right = marble dispenser) --- */
+
+.activation__hold-split {
+  display: flex;
+  align-items: stretch;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-bottom-color: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(180deg, #161628 0%, #0a0a15 40%, #080812 100%);
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.6),
+    0 1px 3px rgba(0, 0, 0, 0.4),
+    0 -1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 1px 0 rgba(0, 0, 0, 0.5) inset;
+  overflow: hidden;
+}
+
+.activation__hold-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  padding: 0.45em 0.8em;
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.activation__hold-left.active {
+  background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(255,255,255,0.04) 100%);
+  color: var(--text-primary);
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.7);
+}
+
+.activation__hold-left kbd {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.1em 0.35em;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.activation__hold-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.6em;
+  min-width: 40px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.activation__hold-right:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Marble spawn button (appears when no tray marble yet) */
+.activation__marble-spawn {
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s, transform 0.15s;
+}
+
+.activation__marble-spawn:hover {
+  color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.1);
+}
+
+.activation__marble-full {
+  color: rgba(255, 220, 100, 0.4);
+  font-size: 0.9rem;
+}
+
+/* --- Marble visual (shared across tray, dragging, puddle) --- */
+
+.marble-visual {
+  width: var(--marble-size);
+  height: var(--marble-size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--marble-highlight) 0%,
+    var(--marble-color) 50%,
+    var(--marble-shadow) 100%
+  );
+  box-shadow:
+    inset 0 -2px 5px rgba(0, 0, 0, 0.35),
+    inset 0 1px 3px rgba(255, 255, 255, 0.25),
+    0 2px 6px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* Specular glint */
+.marble-visual::after {
+  content: '';
+  position: absolute;
+  top: 18%;
+  left: 20%;
+  width: 30%;
+  height: 20%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.7) 0%, transparent 100%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+.marble-visual--tray {
+  cursor: grab;
+  transition: transform 0.15s, box-shadow 0.15s;
+  animation: marble-appear 0.3s ease-out;
+}
+
+.marble-visual--tray:hover {
+  transform: scale(1.12);
+  box-shadow:
+    inset 0 -2px 5px rgba(0, 0, 0, 0.35),
+    0 3px 12px rgba(0, 0, 0, 0.5),
+    0 0 8px var(--marble-color);
+}
+
+.marble-visual--tray:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+.marble-visual--dragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.7));
+  transform: scale(1.1);
+}
+
+@keyframes marble-appear {
+  from { opacity: 0; transform: scale(0.5); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* --- Hold button (legacy fallback) --- */
 
 .activation__hold {
   display: flex;
@@ -294,6 +444,7 @@
 
   /* Row 1: Play/Arp, Hold, Stop */
   .activation > .rocker:first-child { grid-row: 1; grid-column: 1; }
+  .activation > .activation__hold-split { grid-row: 1; grid-column: 2; }
   .activation > .activation__hold { grid-row: 1; grid-column: 2; }
   .activation > .activation__stop { grid-row: 1; grid-column: 3; }
 

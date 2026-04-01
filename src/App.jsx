@@ -24,6 +24,7 @@ import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
 import { MobileSplash } from './components/MobileSplash'
 import { PresetSplash } from './components/PresetSplash'
+import { useMarbles } from './hooks/useMarbles'
 import { useAccount } from 'wagmi'
 import './App.css'
 
@@ -82,6 +83,28 @@ function App() {
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
+
+  // Marble hold system
+  const {
+    marbles: _marbles,
+    nextSlotId: marbleNextSlotId,
+    trayMarble,
+    draggingMarble,
+    puddleMarbles,
+    spawnMarble,
+    handlePickUp: handleMarblePickUp,
+    removeFromPuddle: removeMarbleFromPuddle,
+    applyImpulse: applyMarbleImpulse,
+    clearAllMarbles,
+  } = useMarbles(ribbonRef)
+
+  // Marble depressions ref for shader (updated whenever puddleMarbles changes)
+  const marbleDepressionsRef = useRef([])
+  marbleDepressionsRef.current = puddleMarbles.map(m => ({
+    x: m.x,
+    y: m.y,
+    radius: m.size / 400,
+  }))
   const shakeTimerRef = useRef(null)
   const undulateTimerRef = useRef(null)
   const easterEggTimerRef = useRef(null)
@@ -465,7 +488,7 @@ function App() {
   // Hold in play mode: note sustains at its original pitch until space or hold toggled off
   // No global mouse tracking — "wild mode" (global pitch follow) removed for now
 
-  // When hold is toggled off, stop all notes and arp
+  // When hold is toggled off, stop all notes, arp, and clear puddle marbles
   const holdRef = useRef(hold)
   useEffect(() => {
     const wasHold = holdRef.current
@@ -479,8 +502,73 @@ function App() {
         arpStopRef.current?.()
         engine.allNotesOff()
       }
+      clearAllMarbles()
     }
-  }, [hold, getEngine, mode])
+  }, [hold, getEngine, mode, clearAllMarbles])
+
+  // Marble audio: start/stop voices when marbles land on or leave the puddle
+  // In arp+hold+poly mode: inject into arpNotes. In play mode: continuous voice.
+  const prevPuddleMarbleIdsRef = useRef(new Set())
+  useEffect(() => {
+    const engine = getEngine()
+    const currentIds = new Set(puddleMarbles.map(m => m.id))
+    const prevIds = prevPuddleMarbleIdsRef.current
+
+    // Marbles removed from puddle — stop voices / remove from arp
+    for (const id of prevIds) {
+      if (!currentIds.has(id)) {
+        if (mode !== 'arp') {
+          engine.voiceOff(`marble_${id}`)
+        }
+        // In arp mode, arp notes are rebuilt from scratch below
+      }
+    }
+
+    // Marbles added to puddle — start voices
+    for (const marble of puddleMarbles) {
+      if (!prevIds.has(marble.id)) {
+        if (mode !== 'arp') {
+          const hz = positionToFrequency(marble.x, { octaves, stepped, scale })
+          engine.voiceOn(`marble_${marble.id}`, hz, marble.velocity)
+        }
+      }
+    }
+
+    // In arp mode: sync marble freqs into arpNotes (by droppedAt order)
+    if (mode === 'arp' && hold && poly) {
+      const marbleHzList = puddleMarbles.map(m =>
+        positionToFrequency(m.x, { octaves, stepped, scale })
+      )
+      setArpNotes(prev => {
+        // Keep finger-added notes (not from marbles), append marble notes
+        const fingerNotes = prev.filter(hz => !marbleHzList.some(mhz => Math.abs(mhz - hz) < 1))
+        return [...fingerNotes, ...marbleHzList]
+      })
+    }
+
+    prevPuddleMarbleIdsRef.current = currentIds
+  }, [puddleMarbles, mode, hold, poly, getEngine, octaves, stepped, scale])
+
+  // Update live marble voice frequencies when marbles roll (physics)
+  useEffect(() => {
+    if (mode === 'arp') return // arp handles its own freq cycling
+    const engine = getEngine()
+    for (const marble of puddleMarbles) {
+      const hz = positionToFrequency(marble.x, { octaves, stepped, scale })
+      engine.voiceSetFrequency(`marble_${marble.id}`, hz)
+      engine.voiceSetVelocity(`marble_${marble.id}`, marble.velocity)
+    }
+  }, [puddleMarbles, mode, getEngine, octaves, stepped, scale])
+
+  // Handle the marble pick-up button (either from tray or spawn first)
+  const handleMarblePickUpOrSpawn = useCallback((id, clientX, clientY) => {
+    if (id === -1) {
+      // Spawn button clicked — just spawn the marble (user picks it up next press)
+      spawnMarble()
+    } else {
+      handleMarblePickUp(id, clientX, clientY)
+    }
+  }, [spawnMarble, handleMarblePickUp])
 
   const handleStop = useCallback(() => {
     getEngine().allNotesOff()
@@ -595,6 +683,10 @@ function App() {
           recordEvent={recordEvent}
           onDragEscape={handleDragEscape}
           onPuddleActivity={handlePuddleActivity}
+          puddleMarbles={puddleMarbles}
+          onMarbleRemove={removeMarbleFromPuddle}
+          onMarbleImpulse={applyMarbleImpulse}
+          marbleDepressions={marbleDepressionsRef}
         />
 
         <VCFControl
@@ -645,6 +737,10 @@ function App() {
           goopLevels={goopLevels}
           puddleActivity={puddleActivity}
           registerControl={registerControl}
+          trayMarble={trayMarble}
+          draggingMarble={draggingMarble}
+          onMarblePickUp={handleMarblePickUpOrSpawn}
+          nextSlotId={marbleNextSlotId}
         />
       </div>
 

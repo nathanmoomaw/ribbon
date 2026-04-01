@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-03-31 — Marble hold, QR warp, DUMP meta fix
+
+- **Marble hold**: Hold button split into left (traditional hold) + right (marble dispenser). Up to 9 marbles (Ruby, Amber, Emerald, Sapphire, Amethyst, Opal, Onyx, TigerEye, Moonstone), each with unique CSS 3D appearance. Drag from tray → drop on puddle to lock in pitch. Dropping outside puddle animates marble back. Click puddle marble to recall it. Marble size = velocity/loudness. In arp+hold+poly mode, marble freqs inject into arpNotes in drop order. Finger touches apply physics impulses. Marble-marble elastic collision physics. Three.js depression uniforms for puddle surface displacement at marble positions. Turning off hold clears all puddle marbles.
+- **QR text warp**: More aggressive wave baseline, per-char font style mixing (bold/italic bold), stronger glow, ghost echoes, larger rotation/scale/skew ranges.
+- **DUMP meta**: Noted that empty DUMP.md items should be left as placeholders, not marked done.
+
 ## 2026-03-31 — Preset splash screen + VCF shake fix
 
 - **PresetSplash**: When the app is opened via a preset link/QR, a full-screen splash shows the QR code and a play button. Clicking play resumes AudioContext (required by browsers), loads loop data, auto-starts arp if the preset has arp+hold+notes, then dismisses the splash. Regular fresh visits still get MobileSplash on mobile.

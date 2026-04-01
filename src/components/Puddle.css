@@ -78,6 +78,55 @@
   z-index: 3;
 }
 
+.puddle__marble {
+  position: absolute;
+  width: var(--marble-size);
+  height: var(--marble-size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    var(--marble-highlight) 0%,
+    var(--marble-color) 50%,
+    var(--marble-shadow) 100%
+  );
+  box-shadow:
+    inset 0 -2px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.25),
+    0 3px 10px rgba(0, 0, 0, 0.6),
+    0 0 12px var(--marble-color),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 10;
+  animation: marble-land 0.25s ease-out;
+  transition: box-shadow 0.2s;
+}
+
+.puddle__marble::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  left: 18%;
+  width: 28%;
+  height: 18%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.65) 0%, transparent 100%);
+  transform: rotate(-30deg);
+  pointer-events: none;
+}
+
+.puddle__marble:hover {
+  box-shadow:
+    inset 0 -2px 5px rgba(0, 0, 0, 0.4),
+    0 4px 14px rgba(0, 0, 0, 0.7),
+    0 0 20px var(--marble-color);
+}
+
+@keyframes marble-land {
+  from { transform: translate(-50%, -50%) scale(1.4); opacity: 0.5; }
+  to   { transform: translate(-50%, -50%) scale(1);   opacity: 1; }
+}
+
 .puddle__cursor {
   position: absolute;
   width: 12px;

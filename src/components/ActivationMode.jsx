@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import './ActivationMode.css'
 
 const COLORS = {
@@ -45,22 +46,43 @@ function RockerSwitch({ leftLabel, rightLabel, leftLights, rightLights, isRight,
   )
 }
 
-export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm, hold, setHold, onStop, onKillAll }) {
+function MarbleVisual({ marble, size, style, onPointerDown, className = '' }) {
+  if (!marble) return null
+  return (
+    <div
+      className={`marble-visual ${className}`}
+      style={{
+        '--marble-color': marble.color,
+        '--marble-highlight': marble.highlight,
+        '--marble-shadow': marble.shadow,
+        '--marble-size': `${size ?? marble.size}px`,
+        ...style,
+      }}
+      onPointerDown={onPointerDown}
+    />
+  )
+}
+
+export function ActivationMode({
+  mode, setMode, poly, setPoly, arpBpm, setArpBpm,
+  hold, setHold, onStop, onKillAll,
+  trayMarble, draggingMarble, onMarblePickUp, nextSlotId,
+}) {
   const lastStopRef = { current: 0 }
 
   const handleStop = () => {
     const now = Date.now()
     const elapsed = now - lastStopRef.current
     lastStopRef.current = now
-
     if (elapsed < 400) {
-      // Double-tap: kill all sound including tails
       onKillAll?.()
     } else {
-      // Single tap: normal stop
       onStop?.()
     }
   }
+
+  const marbleCount = nextSlotId === -1 ? 9 : nextSlotId
+  const hasMarbles = marbleCount > 0
 
   return (
     <div className="activation">
@@ -83,15 +105,51 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
         isRight={poly}
         onToggle={() => setPoly(p => !p)}
       />
-      <button
-        className={`activation__hold ${hold ? 'active' : ''}`}
-        onClick={() => setHold(h => !h)}
-        title="Hold note"
-      >
-        <Light color={COLORS.blood} on={hold} />
-        Hold
-        <kbd>4</kbd>
-      </button>
+
+      {/* Hold: left = traditional hold, right = marble dispenser */}
+      <div className={`activation__hold-split ${hold ? 'hold-active' : ''}`}>
+        <button
+          className={`activation__hold-left ${hold ? 'active' : ''}`}
+          onClick={() => setHold(h => !h)}
+          title="Hold note"
+        >
+          <Light color={COLORS.blood} on={hold} />
+          Hold
+          <kbd>4</kbd>
+        </button>
+        <div className="rocker__divider" />
+        <div
+          className={`activation__hold-right ${hasMarbles ? 'has-marbles' : ''}`}
+          title={nextSlotId === -1 ? 'All 9 marbles placed' : 'Pick up a marble'}
+        >
+          {trayMarble ? (
+            <MarbleVisual
+              marble={trayMarble}
+              className="marble-visual--tray"
+              onPointerDown={(e) => {
+                e.preventDefault()
+                onMarblePickUp?.(trayMarble.id, e.clientX, e.clientY)
+              }}
+            />
+          ) : nextSlotId !== -1 ? (
+            // No tray marble yet — show spawn button
+            <button
+              className="activation__marble-spawn"
+              onClick={onMarblePickUp ? undefined : undefined}
+              onPointerDown={(e) => {
+                e.preventDefault()
+                onMarblePickUp?.(-1, e.clientX, e.clientY)
+              }}
+              title="Spawn a marble"
+            >
+              ◉
+            </button>
+          ) : (
+            <span className="activation__marble-full">✦</span>
+          )}
+        </div>
+      </div>
+
       <button
         className="activation__stop"
         onClick={handleStop}
@@ -113,6 +171,22 @@ export function ActivationMode({ mode, setMode, poly, setPoly, arpBpm, setArpBpm
           disabled={mode !== 'arp'}
         />
       </div>
+
+      {/* Dragging marble portal — renders at pointer position above everything */}
+      {draggingMarble && createPortal(
+        <MarbleVisual
+          marble={draggingMarble}
+          className="marble-visual--dragging"
+          style={{
+            position: 'fixed',
+            left: (draggingMarble.dragX ?? 0) - draggingMarble.size / 2,
+            top: (draggingMarble.dragY ?? 0) - draggingMarble.size / 2,
+            pointerEvents: 'none',
+            zIndex: 10000,
+          }}
+        />,
+        document.body
+      )}
     </div>
   )
 }

@@ -85,68 +85,111 @@ function drawSpillEdges(ctx, w, h, rng) {
   }
 }
 
-// Draw warped recaptcha-style text — per-character distortion
+// Draw warped recaptcha-style text — aggressive per-character distortion with wave baseline
 function drawWarpedText(ctx, text, cx, cy, size, rng) {
-  const fontSize = Math.min(22, Math.max(11, Math.floor(size / (text.length * 0.65))))
+  const fontSize = Math.min(26, Math.max(13, Math.floor(size / (text.length * 0.6))))
   const chars = text.split('')
+  const fonts = ['bold', 'italic bold', 'bold']
 
-  // Measure total width for centering
+  // Measure total width for centering (use a consistent font for measuring)
   ctx.font = `bold ${fontSize}px monospace`
-  const charWidths = chars.map(c => ctx.measureText(c).width)
-  const totalW = charWidths.reduce((a, b) => a + b, 0) + chars.length * 1
-  const bandH = fontSize + 14
+  const charWidths = chars.map(c => ctx.measureText(c).width * (0.9 + rng() * 0.4))
+  const spacing = (rng() - 0.5) * 4 // variable per-char spacing offset baked into rng
+  const totalW = charWidths.reduce((a, b) => a + b, 0) + chars.length * 2
+  const bandH = fontSize + 22
 
-  // Semi-transparent dark band behind text
-  ctx.fillStyle = 'rgba(10, 10, 26, 0.7)'
-  const rx = cx - totalW / 2 - 6
+  // Wave parameters for the baseline — low-freq sine makes the whole line wavy
+  const waveAmp = 6 + rng() * 8
+  const waveFreq = 0.8 + rng() * 1.2
+  const wavePhase = rng() * Math.PI * 2
+
+  // Semi-transparent dark band behind text — follows the wave
+  ctx.fillStyle = 'rgba(8, 8, 22, 0.78)'
+  const rx = cx - totalW / 2 - 10
   const ry = cy - bandH / 2
+  const bw = totalW + 20
+  const bh = bandH
+
+  // Wobbly band with more aggressive edge wobble
   ctx.beginPath()
-  // Wobbly band shape
-  ctx.moveTo(rx + 3, ry + rng() * 3)
-  ctx.lineTo(rx + totalW + 12 - 3, ry + rng() * 3)
-  ctx.quadraticCurveTo(rx + totalW + 12, ry, rx + totalW + 12, ry + 3)
-  ctx.lineTo(rx + totalW + 12 + rng() * 2, ry + bandH - 3)
-  ctx.quadraticCurveTo(rx + totalW + 12, ry + bandH, rx + totalW + 9, ry + bandH + rng() * 2)
-  ctx.lineTo(rx + 3, ry + bandH + rng() * 2)
-  ctx.quadraticCurveTo(rx, ry + bandH, rx - rng() * 2, ry + bandH - 3)
-  ctx.lineTo(rx - rng() * 2, ry + 3)
-  ctx.quadraticCurveTo(rx, ry, rx + 3, ry + rng() * 3)
+  ctx.moveTo(rx + 4, ry + (rng() - 0.5) * 6)
+  for (let sx = 0; sx <= bw; sx += bw / 6) {
+    const wobbleTop = (rng() - 0.5) * 7
+    const wobbleBot = (rng() - 0.5) * 7
+    if (sx === 0) continue
+    ctx.lineTo(rx + sx, ry + wobbleTop)
+  }
+  ctx.lineTo(rx + bw, ry + bh + (rng() - 0.5) * 6)
+  for (let sx = bw; sx >= 0; sx -= bw / 6) {
+    ctx.lineTo(rx + sx, ry + bh + (rng() - 0.5) * 7)
+  }
   ctx.closePath()
   ctx.fill()
 
-  // Draw each character with individual distortion
+  // Strikethrough noise line across the band
+  if (rng() > 0.3) {
+    const lineY = ry + bh * (0.3 + rng() * 0.4)
+    ctx.beginPath()
+    ctx.moveTo(rx, lineY + (rng() - 0.5) * 4)
+    for (let sx = 0; sx <= bw; sx += bw / 8) {
+      ctx.lineTo(rx + sx, lineY + (rng() - 0.5) * 6)
+    }
+    const [lr, lg, lb] = lerpColor(GRADIENT_STOPS, rng())
+    ctx.strokeStyle = `rgba(${lr}, ${lg}, ${lb}, 0.25)`
+    ctx.lineWidth = 1 + rng()
+    ctx.stroke()
+  }
+
+  // Draw each character with aggressive per-character distortion
   let xPos = cx - totalW / 2
   for (let i = 0; i < chars.length; i++) {
     const charW = charWidths[i]
-    const angle = (rng() - 0.5) * 0.35  // rotation: ±~20°
-    const scaleX = 0.85 + rng() * 0.35   // horizontal stretch
-    const scaleY = 0.85 + rng() * 0.35   // vertical stretch
-    const yOff = (rng() - 0.5) * 5       // vertical jitter
-    const skewX = (rng() - 0.5) * 0.2    // horizontal skew
+    const charCenterX = xPos + charW / 2
 
-    const gradT = (xPos + cy) / (size * 2)
-    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT % 1)
+    // Wave baseline offset
+    const waveY = Math.sin(wavePhase + (charCenterX - cx) / size * Math.PI * 2 * waveFreq) * waveAmp
+
+    const angle = (rng() - 0.5) * 0.65       // rotation: ±~37°
+    const scaleX = 0.7 + rng() * 0.7          // horizontal stretch 0.7–1.4
+    const scaleY = 0.7 + rng() * 0.65         // vertical stretch 0.7–1.35
+    const yOff = (rng() - 0.5) * 10 + waveY   // larger vertical jitter + wave
+    const skewX = (rng() - 0.5) * 0.45        // stronger horizontal skew
+    const skewY = (rng() - 0.5) * 0.15        // vertical skew too
+    const fontStyle = fonts[Math.floor(rng() * fonts.length)]
+
+    // Per-char color from gradient, shifted along x
+    const gradT = ((charCenterX - cx + size) / (size * 2) + rng() * 0.15) % 1
+    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT)
 
     ctx.save()
-    ctx.translate(xPos + charW / 2, cy + yOff)
+    ctx.translate(charCenterX, cy + yOff)
     ctx.rotate(angle)
-    ctx.transform(scaleX, skewX, 0, scaleY, 0, 0)
-    ctx.font = `bold ${fontSize}px monospace`
+    // Full affine transform: scaleX, skewY, skewX, scaleY
+    ctx.transform(scaleX, skewY, skewX, scaleY, 0, 0)
+    ctx.font = `${fontStyle} ${fontSize}px monospace`
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(chars[i], 0, 0)
 
-    // Subtle glow on some chars
-    if (rng() > 0.6) {
-      ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.6)`
-      ctx.shadowBlur = 4
+    // Glow on most chars — stronger than before
+    if (rng() > 0.35) {
+      ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.8)`
+      ctx.shadowBlur = 6 + rng() * 8
       ctx.fillText(chars[i], 0, 0)
       ctx.shadowBlur = 0
     }
+
+    // Ghost echo on some chars (slightly offset, low opacity)
+    if (rng() > 0.6) {
+      ctx.globalAlpha = 0.18 + rng() * 0.12
+      ctx.fillText(chars[i], (rng() - 0.5) * 4, (rng() - 0.5) * 4)
+      ctx.globalAlpha = 1
+    }
+
     ctx.restore()
 
-    xPos += charW + 1
+    xPos += charW + 2
   }
 }
 

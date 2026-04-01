@@ -17,6 +17,7 @@
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
 - [ ] Future versions: Smash (broken glass theme)
+- [ ] Marble alchemy easter egg — combining specific marble pairs on the puddle triggers hidden sound presets (e.g., Ruby+Sapphire = "Volcano", all 9 marbles = "Solar System" mode)
 
 ## Completed
 - [x] Vite + React project scaffold
@@ -112,3 +113,7 @@
 - [x] VCF settings serialized in QR presets
 - [x] Spacebar stops looper playback
 - [x] Mobile fullscreen splash screen (tap to enter, once per session)
+- [x] Preset splash screen — entering via preset link shows QR + play button to resume AudioContext
+- [x] VCF knob shake fix — VCF interactions no longer trigger shake detection
+- [x] Marble hold — 9 draggable marbles (Ruby→Moonstone) that persist sound on the puddle, with physics, shader depressions, arp cycling by drop order, and voice-per-marble audio
+- [x] QR CAPTCHA text — more aggressive wave baseline, per-char font mixing, ghost echoes, stronger glow

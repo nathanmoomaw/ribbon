@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-01 — QR shake randomization + puddle visual state integration
+
+- **⚡ Shake button in QR modal**: Top-left button regenerates the QR visual style (gradient phase, spiral tightness, spill shapes) without changing the encoded URL or preset data. Style seed persists across modal open/close via module-level `persistedStyleSeed`.
+- **Puddle-state influence on QR**: Marble count tightens/loosens the iridescent spiral (0 marbles = loose, 9 = tight). Average marble X position biases the gradient lean left/right. Active puddle (`puddleActivity=1`) boosts glow intensity. `App.jsx` now passes `puddleActivity` in the QR settings snapshot.
+- **`drawColoredQR` refactored**: Now accepts `styleSeed` and `puddleState` params. RNG seed XORed from URL hash + style seed so spill shapes also vary on shake.
+
 ## 2026-04-01 — Phase 1 Puddle tokenization (ERC-721 on Base)
 
 - **`RibbonPuddle.sol`**: ERC-721 contract (OpenZeppelin) — first-minter-wins via `_hashToToken` mapping, stores `contentHash + name + creator + mintedAt` per token. Deployed target: Base mainnet (testnet via `VITE_USE_TESTNET=true`).

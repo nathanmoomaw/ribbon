@@ -56,6 +56,32 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Shake/randomize QR style button — mirrors close button on the left */
+.preset-qr-modal__shake {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s, transform 0.15s, filter 0.15s;
+  filter: grayscale(0.6);
+}
+
+.preset-qr-modal__shake:hover {
+  color: rgba(255, 255, 255, 0.8);
+  filter: grayscale(0) drop-shadow(0 0 4px rgba(139, 92, 246, 0.5));
+  transform: scale(1.15);
+}
+
+.preset-qr-modal__shake:active {
+  transform: scale(0.9) rotate(-15deg);
+}
+
 .preset-qr-modal__canvas {
   border-radius: 8px;
   background: transparent;

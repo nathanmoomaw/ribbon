@@ -648,11 +648,12 @@ function App() {
       loopData: getLoopData(),
       walletAddress,
       marbles: puddleMarbles.map(m => ({ id: m.id, x: m.x, y: m.y })),
+      puddleActivity,
     })
     // Milestone: shared preset
     const m = checkMilestone('shared_preset')
     if (m) showMilestone(m)
-  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode, showMilestone, getLoopData, walletAddress])
+  }, [mode, oscParams, volume, octaves, delayParams, reverbMix, crunch, filterParams, vcfCutoff, vcfResonance, vcfRouting, glideSpeed, stepped, scale, poly, hold, arpBpm, visualMode, showMilestone, getLoopData, walletAddress, puddleMarbles, puddleActivity])
 
   const handleKillAll = useCallback(() => {
     getEngine().killAllSound()

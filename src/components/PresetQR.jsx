@@ -7,6 +7,9 @@ import { pinPuddleMetadata } from '../crypto/ipfs'
 import { checkMilestone } from '../crypto/milestones'
 import './PresetQR.css'
 
+// Persists QR style seed across modal open/close cycles
+let persistedStyleSeed = 0
+
 // Oil-spill iridescent gradient — thin-film interference palette
 const GRADIENT_STOPS = [
   { offset: 0, color: [180, 40, 255] },     // deep violet
@@ -197,7 +200,9 @@ function drawWarpedText(ctx, text, cx, cy, size, rng) {
   }
 }
 
-export function drawColoredQR(canvas, url, name) {
+// styleSeed: 0–1, rotates/varies the gradient and spill shapes
+// puddleState: { marbles: [{x,y}], activity: 0|1 } — influences gradient from current puddle
+export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}) {
   const qrSize = 280
   const spill = 24 // extra space for spill effects
   const size = qrSize + spill * 2
@@ -207,6 +212,22 @@ export function drawColoredQR(canvas, url, name) {
 
   // Use higher error correction when embedding text so the QR stays scannable
   const ecLevel = name ? 'H' : 'M'
+
+  // --- Puddle-state influence ---
+  const marbles = puddleState.marbles || []
+  const marbleCount = marbles.length
+  const avgMarbleX = marbleCount > 0 ? marbles.reduce((s, m) => s + m.x, 0) / marbleCount : 0.5
+  // More marbles = tighter spiral (angle weight decreases, dist weight increases)
+  const spiralFactor = 0.3 + (marbleCount / 9) * 0.35        // 0.3–0.65
+  // Average marble x biases gradient left/right lean
+  const angleBias = (avgMarbleX - 0.5) * 0.12
+  // Style seed + marble count shift the gradient color phase
+  const gradOffset = (styleSeed + marbleCount / 18 + angleBias) % 1
+  // Active puddle → boosted glow
+  const glowBoost = puddleState.activity ? 0.06 : 0
+
+  // RNG seeded from URL + style seed so spill shapes change on shake
+  const rngSeed = hashString(url) ^ Math.floor(styleSeed * 0x7fffffff)
 
   // Create a temp canvas for the raw QR
   const tmpCanvas = document.createElement('canvas')
@@ -220,7 +241,7 @@ export function drawColoredQR(canvas, url, name) {
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, size, size)
 
-    const rng = mulberry32(hashString(url))
+    const rng = mulberry32(rngSeed)
 
     // Draw spill edges first (behind QR)
     ctx.save()
@@ -240,12 +261,12 @@ export function drawColoredQR(canvas, url, name) {
         const idx = (y * qrSize + x) * 4
         const alpha = data[idx + 3]
         if (alpha > 128) {
-          // Swirling iridescence — use radial+angular gradient for oil-spill look
+          // Swirling iridescence — gradient varies with styleSeed and puddle state
           const cx = x / qrSize - 0.5
           const cy = y / qrSize - 0.5
           const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
           const dist = Math.sqrt(cx * cx + cy * cy) * 2
-          const t = (angle * 0.6 + dist * 0.4 + (x + y) / (qrSize * 3)) % 1
+          const t = (angle * (1 - spiralFactor) + dist * spiralFactor + (x + y) / (qrSize * 3) + gradOffset) % 1
           const [r, g, b] = lerpColor(GRADIENT_STOPS, t)
           data[idx] = r
           data[idx + 1] = g
@@ -256,13 +277,13 @@ export function drawColoredQR(canvas, url, name) {
     }
     ctx.putImageData(imageData, spill, spill)
 
-    // Add subtle iridescent glow around QR edges
+    // Add subtle iridescent glow around QR edges (boosted when puddle is active)
     ctx.save()
     ctx.translate(spill, spill)
     const glowGrad = ctx.createRadialGradient(qrSize / 2, qrSize / 2, qrSize * 0.3, qrSize / 2, qrSize / 2, qrSize * 0.6)
     glowGrad.addColorStop(0, 'rgba(180, 40, 255, 0)')
-    glowGrad.addColorStop(0.7, 'rgba(0, 200, 255, 0.04)')
-    glowGrad.addColorStop(1, 'rgba(255, 60, 180, 0.08)')
+    glowGrad.addColorStop(0.7, `rgba(0, 200, 255, ${0.04 + glowBoost})`)
+    glowGrad.addColorStop(1, `rgba(255, 60, 180, ${0.08 + glowBoost})`)
     ctx.globalCompositeOperation = 'screen'
     ctx.fillStyle = glowGrad
     ctx.fillRect(-spill, -spill, size, size)
@@ -292,6 +313,8 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
   const [name, setName] = useState(initialName || '')
   const [copied, setCopied] = useState(false)
   const [mintStep, setMintStep] = useState('idle') // 'idle'|'pinning'|'confirm'|'done'
+  // Style seed persists across modal open/close (module-level persistedStyleSeed)
+  const [qrStyleSeed, setQrStyleSeed] = useState(() => persistedStyleSeed)
 
   const { address: walletAddress, isConnected } = useAccount()
 
@@ -311,12 +334,21 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
     [settings, name]
   )
 
-  // Redraw QR when URL or name changes
+  const handleQRShake = useCallback(() => {
+    const seed = Math.random()
+    persistedStyleSeed = seed
+    setQrStyleSeed(seed)
+  }, [])
+
+  // Redraw QR when URL, name, or style seed changes
   useEffect(() => {
     if (canvasRef.current && url) {
-      drawColoredQR(canvasRef.current, url, name)
+      drawColoredQR(canvasRef.current, url, name, qrStyleSeed, {
+        marbles: settings.marbles,
+        activity: settings.puddleActivity,
+      })
     }
-  }, [url, name])
+  }, [url, name, qrStyleSeed, settings.marbles, settings.puddleActivity])
 
   const handleDownload = useCallback(() => {
     const canvas = canvasRef.current
@@ -418,6 +450,7 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
     <div className="preset-qr-overlay" onClick={onClose}>
       <div className="preset-qr-modal" onClick={e => e.stopPropagation()}>
         <button className="preset-qr-modal__close" onClick={onClose} aria-label="Close">&times;</button>
+        <button className="preset-qr-modal__shake" onClick={handleQRShake} aria-label="Randomize QR style">⚡</button>
 
         <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
 

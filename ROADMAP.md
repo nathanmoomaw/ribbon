@@ -15,15 +15,15 @@
 - [x] Tokenize QR codes — the QR preset code represents a unique "state" (working name) that can be minted/owned
 - [ ] QR state mutability: settings can be mutated by the owner, QR auto-regenerates on change, name can only change when settings change. Original creator retains until sold/traded
 - [ ] Marketplace: owners can put their state back on marketplace (for a price or free) after making changes, adding marbles, changing modes, etc.
-- [ ] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR
+- [x] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR - puddle
 - [ ] Explore what actions are possible after linking a Base account (currently wallet connects but no downstream actions)
 
 ## v3 Polish Plan (priority this week)
 - [ ] Puddle logo — "puddle" wordmark with möbius strip through the dd
 - [ ] Logo toggle — click ribbon logo to switch to puddle logo (and vice versa), both trigger shake
 - [ ] Logo shake flip animation — möbius-strip flip effect, electrons scatter across screen then spring back, all controls scrambled except main volume
-- [ ] QR/token shake randomization — shake icon in the shake modal randomizes QR pattern/style; outside clicks remember last shake state
-- [ ] QR visual state integration — use current puddle visuals (marbles, ripples) to influence generated QR style options
+- [x] QR/token shake randomization — shake icon in the shake modal randomizes QR pattern/style; outside clicks remember last shake state
+- [x] QR visual state integration — use current puddle visuals (marbles, ripples) to influence generated QR style options
 
 ## Puddle Fork (post-v3)
 - [ ] Fork ribbon into puddle.obfusco.us as a separate project
@@ -151,3 +151,5 @@
 - [x] Arp→play hold fix — switching mode no longer cuts sound when hold is on
 - [x] Double-spacebar clears marbles from puddle
 - [x] Puddle tokenization Phase 1 — ERC-721 `RibbonPuddle.sol` on Base, mint/own QR presets, IPFS metadata, ownership badges, `first_mint` milestone
+- [x] QR shake randomization — ⚡ button in QR modal rerandomizes gradient/spiral/spill style, seed persists across open/close
+- [x] QR visual state integration — marble count + avg position + puddle activity influence QR gradient spiral and glow

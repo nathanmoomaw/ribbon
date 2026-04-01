@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import QRCode from 'qrcode'
 import { useAccount } from 'wagmi'
+import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { buildPresetUrl, computePresetHash } from '../utils/presets'
 import { useMintPuddle, usePuddleOwner, PUDDLE_CONTRACT_ADDRESS } from '../crypto/contract'
 import { pinPuddleMetadata } from '../crypto/ipfs'
@@ -317,6 +318,7 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
   const [qrStyleSeed, setQrStyleSeed] = useState(() => persistedStyleSeed)
 
   const { address: walletAddress, isConnected } = useAccount()
+  const { openConnectModal } = useConnectModal()
 
   // Stable content hash of the current settings (excludes wallet/visual/loop)
   const contentHash = useMemo(() => computePresetHash(settings), [settings])
@@ -492,8 +494,8 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
           </button>
           <button
             className={`preset-qr-modal__btn preset-qr-modal__btn--mint ${mintStep === 'done' || isOwnedByMe ? 'preset-qr-modal__btn--minted' : ''}`}
-            onClick={handleMint}
-            disabled={mintDisabled}
+            onClick={!isConnected && PUDDLE_CONTRACT_ADDRESS ? openConnectModal : handleMint}
+            disabled={mintDisabled && isConnected}
             title={mintError ? String(mintError.shortMessage ?? mintError.message) : undefined}
           >
             {mintLabel}

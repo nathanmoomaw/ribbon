@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-01 — Wallet connection UX: non-intrusive integration
+
+- **Wallet button removed from main header**: No longer shows a persistent "0x" connect prompt on every visit — wallet connection is fully optional and only surfaced in the QR modal mint flow
+- **Contextual connect in QR modal**: Mint button now opens the RainbowKit connect modal when clicked while disconnected (via `useConnectModal`), so users discover wallet only when they want to mint a Puddle token — not on first load
+- `reconnectOnMount: false` was already set in wagmiConfig — no auto-reconnect behavior
+
 ## 2026-04-01 — Preset URL shake bug fix + rec/loop shelved for v3
 
 - **Preset URL shake fix**: Two sources of shake on QR/URL entry fixed: (1) `shake` events in loop data were replaying `handleShake()` on every loop pass, randomizing all controls after preset load — removed `shake` from replayCallbacks entirely (shake is a meta-action, not a musical event to replay); (2) clicking `.preset-splash` overlay area (outside the ▶ Play button) triggered click-outside shake — added overlay exclusions to `useShake`.

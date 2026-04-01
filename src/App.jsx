@@ -7,7 +7,6 @@ import { useShake, requestMotionPermission } from './hooks/useShake'
 import { useMIDI } from './hooks/useMIDI'
 import { useLooper } from './hooks/useLooper'
 import { useGoop } from './hooks/useGoop'
-import { WalletButton } from './components/WalletButton'
 import { MilestoneToast, useMilestoneToast } from './components/MilestoneToast'
 import { checkMilestone, incrementMilestone } from './crypto/milestones'
 import { SCALES } from './utils/scales'
@@ -682,7 +681,6 @@ function App() {
         >
           ⚡
         </button>
-        <WalletButton />
         {/* LooperControls shelved for v3 — rec/loop is not part of marble-focused v3 */}
         <button
           className="app-header__qr-mobile"

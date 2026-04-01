@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-01 — Preset URL shake bug fix + rec/loop shelved for v3
+
+- **Preset URL shake fix**: Two sources of shake on QR/URL entry fixed: (1) `shake` events in loop data were replaying `handleShake()` on every loop pass, randomizing all controls after preset load — removed `shake` from replayCallbacks entirely (shake is a meta-action, not a musical event to replay); (2) clicking `.preset-splash` overlay area (outside the ▶ Play button) triggered click-outside shake — added overlay exclusions to `useShake`.
+- **Rec/loop shelved for v3**: `LooperControls` UI removed from header, Enter key binding removed. All hooks/logic preserved (`useLooper`, `loadLoopData`, `recordEvent`, etc.) — existing QR presets with loops still restore on load. v3 is marble-focused.
+
 ## 2026-04-01 — QR shake randomization + puddle visual state integration
 
 - **⚡ Shake button in QR modal**: Top-left button regenerates the QR visual style (gradient phase, spiral tightness, spill shapes) without changing the encoded URL or preset data. Style seed persists across modal open/close via module-level `persistedStyleSeed`.

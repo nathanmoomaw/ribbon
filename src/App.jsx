@@ -7,7 +7,6 @@ import { useShake, requestMotionPermission } from './hooks/useShake'
 import { useMIDI } from './hooks/useMIDI'
 import { useLooper } from './hooks/useLooper'
 import { useGoop } from './hooks/useGoop'
-import { LooperControls } from './components/LooperControls'
 import { WalletButton } from './components/WalletButton'
 import { MilestoneToast, useMilestoneToast } from './components/MilestoneToast'
 import { checkMilestone, incrementMilestone } from './crypto/milestones'
@@ -199,16 +198,14 @@ function App() {
       setKeyboardPositions(new Map())
       setArpNotes([])
       arpStopRef.current?.()
-      // Stop looper playback
-      if (playing) togglePlayback()
     },
     Digit1: () => setMode('play'),
     Digit2: () => setMode('arp'),
     Digit3: () => setPoly(p => !p),
     Digit4: () => setHold((h) => !h),
     KeyV: () => setVisualMode((m) => m === 'party' ? 'lo' : 'party'),
-    Enter: () => toggleRecording(),
-  }), [mode, hold, getEngine, toggleRecording, playing, togglePlayback, clearAllMarbles])
+    // Enter key (looper record) shelved for v3 — hook preserved for future version
+  }), [mode, hold, getEngine, clearAllMarbles])
 
   useKeyboard(keyHandlers)
 
@@ -301,7 +298,8 @@ function App() {
         }
         if (setters[param]) setters[param](value)
       },
-      shake: ({ intensity }) => handleShake(intensity),
+      // shake events are intentionally excluded from replay — they randomize controls
+      // non-deterministically and would corrupt the preset state on loop playback
     }
   })
 
@@ -685,13 +683,7 @@ function App() {
           ⚡
         </button>
         <WalletButton />
-        <LooperControls
-          recording={recording}
-          playing={playing}
-          hasLoop={hasLoop}
-          onToggleRecord={toggleRecording}
-          onTogglePlay={togglePlayback}
-        />
+        {/* LooperControls shelved for v3 — rec/loop is not part of marble-focused v3 */}
         <button
           className="app-header__qr-mobile"
           onClick={handleQRCreate}

@@ -34,7 +34,7 @@
 - [ ] QR token marketplace — make/trade/sell/auction/buy tokens (QR = token outside of visual context)
 
 ## Soon
-- [ ] Save rec/loop function state in presets for playback from QR/URL (shelved — UI preserved)
+- [x] Save rec/loop function state in presets for playback from QR/URL (shelved — UI removed for v3, hook preserved)
 - [ ] Goop functionality — needs dedicated attention, not currently working correctly
 
 ## Future Features

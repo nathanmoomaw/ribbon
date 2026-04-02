@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-01 — Shake restore + grid parallax
+
+- **Shake blank-space restore**: The `[data-rk]` exclusion from the previous commit broke all blank-space shake — `RainbowKitProvider` wraps the entire app in `<div data-rk="">` so every click matched it. Replaced with `!document.getElementById('root').contains(e.target)` — correctly excludes only portal-rendered modals (wallet connect) which are appended directly to `document.body`, not inside `#root`.
+- **Grid parallax**: Background grid now shifts in response to puddle touch position via a RAF loop that reads `ribbonInteraction.current` (existing ref, zero prop drilling). Lerps at 6% per frame toward target offset — up to ±40px horizontal, ±25px vertical. Returns to center when not touching. Applied via `style.transform` on `.app__grid-bg` ref.
+
 ## 2026-04-01 — Performance + shake bug fixes
 
 - **Shake fix (preset link/QR)**: Root cause was React removing `.preset-splash` from the DOM *before* the `window` click handler fires — `closest('.preset-splash')` returned null on a detached node. Fix: added `if (!document.body.contains(e.target)) return` as first guard in click-outside handler, skipping shake for any click on an element no longer in the DOM.

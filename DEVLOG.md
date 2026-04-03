@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-02 — Fix clip-path direction: panels now correctly concave toward puddle
+
+- Previous clip-paths were CONVEX (panels wider at center), which made panels bulge *into* the puddle dead space rather than hug it.
+- Fixed all three panels with CONCAVE inner edges — panels narrow at center (where the oval is widest) and are full-width at top/bottom corners.
+- Left panel right edge: `100%→82%@center→100%` (scoops inward ~18% at middle)
+- Right panel left edge: mirror (`0%→18%@center→0%`)
+- Bottom panel top edge: smile arc — corners clipped ~28%, center reaches full height (oval bottom is lowest at center, rises steeply at corners so corner space was dead)
+
 ## 2026-04-02 — Fix mode-switch breaking controls
 
 - **Root cause**: ActivationMode desktop CSS forced `flex-direction: row; flex-wrap: wrap` (leftover from old top-bar layout). Now that ActivationMode lives in the narrow left column, items were wrapping and the inactive BPM section (`pointer-events: none`) could end up overlapping sibling controls, swallowing clicks. Fixed by changing desktop ActivationMode to `flex-direction: column; align-items: stretch; flex-wrap: nowrap` to match the left panel.

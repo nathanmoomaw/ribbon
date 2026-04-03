@@ -43,3 +43,27 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
+
+.wallet-btn__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.wallet-btn__forget {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  padding: 2px 6px;
+  border-radius: 20px;
+  background: transparent;
+  border: 1px solid rgba(100, 90, 140, 0.1);
+  color: rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.wallet-btn__forget:hover {
+  color: rgba(255, 80, 80, 0.6);
+  border-color: rgba(255, 80, 80, 0.2);
+}

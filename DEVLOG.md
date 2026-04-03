@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-02 — Wallet "forget" option
+
+- Added `WalletButton` to the app header (it existed as a component but wasn't rendered)
+- Added a "forget" link that appears next to the `0x` button only when: (a) user is disconnected and (b) the auto-reconnect localStorage flag is set
+- Clicking "forget" removes `ribbon_wallet_ever_connected` from localStorage — stops silent reconnect on future loads
+- User can still connect at any time via the QR modal's "Connect wallet to mint" button
+
 ## 2026-04-02 — Perspective floor grid + controls chrome strip + curve wrapping
 
 - **Perspective floor grid**: Background grid replaced with a synthwave-style perspective floor plane (`perspective(500px) rotateX(62deg)`, `transform-origin: 50% 100%`). Mask fades at horizon for natural depth. Dark space backdrop is a separate flat element. Parallax now scrolls `background-position` on the floor element (horizontal + depth) rather than translating the whole element — proper parallax on a rotated plane.

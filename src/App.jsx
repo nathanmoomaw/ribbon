@@ -20,6 +20,7 @@ import { VCFControl } from './components/VCFControl'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
+import { WalletButton } from './components/WalletButton'
 import { MobileSplash } from './components/MobileSplash'
 import { PresetSplash } from './components/PresetSplash'
 import { useMarbles } from './hooks/useMarbles'
@@ -57,12 +58,20 @@ function App() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Track connection state — set flag on connect, clear on explicit disconnect
+  // Track connection state — set flag on connect
   useEffect(() => {
     if (isConnected) {
       localStorage.setItem(WALLET_FLAG_KEY, '1')
+      setWalletFlagSet(true)
     }
   }, [isConnected])
+
+  const [walletFlagSet, setWalletFlagSet] = useState(!!localStorage.getItem(WALLET_FLAG_KEY))
+
+  const handleForgetWallet = useCallback(() => {
+    localStorage.removeItem(WALLET_FLAG_KEY)
+    setWalletFlagSet(false)
+  }, [])
 
   const [mode, setMode] = useState(_urlPreset?.mode ?? 'play')
   const [inputMode, setInputMode] = useState('touch')
@@ -757,6 +766,7 @@ function App() {
            : midiDevice ? 'MIDI ✓'
            : 'MIDI'}
         </button>
+        <WalletButton onForget={walletFlagSet && !isConnected ? handleForgetWallet : undefined} />
       </header>
 
       <div className="app__stage" style={{ position: 'relative' }}>

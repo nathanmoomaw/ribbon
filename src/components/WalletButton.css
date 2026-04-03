@@ -50,20 +50,30 @@
   gap: 0.3rem;
 }
 
+.wallet-btn__reconnect {
+  opacity: 0.35;
+}
+
+.wallet-btn__reconnect:hover {
+  opacity: 0.7;
+  border-color: rgba(224, 64, 251, 0.3) !important;
+  box-shadow: 0 0 6px rgba(224, 64, 251, 0.1);
+}
+
 .wallet-btn__forget {
   font-family: var(--font-mono);
   font-size: 0.5rem;
   padding: 2px 6px;
   border-radius: 20px;
   background: transparent;
-  border: 1px solid rgba(100, 90, 140, 0.1);
-  color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(100, 90, 140, 0.08);
+  color: rgba(255, 255, 255, 0.12);
   cursor: pointer;
   letter-spacing: 0.05em;
   transition: color 0.2s, border-color 0.2s;
 }
 
 .wallet-btn__forget:hover {
-  color: rgba(255, 80, 80, 0.6);
+  color: rgba(255, 80, 80, 0.55);
   border-color: rgba(255, 80, 80, 0.2);
 }

@@ -1,11 +1,11 @@
 # Devlog
 
-## 2026-04-02 — Wallet "forget" option
+## 2026-04-02 — Wallet "forget" option (no more auto-popup)
 
-- Added `WalletButton` to the app header (it existed as a component but wasn't rendered)
-- Added a "forget" link that appears next to the `0x` button only when: (a) user is disconnected and (b) the auto-reconnect localStorage flag is set
-- Clicking "forget" removes `ribbon_wallet_ever_connected` from localStorage — stops silent reconnect on future loads
-- User can still connect at any time via the QR modal's "Connect wallet to mint" button
+- Removed silent `reconnect()` call on mount — this was triggering the "Ribbon Puddle wants to continue in Base Account" modal every load for previously-connected users
+- When `ribbon_wallet_ever_connected` flag is set but user is disconnected: header shows subtle `[reconnect] [forget]` options — user explicitly initiates reconnect instead of being prompted
+- "forget" clears the localStorage flag so neither option appears again; user can still connect via QR modal
+- When actually connected: shows address as before
 
 ## 2026-04-02 — Perspective floor grid + controls chrome strip + curve wrapping
 

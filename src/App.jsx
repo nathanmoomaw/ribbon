@@ -24,7 +24,7 @@ import { WalletButton } from './components/WalletButton'
 import { MobileSplash } from './components/MobileSplash'
 import { PresetSplash } from './components/PresetSplash'
 import { useMarbles } from './hooks/useMarbles'
-import { useAccount, useReconnect } from 'wagmi'
+import { useAccount } from 'wagmi'
 import './App.css'
 
 const WALLET_FLAG_KEY = 'ribbon_wallet_ever_connected'
@@ -49,14 +49,9 @@ const _urlPresetHref = _urlPreset ? window.location.href : null
 function App() {
   const getEngine = useAudioEngine()
   const { address: walletAddress, isConnected } = useAccount()
-  const { reconnect } = useReconnect()
 
-  // Silently reconnect on mount if user has connected before
-  useEffect(() => {
-    if (localStorage.getItem(WALLET_FLAG_KEY)) {
-      reconnect()
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  // Don't auto-reconnect on load — that triggers a modal prompt.
+  // Instead show subtle reconnect/forget options in the header (see WalletButton).
 
   // Track connection state — set flag on connect
   useEffect(() => {
@@ -766,7 +761,7 @@ function App() {
            : midiDevice ? 'MIDI ✓'
            : 'MIDI'}
         </button>
-        <WalletButton onForget={walletFlagSet && !isConnected ? handleForgetWallet : undefined} />
+        <WalletButton flagSet={walletFlagSet && !isConnected} onForget={handleForgetWallet} />
       </header>
 
       <div className="app__stage" style={{ position: 'relative' }}>

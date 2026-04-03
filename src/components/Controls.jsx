@@ -2,6 +2,7 @@ import { useCallback, useRef as useRefHook, useEffect, forwardRef, memo } from '
 import { SCALES, SCALE_LABELS } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import { RotaryKnob } from './RotaryKnob'
+import { VCFControl } from './VCFControl'
 import './Controls.css'
 
 function DJFader({ value, onChange, ghostValue }) {
@@ -313,6 +314,12 @@ export const Controls = forwardRef(function Controls({
   draggingMarble,
   onMarblePickUp,
   nextSlotId,
+  vcfCutoff,
+  vcfResonance,
+  vcfRouting,
+  onVcfCutoffChange,
+  onVcfResonanceChange,
+  onVcfRoutingToggle,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -422,6 +429,15 @@ export const Controls = forwardRef(function Controls({
             puddleActivity={puddleActivity || 0}
             className="controls__shared"
           >
+            <VCFControl
+              vcfCutoff={vcfCutoff}
+              vcfResonance={vcfResonance}
+              vcfRouting={vcfRouting}
+              getEngine={getEngine}
+              onCutoffChange={onVcfCutoffChange}
+              onResonanceChange={onVcfResonanceChange}
+              onRoutingToggle={onVcfRoutingToggle}
+            />
             <MiniShakeBolt onClick={() => {
               const engine = getEngine()
               const newOctaves = OCTAVE_OPTIONS[Math.floor(Math.random() * OCTAVE_OPTIONS.length)]

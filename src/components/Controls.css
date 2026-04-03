@@ -574,40 +574,21 @@
   .controls__layout { display: contents; }
   .controls__main { display: contents; }
 
+  /* Left panel — play/arp, mono/poly, hold, stop, bpm, vol */
   .controls__toggles {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 0.4rem 1rem;
-    border-right: none;
-    box-shadow: none;
-    background: rgba(28, 24, 48, 0.7);
-    border: 1px solid rgba(80, 70, 120, 0.3);
-    border-bottom-color: rgba(60, 50, 100, 0.2);
-    border-radius: 6px 6px 20px 20px;
-  }
-
-  .controls__toggles .controls__fader-track {
-    height: 60px;
-  }
-
-  .controls__osc-goopable {
-    flex: 1;
-  }
-
-  /* Left panel — right edge follows the oval's convex left curve */
-  .controls__oscillators {
     grid-column: 1;
     grid-row: 2;
     flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
     padding: 0.5rem;
+    border-right: none;
+    box-shadow: none;
     background: rgba(22, 18, 40, 0.65);
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-right-color: rgba(80, 160, 255, 0.15);
     border-radius: 6px 28px 28px 6px;
+    /* Right edge follows the oval's convex left curve */
     clip-path: polygon(
       0% 0%, 100% 0%,
       100% 7%, 97% 20%, 93% 50%, 97% 80%, 100% 93%,
@@ -615,20 +596,98 @@
     );
   }
 
-  /* Right panel — left edge follows the oval's convex right curve */
-  .controls__shared {
+  .controls__toggles .controls__fader {
+    flex-direction: row;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0;
+  }
+
+  .controls__toggles .controls__fader-track {
+    flex: 1;
+    height: 24px;
+  }
+
+  .controls__toggles .controls__fader-groove {
+    top: 50%;
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    height: 3px;
+    transform: translateY(-50%);
+  }
+
+  .controls__toggles .controls__fader-ghost {
+    top: 3px;
+    bottom: 3px;
+    left: var(--ghost-left, 0);
+    right: auto;
+    height: auto;
+    width: 6px;
+  }
+
+  .controls__toggles .controls__fader-thumb {
+    top: 3px;
+    bottom: 3px;
+    left: var(--thumb-left, 0);
+    right: auto;
+    height: auto;
+    width: 10px;
+  }
+
+  .controls__osc-goopable {
+    flex: 1;
+  }
+
+  /* Right panel — oscillators */
+  .controls__oscillators {
     grid-column: 3;
     grid-row: 2;
+    flex-direction: column;
     padding: 0.5rem;
     background: rgba(22, 18, 40, 0.65);
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-left-color: rgba(80, 160, 255, 0.15);
     border-radius: 28px 6px 6px 28px;
+    /* Left edge follows the oval's convex right curve */
     clip-path: polygon(
       0% 0%, 100% 0%,
       100% 100%, 0% 100%,
       0% 93%, 3% 80%, 7% 50%, 3% 20%, 0% 7%
     );
+  }
+
+  /* Bottom panel — VCF + shared controls (octaves, scale, filter, reverb, crunch, delay) */
+  .controls__shared {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.25rem;
+    align-items: flex-start;
+    padding: 0.5rem 1rem;
+    border-top: none;
+    background: rgba(22, 18, 40, 0.65);
+    border: 1px solid rgba(70, 60, 110, 0.3);
+    border-top-color: rgba(80, 160, 255, 0.15);
+    border-radius: 20px 20px 6px 6px;
+    /* Top edge follows the oval's convex bottom curve */
+    clip-path: polygon(
+      0% 7%, 3% 3%, 7% 0%,
+      50% 5%, 93% 0%, 97% 3%, 100% 7%,
+      100% 100%, 0% 100%
+    );
+  }
+
+  /* VCF sits inline in the bottom bar — remove its standalone container look */
+  .controls__shared .vcf-control {
+    display: contents;
+  }
+
+  .controls__shared .vcf-control__label {
+    display: none;
   }
 
   .preset-qr-trigger {

@@ -14,7 +14,6 @@ import { Puddle } from './components/Puddle'
 import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
-import { VCFControl } from './components/VCFControl'
 // HelpWizard shelved — partially implemented, targeting future version
 // import { HelpWizard, WizardTrigger } from './components/HelpWizard'
 import { positionToFrequency } from './utils/pitchMap'
@@ -798,16 +797,6 @@ function App() {
           marbleDepressions={marbleDepressionsRef}
         />
 
-        <VCFControl
-          vcfCutoff={vcfCutoff}
-          vcfResonance={vcfResonance}
-          vcfRouting={vcfRouting}
-          getEngine={getEngine}
-          onCutoffChange={setVcfCutoff}
-          onResonanceChange={setVcfResonance}
-          onRoutingToggle={handleVcfRoutingToggle}
-        />
-
         <Controls
           ref={controlsRef}
           getEngine={getEngine}
@@ -850,6 +839,12 @@ function App() {
           draggingMarble={draggingMarble}
           onMarblePickUp={handleMarblePickUpOrSpawn}
           nextSlotId={marbleNextSlotId}
+          vcfCutoff={vcfCutoff}
+          vcfResonance={vcfResonance}
+          vcfRouting={vcfRouting}
+          onVcfCutoffChange={setVcfCutoff}
+          onVcfResonanceChange={setVcfResonance}
+          onVcfRoutingToggle={handleVcfRoutingToggle}
         />
       </div>
 

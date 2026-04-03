@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-02 — Controls layout rework: left/right/bottom hugging puddle
+
+- **Left panel** (was top bar): `controls__toggles` — play/arp, mono/poly, hold, stop, bpm, vol now on left side of puddle, vertical stack, right edge curves inward with `clip-path` to hug the oval
+- **Right panel** (was left): `controls__oscillators` — OSC 1/2/3 moved to right side; left edge mirrors the curve
+- **Bottom panel** (was right): `controls__shared` — octaves, scale, filter, reverb, crunch, delay now span full width below puddle; VCFControl merged inline into this panel (no longer a standalone grid item)
+- VCFControl removed from App.jsx render, props passed through Controls component instead
+- `controls__shared` switches from 2-col grid to flex-row wrap for the bottom bar layout
+
 ## 2026-04-02 — Wallet forget: wipe wagmi persisted state
 
 - Root cause of the Base Account modal: wagmi's `reconnectOnMount: false` was set but the Base Account connector (included by default in RainbowKit) stores its own session in `wagmi.store` localStorage and prompts independently

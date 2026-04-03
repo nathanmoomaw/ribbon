@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-02 — Fix shake-on-knob-release + restore VCF in bottom bar
+
+- **Shake on unclick fix**: When dragging a rotary knob, pointer capture routes `pointerup` to the knob even if the pointer ended outside controls. The browser then fires a `click` at the actual release position, which was outside controls and triggered shake. Fix: track `hasDragged` in RotaryKnob; on `pointerUp` after a drag, register a one-time capture-phase `click` listener on `document` that calls `stopImmediatePropagation()` — swallowing the synthetic click before it reaches the shake handler.
+- **VCF restored**: Previous `display: contents` trick removed the VCF visual wrapper and its "VCF" label, making it look invisible. Fixed by keeping VCF as a proper flex item with its column layout, separated from the rest of the bottom bar by a subtle magenta border-right.
+
 ## 2026-04-02 — Controls hugging puddle + layout stability fixes
 
 - **Tighter puddle hugging**: column-gap set to 0 (was 0.75rem) so side panels abut puddle div with no dead space between grid columns. Row gap kept at 0.4rem for bottom bar breathing room.

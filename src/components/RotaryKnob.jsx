@@ -26,6 +26,7 @@ export const RotaryKnob = memo(function RotaryKnob({
   const ghostRef = useRef(null)
   const ghostThumbRef = useRef(null)
   const dragging = useRef(false)
+  const hasDragged = useRef(false)
   const startY = useRef(0)
   const startValue = useRef(0)
 
@@ -59,6 +60,7 @@ export const RotaryKnob = memo(function RotaryKnob({
 
   const onPointerMove = useCallback((e) => {
     if (!dragging.current) return
+    hasDragged.current = true
 
     // Vertical drag: up = increase, down = decrease
     // 200px of drag covers the full range
@@ -77,10 +79,19 @@ export const RotaryKnob = memo(function RotaryKnob({
     onChange(clampedStepped)
   }, [min, max, step, range, onChange, applyVisuals])
 
-  const onPointerUp = useCallback((e) => {
+  const onPointerUp = useCallback(() => {
+    const didDrag = hasDragged.current
     dragging.current = false
+    hasDragged.current = false
     // Hide ghost slider
     if (ghostRef.current) ghostRef.current.classList.remove('rotary-knob__ghost--visible')
+    if (didDrag) {
+      // Swallow the synthetic click that fires after a pointer-capture drag ends
+      // outside the knob element — prevents the useShake click handler from firing.
+      const suppress = (e) => e.stopImmediatePropagation()
+      document.addEventListener('click', suppress, { once: true, capture: true })
+      setTimeout(() => document.removeEventListener('click', suppress, true), 300)
+    }
   }, [])
 
   const ghostTopPct = (1 - ratio) * 100

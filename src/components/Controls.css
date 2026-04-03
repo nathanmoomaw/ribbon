@@ -704,13 +704,14 @@
     );
   }
 
-  /* VCF sits inline in the bottom bar — remove its standalone container look */
+  /* VCF sits as a flex item in the bottom bar */
   .controls__shared .vcf-control {
-    display: contents;
-  }
-
-  .controls__shared .vcf-control__label {
-    display: none;
+    background: none;
+    border: none;
+    border-right: 1px solid rgba(224, 64, 251, 0.15);
+    padding: 0 1rem 0 0;
+    border-radius: 0;
+    flex-shrink: 0;
   }
 
   .preset-qr-trigger {

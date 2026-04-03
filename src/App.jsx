@@ -64,7 +64,13 @@ function App() {
   const [walletFlagSet, setWalletFlagSet] = useState(!!localStorage.getItem(WALLET_FLAG_KEY))
 
   const handleForgetWallet = useCallback(() => {
+    // Clear our flag
     localStorage.removeItem(WALLET_FLAG_KEY)
+    // Clear wagmi's persisted connection state so the Base Account connector
+    // stops auto-prompting on next load (wagmi stores session under wagmi.store)
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('wagmi'))
+      .forEach(k => localStorage.removeItem(k))
     setWalletFlagSet(false)
   }, [])
 

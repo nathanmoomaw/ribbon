@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-02 — Wallet forget: wipe wagmi persisted state
+
+- Root cause of the Base Account modal: wagmi's `reconnectOnMount: false` was set but the Base Account connector (included by default in RainbowKit) stores its own session in `wagmi.store` localStorage and prompts independently
+- "forget" now wipes all `wagmi.*` keys from localStorage in addition to our flag, fully clearing the stored session so the connector stops prompting
+
 ## 2026-04-02 — Wallet "forget" option (no more auto-popup)
 
 - Removed silent `reconnect()` call on mount — this was triggering the "Ribbon Puddle wants to continue in Base Account" modal every load for previously-connected users

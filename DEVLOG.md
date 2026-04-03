@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-02 — Fix mode-switch breaking controls
+
+- **Root cause**: ActivationMode desktop CSS forced `flex-direction: row; flex-wrap: wrap` (leftover from old top-bar layout). Now that ActivationMode lives in the narrow left column, items were wrapping and the inactive BPM section (`pointer-events: none`) could end up overlapping sibling controls, swallowing clicks. Fixed by changing desktop ActivationMode to `flex-direction: column; align-items: stretch; flex-wrap: nowrap` to match the left panel.
+- **Secondary fix**: `lastStopRef = { current: 0 }` in ActivationMode was a plain object recreated every render, meaning the Stop double-click detection for kill-all never worked. Changed to `useRef(0)`.
+
 ## 2026-04-02 — Fix shake-on-knob-release + restore VCF in bottom bar
 
 - **Shake on unclick fix**: When dragging a rotary knob, pointer capture routes `pointerup` to the knob even if the pointer ended outside controls. The browser then fires a `click` at the actual release position, which was outside controls and triggered shake. Fix: track `hasDragged` in RotaryKnob; on `pointerUp` after a drag, register a one-time capture-phase `click` listener on `document` that calls `stopImmediatePropagation()` — swallowing the synthetic click before it reaches the shake handler.

@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { createPortal } from 'react-dom'
 import './ActivationMode.css'
 
@@ -69,7 +70,7 @@ export function ActivationMode({
   hold, setHold, onStop, onKillAll,
   trayMarble, draggingMarble, onMarblePickUp, nextSlotId,
 }) {
-  const lastStopRef = { current: 0 }
+  const lastStopRef = useRef(0)
 
   const handleStop = () => {
     const now = Date.now()

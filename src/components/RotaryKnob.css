@@ -15,7 +15,10 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   min-width: calc(var(--knob-size, 48px) + 8px);
+  width: calc(var(--knob-size, 48px) + 8px);
   text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rotary-knob__body {

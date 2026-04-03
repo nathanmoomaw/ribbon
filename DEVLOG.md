@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-04-02 — Controls hugging puddle + layout stability fixes
+
+- **Tighter puddle hugging**: column-gap set to 0 (was 0.75rem) so side panels abut puddle div with no dead space between grid columns. Row gap kept at 0.4rem for bottom bar breathing room.
+- **Panel stretch**: `align-items: stretch` on `.app__stage` so side panels stretch to the full puddle row height instead of top-aligning and leaving dead corners.
+- **More aggressive clip-paths**: left panel right-edge arc cuts 26% at corners → 4% at center (was 7% flat). Right panel mirrors. Bottom bar top arc is deeper (18% at corners). Arcs now visually match the oval's bezier curve.
+- **Narrower side columns**: `minmax(140px, 195px)` (was `minmax(200px, 280px)`) — gives more space to the puddle center.
+- **Controls center**: `justify-content: center` on toggles panel so controls center in the stretched panel height.
+- **Layout stability**: `controls__value` gets `font-variant-numeric: tabular-nums; min-width: 4ch; display: inline-block` so changing values (fast/med/slow, 0%-100%) don't reflow surrounding controls. `controls__section` gets `flex-shrink: 0`. `controls__label` gets `white-space: nowrap`. Rotary knob label gets fixed `width` so it never expands the knob layout.
+
 ## 2026-04-02 — Controls layout rework: left/right/bottom hugging puddle
 
 - **Left panel** (was top bar): `controls__toggles` — play/arp, mono/poly, hold, stop, bpm, vol now on left side of puddle, vertical stack, right edge curves inward with `clip-path` to hug the oval

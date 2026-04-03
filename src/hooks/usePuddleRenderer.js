@@ -159,58 +159,24 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
     const scene = new THREE.Scene()
     sceneRef.current = scene
 
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100)
-    camera.position.set(0, 0, 1.8)
-    camera.lookAt(0, 0, 0)
+    // Orthographic fullscreen quad — plane fills NDC exactly regardless of aspect ratio.
+    // CSS clip-path owns the puddle shape; Three.js just fills the container with texture.
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10)
+    camera.position.set(0, 0, 1)
     cameraRef.current = camera
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
-      antialias: false,  // disabled — iridescent surface masks aliasing, saves ~15% GPU
+      antialias: false,
       powerPreference: 'default',
     })
     renderer.setClearColor(0x000000, 0)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))  // 1.5 vs 2 = 44% fewer pixels on 3× screens
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
     rendererRef.current = renderer
     container.appendChild(renderer.domElement)
 
-    // Puddle mesh — subdivided plane, stretched wider to match sketch (3:2 ratio)
-    // 64×64 segments: 4225 vertices vs 9409 at 96×96 — same visual quality at half the vert cost
+    // Simple flat plane — fills the camera view exactly; clip-path handles shape
     const geometry = new THREE.PlaneGeometry(2, 2, 64, 64)
-
-    // Warp vertices into an organic oil-puddle blob matching the sketched shape:
-    // wide amoeba, 3 OSC lobes (top-center, top-right, bottom-center), flatter left side
-    const posAttr = geometry.attributes.position
-    for (let i = 0; i < posAttr.count; i++) {
-      const x = posAttr.getX(i)
-      const y = posAttr.getY(i)
-      // Stretch horizontally to match sketch's ~3:2 aspect ratio
-      const sx = x * 1.4
-      const sy = y * 0.9
-      const dist = Math.sqrt(sx * sx + sy * sy)
-      const angle = Math.atan2(sy, sx)
-      // Base organic blob with gentle harmonics
-      const blobRadius = 0.75
-        + 0.06 * Math.sin(angle * 2 + 0.3)
-        + 0.04 * Math.cos(angle * 3 - 0.5)
-        + 0.03 * Math.sin(angle * 5 + 1.8)
-        + 0.02 * Math.cos(angle * 7 + 0.2)
-        // OSC 1 lobe — upper-left-center (angle ~2.1 rad)
-        + 0.13 * Math.max(0, Math.cos(angle - 2.1)) ** 3
-        // OSC 2 lobe — upper-right (angle ~0.6 rad)
-        + 0.11 * Math.max(0, Math.cos(angle - 0.6)) ** 3
-        // OSC 3 lobe — bottom-center (angle ~-1.57 rad = -π/2)
-        + 0.10 * Math.max(0, Math.cos(angle + 1.57)) ** 3
-        // Flatten left edge slightly (where controls live, angle ~π)
-        - 0.06 * Math.max(0, Math.cos(angle - Math.PI)) ** 2
-      if (dist > blobRadius) {
-        const scale = blobRadius / dist
-        posAttr.setXY(i, sx * scale, sy * scale)
-      } else {
-        posAttr.setXY(i, sx, sy)
-      }
-    }
-    posAttr.needsUpdate = true
     geometry.computeVertexNormals()
 
     const material = new THREE.ShaderMaterial({
@@ -233,13 +199,11 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
     const mesh = new THREE.Mesh(geometry, material)
     scene.add(mesh)
 
-    // Resize handler
+    // Resize handler — ortho camera fills NDC regardless of aspect; just update renderer
     function resize() {
       const w = container.clientWidth
       const h = container.clientHeight
       if (w === 0 || h === 0) return
-      camera.aspect = w / h
-      camera.updateProjectionMatrix()
       renderer.setSize(w, h)
     }
     resize()
@@ -247,9 +211,9 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(container)
 
-    // UV remapping constants (camera z=1.8, FOV=45°, plane 1.4x horiz, 0.9x vert)
-    const UV_X_SCALE = 0.5326, UV_X_OFF = 0.2337
-    const UV_Y_SCALE = 0.8284, UV_Y_OFF = 0.0858
+    // UV remapping: ortho fullscreen quad → UV 0-1 maps directly to div 0-1
+    const UV_X_SCALE = 1.0, UV_X_OFF = 0.0
+    const UV_Y_SCALE = 1.0, UV_Y_OFF = 0.0
 
     // Pre-allocate Vector3 objects so animate loop never heap-allocates
     const rippleVecs = new Array(24).fill(null).map(() => new THREE.Vector3())
@@ -301,10 +265,6 @@ export function usePuddleRenderer(containerRef, ripples, getEngine, marbleDepres
           deps[i].radius * (UV_X_SCALE + UV_Y_SCALE) / 2
         )
       }
-
-      // Gentle camera bob
-      camera.position.x = Math.sin(elapsed * 0.2) * 0.02
-      camera.position.y = Math.cos(elapsed * 0.15) * 0.02
 
       renderer.render(scene, camera)
     }

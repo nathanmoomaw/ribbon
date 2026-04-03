@@ -6,7 +6,7 @@
 - [ ] Production domain setup
 - [ ] Wire first_sound milestone to Puddle touch events
 - [ ] Serialize goop state in QR codes
-- [ ] Puddle shape design — draw a less jagged, more natural puddle silhouette (needs user input on desired shape)
+- [x] Puddle shape design — draw a less jagged, more natural puddle silhouette (needs user input on desired shape)
 - [x] Focus on marble puddle with splashing and tighter controls — sci-fi controls lining the edge of a nice puddle-shaped center, splashes and movement on touch
 - [x] QR code style: branch to a subtler style where letters don't blow out against the QR grain (less visible text)
 
@@ -49,6 +49,10 @@
 - [ ] Marble alchemy easter egg — combining specific marble pairs on the puddle triggers hidden sound presets (e.g., Ruby+Sapphire = "Volcano", all 9 marbles = "Solar System" mode)
 
 ## Completed
+- [x] Perspective floor plane background grid with puddle-touch parallax (synthwave floor look)
+- [x] Controls chrome stripped — removed backdrop-filter, heavy borders/shadows/animations from panels
+- [x] Controls curve-follow — left/right panels shaped with clip-path to hug the puddle oval
+- [x] Performance: throttled drag ripples, removed backdrop-filter, reduced confetti burst size
 - [x] Vite + React project scaffold
 - [x] Web Audio engine (oscillator, gain, delay, reverb)
 - [x] Ribbon controller with pointer events

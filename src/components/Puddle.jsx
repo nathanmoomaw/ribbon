@@ -168,7 +168,7 @@ export const Puddle = forwardRef(function Puddle({
   const SHAPES = ['triangle', 'square', 'pentagon', 'diamond']
 
   function spawnConfetti(nx, ny) {
-    const count = 8 + Math.floor(Math.random() * 8)
+    const count = 5 + Math.floor(Math.random() * 5)
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2
       const speed = 1 + Math.random() * 3
@@ -269,6 +269,37 @@ export const Puddle = forwardRef(function Puddle({
   const allPositions = [...positions.entries()]
 
   return (
+    <>
+    {/* SVG clip path — objectBoundingBox coords (0–1) make it fully responsive */}
+    <svg width="0" height="0" style={{ position: 'absolute', pointerEvents: 'none', overflow: 'hidden' }}>
+      <defs>
+        {/*
+          Puddle silhouette — wide/flat, ~3:1 ratio.
+          Two organic lobes on the left with concave notches,
+          smooth rounded right cap, gentle top/bottom arcs.
+          Coordinates in objectBoundingBox space (0–1 on each axis).
+        */}
+        {/*
+          Puddle silhouette — clean non-self-intersecting smooth oval.
+          Slightly wider on the right, asymmetric organic feel.
+          No bumps for now: bumps require careful path design to avoid
+          the nonzero winding rule creating interior holes.
+          objectBoundingBox coords (0–1 on each axis).
+        */}
+        <clipPath id="puddle-shape-clip" clipPathUnits="objectBoundingBox">
+          <path d="
+            M 0.20 0.18
+            C 0.38 0.09, 0.60 0.09, 0.78 0.18
+            C 0.90 0.24, 0.97 0.36, 0.97 0.50
+            C 0.97 0.64, 0.90 0.76, 0.78 0.82
+            C 0.60 0.91, 0.38 0.91, 0.20 0.82
+            C 0.08 0.75, 0.03 0.64, 0.03 0.50
+            C 0.03 0.36, 0.08 0.24, 0.20 0.18
+            Z
+          " />
+        </clipPath>
+      </defs>
+    </svg>
     <div
       className={`puddle ${activePointers.size > 0 ? 'puddle--active' : ''} ${shaking ? 'puddle--shaking' : ''}`}
       ref={(el) => {
@@ -371,5 +402,6 @@ export const Puddle = forwardRef(function Puddle({
           : 'touch puddle to play'}
       </div>
     </div>
+    </>
   )
 })

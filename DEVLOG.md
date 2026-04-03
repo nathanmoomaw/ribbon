@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-02 — Perspective floor grid + controls chrome strip + curve wrapping
+
+- **Perspective floor grid**: Background grid replaced with a synthwave-style perspective floor plane (`perspective(500px) rotateX(62deg)`, `transform-origin: 50% 100%`). Mask fades at horizon for natural depth. Dark space backdrop is a separate flat element. Parallax now scrolls `background-position` on the floor element (horizontal + depth) rather than translating the whole element — proper parallax on a rotated plane.
+- **Performance**: Removed `backdrop-filter: blur(12px)` from all three desktop control panels (oscillators, shared, toggles) — one of the most GPU-expensive CSS properties. Removed `sphere-light` and `float` animations from `.controls`. Throttled drag ripples to max 10fps (100ms interval) — was firing every pointermove event. Reduced confetti burst from 8–16 to 5–10 particles.
+- **Controls chrome stripped**: Removed heavy beveled industrial borders, brushed-metal backgrounds, thick box-shadows from desktop panels. Replaced with minimal semi-transparent backgrounds and single thin border with subtle cyan edge.
+- **Curve wrapping**: Left panel (oscillators) right edge follows the oval's convex left side via `clip-path: polygon()` with a concave notch at center. Right panel (shared controls) mirrors this on the left edge. Top bar has `border-radius: 6px 6px 20px 20px` to echo the oval's top arc.
+
 ## 2026-04-01 — Shake restore + grid parallax
 
 - **Shake blank-space restore**: The `[data-rk]` exclusion from the previous commit broke all blank-space shake — `RainbowKitProvider` wraps the entire app in `<div data-rk="">` so every click matched it. Replaced with `!document.getElementById('root').contains(e.target)` — correctly excludes only portal-rendered modals (wallet connect) which are appended directly to `document.body`, not inside `#root`.

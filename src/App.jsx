@@ -99,6 +99,7 @@ function App() {
   const controlsRef = useRef(null)
   const ribbonRef = useRef(null)
   const gridBgRef = useRef(null)
+  const gridFloorRef = useRef(null)
   const gridOffsetRef = useRef({ x: 0, y: 0 }) // current lerped offset
 
   // Marble hold system
@@ -507,28 +508,29 @@ function App() {
 
   useShake(handleShake, controlsRef, ribbonRef)
 
-  // Grid background parallax — smoothly shifts with puddle touch position
+  // Grid floor parallax — shifts background-position with puddle touch (perspective floor)
   useEffect(() => {
     let rafId
-    const MAX_SHIFT_X = 40 // px
-    const MAX_SHIFT_Y = 25 // px
+    const MAX_SHIFT_X = 60 // px — horizontal pan
+    const MAX_SHIFT_Y = 40 // px — depth scroll
     const LERP = 0.06      // easing factor per frame
 
     function tick() {
       rafId = requestAnimationFrame(tick)
-      const grid = gridBgRef.current
-      if (!grid) return
+      const floor = gridFloorRef.current
+      if (!floor) return
       const interact = ribbonInteraction.current
       const tx = interact.active && interact.position !== null
         ? (interact.position - 0.5) * MAX_SHIFT_X
         : 0
       const ty = interact.active && interact.velocity !== undefined
-        ? (0.5 - interact.velocity) * MAX_SHIFT_Y   // invert Y so press-down shifts down
+        ? (0.5 - interact.velocity) * MAX_SHIFT_Y
         : 0
       const o = gridOffsetRef.current
       o.x += (tx - o.x) * LERP
       o.y += (ty - o.y) * LERP
-      grid.style.transform = `translate(${o.x.toFixed(2)}px, ${o.y.toFixed(2)}px)`
+      // Move background-position so the perspective grid scrolls with touch
+      floor.style.backgroundPosition = `${o.x.toFixed(2)}px ${o.y.toFixed(2)}px, ${o.x.toFixed(2)}px ${o.y.toFixed(2)}px`
     }
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
@@ -713,8 +715,10 @@ function App() {
         ? <PresetSplash presetUrl={_urlPresetHref} onEnter={handlePresetEnter} />
         : <MobileSplash onEnter={() => getEngine()} />
       }
-      {/* Moving grid background — parallax driven by puddle touch position */}
+      {/* Dark space backdrop */}
       <div className="app__grid-bg" ref={gridBgRef} />
+      {/* Perspective floor grid — parallax driven by puddle touch position */}
+      <div className="app__grid-floor" ref={gridFloorRef} />
 
       <header className="app-header">
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">

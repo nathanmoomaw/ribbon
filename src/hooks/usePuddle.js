@@ -10,6 +10,7 @@ export function usePuddle(onPositionChange, onDown, onUp, onDragEscape) {
   const activePointers = useRef(new Set())
   const escapedPointers = useRef(new Set()) // pointers that left the puddle bounds
   const ripples = useRef([]) // ring buffer of { x, y, t, intensity }
+  const lastDragRippleTime = useRef(0)
   const MAX_RIPPLES = 24
 
   const getPosition = useCallback((e) => {
@@ -70,8 +71,12 @@ export function usePuddle(onPositionChange, onDown, onUp, onDragEscape) {
     }
 
     const { x, y } = getPosition(e)
-    // Add smaller ripples on drag
-    addRipple(x, y, 0.3)
+    // Throttle drag ripples to ~10fps to reduce physics overhead
+    const now = performance.now()
+    if (now - lastDragRippleTime.current > 100) {
+      addRipple(x, y, 0.3)
+      lastDragRippleTime.current = now
+    }
     onPositionChange?.(e.pointerId, x, y)
   }, [getPosition, isInsidePuddle, addRipple, onPositionChange, onDragEscape])
 

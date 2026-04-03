@@ -1,22 +1,13 @@
 .puddle {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
-  max-width: min(60vh, 500px);
+  aspect-ratio: 5 / 3;
+  max-width: min(82vw, 700px);
   margin: 0 auto;
   cursor: crosshair;
 
-  /* Organic puddle blob shape — irregular oil spill silhouette */
-  clip-path: polygon(
-    42% 2%, 50% 0%, 58% 1%, 68% 4%, 76% 8%,
-    83% 14%, 88% 20%, 93% 28%, 96% 37%, 98% 46%,
-    99% 55%, 97% 63%, 94% 70%, 96% 75%, 99% 80%,
-    98% 86%, 94% 91%, 88% 95%, 80% 98%, 72% 99%,
-    63% 97%, 55% 98%, 47% 100%, 38% 98%, 30% 95%,
-    23% 91%, 17% 86%, 12% 80%, 8% 73%, 5% 65%,
-    3% 57%, 1% 50%, 2% 42%, 1% 34%, 3% 26%,
-    6% 19%, 10% 13%, 16% 8%, 23% 4%, 32% 2%
-  );
+  /* Organic puddle blob — wide/flat asymmetric silhouette via SVG bezier clipPath */
+  clip-path: url(#puddle-shape-clip);
 
   /* Moving grid background */
   background:
@@ -283,19 +274,23 @@
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
 }
 
-/* Desktop: grid position in surrounding layout */
+/* Desktop: stretch to fill the grid row set by the side control panels */
 @media (min-width: 768px) {
   .puddle {
     grid-column: 2;
     grid-row: 2;
-    justify-self: center;
-    align-self: center;
+    justify-self: stretch;
+    align-self: stretch;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: auto;
+    min-height: 200px;
   }
 }
 
 /* Mobile */
 @media (max-width: 767px) {
   .puddle {
-    max-width: min(55vw, 300px);
+    max-width: 92vw;
   }
 }

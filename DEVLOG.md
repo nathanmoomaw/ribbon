@@ -1,10 +1,5 @@
 # Devlog
 
-## 2026-04-04 — OSC flush stacking + seamless panel connection
-
-- **OSC cards truly flush**: removed panel padding (`padding: 0`) + `overflow: hidden` so border-radius clips inner cards. Removed individual card `border-radius`. Removed `border-bottom` on non-last cards to eliminate double-border seam. Removed outer box-shadow per card (only inset highlights kept).
-- **Seamless side→bottom connection**: bottom panel now `position: relative; z-index: 2` — renders above side panels (z-index: 1) in the 50px overlap zone, eliminating the visible side panel bleed-over. Puddle bumped to `z-index: 3` to stay above the bottom panel.
-
 ## 2026-04-04 — OSC stacking, bottom panel lift, marble size fix, left panel polish
 
 - **OSC subpanels flush**: `gap: 0` on right panel + `margin-bottom: -1px` on non-last OSC cards to merge borders + tighter padding `0.5rem 0.75rem`.

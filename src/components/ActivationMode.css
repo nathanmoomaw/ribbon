@@ -194,6 +194,45 @@
   font-size: 0.9rem;
 }
 
+/* --- Marble size selector (3rd section of hold split) --- */
+
+.activation__marble-size {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 0.5em;
+  min-width: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s;
+  font-family: var(--font-mono);
+}
+
+.activation__marble-size:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.activation__marble-size:active {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.activation__marble-size-icon {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  line-height: 1;
+}
+
+.activation__marble-size-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
 /* --- Marble visual (shared across tray, dragging, puddle) --- */
 
 .marble-visual {

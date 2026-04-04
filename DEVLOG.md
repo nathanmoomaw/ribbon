@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-03 — Layout fixes: remove clip-paths, move puddle up, marble size selector
+
+- **Removed all clip-paths** from left/right/bottom panels — they were cutting off controls and providing no real benefit. Panels now render as clean rectangles with mild border-radius.
+- **Side panels 30px closer to puddle**: `margin-right: -30px` on left panel, `margin-left: -30px` on right panel, `z-index: 1` on both so they overlap the puddle column cleanly.
+- **Puddle moves up 70px on desktop**: `margin-top: -70px` in Puddle.css desktop breakpoint.
+- **Octaves, Scale, Speed moved to left panel** below master volume fader — bottom panel now only holds VCF, Filter, Reverb, Crunch, Delay.
+- **Marble size selector**: Added 3rd section to hold container (Hold | Marble slot | Size button). Cycles 1 → ½ → ⅓. Tray marble visually resizes immediately. Dragged marble uses that size/velocity multiplier. Resets to 1 for next marble. Returns to base config size if marble is not dropped on puddle.
+
 ## 2026-04-02 — Fix clip-path direction: panels now correctly concave toward puddle
 
 - Previous clip-paths were CONVEX (panels wider at center), which made panels bulge *into* the puddle dead space rather than hug it.

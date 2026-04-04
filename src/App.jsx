@@ -665,11 +665,11 @@ function App() {
 
   // Handle marble pick-up from the tray slot in ActivationMode
   // Auto-activates hold if not already on (item 388)
-  const handleMarblePickUpOrSpawn = useCallback((id, clientX, clientY) => {
+  const handleMarblePickUpOrSpawn = useCallback((id, clientX, clientY, sizeMultiplier = 1) => {
     if (id === -1) return // spawn is now automatic; ignore stale calls
     // Auto-activate hold on first marble grab
     setHold(h => { if (!h) return true; return h })
-    handleMarblePickUp(id, clientX, clientY)
+    handleMarblePickUp(id, clientX, clientY, sizeMultiplier)
   }, [handleMarblePickUp])
 
   // Handle marble pick-up from the puddle (drag to reposition)

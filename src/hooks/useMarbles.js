@@ -158,10 +158,15 @@ export function useMarbles(puddleRef) {
   }, [])
 
   // Pick up a marble (from tray or puddle) — wires up document pointermove/up
-  const handlePickUp = useCallback((id, clientX, clientY) => {
-    setMarbles(prev => prev.map(m =>
-      m.id === id ? { ...m, status: 'dragging', dragX: clientX, dragY: clientY, x: null, y: null } : m
-    ))
+  // sizeMultiplier: 1 (full), 0.5 (half), ~0.333 (third) — scales display size and audio velocity
+  const handlePickUp = useCallback((id, clientX, clientY, sizeMultiplier = 1) => {
+    setMarbles(prev => prev.map(m => {
+      if (m.id !== id) return m
+      const cfg = MARBLE_CONFIGS[m.id]
+      const newSize = sizeMultiplier === 1 ? cfg.size : Math.max(Math.round(cfg.size * sizeMultiplier), 6)
+      const newVelocity = sizeMultiplier === 1 ? cfg.velocity : Math.max(cfg.velocity * sizeMultiplier, 0.05)
+      return { ...m, status: 'dragging', dragX: clientX, dragY: clientY, x: null, y: null, size: newSize, velocity: newVelocity }
+    }))
 
     const onMove = (e) => {
       setMarbles(prev => prev.map(m =>
@@ -174,8 +179,9 @@ export function useMarbles(puddleRef) {
       document.removeEventListener('pointerup', onUp)
 
       if (!puddleRef.current) {
+        const cfg = MARBLE_CONFIGS[id]
         setMarbles(prev => prev.map(m =>
-          m.id === id ? { ...m, status: 'returning', dragX: null, dragY: null } : m
+          m.id === id ? { ...m, status: 'returning', dragX: null, dragY: null, size: cfg.size, velocity: cfg.velocity } : m
         ))
         setTimeout(() => setMarbles(prev => prev.map(m =>
           m.id === id && m.status === 'returning' ? { ...m, status: 'tray', droppedAt: null } : m
@@ -194,8 +200,10 @@ export function useMarbles(puddleRef) {
           m.id === id ? { ...m, status: 'puddle', x, y, dragX: null, dragY: null, droppedAt: Date.now(), vx: 0, vy: 0 } : m
         ))
       } else {
+        // Return to tray — reset size/velocity to base config
+        const cfg = MARBLE_CONFIGS[id]
         setMarbles(prev => prev.map(m =>
-          m.id === id ? { ...m, status: 'returning', dragX: null, dragY: null } : m
+          m.id === id ? { ...m, status: 'returning', dragX: null, dragY: null, size: cfg.size, velocity: cfg.velocity } : m
         ))
         setTimeout(() => setMarbles(prev => prev.map(m =>
           m.id === id && m.status === 'returning' ? { ...m, status: 'tray', droppedAt: null } : m

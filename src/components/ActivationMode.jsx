@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import './ActivationMode.css'
 
@@ -65,12 +65,27 @@ function MarbleVisual({ marble, size, style, onPointerDown, className = '' }) {
   )
 }
 
+// Size multipliers for marble dispensing: 1 = full, 0.5 = half, ~0.333 = third
+const MARBLE_SIZES = [1, 0.5, 1 / 3]
+const MARBLE_SIZE_LABELS = ['1', '½', '⅓']
+
 export function ActivationMode({
   mode, setMode, poly, setPoly, arpBpm, setArpBpm,
   hold, setHold, onStop, onKillAll,
   trayMarble, draggingMarble, onMarblePickUp, nextSlotId,
 }) {
   const lastStopRef = useRef(0)
+  // Size selector: 0=full, 1=half, 2=third — resets when tray marble changes
+  const [marbleSizeIdx, setMarbleSizeIdx] = useState(0)
+  const prevTrayIdRef = useRef(trayMarble?.id)
+
+  // Reset size to full whenever a new marble appears in the tray
+  useEffect(() => {
+    if (trayMarble?.id !== prevTrayIdRef.current) {
+      prevTrayIdRef.current = trayMarble?.id
+      setMarbleSizeIdx(0)
+    }
+  }, [trayMarble?.id])
 
   const handleStop = () => {
     const now = Date.now()
@@ -85,6 +100,11 @@ export function ActivationMode({
 
   const marbleCount = nextSlotId === -1 ? 9 : nextSlotId
   const hasMarbles = marbleCount > 0
+  const sizeMultiplier = MARBLE_SIZES[marbleSizeIdx]
+  // Display size of tray marble — scaled by current size selector
+  const trayDisplaySize = trayMarble
+    ? Math.max(Math.round(trayMarble.size * sizeMultiplier), 6)
+    : null
 
   return (
     <div className="activation">
@@ -108,7 +128,7 @@ export function ActivationMode({
         onToggle={() => setPoly(p => !p)}
       />
 
-      {/* Hold: left = traditional hold, right = marble dispenser */}
+      {/* Hold: left = traditional hold, center = marble dispenser, right = size selector */}
       <div className={`activation__hold-split ${hold ? 'hold-active' : ''}`}>
         <button
           className={`activation__hold-left ${hold ? 'active' : ''}`}
@@ -127,10 +147,11 @@ export function ActivationMode({
           {trayMarble ? (
             <MarbleVisual
               marble={trayMarble}
+              size={trayDisplaySize}
               className="marble-visual--tray"
               onPointerDown={(e) => {
                 e.preventDefault()
-                onMarblePickUp?.(trayMarble.id, e.clientX, e.clientY)
+                onMarblePickUp?.(trayMarble.id, e.clientX, e.clientY, sizeMultiplier)
               }}
             />
           ) : (
@@ -138,6 +159,15 @@ export function ActivationMode({
             <span className="activation__marble-full">✦</span>
           )}
         </div>
+        <div className="rocker__divider" />
+        <button
+          className="activation__marble-size"
+          onClick={() => setMarbleSizeIdx(i => (i + 1) % MARBLE_SIZES.length)}
+          title={`Marble size: ${MARBLE_SIZE_LABELS[marbleSizeIdx]} — click to change`}
+        >
+          <span className="activation__marble-size-icon">◉</span>
+          <span className="activation__marble-size-label">{MARBLE_SIZE_LABELS[marbleSizeIdx]}</span>
+        </button>
       </div>
 
       <button

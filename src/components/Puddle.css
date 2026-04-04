@@ -285,6 +285,7 @@
     max-width: 100%;
     aspect-ratio: auto;
     min-height: 200px;
+    margin-top: -70px;
   }
 }
 

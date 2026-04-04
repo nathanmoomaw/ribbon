@@ -399,6 +399,60 @@ export const Controls = forwardRef(function Controls({
             nextSlotId={nextSlotId}
           />
           <DJFader value={volume} onChange={handleVolume} />
+
+          <div className="controls__section">
+            <label className="controls__label">Octaves</label>
+            <div className="controls__waveforms">
+              {OCTAVE_OPTIONS.map((o) => (
+                <button
+                  key={o}
+                  className={octaves === o ? 'active' : ''}
+                  onClick={() => setOctaves(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="controls__section controls__section--full">
+            <label className="controls__label">Scale</label>
+            <div className="controls__waveforms">
+              {SCALE_NAMES.map((s) => {
+                const isDoubleHarmonicActive = scale.includes('double harmonic')
+                const isActive = !isDoubleHarmonicActive && scale.includes(s)
+                return (
+                  <button
+                    key={s}
+                    className={isActive ? 'active' : ''}
+                    onClick={() => {
+                      setScale(prev => {
+                        if (s === 'chromatic') {
+                          setStepped(false)
+                          return ['chromatic']
+                        }
+                        setStepped(true)
+                        const without = prev.filter(x => x !== 'chromatic' && x !== s && x !== 'double harmonic')
+                        if (prev.includes(s)) {
+                          const remaining = without.length === 0 ? ['chromatic'] : without
+                          if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
+                          return remaining
+                        }
+                        return [...without, s]
+                      })
+                    }}
+                  >
+                    {SCALE_LABELS[s] ?? s.slice(0, 4).toUpperCase()}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="controls__section">
+            <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
+            <RotaryKnob value={glideSpeed} min={0.001} max={0.3} step={0.001} onChange={handleGlideSpeed} color="#39ff14" size={40} />
+          </div>
         </div>
 
         <div className="controls__main">
@@ -464,65 +518,11 @@ export const Controls = forwardRef(function Controls({
               engine.setCrunch(newCrunch)
             }} title="Randomize general controls" />
             <div className="controls__section">
-              <label className="controls__label">Octaves</label>
-              <div className="controls__waveforms">
-                {OCTAVE_OPTIONS.map((o) => (
-                  <button
-                    key={o}
-                    className={octaves === o ? 'active' : ''}
-                    onClick={() => setOctaves(o)}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="controls__section controls__section--full">
-              <label className="controls__label">Scale</label>
-              <div className="controls__waveforms">
-                {SCALE_NAMES.map((s) => {
-                  const isDoubleHarmonicActive = scale.includes('double harmonic')
-                  const isActive = !isDoubleHarmonicActive && scale.includes(s)
-                  return (
-                    <button
-                      key={s}
-                      className={isActive ? 'active' : ''}
-                      onClick={() => {
-                        setScale(prev => {
-                          if (s === 'chromatic') {
-                            setStepped(false)
-                            return ['chromatic']
-                          }
-                          setStepped(true)
-                          const without = prev.filter(x => x !== 'chromatic' && x !== s && x !== 'double harmonic')
-                          if (prev.includes(s)) {
-                            const remaining = without.length === 0 ? ['chromatic'] : without
-                            if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
-                            return remaining
-                          }
-                          return [...without, s]
-                        })
-                      }}
-                    >
-                      {SCALE_LABELS[s] ?? s.slice(0, 4).toUpperCase()}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="controls__section">
               <label className="controls__label">Filter</label>
               <div className="controls__rotary-row">
                 <RotaryKnob value={filterParams.cutoff} min={20} max={20000} step={1} onChange={handleCutoff} color="#ff8c42" label="Cutoff" size={40} />
                 <RotaryKnob value={filterParams.resonance} min={0} max={25} step={0.1} onChange={handleResonance} color="#ffd700" label="Res" size={40} />
               </div>
-            </div>
-
-            <div className="controls__section">
-              <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
-              <RotaryKnob value={glideSpeed} min={0.001} max={0.3} step={0.001} onChange={handleGlideSpeed} color="#39ff14" size={40} />
             </div>
 
             <div className="controls__section controls__section--reverb">

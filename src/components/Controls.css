@@ -597,8 +597,9 @@
     background: rgba(22, 18, 40, 0.65);
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-right-color: rgba(80, 160, 255, 0.12);
-    border-radius: 6px 8px 8px 6px;
-    margin-right: -30px;
+    border-radius: 6px 8px 0 0;
+    border-bottom: none;
+    margin-right: -23px;
     z-index: 1;
     overflow-y: auto;
   }
@@ -653,12 +654,14 @@
     grid-row: 2;
     flex-direction: column;
     align-self: stretch;
+    gap: 0.35rem;
     padding: 0.5rem 0.4rem 0.5rem 0.5rem;
     background: rgba(22, 18, 40, 0.65);
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-left-color: rgba(80, 160, 255, 0.12);
-    border-radius: 8px 6px 6px 8px;
-    margin-left: -30px;
+    border-radius: 8px 6px 0 0;
+    border-bottom: none;
+    margin-left: -23px;
     z-index: 1;
   }
 
@@ -676,7 +679,7 @@
     background: rgba(22, 18, 40, 0.65);
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-top-color: rgba(80, 160, 255, 0.12);
-    border-radius: 8px 8px 6px 6px;
+    border-radius: 0 0 6px 6px;
   }
 
   /* VCF sits as a flex item in the bottom bar */
@@ -693,6 +696,7 @@
     grid-column: 2;
     grid-row: 4;
     justify-self: center;
+    margin-top: 0.5rem;
   }
 }
 

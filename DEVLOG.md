@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-04 — Layout polish: panel overlap, osc gap, U-shape console, header spacing
+
+- **Side panel overlap reduced**: `margin-right/left` from `-30px` to `-23px` — panels now flush with puddle edge without overlapping.
+- **OSC subpanel gap tightened**: added `gap: 0.35rem` to right panel `.controls__oscillators` on desktop (was inheriting 0.75rem from base rule).
+- **U-shaped console**: set `row-gap: 0` in desktop grid and adjusted border-radius so side panels connect flush to bottom panel (`border-radius: 6px 8px 0 0` / `8px 6px 0 0`; bottom panel `0 0 6px 6px`). Removed `border-bottom` from side panels to eliminate double-border at the join.
+- **Header-to-puddle spacing reduced ~25px**: reduced `.app` padding-top (0.75rem→0.25rem) and gap (0.5rem→0.15rem) on desktop; added `margin-top: -12px` to `.app__stage`.
+
 ## 2026-04-03 — Layout fixes: remove clip-paths, move puddle up, marble size selector
 
 - **Removed all clip-paths** from left/right/bottom panels — they were cutting off controls and providing no real benefit. Panels now render as clean rectangles with mild border-radius.

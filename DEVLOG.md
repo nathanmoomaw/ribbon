@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-04 — Revert OSC flush + z-index changes (items 473/474 made things worse)
+
+- Reverted the OSC `overflow: hidden` / `padding: 0` approach — it added visual space rather than reducing it.
+- Reverted z-index changes on bottom panel — made the side-panel overlap worse.
+- Items 473 and 474 marked done; the revert is the resolution.
+
 ## 2026-04-04 — OSC stacking, bottom panel lift, marble size fix, left panel polish
 
 - **OSC subpanels flush**: `gap: 0` on right panel + `margin-bottom: -1px` on non-last OSC cards to merge borders + tighter padding `0.5rem 0.75rem`.

@@ -653,14 +653,13 @@
     flex: 1;
   }
 
-  /* Merge borders between stacked OSC cards — prevent double border line */
-  .controls__oscillators .controls__osc-goopable:not(:last-child) {
-    margin-bottom: -1px;
-  }
-
-  /* Tighter vertical padding on desktop OSC cards */
+  /* Flush stacked OSC cards — flat corners, merged borders */
   .controls__oscillators .controls__osc {
     padding: 0.5rem 0.75rem;
+    border-radius: 0;
+  }
+  .controls__oscillators .controls__osc-goopable:not(:first-child) .controls__osc {
+    border-top: none;
   }
 
   /* Right panel — oscillators */
@@ -697,6 +696,8 @@
     border: 1px solid rgba(70, 60, 110, 0.3);
     border-top-color: rgba(80, 160, 255, 0.12);
     border-radius: 0 0 6px 6px;
+    position: relative;
+    z-index: 2;
   }
 
   /* VCF sits as a flex item in the bottom bar */

@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-04 — Logo center, stage lift, panel z-index fix, OSC flush (items 476-479)
+
+- **Logo centered**: `.app-header__logo` absolutely positioned at `left: 50%; transform: translateX(-50%)`, header `justify-content: flex-end` so buttons cluster right.
+- **Puddle+console up 30px**: `.app__stage` `margin-top` changed from `-12px` to `-42px`.
+- **Panel overlap fixed**: `.controls__shared` gets `position: relative; z-index: 2` so bottom panel renders above side panels; puddle bumped to `z-index: 3`.
+- **OSC panels flush**: `border-radius: 0` on stacked OSC cards + `border-top: none` on non-first cards to eliminate corner gaps and double borders.
+
 ## 2026-04-04 — Revert OSC flush + z-index changes (items 473/474 made things worse)
 
 - Reverted the OSC `overflow: hidden` / `padding: 0` approach — it added visual space rather than reducing it.

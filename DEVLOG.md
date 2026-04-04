@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-04 — OSC stacking, bottom panel lift, marble size fix, left panel polish
+
+- **OSC subpanels flush**: `gap: 0` on right panel + `margin-bottom: -1px` on non-last OSC cards to merge borders + tighter padding `0.5rem 0.75rem`.
+- **Bottom panel up 50px**: `margin-top: -50px` on `.controls__shared`; puddle gets `position: relative; z-index: 2` so it renders above the overlapping panel.
+- **Bottom panel centered**: added `justify-content: center` to bottom panel flex row.
+- **Marble sizes normalized**: all 9 marbles now use `size: 32px, velocity: 1.0` — the SIZE SELECTOR (1, ½, ⅓) is the only variable. Previously each marble had `BASE/n` sizing causing each successive marble to appear smaller.
+- **Left panel polish**: rocker switches now 1 light per side (symmetric); DJFader `margin-top: 0.75rem` for breathing room between BPM and volume; octaves/scale/speed sections `align-items: center` on desktop.
+
 ## 2026-04-04 — Layout polish: panel overlap, osc gap, U-shape console, header spacing
 
 - **Side panel overlap reduced**: `margin-right/left` from `-30px` to `-23px` — panels now flush with puddle edge without overlapping.

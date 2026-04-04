@@ -1,11 +1,11 @@
 import { useState, useRef, useCallback, useMemo } from 'react'
 
 const MARBLE_COUNT = 9
-const BASE_SIZE = 48  // marble 0 diameter in px; each subsequent = BASE/(n+1)
+const BASE_SIZE = 32    // standard marble diameter in px — same for all marbles
+const BASE_VELOCITY = 1.0  // standard velocity — same for all marbles; sizeMultiplier scales this
 
-// Each marble has unique visuals and fractionalized size/velocity
-// Size: BASE / (n+1) → marble 0 = 48px, marble 1 = 24px, marble 2 = 16px …
-// Velocity: 1 / (n+1) → marble 0 = 1.0 (loudest), marble 8 = 0.11 (quietest)
+// Each marble has unique visuals; size and velocity are uniform so the SIZE SELECTOR
+// (1, ½, ⅓) is the only thing that changes how a marble feels on the puddle.
 // pattern: 'solid' (default glass), 'cat-eye' (inner slit), 'swirl' (classic spiral), 'galaxy' (speckled core)
 export const MARBLE_CONFIGS = [
   { name: 'Ruby',      color: '#cc2222', highlight: '#ff7766', shadow: '#660011', pattern: 'solid' },
@@ -17,10 +17,10 @@ export const MARBLE_CONFIGS = [
   { name: 'Onyx',      color: '#1a1a2e', highlight: '#4466aa', shadow: '#0a0a14', pattern: 'galaxy' },
   { name: 'TigerEye',  color: '#b8780a', highlight: '#f0c040', shadow: '#5c3c00', pattern: 'swirl' },
   { name: 'Moonstone', color: '#aabbd0', highlight: '#e8f0ff', shadow: '#5577aa', pattern: 'solid' },
-].map((cfg, i) => ({
+].map((cfg) => ({
   ...cfg,
-  size: Math.max(Math.round(BASE_SIZE / (i + 1)), 6),
-  velocity: Math.max(1 / (i + 1), 0.1),
+  size: BASE_SIZE,
+  velocity: BASE_VELOCITY,
 }))
 
 function makeMarble(id) {

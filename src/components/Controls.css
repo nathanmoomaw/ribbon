@@ -298,8 +298,8 @@
 }
 
 .controls__osc-goopable {
-  flex: 1;
-  position: relative;
+  /* flex: 1; */
+  /* position: relative; */
 }
 
 /* --- Goop visual overlay --- */
@@ -650,7 +650,7 @@
   }
 
   .controls__osc-goopable {
-    flex: 1;
+    /* flex: 1; */
   }
 
   /* Flush stacked OSC cards — flat corners, merged borders */

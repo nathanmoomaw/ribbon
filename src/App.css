@@ -109,18 +109,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem;
+  justify-content: center;
+  gap: 0.5rem;
   position: relative;
-}
-
-/* Left cluster — MIDI + wallet (+ QR on mobile) */
-.app-header__left {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  position: relative;
-  z-index: 1;
 }
 
 .app-header .ribbon-logo {
@@ -132,11 +123,6 @@
   outline: none;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-  position: absolute;
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 0;
 }
 
 .app-header__logo:active .ribbon-logo {
@@ -156,9 +142,6 @@
   transition: opacity 0.15s, transform 0.15s, filter 0.15s;
   animation: none;
   line-height: 1;
-  position: relative;
-  top: 8px;
-  z-index: 1;
 }
 
 .app-header__shake-bolt:hover {
@@ -194,8 +177,6 @@
   filter: grayscale(0.5);
   transition: opacity 0.15s, transform 0.15s, filter 0.15s;
   line-height: 1;
-  position: relative;
-  top: 8px;
 }
 
 .app-header__qr-mobile:hover {
@@ -249,8 +230,6 @@
   display: flex;
   align-items: center;
   align-self: center;
-  position: relative;
-  top: 8px;
 }
 
 .app-header__ambient-icon {

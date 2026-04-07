@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-06 — Header reorder: MIDI, wallet, logo, shake in a line (item 495)
+
+- Removed `app-header__left` wrapper div — all items now direct children of `<header>`.
+- Logo no longer `position: absolute` — flows inline with other items.
+- Header `justify-content: center; gap: 0.5rem` so all four items sit in a centered row.
+- Removed leftover `top: 8px` from shake bolt, QR button, and ambient button (header `align-items: center` handles vertical alignment).
+- Desktop `pointer-events: none` on logo preserved from item 494.
+
 ## 2026-04-06 — Mobile header fix, puddle hint, logo click-through (items 492-494)
 
 - **Mobile header width**: Removed `align-self: center; flex-wrap: wrap` from mobile `.app-header`; added `width: 100%` so `space-between` spreads left/shake items to edges with logo centered.

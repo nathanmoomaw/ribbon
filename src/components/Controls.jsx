@@ -546,35 +546,38 @@ export const Controls = forwardRef(function Controls({
                 <RotaryKnob value={delayParams.mix} min={0} max={1} step={0.01} onChange={handleDelayMix} color="#c8d0e0" label="Mix" size={40} />
               </div>
             </div>
+            {/* MIDI + wallet + QR — absolute lower-right of console */}
+            {(onQRCreate || onConnectMIDI || utilitySlot) && (
+              <div className="controls__console-corner">
+                {onConnectMIDI && (
+                  <button
+                    className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
+                    onClick={onConnectMIDI}
+                    title={
+                      midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
+                      : midiDevice === 'denied' ? 'MIDI access denied'
+                      : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
+                      : midiDevice ? `MIDI: ${midiDevice}`
+                      : 'Connect MIDI controller'
+                    }
+                  >
+                    {midiDevice === 'unsupported' ? 'MIDI ✗'
+                     : midiDevice === 'denied' ? 'MIDI ✗'
+                     : midiDevice === 'no-device' ? 'MIDI …'
+                     : midiDevice ? 'MIDI ✓'
+                     : 'MIDI'}
+                  </button>
+                )}
+                {utilitySlot}
+                {onQRCreate && (
+                  <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
+                    &#x25A3;
+                  </button>
+                )}
+              </div>
+            )}
           </GoopableSection>
         </div>
-      </div>
-      <div className="controls__utility-bar">
-        {onConnectMIDI && (
-          <button
-            className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
-            onClick={onConnectMIDI}
-            title={
-              midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
-              : midiDevice === 'denied' ? 'MIDI access denied'
-              : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
-              : midiDevice ? `MIDI: ${midiDevice}`
-              : 'Connect MIDI controller'
-            }
-          >
-            {midiDevice === 'unsupported' ? 'MIDI ✗'
-             : midiDevice === 'denied' ? 'MIDI ✗'
-             : midiDevice === 'no-device' ? 'MIDI …'
-             : midiDevice ? 'MIDI ✓'
-             : 'MIDI'}
-          </button>
-        )}
-        {utilitySlot}
-        {onQRCreate && (
-          <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
-            &#x25A3;
-          </button>
-        )}
       </div>
     </div>
   )

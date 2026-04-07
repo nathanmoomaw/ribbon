@@ -745,16 +745,8 @@ function App() {
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
           <RibbonLogo />
         </div>
-        {/* Right: empty spacer — shake bolt moved to puddle nook on desktop */}
-        <div className="app-header__right">
-          <button
-            className="app-header__shake-bolt"
-            onClick={() => { requestMotionPermission(); handleShake(0.5) }}
-            aria-label="Shake / Randomize"
-          >
-            ⚡
-          </button>
-        </div>
+        {/* Right: spacer for grid balance */}
+        <div className="app-header__right" />
       </header>
 
       <div className="app__stage" style={{ position: 'relative' }}>

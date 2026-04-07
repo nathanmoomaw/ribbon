@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-07 — Controls cleanup: console corner, nook fix, bolt removed, panel overflow (items 502-506)
+
+- **502**: Unchecked empty item 501 (was wrongly marked done).
+- **503**: Removed `controls__utility-bar` row. MIDI + wallet + QR now in `controls__console-corner` — `position: absolute; bottom: 0.4rem; right: 0.4rem` inside `.controls__shared`. No new layout row.
+- **504**: Shake nook `margin-bottom` increased from 1.5rem → 4.5rem to lift it above the bottom console's `-50px` overlap zone.
+- **505**: Removed `app-header__shake-bolt` button from JSX entirely (and its CSS). Mobile shake still via logo click; desktop via nook.
+- **506**: Added `padding-bottom: 55px` to both side panels (`controls__toggles` + `controls__oscillators`) so content clears the bottom console's `-50px` overlap on short screens.
+
 ## 2026-04-07 — MIDI/wallet to controls bar, shake nook, panel height cap, QR glow (items 497-501)
 
 - **497**: MIDI + WalletButton moved from header into `controls__utility-bar` in Controls.jsx, rendered alongside QR trigger. Header left now only holds mobile QR button.

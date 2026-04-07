@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-06 — Header layout: MIDI/wallet left, shake right (item 491)
+
+- Wrapped MIDI + wallet + QR into `.app-header__left` div on the left of the logo.
+- Shake bolt stays as last element (right side). Header `justify-content: space-between`.
+- Logo remains absolutely centered via `position: absolute; left: 50%`.
+
 ## 2026-04-06 — Logo clip fix (item 490)
 
 - **Logo no longer clipped at top**: `overflow: hidden` on `.app--puddle` was clipping SVG glow filter effects that extend above the element. Changed to `overflow-x: hidden` (vertical overflow stays open). Added `top: 4px` to logo so it sits 4px below header top. Bumped desktop app padding-top to `0.75rem` for more breathing room.

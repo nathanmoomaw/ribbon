@@ -730,43 +730,49 @@ function App() {
       <div className="app__grid-floor" ref={gridFloorRef} />
 
       <header className="app-header">
-        {/* Order: QR (mobile only), MIDI, wallet, logo, shake */}
-        <button
-          className="app-header__qr-mobile"
-          onClick={handleQRCreate}
-          title="Create preset QR code"
-          aria-label="Create preset QR code"
-        >
-          &#x25A3;
-        </button>
-        <button
-          className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
-          onClick={connectMIDI}
-          title={
-            midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
-            : midiDevice === 'denied' ? 'MIDI access denied'
-            : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
-            : midiDevice ? `MIDI: ${midiDevice}`
-            : 'Connect MIDI controller'
-          }
-        >
-          {midiDevice === 'unsupported' ? 'MIDI ✗'
-           : midiDevice === 'denied' ? 'MIDI ✗'
-           : midiDevice === 'no-device' ? 'MIDI …'
-           : midiDevice ? 'MIDI ✓'
-           : 'MIDI'}
-        </button>
-        <WalletButton flagSet={walletFlagSet && !isConnected} onForget={handleForgetWallet} />
+        {/* Left: MIDI + wallet (+ QR on mobile) */}
+        <div className="app-header__left">
+          <button
+            className="app-header__qr-mobile"
+            onClick={handleQRCreate}
+            title="Create preset QR code"
+            aria-label="Create preset QR code"
+          >
+            &#x25A3;
+          </button>
+          <button
+            className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
+            onClick={connectMIDI}
+            title={
+              midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
+              : midiDevice === 'denied' ? 'MIDI access denied'
+              : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
+              : midiDevice ? `MIDI: ${midiDevice}`
+              : 'Connect MIDI controller'
+            }
+          >
+            {midiDevice === 'unsupported' ? 'MIDI ✗'
+             : midiDevice === 'denied' ? 'MIDI ✗'
+             : midiDevice === 'no-device' ? 'MIDI …'
+             : midiDevice ? 'MIDI ✓'
+             : 'MIDI'}
+          </button>
+          <WalletButton flagSet={walletFlagSet && !isConnected} onForget={handleForgetWallet} />
+        </div>
+        {/* Center: logo — always dead center via CSS grid */}
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
           <RibbonLogo />
         </div>
-        <button
-          className="app-header__shake-bolt"
-          onClick={() => { requestMotionPermission(); handleShake(0.5) }}
-          aria-label="Shake / Randomize"
-        >
-          ⚡
-        </button>
+        {/* Right: shake bolt */}
+        <div className="app-header__right">
+          <button
+            className="app-header__shake-bolt"
+            onClick={() => { requestMotionPermission(); handleShake(0.5) }}
+            aria-label="Shake / Randomize"
+          >
+            ⚡
+          </button>
+        </div>
       </header>
 
       <div className="app__stage" style={{ position: 'relative' }}>

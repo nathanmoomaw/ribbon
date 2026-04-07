@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-06 — Logo dead center via CSS grid header (item 496)
+
+- Header switched from flex to `display: grid; grid-template-columns: 1fr auto 1fr` — logo in the auto-width center column is always geometrically centered regardless of button asymmetry.
+- Left column (`app-header__left`): QR (mobile), MIDI, wallet — `justify-content: flex-start`.
+- Right column (`app-header__right`): shake bolt — `justify-content: flex-end`.
+- Removed the mobile-only `width: 100%` override (now on the root `.app-header` rule always).
+
 ## 2026-04-06 — Header reorder: MIDI, wallet, logo, shake in a line (item 495)
 
 - Removed `app-header__left` wrapper div — all items now direct children of `<header>`.

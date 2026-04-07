@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-06 — Header z-index, panel stacking fix, hold height (items 483-486)
+
+- **Logo no longer cut off**: Added `position: relative; z-index: 15` to `.app-header` on desktop — stage panels (z-index 1) no longer paint over the header now that the header has a higher stacking order.
+- **Wallet/shake above logo**: Logo gets `z-index: 0`, shake bolt gets `z-index: 1` — explicit stacking within the header.
+- **Side panels z-index reliable**: Added `position: relative` to both `.controls__toggles` and `.controls__oscillators` — CSS grid z-index without position can be unreliable in some browsers; now explicit.
+- **Hold section consistent height**: Added `min-height: 52px` to `.activation__hold-split` so the hold/marble row stays the same height regardless of selected marble size (1, ½, ⅓).
+
 ## 2026-04-04 — Logo center, stage lift, panel z-index fix, OSC flush (items 476-479)
 
 - **Logo centered**: `.app-header__logo` absolutely positioned at `left: 50%; transform: translateX(-50%)`, header `justify-content: flex-end` so buttons cluster right.

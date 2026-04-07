@@ -298,11 +298,6 @@
   gap: 0.75rem;
 }
 
-.controls__osc-goopable {
-  /* flex: 1; */
-  /* position: relative; */
-}
-
 /* --- Goop visual overlay --- */
 .goop-effect {
   position: absolute;
@@ -601,6 +596,7 @@
     border-radius: 6px 8px 0 0;
     border-bottom: none;
     margin-right: -23px;
+    position: relative;
     z-index: 1;
     overflow-y: auto;
   }
@@ -650,10 +646,6 @@
     width: 10px;
   }
 
-  .controls__osc-goopable {
-    /* flex: 1; */
-  }
-
   /* Flush stacked OSC cards — flat corners, merged borders */
   .controls__oscillators .controls__osc {
     padding: 0.5rem 0.75rem;
@@ -677,6 +669,7 @@
     border-radius: 8px 6px 0 0;
     border-bottom: none;
     margin-left: -23px;
+    position: relative;
     z-index: 1;
   }
 

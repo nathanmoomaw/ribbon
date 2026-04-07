@@ -730,7 +730,7 @@ function App() {
       <div className="app__grid-floor" ref={gridFloorRef} />
 
       <header className="app-header">
-        {/* Left: MIDI + wallet (+ QR on mobile) */}
+        {/* Left: QR on mobile only */}
         <div className="app-header__left">
           <button
             className="app-header__qr-mobile"
@@ -740,30 +740,12 @@ function App() {
           >
             &#x25A3;
           </button>
-          <button
-            className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
-            onClick={connectMIDI}
-            title={
-              midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
-              : midiDevice === 'denied' ? 'MIDI access denied'
-              : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
-              : midiDevice ? `MIDI: ${midiDevice}`
-              : 'Connect MIDI controller'
-            }
-          >
-            {midiDevice === 'unsupported' ? 'MIDI ✗'
-             : midiDevice === 'denied' ? 'MIDI ✗'
-             : midiDevice === 'no-device' ? 'MIDI …'
-             : midiDevice ? 'MIDI ✓'
-             : 'MIDI'}
-          </button>
-          <WalletButton flagSet={walletFlagSet && !isConnected} onForget={handleForgetWallet} />
         </div>
         {/* Center: logo — always dead center via CSS grid */}
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
           <RibbonLogo />
         </div>
-        {/* Right: shake bolt */}
+        {/* Right: empty spacer — shake bolt moved to puddle nook on desktop */}
         <div className="app-header__right">
           <button
             className="app-header__shake-bolt"
@@ -802,6 +784,15 @@ function App() {
           onMarbleImpulse={applyMarbleImpulse}
           marbleDepressions={marbleDepressionsRef}
         />
+
+        {/* Shake nook — bottom-right corner of puddle on desktop */}
+        <button
+          className="app__shake-nook"
+          onClick={() => { requestMotionPermission(); handleShake(0.5) }}
+          aria-label="Shake / Randomize"
+        >
+          ⚡
+        </button>
 
         <Controls
           ref={controlsRef}
@@ -851,6 +842,9 @@ function App() {
           onVcfCutoffChange={setVcfCutoff}
           onVcfResonanceChange={setVcfResonance}
           onVcfRoutingToggle={handleVcfRoutingToggle}
+          midiDevice={midiDevice}
+          onConnectMIDI={connectMIDI}
+          utilitySlot={<WalletButton flagSet={walletFlagSet && !isConnected} onForget={handleForgetWallet} />}
         />
       </div>
 

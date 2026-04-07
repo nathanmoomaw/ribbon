@@ -599,6 +599,7 @@
     position: relative;
     z-index: 1;
     overflow-y: auto;
+    max-height: 520px;
   }
 
   .controls__toggles .controls__fader {
@@ -671,6 +672,8 @@
     margin-left: -23px;
     position: relative;
     z-index: 1;
+    max-height: 520px;
+    overflow-y: auto;
   }
 
   /* Bottom panel — VCF + shared controls (filter, reverb, crunch, delay) */
@@ -704,11 +707,23 @@
     flex-shrink: 0;
   }
 
-  .preset-qr-trigger {
-    grid-column: 2;
+  /* Utility bar (MIDI + wallet + QR) sits below the console, spanning full width */
+  .controls__utility-bar {
+    grid-column: 1 / -1;
     grid-row: 4;
-    justify-self: center;
-    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+  }
+
+  /* Inside utility bar the QR trigger is in flow, not absolute */
+  .controls__utility-bar .preset-qr-trigger {
+    position: static;
+    bottom: auto;
+    right: auto;
   }
 }
 

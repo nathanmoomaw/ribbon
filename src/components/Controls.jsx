@@ -320,6 +320,9 @@ export const Controls = forwardRef(function Controls({
   onVcfCutoffChange,
   onVcfResonanceChange,
   onVcfRoutingToggle,
+  midiDevice,
+  onConnectMIDI,
+  utilitySlot,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -546,11 +549,33 @@ export const Controls = forwardRef(function Controls({
           </GoopableSection>
         </div>
       </div>
-      {onQRCreate && (
-        <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
-          &#x25A3;
-        </button>
-      )}
+      <div className="controls__utility-bar">
+        {onConnectMIDI && (
+          <button
+            className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
+            onClick={onConnectMIDI}
+            title={
+              midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
+              : midiDevice === 'denied' ? 'MIDI access denied'
+              : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
+              : midiDevice ? `MIDI: ${midiDevice}`
+              : 'Connect MIDI controller'
+            }
+          >
+            {midiDevice === 'unsupported' ? 'MIDI ✗'
+             : midiDevice === 'denied' ? 'MIDI ✗'
+             : midiDevice === 'no-device' ? 'MIDI …'
+             : midiDevice ? 'MIDI ✓'
+             : 'MIDI'}
+          </button>
+        )}
+        {utilitySlot}
+        {onQRCreate && (
+          <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
+            &#x25A3;
+          </button>
+        )}
+      </div>
     </div>
   )
 })

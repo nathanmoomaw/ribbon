@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-04-07 — MIDI/wallet to controls bar, shake nook, panel height cap, QR glow (items 497-501)
+
+- **497**: MIDI + WalletButton moved from header into `controls__utility-bar` in Controls.jsx, rendered alongside QR trigger. Header left now only holds mobile QR button.
+- **498**: Shake bolt (⚡) hidden from header on desktop; new `app__shake-nook` button at `grid-column:2; grid-row:2; align-self:end; justify-self:end` — 2.6rem, bottom-right corner of the puddle cell. Mobile keeps header shake bolt.
+- **499**: `max-height: 520px; overflow-y: auto` added to both `.controls__toggles` and `.controls__oscillators` on desktop — panels no longer overflow into the bottom console.
+- **500**: `qr-glow-cycle` keyframe animates QR button glow through purple→cyan→green→amber→red over 8s. Applied to both `.preset-qr-trigger` and `.app-header__qr-mobile`.
+- **501**: Empty item, skipped.
+
 ## 2026-04-06 — Logo dead center via CSS grid header (item 496)
 
 - Header switched from flex to `display: grid; grid-template-columns: 1fr auto 1fr` — logo in the auto-width center column is always geometrically centered regardless of button asymmetry.

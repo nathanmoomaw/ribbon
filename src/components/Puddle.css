@@ -272,6 +272,22 @@
   pointer-events: none;
   z-index: 5;
   text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.puddle__hint {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .puddle__hint {
+    display: block;
+    font-size: 0.55rem;
+    opacity: 0.6;
+    margin-top: 0.25rem;
+    letter-spacing: 0.08em;
+  }
 }
 
 /* Desktop: stretch to fill the grid row set by the side control panels */

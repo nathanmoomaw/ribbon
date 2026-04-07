@@ -399,7 +399,8 @@ export const Puddle = forwardRef(function Puddle({
       <div className="puddle__label">
         {allPositions.length > 0
           ? `${Math.round(positionToFrequency(allPositions[allPositions.length - 1][1].x, { octaves, stepped, scale }))} Hz`
-          : 'touch puddle to play'}
+          : <>touch puddle to play<span className="puddle__hint">no sound? keep tapping!</span></>
+        }
       </div>
     </div>
     </>

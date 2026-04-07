@@ -97,6 +97,12 @@
     position: relative;
     z-index: 15;
   }
+
+  /* Desktop: puddle extends behind the logo — make logo click-through so puddle is playable */
+  .app-header__logo {
+    pointer-events: none;
+    cursor: default;
+  }
 }
 
 .app-header {
@@ -386,9 +392,8 @@
   }
 
   .app-header {
-    align-self: center;
+    width: 100%;
     flex-shrink: 0;
-    flex-wrap: wrap;
   }
 
   .app-header .ribbon-logo {

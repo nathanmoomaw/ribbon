@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-06 — Mobile header fix, puddle hint, logo click-through (items 492-494)
+
+- **Mobile header width**: Removed `align-self: center; flex-wrap: wrap` from mobile `.app-header`; added `width: 100%` so `space-between` spreads left/shake items to edges with logo centered.
+- **Mobile no-sound hint**: Added `.puddle__hint` span inside idle puddle label — shows "no sound? keep tapping!" on mobile only via CSS.
+- **Desktop logo click-through**: Logo overlaps puddle on desktop (negative margin-top). Added `pointer-events: none` to `.app-header__logo` on desktop so clicks pass through to the puddle. Shake bolt (⚡) on the right still handles desktop shake.
+
 ## 2026-04-06 — Header layout: MIDI/wallet left, shake right (item 491)
 
 - Wrapped MIDI + wallet + QR into `.app-header__left` div on the left of the logo.

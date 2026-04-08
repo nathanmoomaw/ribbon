@@ -214,12 +214,12 @@
 }
 
 @keyframes qr-glow-cycle {
-  0%   { filter: drop-shadow(0 0 5px rgba(139,  92, 246, 0.55)); }
-  20%  { filter: drop-shadow(0 0 6px rgba( 56, 189, 248, 0.55)); }
-  40%  { filter: drop-shadow(0 0 5px rgba( 52, 211, 153, 0.55)); }
-  60%  { filter: drop-shadow(0 0 6px rgba(251, 191,  36, 0.55)); }
-  80%  { filter: drop-shadow(0 0 5px rgba(244,  63,  94, 0.55)); }
-  100% { filter: drop-shadow(0 0 5px rgba(139,  92, 246, 0.55)); }
+  0%   { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
+  20%  { filter: drop-shadow(0 0 9px rgba( 56, 189, 248, 0.85)); }
+  40%  { filter: drop-shadow(0 0 8px rgba( 52, 211, 153, 0.85)); }
+  60%  { filter: drop-shadow(0 0 9px rgba(251, 191,  36, 0.85)); }
+  80%  { filter: drop-shadow(0 0 8px rgba(244,  63,  94, 0.85)); }
+  100% { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
 }
 
 /* QR trigger button — sits in lower right of console */
@@ -230,7 +230,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  opacity: 0.55;
+  opacity: 0.75;
   padding: 0.25rem;
   line-height: 1;
   font-size: 1.1rem;
@@ -240,9 +240,9 @@
 }
 
 .preset-qr-trigger:hover {
-  opacity: 0.95;
+  opacity: 1;
   transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.7)) !important;
+  filter: drop-shadow(0 0 14px rgba(139, 92, 246, 0.95)) !important;
   animation-play-state: paused;
 }
 

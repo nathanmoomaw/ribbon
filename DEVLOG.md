@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-08 — QR glow, panel connection, wallet modal, puddle project fork (items 513-516)
+
+- **513**: QR glow animation made more visible at rest — drop-shadow blur increased from 5-6px to 8-9px, alpha from 0.55 to 0.85. Base opacity raised to 0.75 (was 0.55). Hover glow bumped to 14px. Both `.preset-qr-trigger` and `.app-header__qr-mobile` updated.
+- **514**: Side panel / bottom console connection fixed. Root cause: `max-height: 520px` on panels prevented them from stretching with the grid row on tall viewports. Also added `align-content: start` to `.app__stage` grid so rows don't stretch to fill unused viewport height (was causing row 2 to grow beyond panel max-height). Replaced fixed `max-height: 520px` with `calc(100dvh - 250px)` on both panels.
+- **515**: Wallet auto-reconnect modal (Base Account / Coinbase connector) suppressed by clearing wagmi localStorage keys synchronously in `main.jsx` before `WagmiProvider` mounts. Users connect explicitly via the wallet button.
+- **516**: Forked current puddle-version of ribbon into a standalone `puddle` project at `/Users/nathanmoomaw/Sites/puddle`. Pruned `Ribbon.jsx`, `Ribbon.css`, `useRibbon.js` (old strip component), `versions/` docs, `screenshots/` dir, Signal photos, and old root-level screenshots. Updated `package.json` name, `index.html` title, `CLAUDE.md`, wagmi app name, and DUMP.md. Pushed to https://github.com/nathanmoomaw/puddle.
+
 ## 2026-04-07 — Controls cleanup: console corner, nook fix, bolt removed, panel overflow (items 502-506)
 
 - **502**: Unchecked empty item 501 (was wrongly marked done).

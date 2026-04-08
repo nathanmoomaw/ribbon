@@ -25,12 +25,12 @@
 }
 
 @keyframes qr-glow-cycle {
-  0%   { filter: drop-shadow(0 0 5px rgba(139,  92, 246, 0.55)); }
-  20%  { filter: drop-shadow(0 0 6px rgba( 56, 189, 248, 0.55)); }
-  40%  { filter: drop-shadow(0 0 5px rgba( 52, 211, 153, 0.55)); }
-  60%  { filter: drop-shadow(0 0 6px rgba(251, 191,  36, 0.55)); }
-  80%  { filter: drop-shadow(0 0 5px rgba(244,  63,  94, 0.55)); }
-  100% { filter: drop-shadow(0 0 5px rgba(139,  92, 246, 0.55)); }
+  0%   { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
+  20%  { filter: drop-shadow(0 0 9px rgba( 56, 189, 248, 0.85)); }
+  40%  { filter: drop-shadow(0 0 8px rgba( 52, 211, 153, 0.85)); }
+  60%  { filter: drop-shadow(0 0 9px rgba(251, 191,  36, 0.85)); }
+  80%  { filter: drop-shadow(0 0 8px rgba(244,  63,  94, 0.85)); }
+  100% { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
 }
 
 /* Dark space backdrop */
@@ -96,6 +96,7 @@
     column-gap: 0;
     row-gap: 0;
     align-items: stretch;
+    align-content: start;
     max-width: 1200px;
     width: 100%;
     margin-top: -42px;
@@ -209,15 +210,15 @@
   font-size: 1.1rem;
   cursor: pointer;
   padding: 0 0.25rem;
-  opacity: 0.55;
+  opacity: 0.75;
   transition: opacity 0.15s, transform 0.15s;
   line-height: 1;
   animation: qr-glow-cycle 8s ease-in-out infinite;
 }
 
 .app-header__qr-mobile:hover {
-  opacity: 0.95;
-  filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.7)) !important;
+  opacity: 1;
+  filter: drop-shadow(0 0 14px rgba(139, 92, 246, 0.95)) !important;
   animation-play-state: paused;
 }
 

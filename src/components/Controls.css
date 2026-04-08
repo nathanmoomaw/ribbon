@@ -599,7 +599,7 @@
     position: relative;
     z-index: 1;
     overflow-y: auto;
-    max-height: 520px;
+    max-height: calc(100dvh - 250px);
     padding-bottom: 55px;
   }
 
@@ -673,7 +673,7 @@
     margin-left: -23px;
     position: relative;
     z-index: 1;
-    max-height: 520px;
+    max-height: calc(100dvh - 250px);
     overflow-y: auto;
     padding-bottom: 55px;
   }

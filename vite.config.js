@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { domscribe } from '@domscribe/react/vite'
 import fs from 'fs'
 import path from 'path'
 
@@ -16,7 +17,7 @@ function getHttpsConfig() {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), domscribe()],
   server: {
     host: true,
     https: getHttpsConfig(),

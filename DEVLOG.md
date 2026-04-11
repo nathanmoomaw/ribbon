@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-04-11 — text ribbon: keyboard, velocity, confetti, OSC fix, shake noise, design polish (DUMP 524-529)
+
+- **524**: ASDF/JKL/; keyboard keys trigger ribbon notes at mapped X positions. Keydown spawns voice + confetti + fluid splash; keyup releases note. Key markers drawn as `┊` columns on canvas during press. Modifier keys skipped.
+- **525**: Velocity axis flipped — `velocity = 1 - ny` so bottom of ribbon = soft, top = loud (matching physical ribbon intuition).
+- **526**: Confetti particle system added to AsciiRibbon canvas. `spawnConfetti(nx, ny)` fires 12 ASCII particles (`*+×◇△○◈❋✦`) per touch with random velocity, gravity, and rainbow colors. Also fires on shake and keyboard play.
+- **527**: OSC3 overflow fixed — `.ascii-controls__oscs` changed to `flex-wrap: wrap`, each `.ascii-osc` given `flex: 1 1 70px; min-width: 68px; max-width: 90px` so panels wrap rather than overflow sidebar.
+- **528**: Shake triggers audio noise burst — `shakeNoiseBurst(intensity)` plays 3–5 random notes (duration 80–200ms) via `voiceOn`/`voiceOff` spread across the ribbon's pitch range.
+- **529**: Design aligned closer to original ribbon — dark radial gradient background, perspective floor grid with drift animation, header restructured to 3-column grid (status | logo | shake bolt), sidebar with `backdrop-filter: blur`, same color palette as puddle.
+
 ## 2026-04-11 — v3 text ribbon bootstrap on nmj/text-ribbon (DUMP items 520-523)
 
 - **520-523**: Created branch `nmj/text-ribbon` as ribbon v3 codename "text ribbon". Installed `@chenglou/pretext` for glyph measurement. New components:

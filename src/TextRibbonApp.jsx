@@ -13,6 +13,7 @@ import { AsciiRibbon } from './components/AsciiRibbon'
 import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { readPresetFromUrl } from './utils/presets'
+import { positionToFrequency } from './utils/pitchMap'
 import './TextRibbonApp.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -129,10 +130,30 @@ export default function TextRibbonApp() {
     })
   }, [oscParams, getEngine])
 
+  // Shake noise burst — play a brief random chord then fade
+  const shakeNoiseBurst = useCallback((intensity) => {
+    const engine = getEngine()
+    // Play 3–5 random notes at spread positions, then release after short duration
+    const count = 3 + Math.floor(intensity * 2)
+    const duration = 80 + intensity * 120 // ms
+    const ids = []
+    for (let i = 0; i < count; i++) {
+      const nx = Math.random()
+      const hz = positionToFrequency(nx, { octaves: 2, scale: ['chromatic'] })
+      const id = `shake_${i}_${Date.now()}`
+      ids.push(id)
+      engine.voiceOn(id, hz, 0.3 + Math.random() * 0.5 * intensity)
+    }
+    setTimeout(() => {
+      ids.forEach(id => engine.voiceOff(id))
+    }, duration)
+  }, [getEngine])
+
   // Shake
   const handleShake = useCallback((intensity = 1) => {
     setShaking(true)
     setTimeout(() => setShaking(false), 300)
+    shakeNoiseBurst(intensity)
 
     setOscParams(prev => prev.map(p => ({
       ...p,
@@ -207,13 +228,27 @@ export default function TextRibbonApp() {
 
   return (
     <div className="text-ribbon-app">
+      {/* Background layers matching ribbon aesthetic */}
+      <div className="text-ribbon-bg" />
+      <div className="text-ribbon-grid-floor" />
+
       <header className="text-ribbon-header">
+        <div className="text-ribbon-header__left">
+          <div className="text-ribbon-header__status">
+            <span className={`status-dot${shaking ? ' status-dot--shake' : ''}`}>◈</span>
+            <span className="status-mode">[{mode.toUpperCase()}]</span>
+            {hold && <span className="status-hold">HOLD</span>}
+            {poly && <span className="status-poly">POLY</span>}
+          </div>
+        </div>
         <AsciiLogo onClick={() => handleShake(1.5)} />
-        <div className="text-ribbon-header__status">
-          <span className={`status-dot${shaking ? ' status-dot--shake' : ''}`}>◈</span>
-          <span className="status-mode">[{mode.toUpperCase()}]</span>
-          {hold && <span className="status-hold"> HOLD</span>}
-          {poly && <span className="status-poly"> POLY</span>}
+        <div className="text-ribbon-header__right">
+          <button
+            className="header-shake-btn"
+            onClick={() => handleShake(1)}
+            title="Shake (randomize)"
+            aria-label="Shake"
+          >⚡</button>
         </div>
       </header>
 

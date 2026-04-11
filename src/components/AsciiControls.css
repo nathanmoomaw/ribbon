@@ -50,7 +50,8 @@
 .ascii-controls__oscs {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: 4px;
+  flex-wrap: wrap;
 }
 
 /* ─────────────── Buttons ─────────────── */
@@ -163,7 +164,9 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  flex: 1;
+  flex: 1 1 70px;
+  min-width: 68px;
+  max-width: 90px;
   border: 1px solid color-mix(in srgb, var(--osc-color) 30%, transparent);
   padding: 4px;
   background: color-mix(in srgb, var(--osc-color) 4%, transparent);

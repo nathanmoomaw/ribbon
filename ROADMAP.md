@@ -5,6 +5,12 @@
 - [x] AsciiRibbon canvas: fluid simulation + rainbow ASCII characters
 - [x] AsciiControls: full terminal-aesthetic UI (transport, OSC, FX, VCF, scale)
 - [x] TextRibbonApp wired to existing audio engine (no crypto/wallet layer)
+- [x] ASDF/JKL keyboard triggers ribbon notes with visual column markers
+- [x] Velocity axis corrected (bottom=soft, top=loud)
+- [x] Confetti particles at touch/keyboard points
+- [x] OSC3 panel overflow fixed
+- [x] Shake triggers audio noise burst
+- [x] Design aligned to ribbon aesthetic (grid bg, perspective floor, header layout)
 - [ ] Mobile layout polish for text ribbon
 - [ ] Preset QR support for text ribbon
 - [ ] Keyboard play mode (keys show as ASCII on canvas)

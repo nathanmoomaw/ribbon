@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useState } from 'react'
+import { useRef, useEffect, useCallback } from 'react'
 import { prepare, measureNaturalWidth } from '@chenglou/pretext'
 import { useAsciiFluid } from '../hooks/useAsciiFluid'
 import { positionToFrequency, frequencyToPosition } from '../utils/pitchMap'
@@ -12,18 +12,25 @@ const RAINBOW = [
   '#8000ff', '#cc00ff', '#ff00cc',
 ]
 
+// Confetti chars (Asteroids-style unfilled geometry)
+const CONFETTI_CHARS = ['*', '+', '×', '◇', '△', '○', '◈', '❋', '✦']
+
+// Keyboard → ribbon position map (ASDF home row + JKL)
+const KEY_POSITIONS = {
+  KeyA: 0.0, KeyS: 0.125, KeyD: 0.25, KeyF: 0.375,
+  KeyG: 0.5, KeyH: 0.575, KeyJ: 0.65, KeyK: 0.775, KeyL: 0.9,
+  Semicolon: 1.0,
+}
+
 // Measure a single glyph to size the grid to the canvas
-// Uses pretext for width (zero DOM layout thrash) + canvas for height
 function measureGlyph(font, canvasCtx) {
   try {
     const prepared = prepare('W', font)
     const w = measureNaturalWidth(prepared)
-    // Height approximated from font size (canvas ctx.measureText doesn't give height directly)
     const sizeMatch = font.match(/(\d+)px/)
     const h = sizeMatch ? parseInt(sizeMatch[1]) * 1.2 : 14
     return { w: w || 8, h }
   } catch {
-    // Fallback: measure via canvas
     if (canvasCtx) {
       const w = canvasCtx.measureText('W').width
       const sizeMatch = font.match(/(\d+)px/)
@@ -45,8 +52,24 @@ export function AsciiRibbon({
   const glyphRef = useRef({ w: 8, h: 14 })
   const colsRef = useRef(80)
   const rowsRef = useRef(20)
-  const activePointersRef = useRef(new Map()) // pointerId -> {x,y} normalized
+  const activePointersRef = useRef(new Map()) // pointerId -> {nx, ny}
+  const activeKeysRef = useRef(new Map())     // code -> voiceId
   const fontRef = useRef('14px "Courier New", monospace')
+  const confettiRef = useRef([])              // particle array
+
+  // Stable refs for keyboard handler (avoids stale closure)
+  const modeRef = useRef(mode)
+  const octavesRef = useRef(octaves)
+  const steppedRef = useRef(stepped)
+  const scaleRef = useRef(scale)
+  const holdRef = useRef(hold)
+  const polyRef = useRef(poly)
+  modeRef.current = mode
+  octavesRef.current = octaves
+  steppedRef.current = stepped
+  scaleRef.current = scale
+  holdRef.current = hold
+  polyRef.current = poly
 
   const fluid = useAsciiFluid(colsRef.current, rowsRef.current)
 
@@ -60,14 +83,12 @@ export function AsciiRibbon({
     canvas.height = container.clientHeight
 
     const ctx = canvas.getContext('2d')
-    // Choose font size that fits comfortably
     const fontSize = Math.max(10, Math.floor(canvas.height / 22))
     fontRef.current = `${fontSize}px "Courier New", monospace`
     ctx.font = fontRef.current
 
     const glyph = measureGlyph(fontRef.current, ctx)
     glyphRef.current = glyph
-
     colsRef.current = Math.floor(canvas.width / glyph.w)
     rowsRef.current = Math.floor(canvas.height / glyph.h)
     fluid.reset()
@@ -79,6 +100,27 @@ export function AsciiRibbon({
     if (containerRef.current) ro.observe(containerRef.current)
     return () => ro.disconnect()
   }, [resize])
+
+  // Spawn confetti at a normalized position
+  const spawnConfetti = useCallback((nx, ny) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const x = nx * canvas.width
+    const y = ny * canvas.height
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.random() * Math.PI * 2)
+      const speed = 1.5 + Math.random() * 3.5
+      confettiRef.current.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1.0,
+        decay: 0.025 + Math.random() * 0.02,
+        ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
+        color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
+      })
+    }
+  }, [])
 
   // Render loop
   useEffect(() => {
@@ -93,7 +135,6 @@ export function AsciiRibbon({
       const rows = rowsRef.current
       const { w: gw, h: gh } = glyphRef.current
 
-      // Add ambient movement
       if (frame % 3 === 0) fluid.ambient(0.015)
       fluid.step()
       frame++
@@ -102,23 +143,34 @@ export function AsciiRibbon({
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.font = fontRef.current
 
+      // Draw fluid ASCII surface
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const h = fluid.get(c, r)
-          // Map [-1,1] to [0,1], clip
           const norm = Math.max(0, Math.min(1, (h + 1) / 2))
           const charIdx = Math.floor(norm * (CHARS.length - 1))
           const ch = CHARS[charIdx]
           if (ch === ' ') continue
 
-          // Color: blend horizontal rainbow with brightness
           const colorIdx = Math.floor((c / cols) * RAINBOW.length)
           const color = RAINBOW[Math.min(colorIdx, RAINBOW.length - 1)]
-          const alpha = 0.3 + norm * 0.7
-          ctx.globalAlpha = alpha
+          ctx.globalAlpha = 0.3 + norm * 0.7
           ctx.fillStyle = color
           ctx.fillText(ch, c * gw, (r + 1) * gh)
         }
+      }
+
+      // Draw confetti particles
+      confettiRef.current = confettiRef.current.filter(p => p.life > 0)
+      for (const p of confettiRef.current) {
+        ctx.globalAlpha = p.life * 0.9
+        ctx.fillStyle = p.color
+        ctx.fillText(p.ch, p.x, p.y)
+        p.x += p.vx
+        p.y += p.vy
+        p.vy += 0.12 // gravity
+        p.vx *= 0.97
+        p.life -= p.decay
       }
 
       // Draw active pointer cursors
@@ -132,7 +184,21 @@ export function AsciiRibbon({
         ctx.font = fontRef.current
       })
 
-      // Draw arp note markers (vertical lines)
+      // Draw keyboard key indicators
+      activeKeysRef.current.forEach((_, code) => {
+        const nx = KEY_POSITIONS[code]
+        if (nx == null) return
+        const col = Math.floor(nx * cols)
+        ctx.globalAlpha = 0.85
+        ctx.fillStyle = '#ffffaa'
+        ctx.font = `bold ${fontRef.current}`
+        for (let r = 0; r < rows; r++) {
+          ctx.fillText('┊', col * gw, (r + 1) * gh)
+        }
+        ctx.font = fontRef.current
+      })
+
+      // Draw arp note markers
       if (mode === 'arp' && poly && hold && arpNotes?.length > 0) {
         ctx.globalAlpha = 0.7
         for (const hz of arpNotes) {
@@ -154,30 +220,37 @@ export function AsciiRibbon({
     }
   }, [fluid, mode, poly, hold, arpNotes, octaves])
 
-  // Shake effect — big wave across the surface
+  // Shake effect
   useEffect(() => {
     if (shaking) {
       for (let i = 0; i < 8; i++) {
         fluid.splash(Math.random(), Math.random(), 0.6, 4)
       }
+      // Confetti burst across the whole surface
+      for (let i = 0; i < 5; i++) {
+        spawnConfetti(Math.random(), Math.random())
+      }
     }
-  }, [shaking, fluid])
+  }, [shaking, fluid, spawnConfetti])
 
-  // Pointer interaction
+  // Pointer interaction helpers
+  // Y axis: top = high velocity, bottom = low velocity
   const normalizePointer = useCallback((e) => {
     const rect = canvasRef.current.getBoundingClientRect()
     const nx = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
     const ny = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
-    return { nx, ny }
+    const velocity = 1 - ny // flip: top=loud, bottom=soft
+    return { nx, ny, velocity }
   }, [])
 
   const handlePointerDown = useCallback((e) => {
     e.preventDefault()
     canvasRef.current?.setPointerCapture(e.pointerId)
-    const { nx, ny } = normalizePointer(e)
+    const { nx, ny, velocity } = normalizePointer(e)
     activePointersRef.current.set(e.pointerId, { nx, ny })
 
     fluid.splash(nx, ny, 0.9, 3)
+    spawnConfetti(nx, ny)
     if (onPuddleActivity) onPuddleActivity()
 
     const engine = getEngine()
@@ -186,13 +259,13 @@ export function AsciiRibbon({
 
     if (ribbonInteraction) {
       ribbonInteraction.current.position = nx
-      ribbonInteraction.current.velocity = ny
+      ribbonInteraction.current.velocity = velocity
       ribbonInteraction.current.active = true
     }
 
     if (mode === 'play') {
       if (!poly) engine.allNotesOff()
-      engine.voiceOn(voiceId, hz, ny)
+      engine.voiceOn(voiceId, hz, velocity)
     } else if (mode === 'arp') {
       if (hold && poly) {
         onArpNoteToggle?.(hz)
@@ -201,19 +274,19 @@ export function AsciiRibbon({
         arpStart?.()
       }
     }
-  }, [getEngine, mode, octaves, stepped, scale, hold, poly, fluid, ribbonInteraction, onArpNoteToggle, arpStart, onPuddleActivity, normalizePointer])
+  }, [getEngine, mode, octaves, stepped, scale, hold, poly, fluid, ribbonInteraction, onArpNoteToggle, arpStart, onPuddleActivity, normalizePointer, spawnConfetti])
 
   const handlePointerMove = useCallback((e) => {
     if (!activePointersRef.current.has(e.pointerId)) return
     e.preventDefault()
-    const { nx, ny } = normalizePointer(e)
+    const { nx, ny, velocity } = normalizePointer(e)
     activePointersRef.current.set(e.pointerId, { nx, ny })
 
     fluid.splash(nx, ny, 0.3, 1)
 
     if (ribbonInteraction) {
       ribbonInteraction.current.position = nx
-      ribbonInteraction.current.velocity = ny
+      ribbonInteraction.current.velocity = velocity
     }
 
     const engine = getEngine()
@@ -228,25 +301,89 @@ export function AsciiRibbon({
       } else {
         engine.voiceSetFrequency(voiceId, hz)
       }
-      engine.voiceSetVelocity?.(voiceId, ny)
+      engine.voiceSetVelocity?.(voiceId, velocity)
     }
   }, [getEngine, mode, octaves, stepped, scale, hold, poly, fluid, ribbonInteraction, normalizePointer])
 
   const handlePointerUp = useCallback((e) => {
     activePointersRef.current.delete(e.pointerId)
-    if (ribbonInteraction) ribbonInteraction.current.active = false
+    if (activePointersRef.current.size === 0 && ribbonInteraction) {
+      ribbonInteraction.current.active = false
+    }
 
     const engine = getEngine()
     const voiceId = `touch_${e.pointerId}`
 
     if (mode === 'play') {
-      if (!hold) {
-        engine.voiceOff(voiceId)
-      }
+      if (!hold) engine.voiceOff(voiceId)
     } else if (mode === 'arp' && !(hold && poly)) {
       arpStop?.()
     }
   }, [getEngine, mode, hold, poly, arpStop, ribbonInteraction])
+
+  // ASDF keyboard play
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.repeat) return
+      if (e.metaKey || e.ctrlKey || e.altKey) return
+      const nx = KEY_POSITIONS[e.code]
+      if (nx == null) return
+      if (activeKeysRef.current.has(e.code)) return
+
+      const voiceId = `key_${e.code}`
+      activeKeysRef.current.set(e.code, voiceId)
+
+      const cols = colsRef.current
+      const rows = rowsRef.current
+      fluid.splash(nx, 0.5, 0.7, 2)
+      spawnConfetti(nx, 0.5)
+
+      const engine = getEngine()
+      const hz = positionToFrequency(nx, {
+        octaves: octavesRef.current,
+        stepped: steppedRef.current,
+        scale: scaleRef.current,
+      })
+      const velocity = 0.7 // default keyboard velocity
+
+      if (modeRef.current === 'play') {
+        if (!polyRef.current) engine.allNotesOff()
+        engine.voiceOn(voiceId, hz, velocity)
+      } else if (modeRef.current === 'arp') {
+        if (holdRef.current && polyRef.current) {
+          // onArpNoteToggle is a prop — access via ref pattern isn't available here
+          // just set frequency for simple arp
+          engine.setFrequency(hz)
+          arpStart?.()
+        } else {
+          engine.setFrequency(hz)
+          arpStart?.()
+        }
+      }
+    }
+
+    const handleKeyUp = (e) => {
+      const nx = KEY_POSITIONS[e.code]
+      if (nx == null) return
+      const voiceId = activeKeysRef.current.get(e.code)
+      if (!voiceId) return
+      activeKeysRef.current.delete(e.code)
+
+      const engine = getEngine()
+      if (modeRef.current === 'play' && !holdRef.current) {
+        engine.voiceOff(voiceId)
+      } else if (modeRef.current === 'arp' && !(holdRef.current && polyRef.current)) {
+        arpStop?.()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [getEngine, fluid, spawnConfetti, arpStart, arpStop])
 
   return (
     <div className="ascii-ribbon" ref={containerRef}>

@@ -1,0 +1,117 @@
+/* Text Ribbon v3 — global layout */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #05050e;
+  --fg: #c0c0e0;
+  --accent: #4466cc;
+  --mono: 'Courier New', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  overflow: hidden;
+  height: 100dvh;
+}
+
+/* ─── App shell ─── */
+.text-ribbon-app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  width: 100vw;
+  background: var(--bg);
+  overflow: hidden;
+}
+
+/* ─── Header ─── */
+.text-ribbon-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 12px;
+  border-bottom: 1px solid #1a1a30;
+  background: #070710;
+  flex-shrink: 0;
+  height: 42px;
+}
+
+.text-ribbon-header__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: #5060aa;
+  font-family: var(--mono);
+}
+
+.status-dot {
+  color: #334;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+.status-dot--shake {
+  color: #ff4080;
+  text-shadow: 0 0 8px #ff408088;
+  animation: shake-flash 0.3s ease;
+}
+
+@keyframes shake-flash {
+  0%, 100% { transform: none; }
+  25% { transform: translateX(-2px) rotate(-3deg); }
+  75% { transform: translateX(2px) rotate(3deg); }
+}
+
+.status-mode { color: #6688cc; letter-spacing: 0.1em; }
+.status-hold { color: #ff8040; }
+.status-poly { color: #40cc80; }
+
+/* ─── Main ─── */
+.text-ribbon-main {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ─── Sidebar (controls) ─── */
+.text-ribbon-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  border-right: 1px solid #1a1a30;
+  background: #08080f;
+}
+
+/* ─── Canvas area (ribbon) ─── */
+.text-ribbon-canvas {
+  flex: 1;
+  min-width: 0;
+  padding: 8px;
+}
+
+/* ─── Mobile ─── */
+@media (max-width: 600px) {
+  .text-ribbon-main {
+    flex-direction: column;
+  }
+
+  .text-ribbon-sidebar {
+    width: 100%;
+    max-height: 40vh;
+    border-right: none;
+    border-bottom: 1px solid #1a1a30;
+  }
+
+  .text-ribbon-canvas {
+    flex: 1;
+    padding: 4px;
+  }
+}

@@ -11,6 +11,7 @@
     "test": "node tests/smoke.mjs"
   },
   "dependencies": {
+    "@chenglou/pretext": "^0.0.5",
     "@rainbow-me/rainbowkit": "^2.2.10",
     "@tanstack/react-query": "^5.95.2",
     "qrcode": "^1.5.4",

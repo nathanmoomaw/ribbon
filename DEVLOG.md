@@ -1,5 +1,15 @@
 # Devlog
 
+## 2026-04-11 — v3 text ribbon bootstrap on nmj/text-ribbon (DUMP items 520-523)
+
+- **520-523**: Created branch `nmj/text-ribbon` as ribbon v3 codename "text ribbon". Installed `@chenglou/pretext` for glyph measurement. New components:
+  - `useAsciiFluid.js` — 2D wave-equation fluid simulation (damping=0.96, velocity buffer, splash/ambient API)
+  - `AsciiRibbon.jsx` — canvas-based play surface: fluid sim rendered as ASCII characters (` .·:;+=*#@`), rainbow-colored by X position, handles pointer events for notes, arp, hold modes; uses pretext `measureNaturalWidth` for precise glyph grid sizing
+  - `AsciiControls.jsx` — full terminal-aesthetic control panel with ASCII buttons, block-char sliders, circle-glyph knobs, oscillator panels, VCF, FX, transport, scale selection
+  - `AsciiLogo.jsx` — animated moebius-strip ASCII logo with gradient wordmark
+  - `TextRibbonApp.jsx` — new root app wiring audio engine + all hooks to ASCII components (no crypto layer)
+  - `main.jsx` simplified — removed wagmi/rainbowkit providers; text ribbon renders standalone
+
 ## 2026-04-08 — QR glow, panel connection, wallet modal, puddle project fork (items 513-516)
 
 - **513**: QR glow animation made more visible at rest — drop-shadow blur increased from 5-6px to 8-9px, alpha from 0.55 to 0.85. Base opacity raised to 0.75 (was 0.55). Hover glow bumped to 14px. Both `.preset-qr-trigger` and `.app-header__qr-mobile` updated.

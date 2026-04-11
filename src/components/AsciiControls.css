@@ -1,0 +1,221 @@
+/* ASCII/terminal aesthetic — monospace, box-drawing, dark bg */
+
+.ascii-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  background: #080810;
+  color: #c0c0e0;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  overflow-y: auto;
+  height: 100%;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+/* ─────────────── Box / Section ─────────────── */
+.ascii-box {
+  border: 1px solid #2a2a44;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #0c0c18;
+}
+
+.ascii-box-header {
+  color: #7070cc;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #1a1a32;
+  padding-bottom: 2px;
+}
+
+/* ─────────────── Rows ─────────────── */
+.ascii-controls__row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.ascii-controls__row--wrap {
+  flex-wrap: wrap;
+}
+
+.ascii-controls__oscs {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+/* ─────────────── Buttons ─────────────── */
+.ascii-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  border: 1px solid #2a2a44;
+  background: #0f0f1e;
+  color: #8080aa;
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  line-height: 1.4;
+}
+
+.ascii-btn:hover {
+  background: #1a1a30;
+  color: #c0c0ff;
+  border-color: #5050aa;
+}
+
+.ascii-btn--on {
+  background: #1a1a3a;
+  color: #88aaff;
+  border-color: #4466cc;
+}
+
+.ascii-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ascii-btn__glyph {
+  color: #66aaff;
+}
+
+/* ─────────────── Slider ─────────────── */
+.ascii-slider {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.ascii-slider__label {
+  color: #6060aa;
+  font-size: 9px;
+  min-width: 28px;
+  letter-spacing: 0.05em;
+}
+
+.ascii-slider__track {
+  color: #4488cc;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.ascii-slider__track:hover {
+  color: #66aaff;
+}
+
+.ascii-slider__val {
+  color: #7070aa;
+  font-size: 9px;
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ─────────────── Knob ─────────────── */
+.ascii-knob {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  cursor: ns-resize;
+  padding: 3px;
+  min-width: 28px;
+}
+
+.ascii-knob:hover .ascii-knob__arc {
+  color: #88aaff;
+}
+
+.ascii-knob__arc {
+  font-size: 16px;
+  color: #4466cc;
+  line-height: 1;
+}
+
+.ascii-knob__label {
+  font-size: 8px;
+  color: #5050aa;
+  letter-spacing: 0.05em;
+}
+
+.ascii-knob__val {
+  font-size: 8px;
+  color: #6666aa;
+}
+
+/* ─────────────── Oscillator Panel ─────────────── */
+.ascii-osc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  border: 1px solid color-mix(in srgb, var(--osc-color) 30%, transparent);
+  padding: 4px;
+  background: color-mix(in srgb, var(--osc-color) 4%, transparent);
+}
+
+.ascii-osc .ascii-box-header {
+  color: var(--osc-color);
+  border-bottom-color: color-mix(in srgb, var(--osc-color) 30%, transparent);
+}
+
+.ascii-osc__waves {
+  display: flex;
+  gap: 2px;
+}
+
+.ascii-wave-btn {
+  padding: 2px 4px;
+  border: 1px solid #2a2a44;
+  background: #0f0f1e;
+  color: #6060aa;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  line-height: 1;
+  transition: all 0.1s;
+}
+
+.ascii-wave-btn:hover {
+  color: #c0c0ff;
+  border-color: #5050aa;
+}
+
+.ascii-wave-btn--on {
+  background: color-mix(in srgb, var(--osc-color, #4466cc) 20%, #0f0f1e);
+  color: var(--osc-color, #88aaff);
+  border-color: var(--osc-color, #4466cc);
+}
+
+/* ─────────────── Label ─────────────── */
+.ascii-label {
+  color: #6060aa;
+  font-size: 9px;
+  margin-right: 2px;
+}
+
+/* ─────────────── Scrollbar ─────────────── */
+.ascii-controls::-webkit-scrollbar {
+  width: 4px;
+}
+.ascii-controls::-webkit-scrollbar-track {
+  background: #080810;
+}
+.ascii-controls::-webkit-scrollbar-thumb {
+  background: #2a2a44;
+}

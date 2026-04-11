@@ -1,5 +1,15 @@
 # Roadmap
 
+## v3 "text ribbon" (branch: nmj/text-ribbon)
+- [x] Bootstrap ASCII rendering layer using @chenglou/pretext
+- [x] AsciiRibbon canvas: fluid simulation + rainbow ASCII characters
+- [x] AsciiControls: full terminal-aesthetic UI (transport, OSC, FX, VCF, scale)
+- [x] TextRibbonApp wired to existing audio engine (no crypto/wallet layer)
+- [ ] Mobile layout polish for text ribbon
+- [ ] Preset QR support for text ribbon
+- [ ] Keyboard play mode (keys show as ASCII on canvas)
+- [ ] Marble hold mode ported to ASCII representation
+
 ## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
 - [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant

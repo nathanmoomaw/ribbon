@@ -1,0 +1,39 @@
+.ascii-logo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+  user-select: none;
+  padding: 4px 8px;
+}
+
+.ascii-logo__ribbon {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 0.15em;
+  background: linear-gradient(90deg, #ff0080, #ff8000, #ffff00, #00ff80, #00ccff, #8000ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ascii-logo__moebius {
+  font-size: 13px;
+  color: #6688cc;
+  letter-spacing: -0.02em;
+  animation: moebius-glow 2s ease-in-out infinite;
+}
+
+@keyframes moebius-glow {
+  0%, 100% { color: #4466aa; text-shadow: 0 0 4px #4466aa44; }
+  50% { color: #88aaff; text-shadow: 0 0 8px #88aaff88; }
+}
+
+.ascii-logo__tag {
+  font-size: 9px;
+  color: #333355;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

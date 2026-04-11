@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-11 — text ribbon: mobile ribbon above controls (DUMP 534)
+
+- **534**: On mobile (`max-width: 600px`) the ribbon canvas now appears above the controls sidebar — `order: 1` on `.text-ribbon-canvas`, `order: 2` on `.text-ribbon-sidebar`.
+
 ## 2026-04-11 — text ribbon: shake fix, confetti tuning, moebius canvas, ribbon-dev deploy (DUMP 530-533)
 
 - **530**: Spurious shake on mouse click fixed — `useShake` called with `sidebarRef` + `canvasAreaRef` so clicks on the sidebar and the ribbon canvas are excluded from the "click outside" shake trigger. Previously no refs were passed, meaning every canvas click triggered shake.

@@ -19,16 +19,11 @@
   background-clip: text;
 }
 
-.ascii-logo__moebius {
-  font-size: 13px;
-  color: #6688cc;
-  letter-spacing: -0.02em;
-  animation: moebius-glow 2s ease-in-out infinite;
-}
-
-@keyframes moebius-glow {
-  0%, 100% { color: #4466aa; text-shadow: 0 0 4px #4466aa44; }
-  50% { color: #88aaff; text-shadow: 0 0 8px #88aaff88; }
+.ascii-logo__moebius-canvas {
+  width: 80px;
+  height: 34px;
+  display: block;
+  filter: drop-shadow(0 0 3px rgba(80, 140, 255, 0.4));
 }
 
 .ascii-logo__tag {

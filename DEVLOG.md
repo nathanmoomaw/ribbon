@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-11 — text ribbon: shake fix, confetti tuning, moebius canvas, ribbon-dev deploy (DUMP 530-533)
+
+- **530**: Spurious shake on mouse click fixed — `useShake` called with `sidebarRef` + `canvasAreaRef` so clicks on the sidebar and the ribbon canvas are excluded from the "click outside" shake trigger. Previously no refs were passed, meaning every canvas click triggered shake.
+- **531**: Confetti now lasts longer and flies further — initial speed raised from 1.5–5 to 3–9, slight upward bias added (`vy -= 1.5`), decay rate halved (0.010–0.022 vs 0.025–0.045), gravity reduced from 0.12 to 0.06. Particle count raised from 12 to 16.
+- **532** (new item): Moebius animation replaced with canvas-based parametric curve. Draws the actual Möbius strip as two edges of a lemniscate with half-twist — near edge rendered as a rainbow gradient solid line, far edge as a dashed dim line, crossover points marked with white dots. Animates continuously via RAF.
+- **533**: Deploying to ribbon-dev — `nmj/text-ribbon` matches `nmj/**` pattern in deploy.yml; pushing to origin triggers the `deploy-dev` GitHub Actions job that syncs to `s3://ribbon-dev.obfusco.us/` and invalidates CloudFront.
+
 ## 2026-04-11 — text ribbon: keyboard, velocity, confetti, OSC fix, shake noise, design polish (DUMP 524-529)
 
 - **524**: ASDF/JKL/; keyboard keys trigger ribbon notes at mapped X positions. Keydown spawns voice + confetti + fluid splash; keyup releases note. Key markers drawn as `┊` columns on canvas during press. Modifier keys skipped.

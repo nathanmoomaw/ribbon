@@ -57,6 +57,8 @@ export default function TextRibbonApp() {
   const [doubleHarmonicUnlocked, setDoubleHarmonicUnlocked] = useState(false)
 
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
+  const sidebarRef = useRef(null)
+  const canvasAreaRef = useRef(null)
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
@@ -179,7 +181,8 @@ export default function TextRibbonApp() {
     }
   }, [])
 
-  useShake(handleShake)
+  // Pass sidebar + canvas refs so clicks inside them don't trigger the "click outside" shake
+  useShake(handleShake, sidebarRef, canvasAreaRef)
 
   // Keyboard shortcuts
   const keyHandlers = useMemo(() => ({
@@ -253,7 +256,7 @@ export default function TextRibbonApp() {
       </header>
 
       <main className="text-ribbon-main">
-        <aside className="text-ribbon-sidebar">
+        <aside className="text-ribbon-sidebar" ref={sidebarRef}>
           <AsciiControls
             mode={mode} setMode={setMode}
             poly={poly} setPoly={setPoly}
@@ -277,7 +280,7 @@ export default function TextRibbonApp() {
           />
         </aside>
 
-        <section className="text-ribbon-canvas">
+        <section className="text-ribbon-canvas" ref={canvasAreaRef}>
           <AsciiRibbon
             getEngine={getEngine}
             mode={mode}

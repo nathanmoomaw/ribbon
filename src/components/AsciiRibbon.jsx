@@ -107,15 +107,15 @@ export function AsciiRibbon({
     if (!canvas) return
     const x = nx * canvas.width
     const y = ny * canvas.height
-    for (let i = 0; i < 12; i++) {
-      const angle = (Math.random() * Math.PI * 2)
-      const speed = 1.5 + Math.random() * 3.5
+    for (let i = 0; i < 16; i++) {
+      const angle = Math.random() * Math.PI * 2
+      const speed = 3 + Math.random() * 6      // faster: was 1.5–5
       confettiRef.current.push({
         x, y,
         vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
+        vy: Math.sin(angle) * speed - 1.5,     // slight upward bias
         life: 1.0,
-        decay: 0.025 + Math.random() * 0.02,
+        decay: 0.010 + Math.random() * 0.012,  // slower decay: was 0.025–0.045
         ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
         color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
       })
@@ -168,7 +168,7 @@ export function AsciiRibbon({
         ctx.fillText(p.ch, p.x, p.y)
         p.x += p.vx
         p.y += p.vy
-        p.vy += 0.12 // gravity
+        p.vy += 0.06 // gravity (gentler so particles float longer)
         p.vx *= 0.97
         p.life -= p.decay
       }

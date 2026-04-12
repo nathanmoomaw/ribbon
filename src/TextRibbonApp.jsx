@@ -12,6 +12,7 @@ import { SCALES, HIDDEN_SCALES } from './utils/scales'
 import { AsciiRibbon } from './components/AsciiRibbon'
 import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
+import { AsciiOrbs } from './components/AsciiOrbs'
 import { readPresetFromUrl } from './utils/presets'
 import { positionToFrequency } from './utils/pitchMap'
 import './TextRibbonApp.css'
@@ -256,7 +257,33 @@ export default function TextRibbonApp() {
       </header>
 
       <main className="text-ribbon-main">
-        <aside className="text-ribbon-sidebar" ref={sidebarRef}>
+        {/* Oscillator sphere visualizers — ribbon v2 style */}
+        <section className="text-ribbon-orbs">
+          <AsciiOrbs oscParams={oscParams} shaking={shaking} />
+        </section>
+
+        {/* Horizontal ribbon strip */}
+        <section className="text-ribbon-strip" ref={canvasAreaRef}>
+          <AsciiRibbon
+            getEngine={getEngine}
+            mode={mode}
+            octaves={octaves}
+            stepped={stepped}
+            scale={scale}
+            ribbonInteraction={ribbonInteraction}
+            arpStart={arpStart}
+            arpStop={arpStop}
+            hold={hold}
+            poly={poly}
+            shaking={shaking}
+            onArpNoteToggle={handleArpNoteToggle}
+            arpNotes={arpNotes}
+            oscParams={oscParams}
+          />
+        </section>
+
+        {/* Bottom controls panel — v2 layout */}
+        <section className="text-ribbon-controls" ref={sidebarRef}>
           <AsciiControls
             mode={mode} setMode={setMode}
             poly={poly} setPoly={setPoly}
@@ -277,25 +304,6 @@ export default function TextRibbonApp() {
             onStop={handleStop}
             onShake={() => handleShake(1)}
             doubleHarmonicUnlocked={doubleHarmonicUnlocked}
-          />
-        </aside>
-
-        <section className="text-ribbon-canvas" ref={canvasAreaRef}>
-          <AsciiRibbon
-            getEngine={getEngine}
-            mode={mode}
-            octaves={octaves}
-            stepped={stepped}
-            scale={scale}
-            ribbonInteraction={ribbonInteraction}
-            arpStart={arpStart}
-            arpStop={arpStop}
-            hold={hold}
-            poly={poly}
-            shaking={shaking}
-            onArpNoteToggle={handleArpNoteToggle}
-            arpNotes={arpNotes}
-            oscParams={oscParams}
           />
         </section>
       </main>

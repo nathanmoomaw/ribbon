@@ -1,5 +1,22 @@
 # Devlog
 
+## 2026-04-11 — ascii ribbon: v2 "Rock & Rumble" layout redesign
+
+- Layout restructured from puddle-style (sidebar+canvas) to v2-style vertical stack:
+  header → orb visualizers → horizontal ribbon strip → bottom controls panel
+- `AsciiOrbs` component: 3 animated ASCII wireframe spheres (one per oscillator) using
+  parametric sphere rendering with z-buffer. Each orb reflects its osc's waveform, mix,
+  and detune. Color palette: steel purple/blue/teal matching Rock & Rumble.
+- `AsciiControls` redesigned as horizontal 3-column bottom panel:
+  LEFT: toggle buttons (play/arp, mono/poly, hold/stop, bpm, vol) matching v2's left-side
+  CENTER: 3 oscillator panels side by side (full width, no scroll)
+  RIGHT: baked FX (SpaceVerb, CrunchSweep), VCF routing, pitch/scale/glide
+- `TextRibbonApp.css` rewritten: industrial steel-blue color scheme, perspective grid floor,
+  panel bevel effects, inset ribbon strip shadow
+- `AsciiControls.css` rewritten: Rock & Rumble palette, horizontal layout, beveled buttons
+- AsciiRibbon: industrial inset shadow, tighter strip presentation
+- AsciiLogo: slightly smaller to fit compact header
+
 ## 2026-04-11 — ascii ribbon: shake fix, ambient rippling, osc waveform vis, codename rename (DUMP 535-546)
 
 - **535**: Excess shake fix — `useShake` now excludes `.text-ribbon-header` from the window click handler. Previously clicking the `AsciiLogo` (a div, not a button) triggered both its direct `onClick` and the window-level `triggerShake(0.4)` for a double-shake.

@@ -279,114 +279,39 @@ export function AsciiControls({
   return (
     <div className="ascii-controls">
 
-      {/* ── Transport ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">◈ TRANSPORT</div>
-        <div className="ascii-controls__row">
-          <AsciiButton
-            label="PLAY"
-            glyph={mode === 'play' ? '▶' : ' '}
-            active={mode === 'play'}
-            onClick={() => setMode('play')}
-          />
-          <AsciiButton
-            label="ARP"
-            glyph={mode === 'arp' ? '⟳' : ' '}
-            active={mode === 'arp'}
-            onClick={() => setMode('arp')}
-          />
+      {/* ── LEFT: Toggles (v2 style: play/arp, mono/poly, hold, stop, bpm, vol) ── */}
+      <div className="ascii-panel ascii-panel--toggles">
+        <div className="ascii-panel__header">◈</div>
+        <div className="ascii-toggle-pair">
+          <AsciiButton label="▶ PLAY" active={mode === 'play'} onClick={() => setMode('play')} />
+          <AsciiButton label="⟳ ARP"  active={mode === 'arp'}  onClick={() => setMode('arp')} />
         </div>
-        <div className="ascii-controls__row">
-          <AsciiButton
-            label="MONO"
-            active={!poly}
-            onClick={() => setPoly(false)}
-          />
-          <AsciiButton
-            label="POLY"
-            active={poly}
-            onClick={() => setPoly(true)}
-          />
+        <div className="ascii-toggle-pair">
+          <AsciiButton label="MONO" active={!poly} onClick={() => setPoly(false)} />
+          <AsciiButton label="POLY" active={poly}  onClick={() => setPoly(true)} />
         </div>
-        <div className="ascii-controls__row">
-          <AsciiButton
-            label={`HOLD${hold ? ' ●' : ' ○'}`}
-            active={hold}
-            onClick={() => setHold(h => !h)}
-          />
-          <AsciiButton label="STOP" onClick={onStop} />
+        <div className="ascii-toggle-pair">
+          <AsciiButton label={hold ? '● HOLD' : '○ HOLD'} active={hold} onClick={() => setHold(h => !h)} />
+          <AsciiButton label="■ STOP" onClick={onStop} />
         </div>
-        <AsciiSlider
-          label="BPM"
-          value={arpBpm}
-          min={40}
-          max={280}
-          onChange={setArpBpm}
-          width={12}
-        />
-        <AsciiSlider
-          label="VOL"
-          value={volume}
-          min={0}
-          max={1}
-          onChange={setVolume}
-          width={12}
-        />
+        <AsciiSlider label="BPM" value={arpBpm} min={40} max={280} onChange={setArpBpm} width={10} />
+        <AsciiSlider label="VOL" value={volume} min={0} max={1} onChange={setVolume} width={10} />
+        <button className="ascii-shake-btn" onClick={onShake} title="Shake">⚡</button>
       </div>
 
-      {/* ── Oscillators ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">≋ OSCILLATORS</div>
+      {/* ── CENTER: Oscillators (3 panels, v2 style) ── */}
+      <div className="ascii-panel ascii-panel--oscs">
+        <div className="ascii-panel__header">≋ OSC</div>
         <div className="ascii-controls__oscs">
           {oscParams.map((p, i) => (
-            <OscPanel
-              key={i}
-              index={i}
-              params={p}
-              onChange={par => setOscParam(i, par)}
-            />
+            <OscPanel key={i} index={i} params={p} onChange={par => setOscParam(i, par)} />
           ))}
         </div>
       </div>
 
-      {/* ── Pitch ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">♩ PITCH</div>
-        <div className="ascii-controls__row ascii-controls__row--wrap">
-          <AsciiButton
-            label={`OCT: ${octaves}`}
-            onClick={() => setOctaves(o => o === 2 ? 3 : o === 3 ? 4 : 2)}
-          />
-          <AsciiButton
-            label={`STEP: ${stepped ? 'ON' : 'OFF'}`}
-            active={stepped}
-            onClick={() => setStepped(s => !s)}
-          />
-        </div>
-        <div className="ascii-controls__row ascii-controls__row--wrap">
-          <span className="ascii-label">SCALE:</span>
-          {Object.keys(allScales).map(s => (
-            <AsciiButton
-              key={s}
-              label={SCALE_LABELS[s] || s}
-              active={scale.includes(s)}
-              onClick={() => toggleScale(s)}
-            />
-          ))}
-        </div>
-        <AsciiSlider
-          label="GLIDE"
-          value={glideSpeed}
-          min={0}
-          max={0.1}
-          onChange={setGlideSpeed}
-          width={10}
-        />
-      </div>
-
-      {/* ── Baked FX ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">⊛ BAKED FX</div>
+      {/* ── RIGHT: FX + Pitch ── */}
+      <div className="ascii-panel ascii-panel--fx">
+        <div className="ascii-panel__header">⊛ FX / PITCH</div>
         <BipolarKnob
           label="SPACEVERB"
           subLabel={{ left: 'REVERB', right: 'ECHO' }}
@@ -402,21 +327,22 @@ export function AsciiControls({
         <div className="ascii-controls__row">
           <span className="ascii-label">VCF→</span>
           {[0, 1, 2].map(i => (
-            <AsciiButton
-              key={i}
-              label={`${i + 1}`}
-              active={vcfRouting[i]}
-              onClick={() => setVcfRouting(r => r.map((v, j) => j === i ? !v : v))}
-            />
+            <AsciiButton key={i} label={`${i + 1}`} active={vcfRouting[i]}
+              onClick={() => setVcfRouting(r => r.map((v, j) => j === i ? !v : v))} />
           ))}
         </div>
+        <div className="ascii-pitch-row">
+          <AsciiButton label={`OCT ${octaves}`} onClick={() => setOctaves(o => o === 2 ? 3 : o === 3 ? 4 : 2)} />
+          <AsciiButton label={stepped ? 'STEP' : 'CONT'} active={stepped} onClick={() => setStepped(s => !s)} />
+        </div>
+        <div className="ascii-scale-row">
+          {Object.keys(allScales).map(s => (
+            <AsciiButton key={s} label={SCALE_LABELS[s] || s} active={scale.includes(s)} onClick={() => toggleScale(s)} />
+          ))}
+        </div>
+        <AsciiSlider label="GLIDE" value={glideSpeed} min={0} max={0.1} onChange={setGlideSpeed} width={8} />
       </div>
 
-      {/* ── Shake ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">⚡ ACTIONS</div>
-        <AsciiButton label="⟳ SHAKE" onClick={onShake} />
-      </div>
     </div>
   )
 }

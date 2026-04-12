@@ -10,7 +10,7 @@
 }
 
 .ascii-logo__ribbon {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
   letter-spacing: 0.15em;
   background: linear-gradient(90deg, #ff0080, #ff8000, #ffff00, #00ff80, #00ccff, #8000ff);
@@ -20,8 +20,8 @@
 }
 
 .ascii-logo__moebius-canvas {
-  width: 80px;
-  height: 34px;
+  width: 64px;
+  height: 28px;
   display: block;
   filter: drop-shadow(0 0 3px rgba(80, 140, 255, 0.4));
 }

@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-04-11 — ascii ribbon: shake fix, ambient rippling, osc waveform vis, codename rename (DUMP 535-546)
+
+- **535**: Excess shake fix — `useShake` now excludes `.text-ribbon-header` from the window click handler. Previously clicking the `AsciiLogo` (a div, not a button) triggered both its direct `onClick` and the window-level `triggerShake(0.4)` for a double-shake.
+- **536**: Ambient idle rippling — `AsciiRibbon` now fires small splashes (`strength 0.25–0.45, radius 2`) when idle for >1.5s at random positions (~every 1.8–3.2s). Interaction timestamps tracked in `lastInteractionRef` to gate the idle logic. Gives the ribbon surface a living, breathing quality when not in use.
+- **538/546**: ASCII ribbon is the official v3 of ribbon, based on ribbon v2 feature set. Oscillator waveform animation bands added — each active oscillator (with mix > 0.05) draws its waveform shape (`waveformSample` function) across a horizontal band of the canvas, animated with time + detune-influenced speed. Colors: pink (osc1), cyan (osc2), lime (osc3).
+- **544**: Codename updated to "ascii ribbon" — tagline in AsciiLogo changed to `v3 · ascii ribbon`, label in AsciiRibbon changed to `RIBBON v3 · ASCII`.
+- **539**: Created `nmj/ascii` branch in puddle repo with ASCII components (AsciiRibbon, AsciiLogo, AsciiControls, useAsciiFluid, TextRibbonApp) for future puddle v2 inclusion.
+- **540–543, 545**: Roadmap updated with ASCII lineage strategy, v4 ascii/lo mode plan, branch/tag strategy, knob baking concept.
+
 ## 2026-04-11 — text ribbon: mobile ribbon above controls (DUMP 534)
 
 - **534**: On mobile (`max-width: 600px`) the ribbon canvas now appears above the controls sidebar — `order: 1` on `.text-ribbon-canvas`, `order: 2` on `.text-ribbon-sidebar`.

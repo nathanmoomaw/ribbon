@@ -1,6 +1,7 @@
 # Roadmap
 
-## v3 "text ribbon" (branch: nmj/text-ribbon)
+## v3 "ascii ribbon" (branch: nmj/ascii, codename: ascii ribbon)
+> Note: the original text-ribbon branch was an ASCII version of early puddle; now adopted as the official ascii ribbon v3, based on ribbon v2 feature set.
 - [x] Bootstrap ASCII rendering layer using @chenglou/pretext
 - [x] AsciiRibbon canvas: fluid simulation + rainbow ASCII characters
 - [x] AsciiControls: full terminal-aesthetic UI (transport, OSC, FX, VCF, scale)
@@ -11,10 +12,15 @@
 - [x] OSC3 panel overflow fixed
 - [x] Shake triggers audio noise burst
 - [x] Design aligned to ribbon aesthetic (grid bg, perspective floor, header layout)
-- [ ] Mobile layout polish for text ribbon
-- [ ] Preset QR support for text ribbon
+- [x] Codename updated to "ascii ribbon"; tagline updated in UI
+- [x] Oscillator waveform animation bands (per-osc wave pattern in ribbon canvas)
+- [x] Ambient idle rippling (auto-splashes when idle >1.5s for living surface)
+- [x] Shake excess fix (header clicks no longer double-trigger window shake handler)
+- [ ] Mobile layout polish
+- [ ] Preset QR support
 - [ ] Keyboard play mode (keys show as ASCII on canvas)
 - [ ] Marble hold mode ported to ASCII representation
+- [ ] Branch nmj/ascii in puddle repo with ASCII components (feature for puddle v2)
 
 ## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
@@ -52,6 +58,18 @@
 ## Soon
 - [x] Save rec/loop function state in presets for playback from QR/URL (shelved — UI removed for v3, hook preserved)
 - [ ] Goop functionality — needs dedicated attention, not currently working correctly
+
+## ASCII Ribbon — Lineage Strategy
+> The ascii ribbon (v3) is the first in a planned lineage of ASCII/lo-fi rendering modes across ribbon versions.
+- [ ] ribbon v4: ASCII mode = "lo" mode; party mode = full visuals, lo mode switches to ASCII rendering
+- [ ] Easily apply ASCII rendering to future ribbon lineage versions (puddle v2, smash, etc.)
+- [ ] Ribbon lineage: apps/toys evolved from ribbon share the ASCII mode concept as a cross-cutting feature
+- [ ] nmj/ascii in puddle repo — ASCII components as feature branch for puddle v2 inclusion
+- [ ] Branch/tag strategy: v1, v2, v3 branches map latest stable → /v1, /v2, /v3 URL paths; minor versions auto-increment with commit hash visible in info button; dev branches nmj/xyz autodeploy to x-dev
+- [x] Knob baking — BipolarKnob: CrunchSweep (dark←→bright) and SpaceVerb (reverb←→echo) in ASCII ribbon
+- [ ] VCF new functionality — to be designed (see DUMP for context)
+- [ ] Baked vs verbose mode toggle — let user switch between baked knobs and full verbose parameter set
+- [ ] Compound OSC control — single circle component: outer ring=mix, inner ring=detune, center pizza-cut circle=waveform selector (4 quadrants). Sketch: screenshots/signal-2026-04-11-173023_002.jpeg
 
 ## Future Features
 - [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)

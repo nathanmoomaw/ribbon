@@ -105,7 +105,7 @@ export function useShake(onShake, controlsRef, ribbonRef) {
       const ribbon = ribbonRef?.current
       if (controls && controls.contains(e.target)) return
       if (ribbon && ribbon.contains(e.target)) return
-      if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
+      if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.text-ribbon-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
       if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.vcf-control')) return
       // Don't shake when interacting with modals/overlays
       if (e.target.closest('.preset-splash') || e.target.closest('.preset-qr-overlay') || e.target.closest('.milestone-toast')) return

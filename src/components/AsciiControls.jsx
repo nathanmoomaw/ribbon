@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useRef, useEffect, useState } from 'react'
 import { SCALES, SCALE_LABELS, HIDDEN_SCALES } from '../utils/scales'
 import './AsciiControls.css'
 
@@ -109,6 +109,58 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
+// Bipolar baked knob — 0=full-left, 0.5=center, 1=full-right
+// Shows center-biased ASCII indicator
+function BipolarKnob({ label, subLabel, value, onChange }) {
+  const dragging = useRef(false)
+  const startY = useRef(0)
+  const startVal = useRef(0)
+
+  // Build indicator: 7 chars, center marker at pos 3
+  const INDICATOR_WIDTH = 7
+  const centerPos = Math.round((INDICATOR_WIDTH - 1) / 2) // = 3
+  const pos = Math.round(value * (INDICATOR_WIDTH - 1))
+  let indicator = ''
+  for (let i = 0; i < INDICATOR_WIDTH; i++) {
+    if (i === centerPos && pos !== centerPos) indicator += '┼'
+    else if (i === pos) indicator += '◉'
+    else if (i < Math.min(pos, centerPos) || i > Math.max(pos, centerPos)) indicator += '─'
+    else indicator += (i < centerPos ? '◂' : '▸')
+  }
+
+  const onDown = useCallback((e) => {
+    dragging.current = true
+    startY.current = e.clientY
+    startVal.current = value
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }, [value])
+
+  const onMove = useCallback((e) => {
+    if (!dragging.current) return
+    const delta = (startY.current - e.clientY) / 100
+    onChange(Math.max(0, Math.min(1, startVal.current + delta)))
+  }, [onChange])
+
+  const onUp = useCallback(() => { dragging.current = false }, [])
+
+  const sideLabel = value < 0.45 ? (subLabel?.left ?? 'L') : value > 0.55 ? (subLabel?.right ?? 'R') : '·'
+
+  return (
+    <div
+      className="ascii-bipolar-knob"
+      onPointerDown={onDown}
+      onPointerMove={onMove}
+      onPointerUp={onUp}
+      onPointerCancel={onUp}
+      title={`${label}: drag up/down. Center=neutral, left=${subLabel?.left}, right=${subLabel?.right}`}
+    >
+      <div className="ascii-bipolar-knob__label">{label}</div>
+      <div className="ascii-bipolar-knob__indicator">{indicator}</div>
+      <div className="ascii-bipolar-knob__side">{sideLabel}</div>
+    </div>
+  )
+}
+
 function OscPanel({ index, params, onChange }) {
   const colors = ['#ff4080', '#40ff80', '#4080ff']
   const color = colors[index]
@@ -172,6 +224,43 @@ export function AsciiControls({
   doubleHarmonicUnlocked,
 }) {
   const allScales = { ...SCALES, ...(doubleHarmonicUnlocked ? HIDDEN_SCALES : {}) }
+
+  // ── Baked knobs ──────────────────────────────────────────────────────────
+  // CrunchSweep: 0=dark/crunchy (left), 0.5=neutral, 1=bright/swept (right)
+  const [crunchSweep, setCrunchSweep] = useState(0.5)
+  const handleCrunchSweep = useCallback((v) => {
+    setCrunchSweep(v)
+    if (v < 0.5) {
+      // Left: crunch increases, VCF closes down dark
+      const t = (0.5 - v) * 2 // 0 at center, 1 at full left
+      setCrunch(t * 0.9)
+      setVcfCutoff(300 + (1 - t) * 1700) // 300–2000 Hz
+      setVcfResonance(t * 12)
+    } else {
+      // Right: bright sweep — crunch=0, VCF opens up
+      const t = (v - 0.5) * 2 // 0 at center, 1 at full right
+      setCrunch(0)
+      setVcfCutoff(2000 + t * 18000) // 2000–20000 Hz
+      setVcfResonance(t * 8) // slight resonance peak at top
+    }
+  }, [setCrunch, setVcfCutoff, setVcfResonance])
+
+  // SpaceVerb: 0=dense reverb (left), 0.5=dry, 1=echo/delay (right)
+  const [spaceVerb, setSpaceVerb] = useState(0.5)
+  const handleSpaceVerb = useCallback((v) => {
+    setSpaceVerb(v)
+    if (v < 0.5) {
+      // Left: reverb swell
+      const t = (0.5 - v) * 2
+      setReverbMix(t * 0.85)
+      setDelayParams({ time: 0.15, feedback: 0.2, mix: 0 })
+    } else {
+      // Right: echo/delay wash
+      const t = (v - 0.5) * 2
+      setReverbMix(t * 0.2) // slight reverb tail on delay
+      setDelayParams({ time: 0.1 + t * 0.5, feedback: t * 0.65, mix: t * 0.75 })
+    }
+  }, [setReverbMix, setDelayParams])
 
   const toggleScale = useCallback((s) => {
     setScale(prev => {
@@ -295,37 +384,23 @@ export function AsciiControls({
         />
       </div>
 
-      {/* ── FX ── */}
+      {/* ── Baked FX ── */}
       <div className="ascii-box">
-        <div className="ascii-box-header">⊛ EFFECTS</div>
-        <AsciiSlider label="DLY" value={delayParams.time} min={0} max={1} onChange={v => setDelayParams(d => ({ ...d, time: v }))} width={10} />
-        <AsciiSlider label="DFB" value={delayParams.feedback} min={0} max={0.9} onChange={v => setDelayParams(d => ({ ...d, feedback: v }))} width={10} />
-        <AsciiSlider label="DMX" value={delayParams.mix} min={0} max={1} onChange={v => setDelayParams(d => ({ ...d, mix: v }))} width={10} />
-        <AsciiSlider label="REV" value={reverbMix} min={0} max={1} onChange={setReverbMix} width={10} />
-        <AsciiSlider label="CRN" value={crunch} min={0} max={1} onChange={setCrunch} width={10} />
-      </div>
-
-      {/* ── VCF ── */}
-      <div className="ascii-box">
-        <div className="ascii-box-header">⌖ VCF</div>
-        <AsciiSlider
-          label="CUT"
-          value={vcfCutoff}
-          min={20}
-          max={20000}
-          onChange={setVcfCutoff}
-          width={10}
+        <div className="ascii-box-header">⊛ BAKED FX</div>
+        <BipolarKnob
+          label="SPACEVERB"
+          subLabel={{ left: 'REVERB', right: 'ECHO' }}
+          value={spaceVerb}
+          onChange={handleSpaceVerb}
         />
-        <AsciiSlider
-          label="RES"
-          value={vcfResonance}
-          min={0}
-          max={30}
-          onChange={setVcfResonance}
-          width={10}
+        <BipolarKnob
+          label="CRUNCHSWEEP"
+          subLabel={{ left: 'DARK', right: 'BRIGHT' }}
+          value={crunchSweep}
+          onChange={handleCrunchSweep}
         />
         <div className="ascii-controls__row">
-          <span className="ascii-label">OSC:</span>
+          <span className="ascii-label">VCF→</span>
           {[0, 1, 2].map(i => (
             <AsciiButton
               key={i}

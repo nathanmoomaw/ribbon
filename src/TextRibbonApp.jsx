@@ -295,6 +295,7 @@ export default function TextRibbonApp() {
             shaking={shaking}
             onArpNoteToggle={handleArpNoteToggle}
             arpNotes={arpNotes}
+            oscParams={oscParams}
           />
         </section>
       </main>

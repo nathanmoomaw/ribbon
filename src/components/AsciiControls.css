@@ -158,6 +158,44 @@
   color: #6666aa;
 }
 
+/* ─────────────── Bipolar Baked Knob ─────────────── */
+.ascii-bipolar-knob {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  cursor: ns-resize;
+  padding: 4px 3px;
+  border-bottom: 1px solid #1a1a3a;
+  user-select: none;
+}
+
+.ascii-bipolar-knob:hover .ascii-bipolar-knob__indicator {
+  color: #aaccff;
+}
+
+.ascii-bipolar-knob__label {
+  font-size: 9px;
+  color: #7788cc;
+  letter-spacing: 0.08em;
+}
+
+.ascii-bipolar-knob__indicator {
+  font-size: 11px;
+  color: #5577cc;
+  letter-spacing: 0.05em;
+  font-family: inherit;
+  transition: color 0.1s;
+}
+
+.ascii-bipolar-knob__side {
+  font-size: 8px;
+  color: #4466aa;
+  align-self: center;
+  min-width: 40px;
+  text-align: center;
+}
+
 /* ─────────────── Oscillator Panel ─────────────── */
 .ascii-osc {
   display: flex;

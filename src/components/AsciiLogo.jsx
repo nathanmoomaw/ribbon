@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import './AsciiLogo.css'
 
-const TAGLINE = 'v3 · text ribbon'
+const TAGLINE = 'v3 · ascii ribbon'
 
 /**
  * Moebius strip drawn as a parametric curve on canvas.

@@ -40,10 +40,22 @@ function measureGlyph(font, canvasCtx) {
   }
 }
 
+// Draw a waveform sample for a given waveform type at phase t (0–1)
+function waveformSample(type, t) {
+  switch (type) {
+    case 'sine':     return Math.sin(t * Math.PI * 2)
+    case 'square':   return t < 0.5 ? 1 : -1
+    case 'sawtooth': return (t * 2 - 1)
+    case 'triangle': return 1 - Math.abs((t * 4 % 4) - 2)
+    default:         return Math.sin(t * Math.PI * 2)
+  }
+}
+
 export function AsciiRibbon({
   getEngine, mode, octaves, stepped, scale,
   ribbonInteraction, arpStart, arpStop, hold, poly,
   shaking, onArpNoteToggle, arpNotes,
+  oscParams,
   onPuddleActivity,
 }) {
   const containerRef = useRef(null)
@@ -56,6 +68,8 @@ export function AsciiRibbon({
   const activeKeysRef = useRef(new Map())     // code -> voiceId
   const fontRef = useRef('14px "Courier New", monospace')
   const confettiRef = useRef([])              // particle array
+  const lastInteractionRef = useRef(0)        // timestamp of last user interaction
+  const nextAmbientSplashRef = useRef(0)      // when to fire the next ambient ripple
 
   // Stable refs for keyboard handler (avoids stale closure)
   const modeRef = useRef(mode)
@@ -64,12 +78,14 @@ export function AsciiRibbon({
   const scaleRef = useRef(scale)
   const holdRef = useRef(hold)
   const polyRef = useRef(poly)
+  const oscParamsRef = useRef(oscParams ?? [])
   modeRef.current = mode
   octavesRef.current = octaves
   steppedRef.current = stepped
   scaleRef.current = scale
   holdRef.current = hold
   polyRef.current = poly
+  oscParamsRef.current = oscParams ?? []
 
   const fluid = useAsciiFluid(colsRef.current, rowsRef.current)
 
@@ -135,7 +151,20 @@ export function AsciiRibbon({
       const rows = rowsRef.current
       const { w: gw, h: gh } = glyphRef.current
 
+      const now = Date.now()
+      const isIdle = activePointersRef.current.size === 0 && activeKeysRef.current.size === 0
+      const idleDuration = now - lastInteractionRef.current
+
       if (frame % 3 === 0) fluid.ambient(0.015)
+
+      // Ambient ripples when idle for >1.5s — creates visible propagating waves
+      if (isIdle && idleDuration > 1500 && now > nextAmbientSplashRef.current) {
+        const nx = Math.random()
+        const ny = 0.2 + Math.random() * 0.6 // avoid edges
+        fluid.splash(nx, ny, 0.25 + Math.random() * 0.2, 2)
+        nextAmbientSplashRef.current = now + 1800 + Math.random() * 1400
+      }
+
       fluid.step()
       frame++
 
@@ -159,6 +188,29 @@ export function AsciiRibbon({
           ctx.fillText(ch, c * gw, (r + 1) * gh)
         }
       }
+
+      // Draw oscillator waveforms — each osc gets a horizontal band with its waveform shape
+      const oscs = oscParamsRef.current
+      const oscColors = ['#ff0080', '#00ccff', '#aaff00']
+      const waveTime = frame * 0.025
+      for (let oscIdx = 0; oscIdx < oscs.length; oscIdx++) {
+        const osc = oscs[oscIdx]
+        if (!osc || osc.mix < 0.05) continue
+        const bandRow = Math.floor((oscIdx + 1) * rows / 4) // rows ~1/4, 2/4, 3/4
+        const detuneFactor = 1 + (osc.detune / 50) * 0.3
+        for (let c = 0; c < cols; c++) {
+          const t = (c / cols + waveTime * detuneFactor) % 1
+          const sample = waveformSample(osc.waveform, t)
+          const rowOffset = Math.round(sample * 2.5)
+          const r = Math.max(0, Math.min(rows - 1, bandRow + rowOffset))
+          const alpha = osc.mix * 0.35
+          if (alpha < 0.04) continue
+          ctx.globalAlpha = alpha
+          ctx.fillStyle = oscColors[oscIdx]
+          ctx.fillText('·', c * gw, (r + 1) * gh)
+        }
+      }
+      ctx.globalAlpha = 1
 
       // Draw confetti particles
       confettiRef.current = confettiRef.current.filter(p => p.life > 0)
@@ -248,6 +300,7 @@ export function AsciiRibbon({
     canvasRef.current?.setPointerCapture(e.pointerId)
     const { nx, ny, velocity } = normalizePointer(e)
     activePointersRef.current.set(e.pointerId, { nx, ny })
+    lastInteractionRef.current = Date.now()
 
     fluid.splash(nx, ny, 0.9, 3)
     spawnConfetti(nx, ny)
@@ -332,6 +385,7 @@ export function AsciiRibbon({
 
       const voiceId = `key_${e.code}`
       activeKeysRef.current.set(e.code, voiceId)
+      lastInteractionRef.current = Date.now()
 
       const cols = colsRef.current
       const rows = rowsRef.current
@@ -396,7 +450,7 @@ export function AsciiRibbon({
         onPointerCancel={handlePointerUp}
         style={{ touchAction: 'none', cursor: 'crosshair' }}
       />
-      <div className="ascii-ribbon__label">RIBBON v3 · TEXT</div>
+      <div className="ascii-ribbon__label">RIBBON v3 · ASCII</div>
     </div>
   )
 }

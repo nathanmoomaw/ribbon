@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-04-11 — ascii ribbon: baked knob rotary, sweet spots, shake fix, orb cleanup, full-screen confetti (DUMP 558-563)
+
+- **558**: Baked FX knobs now render as ASCII rotary dials. `BipolarKnob` replaced the 7-char horizontal bar indicator with a directional arrow that sweeps from ↙ (7 o'clock) through ↑ (12 o'clock = center/neutral) to ↘ (5 o'clock), matching real synth rotary behavior. CSS updated: `align-items: center`, large 20px dial char.
+- **559**: Noted ASCII-only rendering for borders/knobs as a future investigation (not implemented per request).
+- **560**: Redesigned baked knob sweet spots. SPACE (was SpaceVerb): left=CATHEDRAL (reverb 0.78 + delay wash), center=dry, right=ORBIT (rhythmic delay 0.5s/0.72fb + reverb halo). TONE (was CrunchSweep): left=GRIT (crunch 0.82 + VCF 500Hz/warm resonance), center=clean, right=GLITTER (tiny crunch + resonant presence peak at 7kHz/Q=16). Both blend multiple parameters for musical "sweet spots".
+- **561**: Shake now depresses a single ribbon spot. `shakeNoiseBurst` reduced from 3–5 voices to 1. `AsciiRibbon` shake effect reduced from 8 simultaneous fluid splashes to a single centered splash.
+- **562**: OSC sphere orbs now borderless/labelless — pure visual effect. Removed `ascii-orb__label`, `ascii-orb__mix`, and border CSS. Inactive opacity reduced to 0.25 for subtlety.
+- **563**: Confetti now scatters full-screen via new `ConfettiCanvas` (fixed overlay, z-index 1000, pointer-events none). Confetti logic extracted from `AsciiRibbon` canvas into standalone component with `spawn(x, y)` method via `forwardRef`/`useImperativeHandle`. Ribbon interaction confetti converts to viewport coords. Shake fires 5 confetti bursts at random viewport positions.
+
 ## 2026-04-11 — ascii ribbon: v2 "Rock & Rumble" layout redesign
 
 - Layout restructured from puddle-style (sidebar+canvas) to v2-style vertical stack:

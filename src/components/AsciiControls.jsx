@@ -109,24 +109,18 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Bipolar baked knob — 0=full-left, 0.5=center, 1=full-right
-// Shows center-biased ASCII indicator
+// Bipolar rotary knob — 0=full-left, 0.5=center, 1=full-right
+// Shows a directional arrow that sweeps from 7-o-clock (bottom-left) through
+// 12-o-clock (top = center/neutral) to 5-o-clock (bottom-right)
 function BipolarKnob({ label, subLabel, value, onChange }) {
   const dragging = useRef(false)
   const startY = useRef(0)
   const startVal = useRef(0)
 
-  // Build indicator: 7 chars, center marker at pos 3
-  const INDICATOR_WIDTH = 7
-  const centerPos = Math.round((INDICATOR_WIDTH - 1) / 2) // = 3
-  const pos = Math.round(value * (INDICATOR_WIDTH - 1))
-  let indicator = ''
-  for (let i = 0; i < INDICATOR_WIDTH; i++) {
-    if (i === centerPos && pos !== centerPos) indicator += '┼'
-    else if (i === pos) indicator += '◉'
-    else if (i < Math.min(pos, centerPos) || i > Math.max(pos, centerPos)) indicator += '─'
-    else indicator += (i < centerPos ? '◂' : '▸')
-  }
+  // 7 rotary positions: ↙ ← ↖ ↑ ↗ → ↘  (7→9→10:30→12→1:30→3→5 o'clock)
+  const DIAL = ['↙', '←', '↖', '↑', '↗', '→', '↘']
+  const dialIdx = Math.min(6, Math.floor(value * 7))
+  const dialChar = DIAL[dialIdx]
 
   const onDown = useCallback((e) => {
     dragging.current = true
@@ -155,7 +149,7 @@ function BipolarKnob({ label, subLabel, value, onChange }) {
       title={`${label}: drag up/down. Center=neutral, left=${subLabel?.left}, right=${subLabel?.right}`}
     >
       <div className="ascii-bipolar-knob__label">{label}</div>
-      <div className="ascii-bipolar-knob__indicator">{indicator}</div>
+      <div className="ascii-bipolar-knob__dial">{dialChar}</div>
       <div className="ascii-bipolar-knob__side">{sideLabel}</div>
     </div>
   )
@@ -226,39 +220,39 @@ export function AsciiControls({
   const allScales = { ...SCALES, ...(doubleHarmonicUnlocked ? HIDDEN_SCALES : {}) }
 
   // ── Baked knobs ──────────────────────────────────────────────────────────
-  // CrunchSweep: 0=dark/crunchy (left), 0.5=neutral, 1=bright/swept (right)
-  const [crunchSweep, setCrunchSweep] = useState(0.5)
-  const handleCrunchSweep = useCallback((v) => {
-    setCrunchSweep(v)
-    if (v < 0.5) {
-      // Left: crunch increases, VCF closes down dark
+  // TONE: 0=GRIT (warm crunch + low filter), 0.5=CLEAN, 1=GLITTER (sparkle resonance)
+  const [tone, setTone] = useState(0.5)
+  const handleTone = useCallback((v) => {
+    setTone(v)
+    if (v <= 0.5) {
+      // Left: warm saturation — crunch + filter closes down, resonance adds warmth
       const t = (0.5 - v) * 2 // 0 at center, 1 at full left
-      setCrunch(t * 0.9)
-      setVcfCutoff(300 + (1 - t) * 1700) // 300–2000 Hz
+      setCrunch(t * 0.82)
+      setVcfCutoff(20000 - t * 19500) // 20000 → 500 Hz
       setVcfResonance(t * 12)
     } else {
-      // Right: bright sweep — crunch=0, VCF opens up
+      // Right: glittery sparkle — slight bite + resonant presence peak at high freq
       const t = (v - 0.5) * 2 // 0 at center, 1 at full right
-      setCrunch(0)
-      setVcfCutoff(2000 + t * 18000) // 2000–20000 Hz
-      setVcfResonance(t * 8) // slight resonance peak at top
+      setCrunch(t * 0.08)           // tiny harmonic bite
+      setVcfCutoff(20000 - t * 13000) // 20000 → 7000 Hz (resonant presence)
+      setVcfResonance(t * 16)         // high resonance = sparkly singing quality
     }
   }, [setCrunch, setVcfCutoff, setVcfResonance])
 
-  // SpaceVerb: 0=dense reverb (left), 0.5=dry, 1=echo/delay (right)
-  const [spaceVerb, setSpaceVerb] = useState(0.5)
-  const handleSpaceVerb = useCallback((v) => {
-    setSpaceVerb(v)
-    if (v < 0.5) {
-      // Left: reverb swell
+  // SPACE: 0=CATHEDRAL (reverb+delay wash), 0.5=DRY, 1=ORBIT (rhythmic delay+tail)
+  const [space, setSpace] = useState(0.5)
+  const handleSpace = useCallback((v) => {
+    setSpace(v)
+    if (v <= 0.5) {
+      // Left: cathedral — lush reverb bloom with supporting delay wash
       const t = (0.5 - v) * 2
-      setReverbMix(t * 0.85)
-      setDelayParams({ time: 0.15, feedback: 0.2, mix: 0 })
+      setReverbMix(t * 0.78)
+      setDelayParams({ time: 0.25 + t * 0.15, feedback: 0.2 + t * 0.3, mix: t * 0.35 })
     } else {
-      // Right: echo/delay wash
+      // Right: orbital — rhythmic delay with a reverb halo
       const t = (v - 0.5) * 2
-      setReverbMix(t * 0.2) // slight reverb tail on delay
-      setDelayParams({ time: 0.1 + t * 0.5, feedback: t * 0.65, mix: t * 0.75 })
+      setReverbMix(t * 0.15)
+      setDelayParams({ time: 0.28 + t * 0.22, feedback: 0.3 + t * 0.42, mix: t * 0.7 })
     }
   }, [setReverbMix, setDelayParams])
 
@@ -313,16 +307,16 @@ export function AsciiControls({
       <div className="ascii-panel ascii-panel--fx">
         <div className="ascii-panel__header">⊛ FX / PITCH</div>
         <BipolarKnob
-          label="SPACEVERB"
-          subLabel={{ left: 'REVERB', right: 'ECHO' }}
-          value={spaceVerb}
-          onChange={handleSpaceVerb}
+          label="SPACE"
+          subLabel={{ left: 'CATHEDRAL', right: 'ORBIT' }}
+          value={space}
+          onChange={handleSpace}
         />
         <BipolarKnob
-          label="CRUNCHSWEEP"
-          subLabel={{ left: 'DARK', right: 'BRIGHT' }}
-          value={crunchSweep}
-          onChange={handleCrunchSweep}
+          label="TONE"
+          subLabel={{ left: 'GRIT', right: 'GLITTER' }}
+          value={tone}
+          onChange={handleTone}
         />
         <div className="ascii-controls__row">
           <span className="ascii-label">VCF→</span>

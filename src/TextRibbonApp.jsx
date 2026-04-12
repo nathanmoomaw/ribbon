@@ -13,6 +13,7 @@ import { AsciiRibbon } from './components/AsciiRibbon'
 import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
+import { ConfettiCanvas } from './components/ConfettiCanvas'
 import { readPresetFromUrl } from './utils/presets'
 import { positionToFrequency } from './utils/pitchMap'
 import './TextRibbonApp.css'
@@ -60,6 +61,7 @@ export default function TextRibbonApp() {
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const sidebarRef = useRef(null)
   const canvasAreaRef = useRef(null)
+  const confettiRef = useRef(null)
   const arpStopRef = useRef(null)
   const lastSpaceRef = useRef(0)
 
@@ -133,23 +135,23 @@ export default function TextRibbonApp() {
     })
   }, [oscParams, getEngine])
 
-  // Shake noise burst — play a brief random chord then fade
+  // Convert ribbon-normalized coords to viewport coords for confetti
+  const spawnConfetti = useCallback((nx, ny) => {
+    const canvas = canvasAreaRef.current
+    if (!canvas || !confettiRef.current) return
+    const rect = canvas.getBoundingClientRect()
+    confettiRef.current.spawn(rect.left + nx * rect.width, rect.top + ny * rect.height)
+  }, [])
+
+  // Shake noise burst — play a single random note then release
   const shakeNoiseBurst = useCallback((intensity) => {
     const engine = getEngine()
-    // Play 3–5 random notes at spread positions, then release after short duration
-    const count = 3 + Math.floor(intensity * 2)
-    const duration = 80 + intensity * 120 // ms
-    const ids = []
-    for (let i = 0; i < count; i++) {
-      const nx = Math.random()
-      const hz = positionToFrequency(nx, { octaves: 2, scale: ['chromatic'] })
-      const id = `shake_${i}_${Date.now()}`
-      ids.push(id)
-      engine.voiceOn(id, hz, 0.3 + Math.random() * 0.5 * intensity)
-    }
-    setTimeout(() => {
-      ids.forEach(id => engine.voiceOff(id))
-    }, duration)
+    const nx = Math.random()
+    const hz = positionToFrequency(nx, { octaves: 2, scale: ['chromatic'] })
+    const id = `shake_${Date.now()}`
+    engine.voiceOn(id, hz, 0.3 + Math.random() * 0.5 * intensity)
+    const duration = 80 + intensity * 120
+    setTimeout(() => engine.voiceOff(id), duration)
   }, [getEngine])
 
   // Shake
@@ -157,6 +159,15 @@ export default function TextRibbonApp() {
     setShaking(true)
     setTimeout(() => setShaking(false), 300)
     shakeNoiseBurst(intensity)
+    // Confetti burst at random viewport positions (full screen scatter)
+    if (confettiRef.current) {
+      for (let i = 0; i < 5; i++) {
+        confettiRef.current.spawn(
+          Math.random() * window.innerWidth,
+          Math.random() * window.innerHeight
+        )
+      }
+    }
 
     setOscParams(prev => prev.map(p => ({
       ...p,
@@ -232,6 +243,9 @@ export default function TextRibbonApp() {
 
   return (
     <div className="text-ribbon-app">
+      {/* Full-screen confetti overlay */}
+      <ConfettiCanvas ref={confettiRef} />
+
       {/* Background layers matching ribbon aesthetic */}
       <div className="text-ribbon-bg" />
       <div className="text-ribbon-grid-floor" />
@@ -279,6 +293,7 @@ export default function TextRibbonApp() {
             onArpNoteToggle={handleArpNoteToggle}
             arpNotes={arpNotes}
             oscParams={oscParams}
+            onSpawnConfetti={spawnConfetti}
           />
         </section>
 

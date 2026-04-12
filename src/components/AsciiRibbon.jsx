@@ -12,9 +12,6 @@ const RAINBOW = [
   '#8000ff', '#cc00ff', '#ff00cc',
 ]
 
-// Confetti chars (Asteroids-style unfilled geometry)
-const CONFETTI_CHARS = ['*', '+', '×', '◇', '△', '○', '◈', '❋', '✦']
-
 // Keyboard → ribbon position map (ASDF home row + JKL)
 const KEY_POSITIONS = {
   KeyA: 0.0, KeyS: 0.125, KeyD: 0.25, KeyF: 0.375,
@@ -57,6 +54,7 @@ export function AsciiRibbon({
   shaking, onArpNoteToggle, arpNotes,
   oscParams,
   onPuddleActivity,
+  onSpawnConfetti,
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -67,7 +65,6 @@ export function AsciiRibbon({
   const activePointersRef = useRef(new Map()) // pointerId -> {nx, ny}
   const activeKeysRef = useRef(new Map())     // code -> voiceId
   const fontRef = useRef('14px "Courier New", monospace')
-  const confettiRef = useRef([])              // particle array
   const lastInteractionRef = useRef(0)        // timestamp of last user interaction
   const nextAmbientSplashRef = useRef(0)      // when to fire the next ambient ripple
 
@@ -117,26 +114,14 @@ export function AsciiRibbon({
     return () => ro.disconnect()
   }, [resize])
 
-  // Spawn confetti at a normalized position
+  // Spawn confetti at a normalized ribbon position — converts to viewport coords
   const spawnConfetti = useCallback((nx, ny) => {
+    if (!onSpawnConfetti) return
     const canvas = canvasRef.current
     if (!canvas) return
-    const x = nx * canvas.width
-    const y = ny * canvas.height
-    for (let i = 0; i < 16; i++) {
-      const angle = Math.random() * Math.PI * 2
-      const speed = 3 + Math.random() * 6      // faster: was 1.5–5
-      confettiRef.current.push({
-        x, y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 1.5,     // slight upward bias
-        life: 1.0,
-        decay: 0.010 + Math.random() * 0.012,  // slower decay: was 0.025–0.045
-        ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
-        color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
-      })
-    }
-  }, [])
+    const rect = canvas.getBoundingClientRect()
+    onSpawnConfetti(rect.left + nx * rect.width, rect.top + ny * rect.height)
+  }, [onSpawnConfetti])
 
   // Render loop
   useEffect(() => {
@@ -212,19 +197,6 @@ export function AsciiRibbon({
       }
       ctx.globalAlpha = 1
 
-      // Draw confetti particles
-      confettiRef.current = confettiRef.current.filter(p => p.life > 0)
-      for (const p of confettiRef.current) {
-        ctx.globalAlpha = p.life * 0.9
-        ctx.fillStyle = p.color
-        ctx.fillText(p.ch, p.x, p.y)
-        p.x += p.vx
-        p.y += p.vy
-        p.vy += 0.06 // gravity (gentler so particles float longer)
-        p.vx *= 0.97
-        p.life -= p.decay
-      }
-
       // Draw active pointer cursors
       activePointersRef.current.forEach(({ nx, ny }) => {
         const col = Math.floor(nx * cols)
@@ -272,16 +244,13 @@ export function AsciiRibbon({
     }
   }, [fluid, mode, poly, hold, arpNotes, octaves])
 
-  // Shake effect
+  // Shake effect — single splash, single confetti burst
   useEffect(() => {
     if (shaking) {
-      for (let i = 0; i < 8; i++) {
-        fluid.splash(Math.random(), Math.random(), 0.6, 4)
-      }
-      // Confetti burst across the whole surface
-      for (let i = 0; i < 5; i++) {
-        spawnConfetti(Math.random(), Math.random())
-      }
+      const nx = Math.random()
+      const ny = 0.2 + Math.random() * 0.6
+      fluid.splash(nx, ny, 0.8, 5)
+      spawnConfetti(nx, ny)
     }
   }, [shaking, fluid, spawnConfetti])
 

@@ -172,21 +172,21 @@
 .ascii-knob__label { font-size: 7px; color: var(--ctrl-dim); letter-spacing: 0.05em; }
 .ascii-knob__val   { font-size: 7px; color: #5060aa; }
 
-/* ────────────────────────────── Bipolar baked knob ── */
+/* ────────────────────────────── Bipolar rotary knob ── */
 .ascii-bipolar-knob {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   gap: 1px;
   cursor: ns-resize;
-  padding: 3px 3px;
+  padding: 4px 6px;
   border-bottom: 1px solid rgba(50, 60, 90, 0.4);
   user-select: none;
 }
-.ascii-bipolar-knob:hover .ascii-bipolar-knob__indicator { color: #99bbff; }
-.ascii-bipolar-knob__label    { font-size: 8px; color: var(--ctrl-hot); letter-spacing: 0.06em; }
-.ascii-bipolar-knob__indicator { font-size: 10px; color: #4a66aa; letter-spacing: 0.04em; font-family: inherit; transition: color 0.1s; }
-.ascii-bipolar-knob__side      { font-size: 7px; color: var(--ctrl-dim); align-self: center; min-width: 36px; text-align: center; }
+.ascii-bipolar-knob:hover .ascii-bipolar-knob__dial { color: #99bbff; }
+.ascii-bipolar-knob__label { font-size: 8px; color: var(--ctrl-hot); letter-spacing: 0.06em; }
+.ascii-bipolar-knob__dial  { font-size: 20px; color: #4a66aa; line-height: 1.1; transition: color 0.1s; }
+.ascii-bipolar-knob__side  { font-size: 7px; color: var(--ctrl-dim); min-width: 40px; text-align: center; }
 
 /* ────────────────────────────── OSC panels (inside center panel) ── */
 .ascii-controls__oscs {

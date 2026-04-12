@@ -136,14 +136,9 @@ function OrbCanvas({ params, index, active, tRef }) {
     return () => cancelAnimationFrame(rafRef.current)
   }, [params, active, color, index, tRef])
 
-  const mixPct = Math.round((params?.mix ?? 0) * 100)
-  const label  = ['OSC1', 'OSC2', 'OSC3'][index]
-
   return (
-    <div className={`ascii-orb${params?.mix > 0.05 ? ' ascii-orb--active' : ''}`} style={{ '--orb-color': color.fg, '--orb-bright': color.bright }}>
-      <div className="ascii-orb__label">{label} <span className="ascii-orb__wave">{params?.waveform?.[0]?.toUpperCase() ?? 'S'}</span></div>
+    <div className={`ascii-orb${params?.mix > 0.05 ? ' ascii-orb--active' : ''}`} style={{ '--orb-color': color.fg }}>
       <canvas ref={canvasRef} className="ascii-orb__canvas" />
-      <div className="ascii-orb__mix">{'▮'.repeat(Math.round(mixPct / 10))}{'▯'.repeat(10 - Math.round(mixPct / 10))} {mixPct}%</div>
     </div>
   )
 }

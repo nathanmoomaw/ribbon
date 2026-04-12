@@ -135,12 +135,10 @@ export default function TextRibbonApp() {
     })
   }, [oscParams, getEngine])
 
-  // Convert ribbon-normalized coords to viewport coords for confetti
-  const spawnConfetti = useCallback((nx, ny) => {
-    const canvas = canvasAreaRef.current
-    if (!canvas || !confettiRef.current) return
-    const rect = canvas.getBoundingClientRect()
-    confettiRef.current.spawn(rect.left + nx * rect.width, rect.top + ny * rect.height)
+  // AsciiRibbon already converts to viewport coords — just forward to confetti overlay
+  const spawnConfetti = useCallback((x, y) => {
+    if (!confettiRef.current) return
+    confettiRef.current.spawn(x, y)
   }, [])
 
   // Shake noise burst — play a single random note then release

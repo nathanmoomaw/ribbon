@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-14 — ascii ribbon: larger OSC controls on desktop, more confetti (DUMP 585-586)
+
+- **585**: Added `@media (min-width: 1440px)` overrides in AsciiControls.css — OSC arc chars scale to `clamp(48px,5vw,80px)` (vs 24px cap before), wave buttons to `clamp(28px,3.2vw,52px)`. Labels/vals also bump up. Space/Tone BipolarKnobs unchanged (user said fine).
+- **586**: Confetti boosted — default spawn count 16→32, ribbon-touch count raised to 48 at speed 5.5, sparkle count around notes 5→10, particle life extended and decay slowed for longer trails.
+
 ## 2026-04-13 — ascii ribbon: slide note confetti, resize debounce, bigger controls, staff z-fix (DUMP 575-578)
 
 - **575**: Note name particles now spawn as user slides across the ribbon — detects note name crossings in `handlePointerMove` using `lastSpawnedNoteRef` per pointer ID.

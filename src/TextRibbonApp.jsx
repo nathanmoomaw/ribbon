@@ -145,7 +145,7 @@ export default function TextRibbonApp() {
   // AsciiRibbon already converts to viewport coords — just forward to confetti overlay
   const spawnConfetti = useCallback((x, y) => {
     if (!confettiRef.current) return
-    confettiRef.current.spawn(x, y)
+    confettiRef.current.spawn(x, y, { count: 48, speed: 5.5 })
   }, [])
 
   const spawnNote = useCallback((x, y, noteName) => {

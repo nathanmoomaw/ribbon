@@ -172,6 +172,16 @@
 .ascii-knob__label { font-size: clamp(9px, 0.9vw, 12px); color: var(--ctrl-dim); letter-spacing: 0.05em; }
 .ascii-knob__val   { font-size: clamp(9px, 0.9vw, 12px); color: #5060aa; }
 
+/* ────────────────────────────── Large desktop overrides (≥1440px) ── */
+@media (min-width: 1440px) {
+  .ascii-osc .ascii-knob__arc  { font-size: clamp(48px, 5vw, 80px); }
+  .ascii-osc .ascii-knob__label { font-size: clamp(13px, 1.3vw, 18px); }
+  .ascii-osc .ascii-knob__val   { font-size: clamp(12px, 1.2vw, 16px); }
+  .ascii-osc .ascii-knob       { gap: 4px; padding: 6px 8px; min-width: 64px; }
+  .ascii-osc .ascii-wave-btn   { font-size: clamp(28px, 3.2vw, 52px); padding: 4px 8px; }
+  .ascii-osc .ascii-box-header { font-size: clamp(12px, 1.2vw, 16px); }
+}
+
 /* ────────────────────────────── Bipolar rotary knob ── */
 .ascii-bipolar-knob {
   display: flex;

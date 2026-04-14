@@ -19,7 +19,7 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
 
   useImperativeHandle(ref, () => ({
     spawn(x, y, opts = {}) {
-      const count = opts.count ?? 16
+      const count = opts.count ?? 32
       const baseSpeed = opts.speed ?? 4.5
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2
@@ -29,8 +29,8 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
           x, y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 1.5 - Math.random() * 2,
-          life: 0.7 + Math.random() * 0.3,
-          decay: 0.008 + Math.random() * 0.018,
+          life: 0.85 + Math.random() * 0.3,
+          decay: 0.005 + Math.random() * 0.012,
           ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
           color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
           size: opts.size ?? (10 + Math.floor(Math.random() * 6)),
@@ -51,7 +51,7 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
         isNote: true,
       })
       // A few small sparkles around the note
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 10; i++) {
         const angle = Math.random() * Math.PI * 2
         const speed = 2 + Math.random() * 3
         particlesRef.current.push({

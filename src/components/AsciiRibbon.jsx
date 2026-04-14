@@ -65,8 +65,10 @@ export function AsciiRibbon({
   const rowsRef = useRef(20)
   const activePointersRef = useRef(new Map()) // pointerId -> {nx, ny}
   const activeKeysRef = useRef(new Map())     // code -> voiceId
+  const lastSpawnedNoteRef = useRef(new Map()) // pointerId -> noteName (for slide detection)
   const fontRef = useRef('14px "Courier New", monospace')
   const lastInteractionRef = useRef(0)        // timestamp of last user interaction
+  const resizeTimerRef = useRef(null)         // debounce timer for resize
   const nextAmbientSplashRef = useRef(0)      // when to fire the next ambient ripple
   const nextGlitchRef = useRef(0)             // when to fire the next glitch frame
   const glitchActiveRef = useRef(false)       // glitch is currently rendering
@@ -113,9 +115,16 @@ export function AsciiRibbon({
 
   useEffect(() => {
     resize()
-    const ro = new ResizeObserver(resize)
+    const debouncedResize = () => {
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current)
+      resizeTimerRef.current = setTimeout(resize, 80)
+    }
+    const ro = new ResizeObserver(debouncedResize)
     if (containerRef.current) ro.observe(containerRef.current)
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      if (resizeTimerRef.current) clearTimeout(resizeTimerRef.current)
+    }
   }, [resize])
 
   // Spawn confetti at a normalized ribbon position — converts to viewport coords
@@ -339,6 +348,7 @@ export function AsciiRibbon({
       if (!poly) engine.allNotesOff()
       engine.voiceOn(voiceId, hz, velocity)
       spawnNote(nx, ny, hz)
+      lastSpawnedNoteRef.current.set(e.pointerId, frequencyToNoteName(hz))
     } else if (mode === 'arp') {
       if (hold && poly) {
         onArpNoteToggle?.(hz)
@@ -375,11 +385,18 @@ export function AsciiRibbon({
         engine.voiceSetFrequency(voiceId, hz)
       }
       engine.voiceSetVelocity?.(voiceId, velocity)
+      // Spawn note particle when sliding past a new note
+      const noteName = frequencyToNoteName(hz)
+      if (lastSpawnedNoteRef.current.get(e.pointerId) !== noteName) {
+        lastSpawnedNoteRef.current.set(e.pointerId, noteName)
+        spawnNote(nx, ny, hz)
+      }
     }
-  }, [getEngine, mode, octaves, stepped, scale, hold, poly, fluid, ribbonInteraction, normalizePointer])
+  }, [getEngine, mode, octaves, stepped, scale, hold, poly, fluid, ribbonInteraction, normalizePointer, spawnNote])
 
   const handlePointerUp = useCallback((e) => {
     activePointersRef.current.delete(e.pointerId)
+    lastSpawnedNoteRef.current.delete(e.pointerId)
     if (activePointersRef.current.size === 0 && ribbonInteraction) {
       ribbonInteraction.current.active = false
     }

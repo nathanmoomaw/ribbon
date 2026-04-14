@@ -168,7 +168,7 @@ function BipolarKnob({ label, subLabel, value, onChange }) {
       title={`${label}: drag up/down. Center=neutral, left=${subLabel?.left}, right=${subLabel?.right}`}
     >
       <div className="ascii-bipolar-knob__label">{label}</div>
-      <svg className="ascii-bipolar-knob__svg" viewBox="0 0 28 28" width="40" height="40">
+      <svg className="ascii-bipolar-knob__svg" viewBox="0 0 28 28" width="52" height="52">
         {/* Background track */}
         <path d={trackPath} fill="none" stroke="#1e2240" strokeWidth="2.5" strokeLinecap="round" />
         {/* Active arc */}

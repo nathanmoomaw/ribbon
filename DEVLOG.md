@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-13 — ascii ribbon: slide note confetti, resize debounce, bigger controls, staff z-fix (DUMP 575-578)
+
+- **575**: Note name particles now spawn as user slides across the ribbon — detects note name crossings in `handlePointerMove` using `lastSpawnedNoteRef` per pointer ID.
+- **576**: ResizeObserver callback debounced (80ms) so `fluid.reset()` only fires once after resize completes, preventing mid-resize canvas flicker.
+- **577**: Controls panel scaled up — font sizes bumped via `clamp()` throughout, panel widths increased (toggles 130→155px, fx 160→190px), BipolarKnob SVG 40→52px, wave-btn and knob arc fonts larger.
+- **578**: `FloatingStaff` z-index raised from 0 to 4 so staff drifts visibly over orbs and controls. Alpha bumped from 0.06-0.18 → 0.12-0.28 for better visibility.
+
 ## 2026-04-13 — ascii ribbon: floating staff, circular knobs, note confetti, QR/wallet, glitch fx (DUMP 564-574)
 
 - **564**: `FloatingStaff` component — animated ASCII music staves with notes/barlines that drift across the screen at varied speeds and opacities, inspired by Rock & Rumble v2. Steel-blue palette matches controls aesthetic. Fixed z-index 0 canvas behind all UI.

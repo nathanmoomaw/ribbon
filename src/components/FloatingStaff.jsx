@@ -33,7 +33,7 @@ function makeStrip(canvasW, canvasH) {
   const speed = randBetween(0.18, 0.55) // px/frame
   const direction = Math.random() < 0.5 ? 1 : -1
   const lineSpacing = randBetween(5, 9)
-  const alpha = randBetween(0.06, 0.18)
+  const alpha = randBetween(0.12, 0.28)
   const width = randBetween(canvasW * 0.4, canvasW * 1.1)
   const startX = direction > 0
     ? -width - randBetween(0, canvasW * 0.5)
@@ -155,7 +155,7 @@ export function FloatingStaff() {
         top: 0, left: 0,
         width: '100vw', height: '100vh',
         pointerEvents: 'none',
-        zIndex: 0,
+        zIndex: 4,
       }}
     />
   )

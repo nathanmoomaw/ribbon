@@ -1,7 +1,7 @@
 import { useRef, useEffect, useCallback } from 'react'
 import { prepare, measureNaturalWidth } from '@chenglou/pretext'
 import { useAsciiFluid } from '../hooks/useAsciiFluid'
-import { positionToFrequency, frequencyToPosition } from '../utils/pitchMap'
+import { positionToFrequency, frequencyToPosition, frequencyToNoteName } from '../utils/pitchMap'
 import './AsciiRibbon.css'
 
 // ASCII characters from sparse to dense — maps wave height to char
@@ -55,6 +55,7 @@ export function AsciiRibbon({
   oscParams,
   onPuddleActivity,
   onSpawnConfetti,
+  onSpawnNote,
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -67,6 +68,9 @@ export function AsciiRibbon({
   const fontRef = useRef('14px "Courier New", monospace')
   const lastInteractionRef = useRef(0)        // timestamp of last user interaction
   const nextAmbientSplashRef = useRef(0)      // when to fire the next ambient ripple
+  const nextGlitchRef = useRef(0)             // when to fire the next glitch frame
+  const glitchActiveRef = useRef(false)       // glitch is currently rendering
+  const glitchEndRef = useRef(0)              // when glitch effect expires
 
   // Stable refs for keyboard handler (avoids stale closure)
   const modeRef = useRef(mode)
@@ -123,6 +127,19 @@ export function AsciiRibbon({
     onSpawnConfetti(rect.left + nx * rect.width, rect.top + ny * rect.height)
   }, [onSpawnConfetti])
 
+  // Spawn note-name particle at ribbon position
+  const spawnNote = useCallback((nx, ny, hz) => {
+    if (!onSpawnNote) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    onSpawnNote(
+      rect.left + nx * rect.width,
+      rect.top + ny * rect.height,
+      frequencyToNoteName(hz)
+    )
+  }, [onSpawnNote])
+
   // Render loop
   useEffect(() => {
     let frame = 0
@@ -149,6 +166,14 @@ export function AsciiRibbon({
         fluid.splash(nx, ny, 0.25 + Math.random() * 0.2, 2)
         nextAmbientSplashRef.current = now + 1800 + Math.random() * 1400
       }
+
+      // Glitch flicker — fires at a much lower frequency than ambient ripples (every 6-14s when idle)
+      if (isIdle && idleDuration > 2000 && now > nextGlitchRef.current) {
+        glitchActiveRef.current = true
+        glitchEndRef.current = now + 60 + Math.random() * 120  // 60–180ms glitch burst
+        nextGlitchRef.current = now + 6000 + Math.random() * 8000
+      }
+      if (now > glitchEndRef.current) glitchActiveRef.current = false
 
       fluid.step()
       frame++
@@ -197,14 +222,39 @@ export function AsciiRibbon({
       }
       ctx.globalAlpha = 1
 
-      // Draw active pointer cursors
+      // Glitch flicker — shift a random horizontal slice and invert chars briefly
+      if (glitchActiveRef.current && frame % 2 === 0) {
+        const glitchRows = 1 + Math.floor(Math.random() * 3)
+        const glitchRow = Math.floor(Math.random() * rows)
+        const shiftX = Math.floor((Math.random() - 0.5) * gw * 8)
+        const glitchChars = '▓▒░█▌▐'
+        ctx.globalAlpha = 0.55 + Math.random() * 0.3
+        ctx.fillStyle = RAINBOW[Math.floor(Math.random() * RAINBOW.length)]
+        for (let gr = glitchRow; gr < Math.min(rows, glitchRow + glitchRows); gr++) {
+          for (let gc = 0; gc < cols; gc += 2 + Math.floor(Math.random() * 4)) {
+            const ch = glitchChars[Math.floor(Math.random() * glitchChars.length)]
+            ctx.fillText(ch, gc * gw + shiftX, (gr + 1) * gh)
+          }
+        }
+        ctx.globalAlpha = 1
+      }
+
+      // Draw active pointer cursors — full-height column + bright marker at touch row
       activePointersRef.current.forEach(({ nx, ny }) => {
         const col = Math.floor(nx * cols)
-        const row = Math.floor(ny * rows)
+        const touchRow = Math.floor(ny * rows)
+        ctx.font = fontRef.current
+        // Faint vertical line across full ribbon height
+        ctx.globalAlpha = 0.28
+        ctx.fillStyle = '#ffffff'
+        for (let r = 0; r < rows; r++) {
+          ctx.fillText('│', col * gw, (r + 1) * gh)
+        }
+        // Bright highlight at actual touch row
         ctx.globalAlpha = 1
         ctx.fillStyle = '#ffffff'
         ctx.font = `bold ${fontRef.current}`
-        ctx.fillText('◉', col * gw - gw / 2, (row + 1) * gh)
+        ctx.fillText('◉', col * gw - gw * 0.2, (touchRow + 1) * gh)
         ctx.font = fontRef.current
       })
 
@@ -288,6 +338,7 @@ export function AsciiRibbon({
     if (mode === 'play') {
       if (!poly) engine.allNotesOff()
       engine.voiceOn(voiceId, hz, velocity)
+      spawnNote(nx, ny, hz)
     } else if (mode === 'arp') {
       if (hold && poly) {
         onArpNoteToggle?.(hz)
@@ -356,8 +407,6 @@ export function AsciiRibbon({
       activeKeysRef.current.set(e.code, voiceId)
       lastInteractionRef.current = Date.now()
 
-      const cols = colsRef.current
-      const rows = rowsRef.current
       fluid.splash(nx, 0.5, 0.7, 2)
       spawnConfetti(nx, 0.5)
 
@@ -372,6 +421,7 @@ export function AsciiRibbon({
       if (modeRef.current === 'play') {
         if (!polyRef.current) engine.allNotesOff()
         engine.voiceOn(voiceId, hz, velocity)
+        spawnNote(nx, 0.5, hz)
       } else if (modeRef.current === 'arp') {
         if (holdRef.current && polyRef.current) {
           // onArpNoteToggle is a prop — access via ref pattern isn't available here
@@ -406,7 +456,7 @@ export function AsciiRibbon({
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [getEngine, fluid, spawnConfetti, arpStart, arpStop])
+  }, [getEngine, fluid, spawnConfetti, spawnNote, arpStart, arpStop])
 
   return (
     <div className="ascii-ribbon" ref={containerRef}>

@@ -1,5 +1,18 @@
 # Devlog
 
+## 2026-04-13 — ascii ribbon: floating staff, circular knobs, note confetti, QR/wallet, glitch fx (DUMP 564-574)
+
+- **564**: `FloatingStaff` component — animated ASCII music staves with notes/barlines that drift across the screen at varied speeds and opacities, inspired by Rock & Rumble v2. Steel-blue palette matches controls aesthetic. Fixed z-index 0 canvas behind all UI.
+- **565**: Ribbon strip taller (`clamp(140px,28vh,240px)`) with `margin-top` negative to overlap ~50% of the orbs row. Responsive mobile sizes updated similarly.
+- **566**: Default oscParams now have all 3 oscs on: OSC1 sawtooth 0.8 mix, OSC2 square +7 detune 0.5 mix, OSC3 sine -5 detune 0.35 mix.
+- **567**: QR/NFT from puddle ported into ASCII ribbon. Added wagmi/RainbowKit providers to `main.jsx`. `PresetQR` + `WalletButton` in header. QR button (⬡) with subtle pulse animation. `handleOpenQR` serializes current settings.
+- **568**: Touch indicator now draws a faint full-height vertical column (`│`) + bright `◉` at actual touch row, clearly distinct from oscillator waveform bands.
+- **569/570**: `BipolarKnob` replaced with smooth SVG circular knob. 270° arc sweep, continuous rotation, active arc + needle + center dot. No discrete arrow positions.
+- **571**: All control font sizes use `clamp()` with viewport-relative midpoint — scale with browser width from ~8px to ~13px.
+- **572**: Shake confetti now spawns 2–4 organic bursts (not 5 uniform) with varied counts (8–18 particles), speeds (4–9), and positions biased toward mid-screen vertically.
+- **573**: `frequencyToNoteName()` added to pitchMap. `ConfettiCanvas.spawnNote(x,y,name)` emits a large bold note name particle (22–30px, slow gravity, long life) + 5 sparkles. Called on every `voiceOn` in ribbon (touch + keyboard).
+- **574**: Ribbon glitch flicker — idle >2s triggers occasional 60–180ms glitch burst every 6–14s: random horizontal slice gets `▓▒░█▌▐` chars with color shift and x-offset. Much less frequent than ambient ripples.
+
 ## 2026-04-11 — ascii ribbon: baked knob rotary, sweet spots, shake fix, orb cleanup, full-screen confetti (DUMP 558-563)
 
 - **558**: Baked FX knobs now render as ASCII rotary dials. `BipolarKnob` replaced the 7-char horizontal bar indicator with a directional arrow that sweeps from ↙ (7 o'clock) through ↑ (12 o'clock = center/neutral) to ↘ (5 o'clock), matching real synth rotary behavior. CSS updated: `align-items: center`, large 20px dial char.

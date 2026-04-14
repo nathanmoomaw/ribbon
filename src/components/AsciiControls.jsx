@@ -109,18 +109,37 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Bipolar rotary knob — 0=full-left, 0.5=center, 1=full-right
-// Shows a directional arrow that sweeps from 7-o-clock (bottom-left) through
-// 12-o-clock (top = center/neutral) to 5-o-clock (bottom-right)
+// Circular SVG bipolar knob — 0=full-left (7-o-clock), 0.5=top (12), 1=full-right (5-o-clock)
+// Smooth continuous rotation, no discrete steps
 function BipolarKnob({ label, subLabel, value, onChange }) {
   const dragging = useRef(false)
   const startY = useRef(0)
   const startVal = useRef(0)
 
-  // 7 rotary positions: ↙ ← ↖ ↑ ↗ → ↘  (7→9→10:30→12→1:30→3→5 o'clock)
-  const DIAL = ['↙', '←', '↖', '↑', '↗', '→', '↘']
-  const dialIdx = Math.min(6, Math.floor(value * 7))
-  const dialChar = DIAL[dialIdx]
+  // 270° sweep: from -135° (7-o-clock) to +135° (5-o-clock), 0=top (12-o-clock)
+  const MIN_DEG = -135
+  const MAX_DEG = 135
+  const angleDeg = MIN_DEG + value * (MAX_DEG - MIN_DEG)
+  const angleRad = (angleDeg * Math.PI) / 180
+
+  // Needle tip at radius 9 from center (SVG viewBox 0 0 28 28, center 14,14)
+  const cx = 14, cy = 14, r = 9
+  const tipX = cx + r * Math.sin(angleRad)
+  const tipY = cy - r * Math.cos(angleRad)
+
+  // Arc path: background track
+  const toXY = (deg) => {
+    const rad = (deg * Math.PI) / 180
+    return [cx + r * Math.sin(rad), cy - r * Math.cos(rad)]
+  }
+  const [x0, y0] = toXY(MIN_DEG)
+  const [x1, y1] = toXY(MAX_DEG)
+  const trackPath = `M ${x0} ${y0} A ${r} ${r} 0 1 1 ${x1} ${y1}`
+
+  // Active arc from MIN to current angle
+  const sweepSpan = angleDeg - MIN_DEG
+  const largeArc = sweepSpan > 180 ? 1 : 0
+  const activePath = `M ${x0} ${y0} A ${r} ${r} 0 ${largeArc} 1 ${tipX.toFixed(2)} ${tipY.toFixed(2)}`
 
   const onDown = useCallback((e) => {
     dragging.current = true
@@ -149,7 +168,22 @@ function BipolarKnob({ label, subLabel, value, onChange }) {
       title={`${label}: drag up/down. Center=neutral, left=${subLabel?.left}, right=${subLabel?.right}`}
     >
       <div className="ascii-bipolar-knob__label">{label}</div>
-      <div className="ascii-bipolar-knob__dial">{dialChar}</div>
+      <svg className="ascii-bipolar-knob__svg" viewBox="0 0 28 28" width="40" height="40">
+        {/* Background track */}
+        <path d={trackPath} fill="none" stroke="#1e2240" strokeWidth="2.5" strokeLinecap="round" />
+        {/* Active arc */}
+        <path d={activePath} fill="none" stroke="#5577cc" strokeWidth="2.5" strokeLinecap="round" />
+        {/* Knob body */}
+        <circle cx={cx} cy={cy} r="6" fill="#0f1020" stroke="#2a3060" strokeWidth="1" />
+        {/* Needle */}
+        <line
+          x1={cx} y1={cy}
+          x2={tipX.toFixed(2)} y2={tipY.toFixed(2)}
+          stroke="#88aaff" strokeWidth="1.5" strokeLinecap="round"
+        />
+        {/* Center dot */}
+        <circle cx={cx} cy={cy} r="1.2" fill="#5577cc" />
+      </svg>
       <div className="ascii-bipolar-knob__side">{sideLabel}</div>
     </div>
   )

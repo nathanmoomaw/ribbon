@@ -18,18 +18,51 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
   const rafRef = useRef(null)
 
   useImperativeHandle(ref, () => ({
-    spawn(x, y) {
-      for (let i = 0; i < 16; i++) {
+    spawn(x, y, opts = {}) {
+      const count = opts.count ?? 16
+      const baseSpeed = opts.speed ?? 4.5
+      for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2
-        const speed = 3 + Math.random() * 6
+        // Vary speed per particle for organic feel
+        const speed = baseSpeed * (0.4 + Math.random() * 1.2)
         particlesRef.current.push({
           x, y,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 1.5,
-          life: 1.0,
-          decay: 0.010 + Math.random() * 0.012,
+          vy: Math.sin(angle) * speed - 1.5 - Math.random() * 2,
+          life: 0.7 + Math.random() * 0.3,
+          decay: 0.008 + Math.random() * 0.018,
           ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
           color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
+          size: opts.size ?? (10 + Math.floor(Math.random() * 6)),
+        })
+      }
+    },
+    spawnNote(x, y, noteName) {
+      // Large note name particle — fades slowly, rises
+      particlesRef.current.push({
+        x, y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: -3 - Math.random() * 2,
+        life: 1.0,
+        decay: 0.006 + Math.random() * 0.004,
+        ch: noteName,
+        color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
+        size: 22 + Math.floor(Math.random() * 8),
+        isNote: true,
+      })
+      // A few small sparkles around the note
+      for (let i = 0; i < 5; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const speed = 2 + Math.random() * 3
+        particlesRef.current.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 1,
+          life: 0.8 + Math.random() * 0.2,
+          decay: 0.018 + Math.random() * 0.02,
+          ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
+          color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
+          size: 12,
         })
       }
     }
@@ -47,22 +80,23 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
     window.addEventListener('resize', resize)
 
     const ctx = canvas.getContext('2d')
-    const FONT = '14px "Courier New", monospace'
+    let lastFont = ''
 
     function draw() {
       rafRef.current = requestAnimationFrame(draw)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      ctx.font = FONT
 
       particlesRef.current = particlesRef.current.filter(p => p.life > 0)
       for (const p of particlesRef.current) {
-        ctx.globalAlpha = p.life * 0.9
+        const font = `${p.isNote ? 'bold ' : ''}${p.size ?? 14}px "Courier New", monospace`
+        if (font !== lastFont) { ctx.font = font; lastFont = font }
+        ctx.globalAlpha = p.life * (p.isNote ? 0.95 : 0.88)
         ctx.fillStyle = p.color
         ctx.fillText(p.ch, p.x, p.y)
         p.x  += p.vx
         p.y  += p.vy
-        p.vy += 0.06
-        p.vx *= 0.97
+        p.vy += p.isNote ? 0.03 : 0.07   // notes float more gently
+        p.vx *= p.isNote ? 0.99 : 0.97
         p.life -= p.decay
       }
       ctx.globalAlpha = 1

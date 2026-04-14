@@ -14,8 +14,12 @@ import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
 import { ConfettiCanvas } from './components/ConfettiCanvas'
-import { readPresetFromUrl } from './utils/presets'
+import { FloatingStaff } from './components/FloatingStaff'
+import { readPresetFromUrl, buildPresetUrl } from './utils/presets'
 import { positionToFrequency } from './utils/pitchMap'
+import { PresetQR } from './components/PresetQR'
+import { WalletButton } from './components/WalletButton'
+import { useAccount } from 'wagmi'
 import './TextRibbonApp.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
@@ -37,9 +41,9 @@ export default function TextRibbonApp() {
   const [poly, setPoly] = useState(_urlPreset?.poly ?? false)
   const [hold, setHold] = useState(_urlPreset?.hold ?? false)
   const [oscParams, setOscParams] = useState(_urlPreset?.oscParams ?? [
-    { waveform: 'sawtooth', detune: 0, mix: 1.0 },
-    { waveform: 'sawtooth', detune: 0, mix: 0.0 },
-    { waveform: 'sawtooth', detune: 0, mix: 0.0 },
+    { waveform: 'sawtooth', detune: 0,   mix: 0.8 },
+    { waveform: 'square',   detune: 7,   mix: 0.5 },
+    { waveform: 'sine',     detune: -5,  mix: 0.35 },
   ])
   const [volume, setVolume] = useState(_urlPreset?.volume ?? 0.5)
   const [octaves, setOctaves] = useState(_urlPreset?.octaves ?? 2)
@@ -57,6 +61,9 @@ export default function TextRibbonApp() {
   const [arpNotes, setArpNotes] = useState(_urlPreset?.arpNotes ?? [])
   const [shaking, setShaking] = useState(false)
   const [doubleHarmonicUnlocked, setDoubleHarmonicUnlocked] = useState(false)
+  const [qrSettings, setQrSettings] = useState(null)
+
+  const { address: walletAddress } = useAccount()
 
   const ribbonInteraction = useRef({ position: null, velocity: 0, active: false })
   const sidebarRef = useRef(null)
@@ -141,6 +148,37 @@ export default function TextRibbonApp() {
     confettiRef.current.spawn(x, y)
   }, [])
 
+  const spawnNote = useCallback((x, y, noteName) => {
+    if (!confettiRef.current) return
+    confettiRef.current.spawnNote(x, y, noteName)
+  }, [])
+
+  // Gather current settings for QR preset URL
+  const handleOpenQR = useCallback(() => {
+    setQrSettings({
+      mode,
+      poly,
+      hold,
+      oscParams,
+      volume,
+      octaves,
+      delayParams,
+      reverbMix,
+      crunch,
+      filterParams: { cutoff: 20000, resonance: 0 },
+      glideSpeed,
+      stepped,
+      scale,
+      arpBpm,
+      arpNotes,
+      vcfCutoff,
+      vcfResonance,
+      vcfRouting,
+      walletAddress,
+    })
+  }, [mode, poly, hold, oscParams, volume, octaves, delayParams, reverbMix, crunch,
+    glideSpeed, stepped, scale, arpBpm, arpNotes, vcfCutoff, vcfResonance, vcfRouting, walletAddress])
+
   // Shake noise burst — play a single random note then release
   const shakeNoiseBurst = useCallback((intensity) => {
     const engine = getEngine()
@@ -157,13 +195,14 @@ export default function TextRibbonApp() {
     setShaking(true)
     setTimeout(() => setShaking(false), 300)
     shakeNoiseBurst(intensity)
-    // Confetti burst at random viewport positions (full screen scatter)
+    // Confetti: 2-4 clustered bursts at organic positions, varied sizes
     if (confettiRef.current) {
-      for (let i = 0; i < 5; i++) {
-        confettiRef.current.spawn(
-          Math.random() * window.innerWidth,
-          Math.random() * window.innerHeight
-        )
+      const burstCount = 2 + Math.floor(Math.random() * 3)
+      for (let i = 0; i < burstCount; i++) {
+        // Bias toward mid-screen vertically, spread across full width
+        const x = 0.1 * window.innerWidth + Math.random() * 0.8 * window.innerWidth
+        const y = 0.2 * window.innerHeight + Math.random() * 0.6 * window.innerHeight
+        confettiRef.current.spawn(x, y, { count: 8 + Math.floor(Math.random() * 10), speed: 4 + Math.random() * 5 * intensity })
       }
     }
 
@@ -247,6 +286,8 @@ export default function TextRibbonApp() {
       {/* Background layers matching ribbon aesthetic */}
       <div className="text-ribbon-bg" />
       <div className="text-ribbon-grid-floor" />
+      {/* Floating ASCII staff notation */}
+      <FloatingStaff />
 
       <header className="text-ribbon-header">
         <div className="text-ribbon-header__left">
@@ -259,6 +300,13 @@ export default function TextRibbonApp() {
         </div>
         <AsciiLogo onClick={() => handleShake(1.5)} />
         <div className="text-ribbon-header__right">
+          <WalletButton flagSet={false} onForget={() => {}} />
+          <button
+            className="header-qr-btn"
+            onClick={handleOpenQR}
+            title="Share preset (QR code)"
+            aria-label="QR code"
+          >⬡</button>
           <button
             className="header-shake-btn"
             onClick={() => handleShake(1)}
@@ -267,6 +315,14 @@ export default function TextRibbonApp() {
           >⚡</button>
         </div>
       </header>
+
+      {/* QR preset modal */}
+      {qrSettings && (
+        <PresetQR
+          settings={qrSettings}
+          onClose={() => setQrSettings(null)}
+        />
+      )}
 
       <main className="text-ribbon-main">
         {/* Oscillator sphere visualizers — ribbon v2 style */}
@@ -292,6 +348,7 @@ export default function TextRibbonApp() {
             arpNotes={arpNotes}
             oscParams={oscParams}
             onSpawnConfetti={spawnConfetti}
+            onSpawnNote={spawnNote}
           />
         </section>
 

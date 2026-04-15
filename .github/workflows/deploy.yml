@@ -1,23 +1,24 @@
-name: Deploy to S3
+name: Deploy v2
 
 on:
   push:
-    branches: [main, 'nmj/**']
+    branches: [v2]
 
 jobs:
-  deploy-prod:
-    if: github.ref == 'refs/heads/main'
+  deploy-v2:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      - name: Build for /v2
+        run: npm run build -- --base /v2/
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -25,37 +26,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to S3
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
-
-      - name: Deploy v2 snapshot to /v2
+      - name: Deploy to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
+
+      - name: Build for root (v2 is the current stable version)
+        run: npm run build
+
+      - name: Deploy to root
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
       - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
-
-  deploy-dev:
-    if: startsWith(github.ref, 'refs/heads/nmj/')
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - run: npm ci
-      - run: npm run build
-
-      - uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Deploy to dev S3
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete
-
-      - name: Invalidate dev CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

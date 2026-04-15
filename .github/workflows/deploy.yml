@@ -36,11 +36,17 @@ jobs:
       - name: Deploy to /v1
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
 
-      - name: Build for /v2
+      - name: Checkout v2-picker branch (v2 tag + version switcher)
+        run: git fetch origin v2-picker && git checkout v2-picker && npm ci
+
+      - name: Build for /v2 (from v2-picker branch)
         run: npm run build -- --base /v2/
 
       - name: Deploy to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
+
+      - name: Return to main branch
+        run: git checkout main && npm ci
 
       - name: Build for /v3 — ASCII ribbon
         run: npm run build -- --base /v3/

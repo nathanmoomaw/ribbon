@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-04-15 — branch-per-version CI architecture (DUMP 604-609)
+
+- Created `v1`, `v2`, `v3` branches (from v1-picker, v2-picker, nmj/ascii respectively).
+- Each version branch has its own deploy.yml: push to `v1` → deploys /v1/; push to `v2` → deploys /v2/ + root; push to `v3` → deploys /v3/.
+- Main's deploy.yml updated to "rebuild all" mode: checks out each version branch in sequence and deploys all paths. Push to main triggers full rebuild.
+- `v1`/`v2` checkouts use `git fetch origin refs/heads/vN && git checkout FETCH_HEAD` to avoid ambiguity with v1/v2 git tags.
+- Old `v1-picker` and `v2-picker` branches superseded (logical names now `v1`/`v2`).
+- Pattern: each toy version lives on its own branch, branch name = URL path segment.
+
 ## 2026-04-15 — restore Rock & Rumble at root/v2; fix VersionSwitcher v3 nav (DUMP 600-601)
 
 - **600**: App.jsx restored to Rock & Rumble (Ribbon + Visualizer), NOT puddle. Root and /v2 now correctly serve v2 ribbon. VCFControl guarded with `vcfCutoff !== undefined` check so Controls.jsx renders cleanly without puddle VCF props.

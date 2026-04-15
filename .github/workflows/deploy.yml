@@ -1,11 +1,18 @@
 name: Deploy to S3
 
+# Each version branch auto-deploys its own path on push:
+#   v1 → /v1/
+#   v2 → /v2/ + root /
+#   v3 → /v3/
+# Push to main to force a full rebuild of all versions at once.
+
 on:
   push:
     branches: [main, 'nmj/**']
 
 jobs:
   deploy-prod:
+    # Full rebuild: checks out each version branch and deploys all paths.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -18,43 +25,40 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for root (base /) — stable v2 ribbon
-        run: npm run build
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to S3 root
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
+      - name: Checkout v2 branch (root + /v2)
+        run: git fetch origin refs/heads/v2 && git checkout FETCH_HEAD && npm ci
 
-      - name: Checkout v1-picker branch (v1 tag + version switcher)
-        run: git fetch origin v1-picker && git checkout v1-picker && npm ci
-
-      - name: Build for /v1 (from v1-picker branch)
-        run: npm run build -- --base /v1/
-
-      - name: Deploy to /v1
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
-
-      - name: Return to main branch after v1
-        run: git checkout main
-
-      - name: Checkout v2-picker branch (v2 tag + version switcher)
-        run: git fetch origin v2-picker && git checkout v2-picker && npm ci
-
-      - name: Build for /v2 (from v2-picker branch)
+      - name: Build for /v2
         run: npm run build -- --base /v2/
 
       - name: Deploy to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
 
-      - name: Return to main branch
-        run: git checkout main && npm ci
+      - name: Build for root (v2 is current stable)
+        run: npm run build
 
-      - name: Build for /v3 — ASCII ribbon
+      - name: Deploy to root
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
+
+      - name: Checkout v1 branch
+        run: git fetch origin refs/heads/v1 && git checkout FETCH_HEAD && npm ci
+
+      - name: Build for /v1
+        run: npm run build -- --base /v1/
+
+      - name: Deploy to /v1
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
+
+      - name: Checkout v3 branch
+        run: git fetch origin v3 && git checkout v3 && npm ci
+
+      - name: Build for /v3
         run: npm run build -- --base /v3/
 
       - name: Deploy to /v3

@@ -1,7 +1,11 @@
-import { useCallback, useRef as useRefHook, forwardRef, memo } from 'react'
-import { SCALES } from '../utils/scales'
+import { useCallback, useRef as useRefHook, useEffect, forwardRef, memo } from 'react'
+import { SCALES, SCALE_LABELS } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
+import { RotaryKnob } from './RotaryKnob'
+import { VCFControl } from './VCFControl'
+import { VersionSwitcher } from './VersionSwitcher'
 import './Controls.css'
+import './VersionSwitcher.css'
 
 function DJFader({ value, onChange, ghostValue }) {
   const trackRef = useRefHook(null)
@@ -95,6 +99,79 @@ function DJFader({ value, onChange, ghostValue }) {
   )
 }
 
+/**
+ * GoopableSection — wraps a control section, registers it for goop hit-testing,
+ * and renders a goop visual overlay when gooped.
+ */
+function GoopableSection({ id, registerControl, goopLevel, puddleActivity, children, className }) {
+  const elRef = useRefHook(null)
+
+  useEffect(() => {
+    if (registerControl && id) {
+      registerControl(id, elRef.current)
+      return () => registerControl(id, null)
+    }
+  }, [id, registerControl])
+
+  const hasGoop = goopLevel > 0.01
+  const isActive = puddleActivity > 0 && hasGoop
+
+  return (
+    <div
+      ref={elRef}
+      className={`${className || ''} ${hasGoop ? 'gooped' : ''} ${isActive ? 'gooped--active' : ''}`}
+      style={hasGoop ? {
+        position: 'relative',
+        '--goop-level': goopLevel,
+        '--goop-opacity': Math.min(0.7, goopLevel * 0.8),
+      } : undefined}
+    >
+      {children}
+      {hasGoop && (
+        <div className="goop-effect" style={{ '--goop-level': goopLevel }}>
+          <svg viewBox="0 0 100 60" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+            <defs>
+              <radialGradient id={`goop-grad-${id}`} cx="40%" cy="40%" r="60%">
+                <stop offset="0%" stopColor="rgba(180, 100, 255, 0.4)" />
+                <stop offset="50%" stopColor="rgba(100, 200, 255, 0.2)" />
+                <stop offset="100%" stopColor="transparent" />
+              </radialGradient>
+            </defs>
+            <ellipse
+              cx="50" cy="30"
+              rx={25 + goopLevel * 20}
+              ry={12 + goopLevel * 12}
+              fill={`url(#goop-grad-${id})`}
+              stroke={`rgba(120, 80, 200, ${goopLevel * 0.5})`}
+              strokeWidth="1.5"
+            />
+            {goopLevel > 0.3 && (
+              <ellipse
+                cx={35 + goopLevel * 15}
+                cy={18 + goopLevel * 8}
+                rx={10 + goopLevel * 8}
+                ry={6 + goopLevel * 6}
+                fill={`rgba(180, 100, 255, ${goopLevel * 0.15})`}
+                stroke={`rgba(180, 100, 255, ${goopLevel * 0.4})`}
+                strokeWidth="1"
+              />
+            )}
+            {goopLevel > 0.6 && (
+              <circle
+                cx="65" cy="40"
+                r={5 + goopLevel * 6}
+                fill={`rgba(100, 200, 255, ${goopLevel * 0.1})`}
+                stroke={`rgba(100, 200, 255, ${goopLevel * 0.3})`}
+                strokeWidth="1"
+              />
+            )}
+          </svg>
+        </div>
+      )}
+    </div>
+  )
+}
+
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const OCTAVE_OPTIONS = [1, 2, 3, 4]
 const SCALE_NAMES = Object.keys(SCALES)
@@ -131,14 +208,14 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
     getEngine().setWaveform(type, index)
   }, [index, params, getEngine, onUpdate])
 
-  const handleDetune = useCallback((e) => {
-    const detune = parseInt(e.target.value)
+  const handleDetune = useCallback((val) => {
+    const detune = Math.round(val)
     onUpdate(index, { ...params, detune })
     getEngine().setOscDetune(index, detune)
   }, [index, params, getEngine, onUpdate])
 
-  const handleMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
+  const handleMix = useCallback((val) => {
+    const mix = val
     onUpdate(index, { ...params, mix })
     getEngine().setOscMix(index, mix)
   }, [index, params, getEngine, onUpdate])
@@ -160,7 +237,7 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
       <MiniShakeBolt onClick={handleOscShake} title={`Randomize OSC ${index + 1}`} />
       <div className="controls__section">
         <label className="controls__label">Wave</label>
-        <div className="controls__waveforms">
+        <div className="controls__waveforms controls__waveforms--circular">
           {WAVEFORMS.map((w) => (
             <button
               key={w}
@@ -172,28 +249,26 @@ const OscSection = memo(function OscSection({ index, params, getEngine, onUpdate
           ))}
         </div>
       </div>
-      <div className="controls__section">
-        <label className="controls__label">Mix <span className="controls__value">{Math.round(params.mix * 100)}%</span></label>
-        <input
-          className={`slider--osc${index + 1}-mix`}
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
+      <div className="controls__osc-knobs">
+        <RotaryKnob
           value={params.mix}
+          min={0}
+          max={1}
+          step={0.01}
           onChange={handleMix}
+          color={OSC_COLORS[index]}
+          label={`Mix ${Math.round(params.mix * 100)}%`}
+          size={42}
         />
-      </div>
-      <div className="controls__section">
-        <label className="controls__label">Detune <span className="controls__value">{params.detune}¢</span></label>
-        <input
-          className={`slider--osc${index + 1}-detune`}
-          type="range"
-          min="-1200"
-          max="1200"
-          step="1"
+        <RotaryKnob
           value={params.detune}
+          min={-1200}
+          max={1200}
+          step={1}
           onChange={handleDetune}
+          color={OSC_COLORS[index]}
+          label={`Det ${params.detune}¢`}
+          size={42}
         />
       </div>
     </div>
@@ -234,6 +309,24 @@ export const Controls = forwardRef(function Controls({
   onStop,
   onKillAll,
   onQRCreate,
+  goopLevels,
+  puddleActivity,
+  registerControl,
+  trayMarble,
+  draggingMarble,
+  onMarblePickUp,
+  nextSlotId,
+  vcfCutoff,
+  vcfResonance,
+  vcfRouting,
+  onVcfCutoffChange,
+  onVcfResonanceChange,
+  onVcfRoutingToggle,
+  midiDevice,
+  onConnectMIDI,
+  utilitySlot,
+  visualMode,
+  setVisualMode,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -252,52 +345,44 @@ export const Controls = forwardRef(function Controls({
     volRafRef.current = requestAnimationFrame(() => setVolume(val))
   }, [getEngine, setVolume])
 
-  const handleDelayTime = useCallback((e) => {
-    const time = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, time }))
-    getEngine().setDelay({ time })
+  const handleDelayTime = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, time: val }))
+    getEngine().setDelay({ time: val })
   }, [getEngine, setDelayParams])
 
-  const handleDelayFeedback = useCallback((e) => {
-    const feedback = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, feedback }))
-    getEngine().setDelay({ feedback })
+  const handleDelayFeedback = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, feedback: val }))
+    getEngine().setDelay({ feedback: val })
   }, [getEngine, setDelayParams])
 
-  const handleDelayMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
-    setDelayParams((prev) => ({ ...prev, mix }))
-    getEngine().setDelay({ mix })
+  const handleDelayMix = useCallback((val) => {
+    setDelayParams((prev) => ({ ...prev, mix: val }))
+    getEngine().setDelay({ mix: val })
   }, [getEngine, setDelayParams])
 
-  const handleReverbMix = useCallback((e) => {
-    const mix = parseFloat(e.target.value)
-    setReverbMix(mix)
-    getEngine().setReverb({ mix })
+  const handleReverbMix = useCallback((val) => {
+    setReverbMix(val)
+    getEngine().setReverb({ mix: val })
   }, [getEngine, setReverbMix])
 
-  const handleCutoff = useCallback((e) => {
-    const cutoff = parseFloat(e.target.value)
-    setFilterParams((prev) => ({ ...prev, cutoff }))
-    getEngine().setFilter({ cutoff })
+  const handleCutoff = useCallback((val) => {
+    setFilterParams((prev) => ({ ...prev, cutoff: val }))
+    getEngine().setFilter({ cutoff: val })
   }, [getEngine, setFilterParams])
 
-  const handleResonance = useCallback((e) => {
-    const resonance = parseFloat(e.target.value)
-    setFilterParams((prev) => ({ ...prev, resonance }))
-    getEngine().setFilter({ resonance })
+  const handleResonance = useCallback((val) => {
+    setFilterParams((prev) => ({ ...prev, resonance: val }))
+    getEngine().setFilter({ resonance: val })
   }, [getEngine, setFilterParams])
 
-  const handleCrunch = useCallback((e) => {
-    const value = parseFloat(e.target.value)
-    setCrunch(value)
-    getEngine().setCrunch(value)
+  const handleCrunch = useCallback((val) => {
+    setCrunch(val)
+    getEngine().setCrunch(val)
   }, [getEngine, setCrunch])
 
-  const handleGlideSpeed = useCallback((e) => {
-    const value = parseFloat(e.target.value)
-    setGlideSpeed(value)
-    getEngine().setGlideSpeed(value)
+  const handleGlideSpeed = useCallback((val) => {
+    setGlideSpeed(val)
+    getEngine().setGlideSpeed(val)
   }, [getEngine, setGlideSpeed])
 
   return (
@@ -315,24 +400,122 @@ export const Controls = forwardRef(function Controls({
             setHold={setHold}
             onStop={onStop}
             onKillAll={onKillAll}
+            trayMarble={trayMarble}
+            draggingMarble={draggingMarble}
+            onMarblePickUp={onMarblePickUp}
+            nextSlotId={nextSlotId}
           />
           <DJFader value={volume} onChange={handleVolume} />
+
+          <div className="controls__section">
+            <label className="controls__label">Octaves</label>
+            <div className="controls__waveforms">
+              {OCTAVE_OPTIONS.map((o) => (
+                <button
+                  key={o}
+                  className={octaves === o ? 'active' : ''}
+                  onClick={() => setOctaves(o)}
+                >
+                  {o}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="controls__section controls__section--full">
+            <label className="controls__label">Scale</label>
+            <div className="controls__waveforms">
+              {SCALE_NAMES.map((s) => {
+                const isDoubleHarmonicActive = scale.includes('double harmonic')
+                const isActive = !isDoubleHarmonicActive && scale.includes(s)
+                return (
+                  <button
+                    key={s}
+                    className={isActive ? 'active' : ''}
+                    onClick={() => {
+                      setScale(prev => {
+                        if (s === 'chromatic') {
+                          setStepped(false)
+                          return ['chromatic']
+                        }
+                        setStepped(true)
+                        const without = prev.filter(x => x !== 'chromatic' && x !== s && x !== 'double harmonic')
+                        if (prev.includes(s)) {
+                          const remaining = without.length === 0 ? ['chromatic'] : without
+                          if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
+                          return remaining
+                        }
+                        return [...without, s]
+                      })
+                    }}
+                  >
+                    {SCALE_LABELS[s] ?? s.slice(0, 4).toUpperCase()}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="controls__section">
+            <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
+            <RotaryKnob value={glideSpeed} min={0.001} max={0.3} step={0.001} onChange={handleGlideSpeed} color="#39ff14" size={40} />
+          </div>
+
+          {setVisualMode && (
+            <div className="controls__section controls__party-lo">
+              <button
+                className={`controls__visual-btn${visualMode === 'party' ? ' active' : ''}`}
+                onClick={() => setVisualMode('party')}
+              >Party</button>
+              <button
+                className={`controls__visual-btn${visualMode === 'lo' ? ' active' : ''}`}
+                onClick={() => setVisualMode('lo')}
+              >Lo</button>
+            </div>
+          )}
+
+          <div className="controls__version-switcher">
+            <VersionSwitcher current={2} />
+          </div>
         </div>
 
         <div className="controls__main">
           <div className="controls__oscillators">
             {oscParams.map((params, i) => (
-              <OscSection
+              <GoopableSection
                 key={i}
-                index={i}
-                params={params}
-                getEngine={getEngine}
-                onUpdate={handleOscUpdate}
-              />
+                id={`osc-${i}`}
+                registerControl={registerControl}
+                goopLevel={(goopLevels && goopLevels[`osc-${i}`]) || 0}
+                puddleActivity={puddleActivity || 0}
+                className="controls__osc-goopable"
+              >
+                <OscSection
+                  index={i}
+                  params={params}
+                  getEngine={getEngine}
+                  onUpdate={handleOscUpdate}
+                />
+              </GoopableSection>
             ))}
           </div>
 
-          <div className="controls__shared">
+          <GoopableSection
+            id="filter"
+            registerControl={registerControl}
+            goopLevel={(goopLevels && goopLevels['filter']) || 0}
+            puddleActivity={puddleActivity || 0}
+            className="controls__shared"
+          >
+            <VCFControl
+              vcfCutoff={vcfCutoff}
+              vcfResonance={vcfResonance}
+              vcfRouting={vcfRouting}
+              getEngine={getEngine}
+              onCutoffChange={onVcfCutoffChange}
+              onResonanceChange={onVcfResonanceChange}
+              onRoutingToggle={onVcfRoutingToggle}
+            />
             <MiniShakeBolt onClick={() => {
               const engine = getEngine()
               const newOctaves = OCTAVE_OPTIONS[Math.floor(Math.random() * OCTAVE_OPTIONS.length)]
@@ -359,116 +542,64 @@ export const Controls = forwardRef(function Controls({
               engine.setCrunch(newCrunch)
             }} title="Randomize general controls" />
             <div className="controls__section">
-              <label className="controls__label">Octaves</label>
-              <div className="controls__waveforms">
-                {OCTAVE_OPTIONS.map((o) => (
-                  <button
-                    key={o}
-                    className={octaves === o ? 'active' : ''}
-                    onClick={() => setOctaves(o)}
-                  >
-                    {o}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="controls__section">
-              <label className="controls__label">Scale</label>
-              <div className="controls__waveforms">
-                {SCALE_NAMES.map((s) => {
-                  const isDoubleHarmonicActive = scale.includes('double harmonic')
-                  const isActive = !isDoubleHarmonicActive && scale.includes(s)
-                  return (
-                    <button
-                      key={s}
-                      className={isActive ? 'active' : ''}
-                      onClick={() => {
-                        setScale(prev => {
-                          if (s === 'chromatic') {
-                            setStepped(false)
-                            return ['chromatic']
-                          }
-                          setStepped(true)
-                          const without = prev.filter(x => x !== 'chromatic' && x !== s && x !== 'double harmonic')
-                          if (prev.includes(s)) {
-                            const remaining = without.length === 0 ? ['chromatic'] : without
-                            if (remaining.length === 1 && remaining[0] === 'chromatic') setStepped(false)
-                            return remaining
-                          }
-                          return [...without, s]
-                        })
-                      }}
-                    >
-                      {s.slice(0, 4).toUpperCase()}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="controls__section">
               <label className="controls__label">Filter</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Cutoff</span>
-                  <input className="slider--orange" type="range" min="20" max="20000" step="1" value={filterParams.cutoff} onChange={handleCutoff} />
-                </div>
-                <div className="controls__knob">
-                  <span>Res</span>
-                  <input className="slider--gold" type="range" min="0" max="25" step="0.1" value={filterParams.resonance} onChange={handleResonance} />
-                </div>
+              <div className="controls__rotary-row">
+                <RotaryKnob value={filterParams.cutoff} min={20} max={20000} step={1} onChange={handleCutoff} color="#ff8c42" label="Cutoff" size={40} />
+                <RotaryKnob value={filterParams.resonance} min={0} max={25} step={0.1} onChange={handleResonance} color="#ffd700" label="Res" size={40} />
               </div>
-            </div>
-
-            <div className="controls__section">
-              <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
-              <input
-                className="slider--lime"
-                type="range"
-                min="0.001"
-                max="0.3"
-                step="0.001"
-                value={glideSpeed}
-                onChange={handleGlideSpeed}
-              />
             </div>
 
             <div className="controls__section controls__section--reverb">
               <label className="controls__label">Reverb <span className="controls__value">{Math.round(reverbMix * 100)}%</span></label>
-              <input className="slider--teal" type="range" min="0" max="1" step="0.01" value={reverbMix} onChange={handleReverbMix} />
+              <RotaryKnob value={reverbMix} min={0} max={1} step={0.01} onChange={handleReverbMix} color="#00e5cc" size={40} />
             </div>
 
             <div className="controls__section controls__section--crunch">
               <label className="controls__label">Crunch <span className="controls__value">{Math.round(crunch * 100)}%</span></label>
-              <input className="slider--red" type="range" min="0" max="1" step="0.01" value={crunch} onChange={handleCrunch} />
+              <RotaryKnob value={crunch} min={0} max={1} step={0.01} onChange={handleCrunch} color="#ff3366" size={40} />
             </div>
 
             <div className="controls__section controls__section--full controls__section--delay">
               <label className="controls__label">Delay</label>
-              <div className="controls__knobs">
-                <div className="controls__knob">
-                  <span>Time</span>
-                  <input className="slider--blue" type="range" min="0.05" max="1" step="0.01" value={delayParams.time} onChange={handleDelayTime} />
-                </div>
-                <div className="controls__knob">
-                  <span>Fdbk</span>
-                  <input className="slider--lavender" type="range" min="0" max="0.9" step="0.01" value={delayParams.feedback} onChange={handleDelayFeedback} />
-                </div>
-                <div className="controls__knob">
-                  <span>Mix</span>
-                  <input className="slider--silver" type="range" min="0" max="1" step="0.01" value={delayParams.mix} onChange={handleDelayMix} />
-                </div>
+              <div className="controls__rotary-row">
+                <RotaryKnob value={delayParams.time} min={0.05} max={1} step={0.01} onChange={handleDelayTime} color="#4d8bff" label="Time" size={40} />
+                <RotaryKnob value={delayParams.feedback} min={0} max={0.9} step={0.01} onChange={handleDelayFeedback} color="#9b8bff" label="Fdbk" size={40} />
+                <RotaryKnob value={delayParams.mix} min={0} max={1} step={0.01} onChange={handleDelayMix} color="#c8d0e0" label="Mix" size={40} />
               </div>
             </div>
-          </div>
+            {/* MIDI + wallet + QR — absolute lower-right of console */}
+            {(onQRCreate || onConnectMIDI || utilitySlot) && (
+              <div className="controls__console-corner">
+                {onConnectMIDI && (
+                  <button
+                    className={`keys-toggle__btn keys-toggle__midi ${midiDevice && midiDevice !== 'no-device' && midiDevice !== 'unsupported' && midiDevice !== 'denied' ? 'active' : ''} ${midiDevice === 'unsupported' || midiDevice === 'denied' ? 'keys-toggle__midi--err' : ''} ${midiDevice === 'no-device' ? 'keys-toggle__midi--waiting' : ''}`}
+                    onClick={onConnectMIDI}
+                    title={
+                      midiDevice === 'unsupported' ? 'MIDI not supported in this browser'
+                      : midiDevice === 'denied' ? 'MIDI access denied'
+                      : midiDevice === 'no-device' ? 'MIDI enabled — plug in a controller'
+                      : midiDevice ? `MIDI: ${midiDevice}`
+                      : 'Connect MIDI controller'
+                    }
+                  >
+                    {midiDevice === 'unsupported' ? 'MIDI ✗'
+                     : midiDevice === 'denied' ? 'MIDI ✗'
+                     : midiDevice === 'no-device' ? 'MIDI …'
+                     : midiDevice ? 'MIDI ✓'
+                     : 'MIDI'}
+                  </button>
+                )}
+                {utilitySlot}
+                {onQRCreate && (
+                  <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
+                    &#x25A3;
+                  </button>
+                )}
+              </div>
+            )}
+          </GoopableSection>
         </div>
       </div>
-      {onQRCreate && (
-        <button className="preset-qr-trigger" onClick={onQRCreate} title="Create preset QR code" aria-label="Create preset QR code">
-          &#x25A3;
-        </button>
-      )}
     </div>
   )
 })

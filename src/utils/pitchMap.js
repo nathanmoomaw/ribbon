@@ -75,6 +75,16 @@ export function frequencyToPosition(freq, options = {}) {
   return Math.max(0, Math.min(1, semitone / semitoneRange))
 }
 
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+
+/**
+ * Convert a frequency to its nearest note name (e.g., "C", "F#").
+ */
+export function frequencyToNoteName(freq) {
+  const midi = Math.round(12 * Math.log2(freq / 440) + 69)
+  return NOTE_NAMES[((midi % 12) + 12) % 12]
+}
+
 /**
  * Get all note positions (0–1) for step markers on the ribbon.
  */

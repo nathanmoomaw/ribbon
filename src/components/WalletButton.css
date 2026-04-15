@@ -1,0 +1,79 @@
+.wallet-btn {
+  display: inline-flex;
+}
+
+.wallet-btn__trigger {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: transparent;
+  border: 1px solid rgba(100, 90, 140, 0.12);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s, color 0.3s, opacity 0.3s;
+  letter-spacing: 0.05em;
+  opacity: 0.2;
+}
+
+.wallet-btn__trigger:hover {
+  opacity: 0.7;
+  border-color: rgba(224, 64, 251, 0.3);
+  color: var(--text-primary);
+  box-shadow: 0 0 6px rgba(224, 64, 251, 0.1);
+}
+
+.wallet-btn__trigger--connected {
+  opacity: 0.45;
+  border-color: rgba(34, 170, 85, 0.25);
+  color: #22aa55;
+}
+
+.wallet-btn__trigger--connected:hover {
+  opacity: 0.8;
+  border-color: rgba(34, 170, 85, 0.5);
+  box-shadow: 0 0 6px rgba(34, 170, 85, 0.15);
+}
+
+.wallet-btn__address {
+  font-size: 0.55rem;
+}
+
+.wallet-btn__connect {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.wallet-btn__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.wallet-btn__reconnect {
+  opacity: 0.35;
+}
+
+.wallet-btn__reconnect:hover {
+  opacity: 0.7;
+  border-color: rgba(224, 64, 251, 0.3) !important;
+  box-shadow: 0 0 6px rgba(224, 64, 251, 0.1);
+}
+
+.wallet-btn__forget {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  padding: 2px 6px;
+  border-radius: 20px;
+  background: transparent;
+  border: 1px solid rgba(100, 90, 140, 0.08);
+  color: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.wallet-btn__forget:hover {
+  color: rgba(255, 80, 80, 0.55);
+  border-color: rgba(255, 80, 80, 0.2);
+}

@@ -1,0 +1,78 @@
+.vcf-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: rgba(40, 30, 60, 0.4);
+  border: 1px solid rgba(224, 64, 251, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.vcf-control--active {
+  border-color: rgba(224, 64, 251, 0.3);
+  box-shadow: 0 0 12px rgba(224, 64, 251, 0.1);
+}
+
+.vcf-control__label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #e040fb;
+  text-shadow: 0 0 6px rgba(224, 64, 251, 0.4);
+}
+
+.vcf-control__knobs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.vcf-control__routing {
+  display: flex;
+  gap: 4px;
+}
+
+.vcf-control__route-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 28, 50, 0.8);
+  border: 2px solid rgba(100, 90, 140, 0.3);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+}
+
+.vcf-control__route-btn:hover {
+  border-color: var(--route-color, var(--cyan));
+  color: var(--text-primary);
+}
+
+/* Desktop: VCF is inline in the bottom controls bar — no standalone grid placement */
+@media (min-width: 768px) {
+  .vcf-control {
+    flex-direction: row;
+    gap: 0.75rem;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+}
+
+.vcf-control__route-btn.active {
+  border-color: var(--route-color, var(--cyan));
+  background: color-mix(in srgb, var(--route-color, var(--cyan)) 20%, rgba(30, 28, 50, 0.8));
+  color: var(--route-color, var(--cyan));
+  box-shadow: 0 0 8px color-mix(in srgb, var(--route-color, var(--cyan)) 40%, transparent);
+  animation: pulse-glow 2s ease-in-out infinite;
+}

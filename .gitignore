@@ -1,3 +1,8 @@
 node_modules
 dist
 .DS_Store
+
+# Domscribe artifacts
+.domscribe
+.mcp.json
+DUMP.md

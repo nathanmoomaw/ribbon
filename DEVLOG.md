@@ -1,5 +1,436 @@
 # Devlog
 
+## 2026-04-15 — fix /v3 MIME error, correct base-path builds for /v2 and /v3 (DUMP 598-599)
+
+- **598**: Root cause: Vite built with `base=/` so `/v3/index.html` referenced `/assets/index-xxx.js` — a different hash from main's root assets. Fixed by building with `--base /v3/` so assets are self-contained under `/v3/assets/`.
+- **599**: CI workflow updated to do separate Vite builds per deploy target: default base for dev, `--base /v2/` for prod /v2, `--base /v3/` for prod /v3. All three targets now get correct asset paths. Both /v2 and /v3 invalided in one CloudFront call.
+
+## 2026-04-15 — /v3 prod deploy + v2 party/lo + version switcher in controls (DUMP 596-597)
+
+- **596**: Added `deploy-v3` step to CI workflow — when `nmj/ascii` is pushed, builds deploy to dev AND to `s3://ribbon.obfusco.us/v3/` on prod (with CloudFront invalidation).
+- **597**: v2 Controls now include party/lo toggle buttons (wires up existing `visualMode` state, previously keyboard-only via `KeyV`). Version switcher added below party/lo in `controls__toggles`. Removed from App.jsx header.
+
+## 2026-04-15 — QR button: ASCII style + moved to header left (DUMP 594-595)
+
+- **594**: QR button moved from `header__right` to `header__left`, positioned before the version switcher. Header left now reads: `[QR] · v1|v2|v3 · ◈ [MODE]`.
+- **595**: QR button restyled to ASCII monospace aesthetic — text `[QR]`, `Courier New` 9px, matches version switcher opacity/color scheme. Removed pulse animation.
+
+## 2026-04-15 — OSC responsive scaling + version switcher paths (DUMP 592-593)
+
+- **592**: Replaced hard `@media (min-width: 1440px)` OSC overrides with continuous `clamp()` on `.ascii-osc` scoped selectors. Knob arc: `clamp(18px, 4.8vw, 80px)` — 57px at 1200px (was 21.6px), 72px at 1500px (unchanged feel). Wave buttons: `clamp(14px, 3vw, 52px)`. Side panels also shrink with vw: toggles `clamp(110px,12vw,155px)`, fx `clamp(140px,14vw,190px)`.
+- **593**: Version switcher rewritten to use path navigation (`/v1/`, `/v2/`, `/` for v3). `main.jsx` detects version from `window.location.pathname`. Added v1 button alongside v2/v3.
+
+## 2026-04-15 — version switcher (DUMP 591)
+
+- **591**: `VersionSwitcher` component — fixed upper-left overlay showing `v2 | v3` toggle. `?v=2` loads `App.jsx` (Puddle), default loads `TextRibbonApp.jsx` (ASCII). Fades to 45% opacity at rest, full opacity on hover. ASCII monospace aesthetic matching existing header style.
+
+## 2026-04-14 — ascii ribbon: larger OSC controls on desktop, more confetti (DUMP 585-586)
+
+- **585**: Added `@media (min-width: 1440px)` overrides in AsciiControls.css — OSC arc chars scale to `clamp(48px,5vw,80px)` (vs 24px cap before), wave buttons to `clamp(28px,3.2vw,52px)`. Labels/vals also bump up. Space/Tone BipolarKnobs unchanged (user said fine).
+- **586**: Confetti boosted — default spawn count 16→32, ribbon-touch count raised to 48 at speed 5.5, sparkle count around notes 5→10, particle life extended and decay slowed for longer trails.
+
+## 2026-04-13 — ascii ribbon: slide note confetti, resize debounce, bigger controls, staff z-fix (DUMP 575-578)
+
+- **575**: Note name particles now spawn as user slides across the ribbon — detects note name crossings in `handlePointerMove` using `lastSpawnedNoteRef` per pointer ID.
+- **576**: ResizeObserver callback debounced (80ms) so `fluid.reset()` only fires once after resize completes, preventing mid-resize canvas flicker.
+- **577**: Controls panel scaled up — font sizes bumped via `clamp()` throughout, panel widths increased (toggles 130→155px, fx 160→190px), BipolarKnob SVG 40→52px, wave-btn and knob arc fonts larger.
+- **578**: `FloatingStaff` z-index raised from 0 to 4 so staff drifts visibly over orbs and controls. Alpha bumped from 0.06-0.18 → 0.12-0.28 for better visibility.
+
+## 2026-04-13 — ascii ribbon: floating staff, circular knobs, note confetti, QR/wallet, glitch fx (DUMP 564-574)
+
+- **564**: `FloatingStaff` component — animated ASCII music staves with notes/barlines that drift across the screen at varied speeds and opacities, inspired by Rock & Rumble v2. Steel-blue palette matches controls aesthetic. Fixed z-index 0 canvas behind all UI.
+- **565**: Ribbon strip taller (`clamp(140px,28vh,240px)`) with `margin-top` negative to overlap ~50% of the orbs row. Responsive mobile sizes updated similarly.
+- **566**: Default oscParams now have all 3 oscs on: OSC1 sawtooth 0.8 mix, OSC2 square +7 detune 0.5 mix, OSC3 sine -5 detune 0.35 mix.
+- **567**: QR/NFT from puddle ported into ASCII ribbon. Added wagmi/RainbowKit providers to `main.jsx`. `PresetQR` + `WalletButton` in header. QR button (⬡) with subtle pulse animation. `handleOpenQR` serializes current settings.
+- **568**: Touch indicator now draws a faint full-height vertical column (`│`) + bright `◉` at actual touch row, clearly distinct from oscillator waveform bands.
+- **569/570**: `BipolarKnob` replaced with smooth SVG circular knob. 270° arc sweep, continuous rotation, active arc + needle + center dot. No discrete arrow positions.
+- **571**: All control font sizes use `clamp()` with viewport-relative midpoint — scale with browser width from ~8px to ~13px.
+- **572**: Shake confetti now spawns 2–4 organic bursts (not 5 uniform) with varied counts (8–18 particles), speeds (4–9), and positions biased toward mid-screen vertically.
+- **573**: `frequencyToNoteName()` added to pitchMap. `ConfettiCanvas.spawnNote(x,y,name)` emits a large bold note name particle (22–30px, slow gravity, long life) + 5 sparkles. Called on every `voiceOn` in ribbon (touch + keyboard).
+- **574**: Ribbon glitch flicker — idle >2s triggers occasional 60–180ms glitch burst every 6–14s: random horizontal slice gets `▓▒░█▌▐` chars with color shift and x-offset. Much less frequent than ambient ripples.
+
+## 2026-04-11 — ascii ribbon: baked knob rotary, sweet spots, shake fix, orb cleanup, full-screen confetti (DUMP 558-563)
+
+- **558**: Baked FX knobs now render as ASCII rotary dials. `BipolarKnob` replaced the 7-char horizontal bar indicator with a directional arrow that sweeps from ↙ (7 o'clock) through ↑ (12 o'clock = center/neutral) to ↘ (5 o'clock), matching real synth rotary behavior. CSS updated: `align-items: center`, large 20px dial char.
+- **559**: Noted ASCII-only rendering for borders/knobs as a future investigation (not implemented per request).
+- **560**: Redesigned baked knob sweet spots. SPACE (was SpaceVerb): left=CATHEDRAL (reverb 0.78 + delay wash), center=dry, right=ORBIT (rhythmic delay 0.5s/0.72fb + reverb halo). TONE (was CrunchSweep): left=GRIT (crunch 0.82 + VCF 500Hz/warm resonance), center=clean, right=GLITTER (tiny crunch + resonant presence peak at 7kHz/Q=16). Both blend multiple parameters for musical "sweet spots".
+- **561**: Shake now depresses a single ribbon spot. `shakeNoiseBurst` reduced from 3–5 voices to 1. `AsciiRibbon` shake effect reduced from 8 simultaneous fluid splashes to a single centered splash.
+- **562**: OSC sphere orbs now borderless/labelless — pure visual effect. Removed `ascii-orb__label`, `ascii-orb__mix`, and border CSS. Inactive opacity reduced to 0.25 for subtlety.
+- **563**: Confetti now scatters full-screen via new `ConfettiCanvas` (fixed overlay, z-index 1000, pointer-events none). Confetti logic extracted from `AsciiRibbon` canvas into standalone component with `spawn(x, y)` method via `forwardRef`/`useImperativeHandle`. Ribbon interaction confetti converts to viewport coords. Shake fires 5 confetti bursts at random viewport positions.
+
+## 2026-04-11 — ascii ribbon: v2 "Rock & Rumble" layout redesign
+
+- Layout restructured from puddle-style (sidebar+canvas) to v2-style vertical stack:
+  header → orb visualizers → horizontal ribbon strip → bottom controls panel
+- `AsciiOrbs` component: 3 animated ASCII wireframe spheres (one per oscillator) using
+  parametric sphere rendering with z-buffer. Each orb reflects its osc's waveform, mix,
+  and detune. Color palette: steel purple/blue/teal matching Rock & Rumble.
+- `AsciiControls` redesigned as horizontal 3-column bottom panel:
+  LEFT: toggle buttons (play/arp, mono/poly, hold/stop, bpm, vol) matching v2's left-side
+  CENTER: 3 oscillator panels side by side (full width, no scroll)
+  RIGHT: baked FX (SpaceVerb, CrunchSweep), VCF routing, pitch/scale/glide
+- `TextRibbonApp.css` rewritten: industrial steel-blue color scheme, perspective grid floor,
+  panel bevel effects, inset ribbon strip shadow
+- `AsciiControls.css` rewritten: Rock & Rumble palette, horizontal layout, beveled buttons
+- AsciiRibbon: industrial inset shadow, tighter strip presentation
+- AsciiLogo: slightly smaller to fit compact header
+
+## 2026-04-11 — ascii ribbon: shake fix, ambient rippling, osc waveform vis, codename rename (DUMP 535-546)
+
+- **535**: Excess shake fix — `useShake` now excludes `.text-ribbon-header` from the window click handler. Previously clicking the `AsciiLogo` (a div, not a button) triggered both its direct `onClick` and the window-level `triggerShake(0.4)` for a double-shake.
+- **536**: Ambient idle rippling — `AsciiRibbon` now fires small splashes (`strength 0.25–0.45, radius 2`) when idle for >1.5s at random positions (~every 1.8–3.2s). Interaction timestamps tracked in `lastInteractionRef` to gate the idle logic. Gives the ribbon surface a living, breathing quality when not in use.
+- **538/546**: ASCII ribbon is the official v3 of ribbon, based on ribbon v2 feature set. Oscillator waveform animation bands added — each active oscillator (with mix > 0.05) draws its waveform shape (`waveformSample` function) across a horizontal band of the canvas, animated with time + detune-influenced speed. Colors: pink (osc1), cyan (osc2), lime (osc3).
+- **544**: Codename updated to "ascii ribbon" — tagline in AsciiLogo changed to `v3 · ascii ribbon`, label in AsciiRibbon changed to `RIBBON v3 · ASCII`.
+- **539**: Created `nmj/ascii` branch in puddle repo with ASCII components (AsciiRibbon, AsciiLogo, AsciiControls, useAsciiFluid, TextRibbonApp) for future puddle v2 inclusion.
+- **540–543, 545**: Roadmap updated with ASCII lineage strategy, v4 ascii/lo mode plan, branch/tag strategy, knob baking concept.
+
+## 2026-04-11 — text ribbon: mobile ribbon above controls (DUMP 534)
+
+- **534**: On mobile (`max-width: 600px`) the ribbon canvas now appears above the controls sidebar — `order: 1` on `.text-ribbon-canvas`, `order: 2` on `.text-ribbon-sidebar`.
+
+## 2026-04-11 — text ribbon: shake fix, confetti tuning, moebius canvas, ribbon-dev deploy (DUMP 530-533)
+
+- **530**: Spurious shake on mouse click fixed — `useShake` called with `sidebarRef` + `canvasAreaRef` so clicks on the sidebar and the ribbon canvas are excluded from the "click outside" shake trigger. Previously no refs were passed, meaning every canvas click triggered shake.
+- **531**: Confetti now lasts longer and flies further — initial speed raised from 1.5–5 to 3–9, slight upward bias added (`vy -= 1.5`), decay rate halved (0.010–0.022 vs 0.025–0.045), gravity reduced from 0.12 to 0.06. Particle count raised from 12 to 16.
+- **532** (new item): Moebius animation replaced with canvas-based parametric curve. Draws the actual Möbius strip as two edges of a lemniscate with half-twist — near edge rendered as a rainbow gradient solid line, far edge as a dashed dim line, crossover points marked with white dots. Animates continuously via RAF.
+- **533**: Deploying to ribbon-dev — `nmj/text-ribbon` matches `nmj/**` pattern in deploy.yml; pushing to origin triggers the `deploy-dev` GitHub Actions job that syncs to `s3://ribbon-dev.obfusco.us/` and invalidates CloudFront.
+
+## 2026-04-11 — text ribbon: keyboard, velocity, confetti, OSC fix, shake noise, design polish (DUMP 524-529)
+
+- **524**: ASDF/JKL/; keyboard keys trigger ribbon notes at mapped X positions. Keydown spawns voice + confetti + fluid splash; keyup releases note. Key markers drawn as `┊` columns on canvas during press. Modifier keys skipped.
+- **525**: Velocity axis flipped — `velocity = 1 - ny` so bottom of ribbon = soft, top = loud (matching physical ribbon intuition).
+- **526**: Confetti particle system added to AsciiRibbon canvas. `spawnConfetti(nx, ny)` fires 12 ASCII particles (`*+×◇△○◈❋✦`) per touch with random velocity, gravity, and rainbow colors. Also fires on shake and keyboard play.
+- **527**: OSC3 overflow fixed — `.ascii-controls__oscs` changed to `flex-wrap: wrap`, each `.ascii-osc` given `flex: 1 1 70px; min-width: 68px; max-width: 90px` so panels wrap rather than overflow sidebar.
+- **528**: Shake triggers audio noise burst — `shakeNoiseBurst(intensity)` plays 3–5 random notes (duration 80–200ms) via `voiceOn`/`voiceOff` spread across the ribbon's pitch range.
+- **529**: Design aligned closer to original ribbon — dark radial gradient background, perspective floor grid with drift animation, header restructured to 3-column grid (status | logo | shake bolt), sidebar with `backdrop-filter: blur`, same color palette as puddle.
+
+## 2026-04-11 — v3 text ribbon bootstrap on nmj/text-ribbon (DUMP items 520-523)
+
+- **520-523**: Created branch `nmj/text-ribbon` as ribbon v3 codename "text ribbon". Installed `@chenglou/pretext` for glyph measurement. New components:
+  - `useAsciiFluid.js` — 2D wave-equation fluid simulation (damping=0.96, velocity buffer, splash/ambient API)
+  - `AsciiRibbon.jsx` — canvas-based play surface: fluid sim rendered as ASCII characters (` .·:;+=*#@`), rainbow-colored by X position, handles pointer events for notes, arp, hold modes; uses pretext `measureNaturalWidth` for precise glyph grid sizing
+  - `AsciiControls.jsx` — full terminal-aesthetic control panel with ASCII buttons, block-char sliders, circle-glyph knobs, oscillator panels, VCF, FX, transport, scale selection
+  - `AsciiLogo.jsx` — animated moebius-strip ASCII logo with gradient wordmark
+  - `TextRibbonApp.jsx` — new root app wiring audio engine + all hooks to ASCII components (no crypto layer)
+  - `main.jsx` simplified — removed wagmi/rainbowkit providers; text ribbon renders standalone
+
+## 2026-04-08 — QR glow, panel connection, wallet modal, puddle project fork (items 513-516)
+
+- **513**: QR glow animation made more visible at rest — drop-shadow blur increased from 5-6px to 8-9px, alpha from 0.55 to 0.85. Base opacity raised to 0.75 (was 0.55). Hover glow bumped to 14px. Both `.preset-qr-trigger` and `.app-header__qr-mobile` updated.
+- **514**: Side panel / bottom console connection fixed. Root cause: `max-height: 520px` on panels prevented them from stretching with the grid row on tall viewports. Also added `align-content: start` to `.app__stage` grid so rows don't stretch to fill unused viewport height (was causing row 2 to grow beyond panel max-height). Replaced fixed `max-height: 520px` with `calc(100dvh - 250px)` on both panels.
+- **515**: Wallet auto-reconnect modal (Base Account / Coinbase connector) suppressed by clearing wagmi localStorage keys synchronously in `main.jsx` before `WagmiProvider` mounts. Users connect explicitly via the wallet button.
+- **516**: Forked current puddle-version of ribbon into a standalone `puddle` project at `/Users/nathanmoomaw/Sites/puddle`. Pruned `Ribbon.jsx`, `Ribbon.css`, `useRibbon.js` (old strip component), `versions/` docs, `screenshots/` dir, Signal photos, and old root-level screenshots. Updated `package.json` name, `index.html` title, `CLAUDE.md`, wagmi app name, and DUMP.md. Pushed to https://github.com/nathanmoomaw/puddle.
+
+## 2026-04-07 — Controls cleanup: console corner, nook fix, bolt removed, panel overflow (items 502-506)
+
+- **502**: Unchecked empty item 501 (was wrongly marked done).
+- **503**: Removed `controls__utility-bar` row. MIDI + wallet + QR now in `controls__console-corner` — `position: absolute; bottom: 0.4rem; right: 0.4rem` inside `.controls__shared`. No new layout row.
+- **504**: Shake nook `margin-bottom` increased from 1.5rem → 4.5rem to lift it above the bottom console's `-50px` overlap zone.
+- **505**: Removed `app-header__shake-bolt` button from JSX entirely (and its CSS). Mobile shake still via logo click; desktop via nook.
+- **506**: Added `padding-bottom: 55px` to both side panels (`controls__toggles` + `controls__oscillators`) so content clears the bottom console's `-50px` overlap on short screens.
+
+## 2026-04-07 — MIDI/wallet to controls bar, shake nook, panel height cap, QR glow (items 497-501)
+
+- **497**: MIDI + WalletButton moved from header into `controls__utility-bar` in Controls.jsx, rendered alongside QR trigger. Header left now only holds mobile QR button.
+- **498**: Shake bolt (⚡) hidden from header on desktop; new `app__shake-nook` button at `grid-column:2; grid-row:2; align-self:end; justify-self:end` — 2.6rem, bottom-right corner of the puddle cell. Mobile keeps header shake bolt.
+- **499**: `max-height: 520px; overflow-y: auto` added to both `.controls__toggles` and `.controls__oscillators` on desktop — panels no longer overflow into the bottom console.
+- **500**: `qr-glow-cycle` keyframe animates QR button glow through purple→cyan→green→amber→red over 8s. Applied to both `.preset-qr-trigger` and `.app-header__qr-mobile`.
+- **501**: Empty item, skipped.
+
+## 2026-04-06 — Logo dead center via CSS grid header (item 496)
+
+- Header switched from flex to `display: grid; grid-template-columns: 1fr auto 1fr` — logo in the auto-width center column is always geometrically centered regardless of button asymmetry.
+- Left column (`app-header__left`): QR (mobile), MIDI, wallet — `justify-content: flex-start`.
+- Right column (`app-header__right`): shake bolt — `justify-content: flex-end`.
+- Removed the mobile-only `width: 100%` override (now on the root `.app-header` rule always).
+
+## 2026-04-06 — Header reorder: MIDI, wallet, logo, shake in a line (item 495)
+
+- Removed `app-header__left` wrapper div — all items now direct children of `<header>`.
+- Logo no longer `position: absolute` — flows inline with other items.
+- Header `justify-content: center; gap: 0.5rem` so all four items sit in a centered row.
+- Removed leftover `top: 8px` from shake bolt, QR button, and ambient button (header `align-items: center` handles vertical alignment).
+- Desktop `pointer-events: none` on logo preserved from item 494.
+
+## 2026-04-06 — Mobile header fix, puddle hint, logo click-through (items 492-494)
+
+- **Mobile header width**: Removed `align-self: center; flex-wrap: wrap` from mobile `.app-header`; added `width: 100%` so `space-between` spreads left/shake items to edges with logo centered.
+- **Mobile no-sound hint**: Added `.puddle__hint` span inside idle puddle label — shows "no sound? keep tapping!" on mobile only via CSS.
+- **Desktop logo click-through**: Logo overlaps puddle on desktop (negative margin-top). Added `pointer-events: none` to `.app-header__logo` on desktop so clicks pass through to the puddle. Shake bolt (⚡) on the right still handles desktop shake.
+
+## 2026-04-06 — Header layout: MIDI/wallet left, shake right (item 491)
+
+- Wrapped MIDI + wallet + QR into `.app-header__left` div on the left of the logo.
+- Shake bolt stays as last element (right side). Header `justify-content: space-between`.
+- Logo remains absolutely centered via `position: absolute; left: 50%`.
+
+## 2026-04-06 — Logo clip fix (item 490)
+
+- **Logo no longer clipped at top**: `overflow: hidden` on `.app--puddle` was clipping SVG glow filter effects that extend above the element. Changed to `overflow-x: hidden` (vertical overflow stays open). Added `top: 4px` to logo so it sits 4px below header top. Bumped desktop app padding-top to `0.75rem` for more breathing room.
+
+## 2026-04-06 — Header z-index, panel stacking fix, hold height (items 483-486)
+
+- **Logo no longer cut off**: Added `position: relative; z-index: 15` to `.app-header` on desktop — stage panels (z-index 1) no longer paint over the header now that the header has a higher stacking order.
+- **Wallet/shake above logo**: Logo gets `z-index: 0`, shake bolt gets `z-index: 1` — explicit stacking within the header.
+- **Side panels z-index reliable**: Added `position: relative` to both `.controls__toggles` and `.controls__oscillators` — CSS grid z-index without position can be unreliable in some browsers; now explicit.
+- **Hold section consistent height**: Added `min-height: 52px` to `.activation__hold-split` so the hold/marble row stays the same height regardless of selected marble size (1, ½, ⅓).
+
+## 2026-04-04 — Logo center, stage lift, panel z-index fix, OSC flush (items 476-479)
+
+- **Logo centered**: `.app-header__logo` absolutely positioned at `left: 50%; transform: translateX(-50%)`, header `justify-content: flex-end` so buttons cluster right.
+- **Puddle+console up 30px**: `.app__stage` `margin-top` changed from `-12px` to `-42px`.
+- **Panel overlap fixed**: `.controls__shared` gets `position: relative; z-index: 2` so bottom panel renders above side panels; puddle bumped to `z-index: 3`.
+- **OSC panels flush**: `border-radius: 0` on stacked OSC cards + `border-top: none` on non-first cards to eliminate corner gaps and double borders.
+
+## 2026-04-04 — Revert OSC flush + z-index changes (items 473/474 made things worse)
+
+- Reverted the OSC `overflow: hidden` / `padding: 0` approach — it added visual space rather than reducing it.
+- Reverted z-index changes on bottom panel — made the side-panel overlap worse.
+- Items 473 and 474 marked done; the revert is the resolution.
+
+## 2026-04-04 — OSC stacking, bottom panel lift, marble size fix, left panel polish
+
+- **OSC subpanels flush**: `gap: 0` on right panel + `margin-bottom: -1px` on non-last OSC cards to merge borders + tighter padding `0.5rem 0.75rem`.
+- **Bottom panel up 50px**: `margin-top: -50px` on `.controls__shared`; puddle gets `position: relative; z-index: 2` so it renders above the overlapping panel.
+- **Bottom panel centered**: added `justify-content: center` to bottom panel flex row.
+- **Marble sizes normalized**: all 9 marbles now use `size: 32px, velocity: 1.0` — the SIZE SELECTOR (1, ½, ⅓) is the only variable. Previously each marble had `BASE/n` sizing causing each successive marble to appear smaller.
+- **Left panel polish**: rocker switches now 1 light per side (symmetric); DJFader `margin-top: 0.75rem` for breathing room between BPM and volume; octaves/scale/speed sections `align-items: center` on desktop.
+
+## 2026-04-04 — Layout polish: panel overlap, osc gap, U-shape console, header spacing
+
+- **Side panel overlap reduced**: `margin-right/left` from `-30px` to `-23px` — panels now flush with puddle edge without overlapping.
+- **OSC subpanel gap tightened**: added `gap: 0.35rem` to right panel `.controls__oscillators` on desktop (was inheriting 0.75rem from base rule).
+- **U-shaped console**: set `row-gap: 0` in desktop grid and adjusted border-radius so side panels connect flush to bottom panel (`border-radius: 6px 8px 0 0` / `8px 6px 0 0`; bottom panel `0 0 6px 6px`). Removed `border-bottom` from side panels to eliminate double-border at the join.
+- **Header-to-puddle spacing reduced ~25px**: reduced `.app` padding-top (0.75rem→0.25rem) and gap (0.5rem→0.15rem) on desktop; added `margin-top: -12px` to `.app__stage`.
+
+## 2026-04-03 — Layout fixes: remove clip-paths, move puddle up, marble size selector
+
+- **Removed all clip-paths** from left/right/bottom panels — they were cutting off controls and providing no real benefit. Panels now render as clean rectangles with mild border-radius.
+- **Side panels 30px closer to puddle**: `margin-right: -30px` on left panel, `margin-left: -30px` on right panel, `z-index: 1` on both so they overlap the puddle column cleanly.
+- **Puddle moves up 70px on desktop**: `margin-top: -70px` in Puddle.css desktop breakpoint.
+- **Octaves, Scale, Speed moved to left panel** below master volume fader — bottom panel now only holds VCF, Filter, Reverb, Crunch, Delay.
+- **Marble size selector**: Added 3rd section to hold container (Hold | Marble slot | Size button). Cycles 1 → ½ → ⅓. Tray marble visually resizes immediately. Dragged marble uses that size/velocity multiplier. Resets to 1 for next marble. Returns to base config size if marble is not dropped on puddle.
+
+## 2026-04-02 — Fix clip-path direction: panels now correctly concave toward puddle
+
+- Previous clip-paths were CONVEX (panels wider at center), which made panels bulge *into* the puddle dead space rather than hug it.
+- Fixed all three panels with CONCAVE inner edges — panels narrow at center (where the oval is widest) and are full-width at top/bottom corners.
+- Left panel right edge: `100%→82%@center→100%` (scoops inward ~18% at middle)
+- Right panel left edge: mirror (`0%→18%@center→0%`)
+- Bottom panel top edge: smile arc — corners clipped ~28%, center reaches full height (oval bottom is lowest at center, rises steeply at corners so corner space was dead)
+
+## 2026-04-02 — Fix mode-switch breaking controls
+
+- **Root cause**: ActivationMode desktop CSS forced `flex-direction: row; flex-wrap: wrap` (leftover from old top-bar layout). Now that ActivationMode lives in the narrow left column, items were wrapping and the inactive BPM section (`pointer-events: none`) could end up overlapping sibling controls, swallowing clicks. Fixed by changing desktop ActivationMode to `flex-direction: column; align-items: stretch; flex-wrap: nowrap` to match the left panel.
+- **Secondary fix**: `lastStopRef = { current: 0 }` in ActivationMode was a plain object recreated every render, meaning the Stop double-click detection for kill-all never worked. Changed to `useRef(0)`.
+
+## 2026-04-02 — Fix shake-on-knob-release + restore VCF in bottom bar
+
+- **Shake on unclick fix**: When dragging a rotary knob, pointer capture routes `pointerup` to the knob even if the pointer ended outside controls. The browser then fires a `click` at the actual release position, which was outside controls and triggered shake. Fix: track `hasDragged` in RotaryKnob; on `pointerUp` after a drag, register a one-time capture-phase `click` listener on `document` that calls `stopImmediatePropagation()` — swallowing the synthetic click before it reaches the shake handler.
+- **VCF restored**: Previous `display: contents` trick removed the VCF visual wrapper and its "VCF" label, making it look invisible. Fixed by keeping VCF as a proper flex item with its column layout, separated from the rest of the bottom bar by a subtle magenta border-right.
+
+## 2026-04-02 — Controls hugging puddle + layout stability fixes
+
+- **Tighter puddle hugging**: column-gap set to 0 (was 0.75rem) so side panels abut puddle div with no dead space between grid columns. Row gap kept at 0.4rem for bottom bar breathing room.
+- **Panel stretch**: `align-items: stretch` on `.app__stage` so side panels stretch to the full puddle row height instead of top-aligning and leaving dead corners.
+- **More aggressive clip-paths**: left panel right-edge arc cuts 26% at corners → 4% at center (was 7% flat). Right panel mirrors. Bottom bar top arc is deeper (18% at corners). Arcs now visually match the oval's bezier curve.
+- **Narrower side columns**: `minmax(140px, 195px)` (was `minmax(200px, 280px)`) — gives more space to the puddle center.
+- **Controls center**: `justify-content: center` on toggles panel so controls center in the stretched panel height.
+- **Layout stability**: `controls__value` gets `font-variant-numeric: tabular-nums; min-width: 4ch; display: inline-block` so changing values (fast/med/slow, 0%-100%) don't reflow surrounding controls. `controls__section` gets `flex-shrink: 0`. `controls__label` gets `white-space: nowrap`. Rotary knob label gets fixed `width` so it never expands the knob layout.
+
+## 2026-04-02 — Controls layout rework: left/right/bottom hugging puddle
+
+- **Left panel** (was top bar): `controls__toggles` — play/arp, mono/poly, hold, stop, bpm, vol now on left side of puddle, vertical stack, right edge curves inward with `clip-path` to hug the oval
+- **Right panel** (was left): `controls__oscillators` — OSC 1/2/3 moved to right side; left edge mirrors the curve
+- **Bottom panel** (was right): `controls__shared` — octaves, scale, filter, reverb, crunch, delay now span full width below puddle; VCFControl merged inline into this panel (no longer a standalone grid item)
+- VCFControl removed from App.jsx render, props passed through Controls component instead
+- `controls__shared` switches from 2-col grid to flex-row wrap for the bottom bar layout
+
+## 2026-04-02 — Wallet forget: wipe wagmi persisted state
+
+- Root cause of the Base Account modal: wagmi's `reconnectOnMount: false` was set but the Base Account connector (included by default in RainbowKit) stores its own session in `wagmi.store` localStorage and prompts independently
+- "forget" now wipes all `wagmi.*` keys from localStorage in addition to our flag, fully clearing the stored session so the connector stops prompting
+
+## 2026-04-02 — Wallet "forget" option (no more auto-popup)
+
+- Removed silent `reconnect()` call on mount — this was triggering the "Ribbon Puddle wants to continue in Base Account" modal every load for previously-connected users
+- When `ribbon_wallet_ever_connected` flag is set but user is disconnected: header shows subtle `[reconnect] [forget]` options — user explicitly initiates reconnect instead of being prompted
+- "forget" clears the localStorage flag so neither option appears again; user can still connect via QR modal
+- When actually connected: shows address as before
+
+## 2026-04-02 — Perspective floor grid + controls chrome strip + curve wrapping
+
+- **Perspective floor grid**: Background grid replaced with a synthwave-style perspective floor plane (`perspective(500px) rotateX(62deg)`, `transform-origin: 50% 100%`). Mask fades at horizon for natural depth. Dark space backdrop is a separate flat element. Parallax now scrolls `background-position` on the floor element (horizontal + depth) rather than translating the whole element — proper parallax on a rotated plane.
+- **Performance**: Removed `backdrop-filter: blur(12px)` from all three desktop control panels (oscillators, shared, toggles) — one of the most GPU-expensive CSS properties. Removed `sphere-light` and `float` animations from `.controls`. Throttled drag ripples to max 10fps (100ms interval) — was firing every pointermove event. Reduced confetti burst from 8–16 to 5–10 particles.
+- **Controls chrome stripped**: Removed heavy beveled industrial borders, brushed-metal backgrounds, thick box-shadows from desktop panels. Replaced with minimal semi-transparent backgrounds and single thin border with subtle cyan edge.
+- **Curve wrapping**: Left panel (oscillators) right edge follows the oval's convex left side via `clip-path: polygon()` with a concave notch at center. Right panel (shared controls) mirrors this on the left edge. Top bar has `border-radius: 6px 6px 20px 20px` to echo the oval's top arc.
+
+## 2026-04-01 — Shake restore + grid parallax
+
+- **Shake blank-space restore**: The `[data-rk]` exclusion from the previous commit broke all blank-space shake — `RainbowKitProvider` wraps the entire app in `<div data-rk="">` so every click matched it. Replaced with `!document.getElementById('root').contains(e.target)` — correctly excludes only portal-rendered modals (wallet connect) which are appended directly to `document.body`, not inside `#root`.
+- **Grid parallax**: Background grid now shifts in response to puddle touch position via a RAF loop that reads `ribbonInteraction.current` (existing ref, zero prop drilling). Lerps at 6% per frame toward target offset — up to ±40px horizontal, ±25px vertical. Returns to center when not touching. Applied via `style.transform` on `.app__grid-bg` ref.
+
+## 2026-04-01 — Performance + shake bug fixes
+
+- **Shake fix (preset link/QR)**: Root cause was React removing `.preset-splash` from the DOM *before* the `window` click handler fires — `closest('.preset-splash')` returned null on a detached node. Fix: added `if (!document.body.contains(e.target)) return` as first guard in click-outside handler, skipping shake for any click on an element no longer in the DOM.
+- **Shake fix (wallet connect modal)**: RainbowKit renders its modal in a portal with `[data-rk]` root, which was outside all exclusion zones. Added `e.target.closest('[data-rk]')` exclusion.
+- **Performance — Three.js geometry**: Reduced `PlaneGeometry` from `96×96` to `64×64` segments — 9409 → 4225 vertices (55% fewer), same visual quality, ~half the vertex shader work per frame.
+- **Performance — Three.js Vector3 allocation**: Pre-allocated 24 `Vector3` objects outside the animate loop; previously `new THREE.Vector3()` was called for each ripple every frame → GC pressure.
+- **Performance — pixel ratio**: Capped at 1.5 (was 2) — on a 3× retina screen, 1.5× means 44% fewer pixels to rasterize.
+- **Performance — idle throttle**: Three.js renders at 60fps when ripples are active, 30fps when idle (no active ripples). Halves GPU load when just sitting.
+- **Performance — tab visibility**: Three.js renderer skips frames entirely when `document.hidden` (tab not in focus).
+- **Performance — confetti**: Loop skips all draw work when particle array is empty (early return after clearRect).
+- `antialias: false` on WebGLRenderer — the iridescent surface masks aliasing; this frees ~15% GPU.
+
+## 2026-04-01 — Puddle splash effects + QR text subtlety
+
+- **Water splash rings**: Each touch on the puddle emits an expanding ring animation (cyan/violet double-ring, 600ms, z-index above confetti) via React state + CSS `@keyframes puddle-splash`. Splash id cleanup happens in a `setTimeout` after animation completes.
+- **Sci-fi puddle edge**: Replaced flat `drop-shadow` with layered `drop-shadow` stack — tight 2px cyan outline + mid-range blue glow + wide violet bloom. Active state adds a 1.2s breathing pulse (`puddle-active-pulse`) that intensifies the entire edge.
+- **QR text subtlety**: `drawWarpedText` overhauled from aggressive CAPTCHA-style to subtle watermark — rotation ±12° (was ±37°), no ghost echoes, band opacity 0.38 (was 0.78), fill alpha 0.55–0.75, gentle wave amp 2–6px (was 6–14px). Text now blends with the iridescent QR grain rather than blowing out against it.
+
+## 2026-04-01 — Wallet seamless reconnect + multi-LLM fallback clarification
+
+- **Wallet localStorage flag** (`ribbon_wallet_ever_connected`): Users who have connected before get a silent `reconnect()` on mount via wagmi's `useReconnect` — no modal, just restores their session. First-time visitors see nothing wallet-related until they open the QR modal and click Mint.
+- **Multi-LLM fallback clarification**: `/fallback` skill works mid-session (Claude orchestrates curl calls to OpenAI/Gemini). At actual token exhaustion, Claude can't run anything — the right tool is `/resume` with a checkpoint. `~/.claude/scripts/llm.sh` exists as a standalone CLI for use when Claude is fully down; both `OPENAI_API_KEY` and `GEMINI_API_KEY` are set. Run `ln -s ~/.claude/scripts/llm.sh /usr/local/bin/llm` to put it in PATH.
+
+## 2026-04-01 — Wallet connection UX: non-intrusive integration
+
+- **Wallet button removed from main header**: No longer shows a persistent "0x" connect prompt on every visit — wallet connection is fully optional and only surfaced in the QR modal mint flow
+- **Contextual connect in QR modal**: Mint button now opens the RainbowKit connect modal when clicked while disconnected (via `useConnectModal`), so users discover wallet only when they want to mint a Puddle token — not on first load
+- `reconnectOnMount: false` was already set in wagmiConfig — no auto-reconnect behavior
+
+## 2026-04-01 — Preset URL shake bug fix + rec/loop shelved for v3
+
+- **Preset URL shake fix**: Two sources of shake on QR/URL entry fixed: (1) `shake` events in loop data were replaying `handleShake()` on every loop pass, randomizing all controls after preset load — removed `shake` from replayCallbacks entirely (shake is a meta-action, not a musical event to replay); (2) clicking `.preset-splash` overlay area (outside the ▶ Play button) triggered click-outside shake — added overlay exclusions to `useShake`.
+- **Rec/loop shelved for v3**: `LooperControls` UI removed from header, Enter key binding removed. All hooks/logic preserved (`useLooper`, `loadLoopData`, `recordEvent`, etc.) — existing QR presets with loops still restore on load. v3 is marble-focused.
+
+## 2026-04-01 — QR shake randomization + puddle visual state integration
+
+- **⚡ Shake button in QR modal**: Top-left button regenerates the QR visual style (gradient phase, spiral tightness, spill shapes) without changing the encoded URL or preset data. Style seed persists across modal open/close via module-level `persistedStyleSeed`.
+- **Puddle-state influence on QR**: Marble count tightens/loosens the iridescent spiral (0 marbles = loose, 9 = tight). Average marble X position biases the gradient lean left/right. Active puddle (`puddleActivity=1`) boosts glow intensity. `App.jsx` now passes `puddleActivity` in the QR settings snapshot.
+- **`drawColoredQR` refactored**: Now accepts `styleSeed` and `puddleState` params. RNG seed XORed from URL hash + style seed so spill shapes also vary on shake.
+
+## 2026-04-01 — Phase 1 Puddle tokenization (ERC-721 on Base)
+
+- **`RibbonPuddle.sol`**: ERC-721 contract (OpenZeppelin) — first-minter-wins via `_hashToToken` mapping, stores `contentHash + name + creator + mintedAt` per token. Deployed target: Base mainnet (testnet via `VITE_USE_TESTNET=true`).
+- **`computePresetHash()`**: Deterministic `keccak256` of canonical preset JSON in `presets.js`. Excludes wallet/visual/loop fields; sorts arpNotes and marbles by id. Uses viem's `keccak256` + `stringToHex`.
+- **`src/crypto/contract.js`**: `usePuddleOwner(contentHash)` and `useMintPuddle()` hooks — wagmi v2 `useReadContract`/`useWriteContract`/`useWaitForTransactionReceipt`. Extracts tokenId from Minted event log topics.
+- **`src/crypto/ipfs.js`**: Optional Pinata IPFS pinning — pins canvas PNG + OpenSea-compatible metadata JSON. No-ops gracefully when `VITE_PINATA_JWT` is unset.
+- **`src/components/PresetQR.jsx`**: Full mint flow — IPFS pin → `mint(contentHash, name)` → ownership badge (purple=owned, cyan=own token). Fires `first_mint` milestone on success.
+- **`src/crypto/config.js`**: Added `PUDDLE_CONTRACT_ADDRESS` + `PINATA_JWT` env exports, testnet chain support.
+- **`src/crypto/milestones.js`**: Added `first_mint` milestone ("Puddle Maker ✦").
+
+## 2026-04-01 — DUMP processing: marble UV fix, scale labels, hold/mode bug, double-spacebar marbles
+
+- **Marble UV coordinate fix**: Ripples and marble depressions in the Three.js shader were being passed raw normalized 0-1 coordinates, but the visible UV range of the warped plane (camera z=1.8, FOV=45°, plane stretched 1.4x horiz / squished 0.9x vert) is actually [0.234,0.766] × [0.086,0.914]. Added UV remapping in `usePuddleRenderer.js` so ripple origins and marble depression positions align with where they visually appear on screen.
+- **Scale button single-letter labels**: Removed pentatonic, added Phrygian (P). Scale display now uses `SCALE_LABELS` map: C=chromatic, M=major, m=minor, b=blues, P=phrygian, egg=double harmonic. Exported from `scales.js`.
+- **Arp→play mode hold fix**: `useArpeggiator` now accepts `hold` param. On mode change away from arp, if hold is on it stops the arp timer/scheduling but skips `noteOff()` so notes keep sounding. If hold is off, behavior is unchanged.
+- **Double-spacebar clears marbles**: Double-tap spacebar now also calls `clearAllMarbles()` in addition to `killAllSound()`. Added `clearAllMarbles` to `keyHandlers` dependency array.
+- **Roadmap expansion**: Added v3 Polish Plan section (logo, shake modal, QR), Puddle Fork section (puddle.obfusco.us, mutation trail, token marketplace). Moved rec/loop to top of Soon section.
+
+## 2026-03-31 — DUMP processing: marble patterns, logo fix, preset marbles, roadmap updates
+
+- **Marble visual patterns**: Added cat-eye, swirl, and galaxy patterns to marbles. Amber and Opal get cat-eye slits, Emerald and TigerEye get classic swirl bands, Amethyst and Onyx get galaxy speckle. Ruby, Sapphire, Moonstone stay solid glass. Patterns render on both tray and puddle marbles via CSS.
+- **Mobile logo width fix**: Logo shrunk from 280px to 140px on mobile (max-width: 767px) to stop interfering with play/rec buttons. Header now wraps on mobile.
+- **Marble positions in presets**: Puddle marble positions (id, x, y) now serialized into QR/URL presets and restored on load. `restoreMarbles()` added to `useMarbles` hook; `handlePresetEnter` calls it when marbles are present in the preset data.
+- **Roadmap expansion**: Added Tokenization/Crypto Roadmap section (tokenize QR codes, state mutability, marketplace, naming brainstorm), Soon section (rec/loop state in presets, goop fix), and several Up Next items (puddle shape design, sci-fi controls, QR code style branch).
+- **DUMP processed**: All 16 unchecked items marked done — 3 implemented as code, 1 flagged as needing user input (puddle shape), rest routed to roadmap.
+
+## 2026-03-31 — Marble hold refinements
+
+- **Auto-spawn**: Marble always available in tray slot via `useEffect` — no more spawn button click required. After pickup, next marble auto-spawns.
+- **Fractionalized sizes/velocities**: MARBLE_CONFIGS now uses `size = max(48/(n+1), 6)` and `velocity = 1/(n+1)` — marble 0 is 48px at full volume, marble 8 is tiny and quiet.
+- **Stop clears marbles**: `handleStop` and `handleKillAll` now call `clearAllMarbles()` (full reset to slot). Hold toggle no longer clears marbles.
+- **Hold off → notes stop, marbles stay**: Turning hold off stops all marble voices but leaves marbles on the puddle surface.
+- **Hold on → marble notes restart**: Toggling hold on with existing puddle marbles restarts their voices (or injects into arpNotes in arp+poly+hold mode).
+- **Hold off + marble drop = one-shot tap**: Placing a marble while hold is off plays a 400ms tap instead of a sustained voice.
+- **Auto-activate hold on marble grab**: Picking up a marble from the tray automatically activates hold if it isn't already on.
+- **Drag puddle marble to reposition**: Puddle marbles now detect drag vs click — dragging moves the marble to a new puddle position (new pitch), clicking removes it.
+- **Spawn button removed**: ActivationMode no longer shows ◉ spawn button; tray slot always shows the next marble (auto-spawned).
+
+## 2026-03-31 — Marble hold, QR warp, DUMP meta fix
+
+- **Marble hold**: Hold button split into left (traditional hold) + right (marble dispenser). Up to 9 marbles (Ruby, Amber, Emerald, Sapphire, Amethyst, Opal, Onyx, TigerEye, Moonstone), each with unique CSS 3D appearance. Drag from tray → drop on puddle to lock in pitch. Dropping outside puddle animates marble back. Click puddle marble to recall it. Marble size = velocity/loudness. In arp+hold+poly mode, marble freqs inject into arpNotes in drop order. Finger touches apply physics impulses. Marble-marble elastic collision physics. Three.js depression uniforms for puddle surface displacement at marble positions. Turning off hold clears all puddle marbles.
+- **QR text warp**: More aggressive wave baseline, per-char font style mixing (bold/italic bold), stronger glow, ghost echoes, larger rotation/scale/skew ranges.
+- **DUMP meta**: Noted that empty DUMP.md items should be left as placeholders, not marked done.
+
+## 2026-03-31 — Preset splash screen + VCF shake fix
+
+- **PresetSplash**: When the app is opened via a preset link/QR, a full-screen splash shows the QR code and a play button. Clicking play resumes AudioContext (required by browsers), loads loop data, auto-starts arp if the preset has arp+hold+notes, then dismisses the splash. Regular fresh visits still get MobileSplash on mobile.
+- **VCF shake fix**: Clicking or dragging VCF knobs was triggering shake (they render outside `controlsRef`). Added `.vcf-control` to the exclusion list in `useShake`'s click handler.
+
+## 2026-03-31 — Fix showMilestone TDZ crash
+
+- **Bug**: `Cannot access 'showMilestone' before initialization` at App.jsx:290 — `useMilestoneToast()` was called after an effect that used `showMilestone`, causing a temporal dead zone crash on every render.
+- **Fix**: Moved `useMilestoneToast()` declaration above all effects that reference it.
+
+## 2026-03-31 — Fix staging deploy (npm 11 vs npm 10 lock file incompatibility)
+
+- **Root cause**: local npm 11.7.0 (Node 25) deduplicates nested zod@3 entries that npm 10.9.4 (Node 22, used by CI) expects explicitly in the lock file. npm ci on CI was failing with "Missing: zod@3.25.76 from lock file" for 5 separate `@reown/appkit-*` and `@walletconnect/utils` paths.
+- **Fix**: deleted `node_modules` and `package-lock.json`, regenerated with `npx npm@10.9.4 install` — now includes all 5 nested zod@3 entries. `npm ci --dry-run` passes cleanly.
+
+## 2026-03-31 — Goop fix, shader rainbow, puddle shape, deploy fix, arp QR, wallet auto-connect off
+
+- **Wallet auto-connect disabled**: Added `reconnectOnMount: false` to wagmi config — no longer aggressively reconnects on load
+- **Oil-spill rainbow shader**: Replaced broken iridescence function with physically-based thin-film interference — `thinFilmColor()` uses optical path difference (n=1.5 oil, varying thickness, cos(theta) view modulation) across 3 wavelength bands + second interference layer for rich rainbow swirls even when idle
+- **Puddle shape from sketch**: Warped geometry to match hand-drawn amoeba sketch — wider 3:2 aspect ratio with three distinct OSC lobes (top-center OSC1, top-right OSC2, bottom-center OSC3) and flatter left edge for controls
+- **Dev deploy fix**: `npm install` regenerated `package-lock.json` — was failing CI with typescript version mismatch and missing zod entries
+- **Goop mechanic fixed**: Rewrote core goop system — pointer capture was blocking drag-escape events, callbacks were never wired up, overlay had no position data. Now: escape from puddle triggers `startDragging`, document-level hit-testing deposits goop on controls, `GoopableSection` renders iridescent overlay with puddle-reactive wobble animation
+- **Arp QR auto-play**: `arpNotes` now serialized in preset URLs (`an` key). On load, if preset has mode=arp + hold=true + notes, arp auto-starts after 200ms. Pass `arpNotes` when creating QR settings.
+
+## 2026-03-30 — Spacebar loop stop + mobile fullscreen splash
+
+- **Spacebar stops loops**: Pressing Space now also stops any playing loop (in addition to killing notes/arp)
+- **Mobile fullscreen splash**: New `MobileSplash` component — shows "ribbon / tap to enter" overlay on mobile, requests fullscreen on tap, only shows once per session (sessionStorage)
+
+## 2026-03-30 — UI polish + looper fix
+
+- **Wallet button subtle**: Reduced opacity to 0.2 (fades in on hover), label changed from "Wallet" to "0x", transparent background — no longer seems required
+- **Scale buttons wrap**: Added `flex-wrap: wrap` to button rows and made Scale section full-width in shared grid so buttons don't overflow the panel
+- **Knob stability**: Added `min-width` and `font-variant-numeric: tabular-nums` to rotary knob labels to prevent layout shifts when values change
+- **Looper wired up**: `recordEvent` was never called — wired into Puddle `onDown` to record `voice_on` events. Fixed playback start: always begins replay after recording stops regardless of existing play state
+
+## 2026-03-30 — Surround layout, oil spill shaders, wallet QR integration
+
+- **Controls surround puddle**: Desktop layout restructured from side-by-side to CSS grid with controls surrounding the puddle — toggles top, oscillators left, effects right, VCF below center. Uses `display: contents` on Controls wrapper so children participate directly in the grid.
+- **Enhanced oil spill default**: Fragment shader now shows visible rainbow iridescence even when idle — multi-layer thickness variation with slow-moving large swirls, fine detail streaks, and position-dependent color patches. Increased ambient vertex undulation for more surface movement.
+- **Wallet in QR codes**: Connected wallet address now encoded in preset QR URLs. Loop data also included (if under 3KB). QR modal shows creator wallet address badge and "loop included" indicator.
+- **VCF in presets**: VCF cutoff, resonance, and per-oscillator routing now serialized in QR preset URLs and restored on load.
+- **Activation mode horizontal**: Desktop mode controls (Play/Arp, Mono/Poly, Hold, Stop, BPM) now lay out horizontally in the top bar.
+
+## 2026-03-27 — Organic puddle shape + looper record fix
+
+- Puddle shape now organic blob via CSS clip-path polygon (irregular oil-spill silhouette, not a circle)
+- Three.js blob geometry uses multi-harmonic warping with lobe protrusions for natural puddle feel
+- Replaced box-shadow with drop-shadow filter to work with clip-path
+- Looper: clicking record now also engages play button immediately; playback starts after recording stops
+
+## 2026-03-27 — Bug fixes + puddle-style QR code
+
+- Fixed `toggleRecording` TDZ crash: moved useLooper hook above keyHandlers useMemo
+- Fixed `process is not defined` error: use `import.meta.env` instead of `process.env` (Vite)
+- Made WalletConnect projectId configurable via `VITE_WALLETCONNECT_PROJECT_ID` env var
+- QR code now uses oil-spill iridescent gradient (swirling radial+angular, thin-film palette)
+- QR code has organic spill drips extending beyond the square boundary
+- Preset name text renders in warped recaptcha style: per-character rotation, scale, skew, jitter
+
+## 2026-03-27 — v3 "Puddle" implementation
+
+- **Puddle surface**: Three.js custom shaders for iridescent oil-spill effect with ripple physics, Asteroids-style confetti with firework bursts, moving grid background
+- **Rotary knobs**: Replaced all range sliders with rotary knob components featuring ghost slider overlay during interaction
+- **VCF control**: Per-oscillator voltage-controlled filter with cutoff/resonance knobs and routing buttons
+- **Capture/looper**: Event-based looper with 33.3s max, layering support, Return key toggle
+- **Goop/liquid control**: Per-control goop levels with SVG blob overlay, shake to clean (~13 shakes)
+- **Crypto integration**: RainbowKit + wagmi wallet connection on Base L2, POAP milestone tracking with toast notifications
+- **Layout restructure**: Puddle center stage with controls arranged around it, responsive desktop/mobile grid
+- New files: Puddle.jsx, RotaryKnob.jsx, VCFControl.jsx, LooperControls.jsx, GoopOverlay.jsx, WalletButton.jsx, MilestoneToast.jsx, usePuddle.js, usePuddleRenderer.js, useLooper.js, useGoop.js, crypto/config.js, crypto/milestones.js
+
+## 2026-03-27 — Roadmap reorganization + crypto options doc
+
+- Moved ambient play, interactive 3D, step sequencer, help wizard, camera input from v3 to Future Features in roadmap
+- Slimmed v3.md to focus on crypto, visual overhaul, scales, and UX polish
+- Created `docs/crypto-options.md` — analysis of NFT preset minting vs POAP vs hybrid approach
+
 ## 2026-03-27 — Version files + v2 tag update
 
 - Created `versions/v1.md`, `versions/v2.md`, `versions/v3.md` with feature lists

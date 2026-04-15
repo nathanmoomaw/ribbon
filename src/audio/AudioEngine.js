@@ -31,6 +31,11 @@ const globalMixes = [1.0, 0.0, 0.0]
 let globalFilterCutoff = 20000
 let globalFilterResonance = 0
 
+// VCF (voltage-controlled filter) — additional filter routable per-oscillator
+let globalVcfCutoff = 2000
+let globalVcfResonance = 8
+const globalVcfRouting = [false, false, false] // which oscs are routed through VCF
+
 function generateImpulseResponse(context, duration = 2, decay = 2) {
   const rate = context.sampleRate
   const length = rate * duration
@@ -64,9 +69,22 @@ function createVoice(hz) {
     gain.gain.setValueAtTime(globalMixes[i], ctx.currentTime)
 
     osc.connect(gain)
-    gain.connect(noteGain)
-    osc.start()
-    oscs.push({ osc, gain })
+
+    // VCF routing: if this osc is routed through VCF, insert a per-osc filter
+    if (globalVcfRouting[i]) {
+      const vcf = ctx.createBiquadFilter()
+      vcf.type = 'lowpass'
+      vcf.frequency.setValueAtTime(globalVcfCutoff, ctx.currentTime)
+      vcf.Q.setValueAtTime(globalVcfResonance, ctx.currentTime)
+      gain.connect(vcf)
+      vcf.connect(noteGain)
+      osc.start()
+      oscs.push({ osc, gain, vcf })
+    } else {
+      gain.connect(noteGain)
+      osc.start()
+      oscs.push({ osc, gain, vcf: null })
+    }
   }
 
   noteGain.connect(filter)
@@ -507,6 +525,42 @@ export function setCrunch(amount) {
   }
 }
 
+// --- VCF (per-oscillator voltage-controlled filter) ---
+
+export function setVcfCutoff(value) {
+  globalVcfCutoff = value
+  for (const voice of voiceMap.values()) {
+    for (const { vcf } of voice.oscs) {
+      if (!vcf) continue
+      vcf.frequency.cancelScheduledValues(ctx.currentTime)
+      vcf.frequency.setValueAtTime(vcf.frequency.value, ctx.currentTime)
+      vcf.frequency.linearRampToValueAtTime(value, ctx.currentTime + 0.01)
+    }
+  }
+}
+
+export function setVcfResonance(value) {
+  globalVcfResonance = value
+  for (const voice of voiceMap.values()) {
+    for (const { vcf } of voice.oscs) {
+      if (!vcf) continue
+      vcf.Q.cancelScheduledValues(ctx.currentTime)
+      vcf.Q.setValueAtTime(vcf.Q.value, ctx.currentTime)
+      vcf.Q.linearRampToValueAtTime(value, ctx.currentTime + 0.01)
+    }
+  }
+}
+
+export function setVcfRouting(oscIndex, enabled) {
+  globalVcfRouting[oscIndex] = enabled
+  // Routing changes take effect on next voice creation
+  // For existing voices, we'd need to rewire — for simplicity, just affect new notes
+}
+
+export function getVcfRouting() {
+  return [...globalVcfRouting]
+}
+
 export function getAnalyser() {
   return analyser
 }
@@ -556,6 +610,10 @@ function getEngine() {
     setReverb,
     setCrush,
     setCrunch,
+    setVcfCutoff,
+    setVcfResonance,
+    setVcfRouting,
+    getVcfRouting,
     getAnalyser,
     getIsPlaying,
   }

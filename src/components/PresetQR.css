@@ -56,9 +56,37 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
+/* Shake/randomize QR style button — mirrors close button on the left */
+.preset-qr-modal__shake {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.75rem;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.15s, transform 0.15s, filter 0.15s;
+  filter: grayscale(0.6);
+}
+
+.preset-qr-modal__shake:hover {
+  color: rgba(255, 255, 255, 0.8);
+  filter: grayscale(0) drop-shadow(0 0 4px rgba(139, 92, 246, 0.5));
+  transform: scale(1.15);
+}
+
+.preset-qr-modal__shake:active {
+  transform: scale(0.9) rotate(-15deg);
+}
+
 .preset-qr-modal__canvas {
   border-radius: 8px;
-  background: #0a0a1a;
+  background: transparent;
+  max-width: 100%;
+  height: auto;
 }
 
 .preset-qr-modal__name {
@@ -111,6 +139,89 @@
   transform: scale(0.97);
 }
 
+.preset-qr-modal__meta {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.preset-qr-modal__wallet {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(224, 64, 251, 0.8);
+  background: rgba(224, 64, 251, 0.1);
+  border: 1px solid rgba(224, 64, 251, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.preset-qr-modal__loop-badge {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(0, 240, 255, 0.8);
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+/* Puddle ownership badge */
+.preset-qr-modal__puddle-badge {
+  font-family: monospace;
+  font-size: 0.65rem;
+  color: rgba(139, 92, 246, 0.85);
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  letter-spacing: 0.06em;
+}
+
+.preset-qr-modal__puddle-badge--mine {
+  color: rgba(0, 240, 255, 0.9);
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+/* Mint button — accent variant */
+.preset-qr-modal__btn--mint {
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(139, 92, 246, 0.35);
+  color: rgba(180, 140, 255, 0.9);
+}
+
+.preset-qr-modal__btn--mint:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.25);
+  border-color: rgba(139, 92, 246, 0.6);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+}
+
+.preset-qr-modal__btn--mint:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.preset-qr-modal__btn--minted {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.25);
+  color: rgba(0, 240, 255, 0.8);
+}
+
+@keyframes qr-glow-cycle {
+  0%   { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
+  20%  { filter: drop-shadow(0 0 9px rgba( 56, 189, 248, 0.85)); }
+  40%  { filter: drop-shadow(0 0 8px rgba( 52, 211, 153, 0.85)); }
+  60%  { filter: drop-shadow(0 0 9px rgba(251, 191,  36, 0.85)); }
+  80%  { filter: drop-shadow(0 0 8px rgba(244,  63,  94, 0.85)); }
+  100% { filter: drop-shadow(0 0 8px rgba(139,  92, 246, 0.85)); }
+}
+
 /* QR trigger button — sits in lower right of console */
 .preset-qr-trigger {
   position: absolute;
@@ -119,19 +230,20 @@
   background: none;
   border: none;
   cursor: pointer;
-  opacity: 0.25;
+  opacity: 0.75;
   padding: 0.25rem;
   line-height: 1;
   font-size: 1.1rem;
-  transition: opacity 0.2s, transform 0.2s, filter 0.2s;
-  filter: grayscale(0.5);
+  transition: opacity 0.2s, transform 0.2s;
   z-index: 10;
+  animation: qr-glow-cycle 8s ease-in-out infinite;
 }
 
 .preset-qr-trigger:hover {
-  opacity: 0.7;
-  filter: grayscale(0) drop-shadow(0 0 4px rgba(139, 92, 246, 0.4));
+  opacity: 1;
   transform: scale(1.1);
+  filter: drop-shadow(0 0 14px rgba(139, 92, 246, 0.95)) !important;
+  animation-play-state: paused;
 }
 
 .preset-qr-trigger:active {

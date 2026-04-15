@@ -9,15 +9,17 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      - name: Build for root (default base /)
+        run: npm run build
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -25,8 +27,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to S3
+      - name: Deploy to S3 root
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
+
+      - name: Build for /v2
+        run: npm run build -- --base /v2/
 
       - name: Deploy v2 snapshot to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
@@ -38,15 +43,17 @@ jobs:
     if: startsWith(github.ref, 'refs/heads/nmj/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      - name: Build for dev (base /)
+        run: npm run build
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -59,3 +66,23 @@ jobs:
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+      - name: Build for /v2 (nmj/ascii only)
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: npm run build -- --base /v2/
+
+      - name: Deploy v2 to prod /v2 (nmj/ascii only)
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
+
+      - name: Build for /v3 (nmj/ascii only)
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: npm run build -- --base /v3/
+
+      - name: Deploy v3 to prod /v3 (nmj/ascii only)
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v3/ --delete
+
+      - name: Invalidate prod /v2 and /v3 CloudFront cache
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/v2/*" "/v3/*"

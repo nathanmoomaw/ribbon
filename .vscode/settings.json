@@ -1,0 +1,37 @@
+{
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.colorCustomizations": {
+    "editor.background": "#1b102b",
+    "editor.foreground": "#efeaff",
+    "sideBar.background": "#170b24",
+    "activityBar.background": "#2a0f3d",
+    "statusBar.background": "#3a154b",
+    "titleBar.activeBackground": "#2b0f3d",
+    "titleBar.activeForeground": "#f3eaff",
+    "breadcrumb.background": "#1b0f26",
+    "tab.activeBackground": "#2b0f3d",
+    "tab.inactiveBackground": "#1a0c20",
+    "panel.background": "#16081b",
+    "contrastBorder": "#4b1b63"
+  },
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": ["comment", "punctuation.definition.comment"],
+        "settings": { "foreground": "#8b6f9b", "fontStyle": "italic" }
+      },
+      {
+        "scope": ["keyword", "storage.type"],
+        "settings": { "foreground": "#c084fc" }
+      },
+      {
+        "scope": ["string", "constant.other.symbol"],
+        "settings": { "foreground": "#f0abfc" }
+      },
+      {
+        "scope": ["variable", "entity.name.function"],
+        "settings": { "foreground": "#e9d5ff" }
+      }
+    ]
+  }
+}

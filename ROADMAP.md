@@ -1,28 +1,92 @@
 # Roadmap
 
+## v3 "ascii ribbon" (branch: nmj/ascii, codename: ascii ribbon)
+> Note: the original text-ribbon branch was an ASCII version of early puddle; now adopted as the official ascii ribbon v3, based on ribbon v2 feature set.
+- [x] Bootstrap ASCII rendering layer using @chenglou/pretext
+- [x] AsciiRibbon canvas: fluid simulation + rainbow ASCII characters
+- [x] AsciiControls: full terminal-aesthetic UI (transport, OSC, FX, VCF, scale)
+- [x] TextRibbonApp wired to existing audio engine (no crypto/wallet layer)
+- [x] ASDF/JKL keyboard triggers ribbon notes with visual column markers
+- [x] Velocity axis corrected (bottom=soft, top=loud)
+- [x] Confetti particles at touch/keyboard points
+- [x] OSC3 panel overflow fixed
+- [x] Shake triggers audio noise burst
+- [x] Design aligned to ribbon aesthetic (grid bg, perspective floor, header layout)
+- [x] Codename updated to "ascii ribbon"; tagline updated in UI
+- [x] Oscillator waveform animation bands (per-osc wave pattern in ribbon canvas)
+- [x] Ambient idle rippling (auto-splashes when idle >1.5s for living surface)
+- [x] Shake excess fix (header clicks no longer double-trigger window shake handler)
+- [ ] Mobile layout polish
+- [ ] Preset QR support
+- [ ] Keyboard play mode (keys show as ASCII on canvas)
+- [ ] Marble hold mode ported to ASCII representation
+- [ ] Branch nmj/ascii in puddle repo with ASCII components (feature for puddle v2)
+
 ## Up Next
 - [ ] Refine SVG logo (letter spacing, möbius strip polish, crossing depth)
-- [x] Scale selection UI (multi-select combination scales)
-- [x] Bitcrush effect (AudioWorklet)
+- [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
+- [ ] Production domain setup
+- [ ] Wire first_sound milestone to Puddle touch events
+- [ ] Serialize goop state in QR codes
+- [x] Puddle shape design — draw a less jagged, more natural puddle silhouette (needs user input on desired shape)
+- [x] Focus on marble puddle with splashing and tighter controls — sci-fi controls lining the edge of a nice puddle-shaped center, splashes and movement on touch
+- [x] QR code style: branch to a subtler style where letters don't blow out against the QR grain (less visible text)
+
+## Tokenization / Crypto Roadmap
+- [ ] Define tokenization strategy for v1/v2/... scheme — each version could implement tokenization differently, tied to the abstract /v1 /v2 versioning
+- [x] Tokenize QR codes — the QR preset code represents a unique "state" (working name) that can be minted/owned
+- [ ] QR state mutability: settings can be mutated by the owner, QR auto-regenerates on change, name can only change when settings change. Original creator retains until sold/traded
+- [ ] Marketplace: owners can put their state back on marketplace (for a price or free) after making changes, adding marbles, changing modes, etc.
+- [x] Brainstorm better word than "state" for the saved settings/configuration that gets encoded in QR - puddle
+- [ ] Explore what actions are possible after linking a Base account (currently wallet connects but no downstream actions)
+
+## v3 Polish Plan (priority this week)
+- [ ] Puddle logo — "puddle" wordmark with möbius strip through the dd
+- [ ] Logo toggle — click ribbon logo to switch to puddle logo (and vice versa), both trigger shake
+- [ ] Logo shake flip animation — möbius-strip flip effect, electrons scatter across screen then spring back, all controls scrambled except main volume
+- [x] QR/token shake randomization — shake icon in the shake modal randomizes QR pattern/style; outside clicks remember last shake state
+- [x] QR visual state integration — use current puddle visuals (marbles, ripples) to influence generated QR style options
+
+## Puddle Fork (post-v3)
+- [ ] Fork ribbon into puddle.obfusco.us as a separate project
+- [ ] Ambient/marble-focused play: tone clips and moods without needing arp or poly
+- [ ] Mutation trail: each project version forks to create new themed variants (Smash, etc.)
+- [ ] Branch unlock easter egg — unlock mode that gives access to a secured branch to design from
+- [ ] Design concepts evolution file — an overarching mutation log that is itself a living document
+- [ ] QR token marketplace — make/trade/sell/auction/buy tokens (QR = token outside of visual context)
+
+## Soon
+- [x] Save rec/loop function state in presets for playback from QR/URL (shelved — UI removed for v3, hook preserved)
+- [ ] Goop functionality — needs dedicated attention, not currently working correctly
+
+## ASCII Ribbon — Lineage Strategy
+> The ascii ribbon (v3) is the first in a planned lineage of ASCII/lo-fi rendering modes across ribbon versions.
+- [ ] ribbon v4: ASCII mode = "lo" mode; party mode = full visuals, lo mode switches to ASCII rendering
+- [ ] Easily apply ASCII rendering to future ribbon lineage versions (puddle v2, smash, etc.)
+- [ ] Ribbon lineage: apps/toys evolved from ribbon share the ASCII mode concept as a cross-cutting feature
+- [ ] nmj/ascii in puddle repo — ASCII components as feature branch for puddle v2 inclusion
+- [ ] Branch/tag strategy: v1, v2, v3 branches map latest stable → /v1, /v2, /v3 URL paths; minor versions auto-increment with commit hash visible in info button; dev branches nmj/xyz autodeploy to x-dev
+- [x] Knob baking — BipolarKnob: CrunchSweep (dark←→bright) and SpaceVerb (reverb←→echo) in ASCII ribbon
+- [ ] VCF new functionality — to be designed (see DUMP for context)
+- [ ] Baked vs verbose mode toggle — let user switch between baked knobs and full verbose parameter set
+- [ ] Compound OSC control — single circle component: outer ring=mix, inner ring=detune, center pizza-cut circle=waveform selector (4 quadrants). Sketch: screenshots/signal-2026-04-11-173023_002.jpeg
+
+## Future Features
+- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, mild ambient play)
+- [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
+- [ ] Step sequencer functionality
+- [ ] Help wizard — interactive demo with branded cursor, bubble tooltips (partially implemented, shelved)
 - [ ] Camera input mode for ribbon control
 - [ ] Composition saving (record + export)
 - [ ] Multi-ribbon sessions
-- [ ] Rotary knob components (replace range sliders)
-- [x] Mobile-optimized layout (zoom default, controls reorder)
-- [x] MIDI controller support (Web MIDI API — notes, CCs, pitch bend, sustain pedal)
-- [ ] Step sequencer functionality
-- [ ] Ambient autoplay mode (shelved — hook exists, UI removed, targeting v3 as mild ambient play)
-- [ ] Production domain setup
-- [x] v2 "Rock & Rumble" tag — tagged and deployed to /v2
-- [ ] v3 — live by EOW 2026-03-27 (cryptic crypto integration + mild ambient play mode)
-- [ ] Interactive 3D spheres — grab/drag oscillator spheres to change settings and/or create sound
-- [ ] Additional scales: Phrygian dominant, Hirajoshi, Whole tone, Prometheus, Hungarian minor, Enigmatic, Lydian dominant
-- [ ] POAP support (https://poap.xyz/) — proof of attendance protocol integration
-- [ ] Future versions: Puddle (oil spill theme), Smash (broken glass theme)
-- [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
-- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved for now)
+- [ ] Future versions: Smash (broken glass theme)
+- [ ] Marble alchemy easter egg — combining specific marble pairs on the puddle triggers hidden sound presets (e.g., Ruby+Sapphire = "Volcano", all 9 marbles = "Solar System" mode)
 
 ## Completed
+- [x] Perspective floor plane background grid with puddle-touch parallax (synthwave floor look)
+- [x] Controls chrome stripped — removed backdrop-filter, heavy borders/shadows/animations from panels
+- [x] Controls curve-follow — left/right panels shaped with clip-path to hug the puddle oval
+- [x] Performance: throttled drag ripples, removed backdrop-filter, reduced confetti burst size
 - [x] Vite + React project scaffold
 - [x] Web Audio engine (oscillator, gain, delay, reverb)
 - [x] Ribbon controller with pointer events
@@ -96,3 +160,34 @@
 - [x] SVG cityscape panel background (replaced gradient-based buildings with inline SVG skyline)
 - [x] Above-the-fold viewport fit (100dvh, internal scroll, reduced spacing)
 - [x] Ambient play shelved (UI removed, hook preserved for future version)
+- [x] Scale selection UI (multi-select combination scales)
+- [x] Bitcrush effect (AudioWorklet)
+- [x] Mobile-optimized layout (zoom default, controls reorder)
+- [x] MIDI controller support (Web MIDI API — notes, CCs, pitch bend, sustain pedal)
+- [x] v2 "Rock & Rumble" tag — tagged and deployed to /v2
+- [x] Shareable preset QR codes — encode/decode all settings via URL hash, multi-colored QR with download
+- [x] Help wizard — interactive demo with branded cursor, bubble tooltips, and written help modal (partially implemented, shelved)
+- [x] v3 "Puddle" — iridescent oil-spill kaos pad surface with Three.js custom shaders
+- [x] Rotary knob components (replace range sliders) with ghost slider overlay
+- [x] VCF control — per-oscillator voltage-controlled filter with routing buttons
+- [x] Capture/looper — event-based recording/playback with 33.3s max, layering
+- [x] Goop/liquid control — per-control goop levels with SVG blob overlay, shake to clean
+- [x] Crypto integration — RainbowKit + wagmi wallet connection, POAP milestone tracking
+- [x] POAP support — localStorage-based milestone tracking with toast notifications
+- [x] Controls surround puddle layout (CSS grid with display:contents)
+- [x] Enhanced oil spill default shader (multi-layer thickness, position-dependent color patches)
+- [x] Wallet address + loop data in QR preset URLs
+- [x] VCF settings serialized in QR presets
+- [x] Spacebar stops looper playback
+- [x] Mobile fullscreen splash screen (tap to enter, once per session)
+- [x] Preset splash screen — entering via preset link shows QR + play button to resume AudioContext
+- [x] VCF knob shake fix — VCF interactions no longer trigger shake detection
+- [x] Marble hold — 9 draggable marbles (Ruby→Moonstone) that persist sound on the puddle, with physics, shader depressions, arp cycling by drop order, and voice-per-marble audio
+- [x] QR CAPTCHA text — more aggressive wave baseline, per-char font mixing, ghost echoes, stronger glow
+- [x] Scale buttons single-letter labels — C/M/m/b/P (Phrygian replaces Pentatonic), "egg" for double harmonic easter egg
+- [x] Marble UV fix — shader ripples/depressions now correctly mapped to screen position (camera FOV + plane scale correction)
+- [x] Arp→play hold fix — switching mode no longer cuts sound when hold is on
+- [x] Double-spacebar clears marbles from puddle
+- [x] Puddle tokenization Phase 1 — ERC-721 `RibbonPuddle.sol` on Base, mint/own QR presets, IPFS metadata, ownership badges, `first_mint` milestone
+- [x] QR shake randomization — ⚡ button in QR modal rerandomizes gradient/spiral/spill style, seed persists across open/close
+- [x] QR visual state integration — marble count + avg position + puddle activity influence QR gradient spiral and glow

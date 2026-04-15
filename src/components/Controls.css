@@ -31,6 +31,7 @@
   align-items: center;
   gap: 0.35rem;
   margin-top: 0.25rem;
+  width: 100%;
 }
 
 .controls__fader-label {
@@ -208,7 +209,7 @@
     0 -3px 0 rgba(0, 0, 0, 0.6) inset,
     3px 0 0 rgba(100, 90, 140, 0.08) inset,
     -3px 0 0 rgba(0, 0, 0, 0.4) inset;
-  animation: float 6s ease-in-out infinite, sphere-light 12s ease-in-out infinite;
+  animation: none;
   transform-style: preserve-3d;
 }
 
@@ -297,6 +298,46 @@
   gap: 0.75rem;
 }
 
+/* --- Goop visual overlay --- */
+.goop-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 5;
+  overflow: hidden;
+  opacity: var(--goop-opacity, 0.3);
+  box-shadow: inset 0 0 12px rgba(180, 100, 255, calc(var(--goop-level, 0) * 0.4));
+  animation: goop-idle-wobble 3s ease-in-out infinite;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+
+/* Idle wobble — subtle shift even when puddle is not active */
+@keyframes goop-idle-wobble {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(1px, -0.5px) scale(1.005); }
+  50% { transform: translate(-0.5px, 1px) scale(0.995); }
+  75% { transform: translate(0.5px, -1px) scale(1.002); }
+}
+
+/* Active puddle interaction — gooped controls react more strongly */
+.gooped--active .goop-effect {
+  animation: goop-active-wobble 0.6s ease-in-out infinite;
+}
+
+@keyframes goop-active-wobble {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(2px, -1.5px) scale(1.02); }
+  50% { transform: translate(-1.5px, 2px) scale(0.98); }
+  75% { transform: translate(1.5px, -2px) scale(1.01); }
+}
+
+.gooped {
+  /* Slight iridescent border glow */
+  box-shadow: 0 0 8px rgba(120, 80, 200, calc(var(--goop-level, 0) * 0.3)),
+              inset 0 0 4px rgba(100, 200, 255, calc(var(--goop-level, 0) * 0.15));
+}
+
 .controls__osc {
   flex: 1;
   padding: 0.75rem;
@@ -379,10 +420,39 @@
   flex-direction: column;
   gap: 0.4rem;
   min-width: 0;
+  flex-shrink: 0;
 }
 
 .controls__section--full {
   grid-column: 1 / -1;
+}
+
+.controls__party-lo {
+  display: flex;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.controls__visual-btn {
+  flex: 1;
+  padding: 3px 6px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.07);
+  color: rgba(200,200,220,0.4);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+.controls__visual-btn:hover { color: rgba(200,200,220,0.8); border-color: rgba(255,255,255,0.18); }
+.controls__visual-btn.active { color: #c8d0ff; border-color: rgba(100,120,220,0.5); background: rgba(60,70,160,0.2); }
+
+.controls__version-switcher {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .controls__label {
@@ -394,15 +464,23 @@
   display: flex;
   align-items: center;
   gap: 0.5em;
+  white-space: nowrap;
 }
 
 .controls__value {
   color: var(--cyan);
   font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  /* min-width prevents layout shift as value string length changes */
+  min-width: 4ch;
+  display: inline-block;
+  text-align: right;
 }
 
 .controls__waveforms {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
 }
 
@@ -431,6 +509,21 @@
 
 .controls__knob input[type="range"] {
   width: 80px;
+}
+
+/* Rotary knob row — horizontal alignment for grouped knobs */
+.controls__rotary-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+/* Osc section knob pair — mix + detune side by side */
+.controls__osc-knobs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  padding-top: 0.15rem;
 }
 
 .controls__section > input[type="range"] {
@@ -503,6 +596,167 @@
   animation: shake 0.4s ease-out !important;
 }
 
+/* Desktop: break controls into grid-placeable sections around puddle */
+@media (min-width: 768px) {
+  .controls {
+    display: contents;
+    animation: none;
+  }
+  .controls::before { display: none; }
+  .controls__layout { display: contents; }
+  .controls__main { display: contents; }
+
+  /* Left panel — play/arp, mono/poly, hold, stop, bpm, vol, octaves, scale, speed */
+  .controls__toggles {
+    grid-column: 1;
+    grid-row: 2;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    padding: 0.5rem 0.5rem 0.75rem 0.4rem;
+    border-right: none;
+    box-shadow: none;
+    background: rgba(22, 18, 40, 0.65);
+    border: 1px solid rgba(70, 60, 110, 0.3);
+    border-right-color: rgba(80, 160, 255, 0.12);
+    border-radius: 6px 8px 0 0;
+    border-bottom: none;
+    margin-right: -23px;
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    max-height: calc(100dvh - 250px);
+    padding-bottom: 55px;
+  }
+
+  .controls__toggles .controls__fader {
+    flex-direction: row;
+    gap: 0.4rem;
+    align-items: center;
+    margin-top: 0.75rem;
+  }
+
+  /* Center octaves/scale/speed sections in left panel */
+  .controls__toggles .controls__section {
+    align-items: center;
+  }
+
+  .controls__toggles .controls__fader-track {
+    flex: 1;
+    height: 24px;
+  }
+
+  .controls__toggles .controls__fader-groove {
+    top: 50%;
+    bottom: auto;
+    left: 8px;
+    right: 8px;
+    width: auto;
+    height: 3px;
+    transform: translateY(-50%);
+  }
+
+  .controls__toggles .controls__fader-ghost {
+    top: 3px;
+    bottom: 3px;
+    left: var(--ghost-left, 0);
+    right: auto;
+    height: auto;
+    width: 6px;
+  }
+
+  .controls__toggles .controls__fader-thumb {
+    top: 3px;
+    bottom: 3px;
+    left: var(--thumb-left, 0);
+    right: auto;
+    height: auto;
+    width: 10px;
+  }
+
+  /* Flush stacked OSC cards — flat corners, merged borders */
+  .controls__oscillators .controls__osc {
+    padding: 0.5rem 0.75rem;
+    border-radius: 0;
+  }
+  .controls__oscillators .controls__osc-goopable:not(:first-child) .controls__osc {
+    border-top: none;
+  }
+
+  /* Right panel — oscillators */
+  .controls__oscillators {
+    grid-column: 3;
+    grid-row: 2;
+    flex-direction: column;
+    align-self: stretch;
+    gap: 0;
+    padding: 0.5rem 0.4rem 0.5rem 0.5rem;
+    background: rgba(22, 18, 40, 0.65);
+    border: 1px solid rgba(70, 60, 110, 0.3);
+    border-left-color: rgba(80, 160, 255, 0.12);
+    border-radius: 8px 6px 0 0;
+    border-bottom: none;
+    margin-left: -23px;
+    position: relative;
+    z-index: 1;
+    max-height: calc(100dvh - 250px);
+    overflow-y: auto;
+    padding-bottom: 55px;
+  }
+
+  /* Bottom panel — VCF + shared controls (filter, reverb, crunch, delay) */
+  .controls__shared {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0.75rem 1rem 0.5rem;
+    margin-top: -50px;
+    border-top: none;
+    background: rgba(22, 18, 40, 0.65);
+    border: 1px solid rgba(70, 60, 110, 0.3);
+    border-top-color: rgba(80, 160, 255, 0.12);
+    border-radius: 0 0 6px 6px;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* VCF sits as a flex item in the bottom bar */
+  .controls__shared .vcf-control {
+    background: none;
+    border: none;
+    border-right: 1px solid rgba(224, 64, 251, 0.15);
+    padding: 0 1rem 0 0;
+    border-radius: 0;
+    flex-shrink: 0;
+  }
+
+  /* Console corner — MIDI + wallet + QR, absolute lower-right of bottom panel */
+  .controls__console-corner {
+    position: absolute;
+    bottom: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.3rem;
+    z-index: 10;
+  }
+
+  /* QR trigger inside corner is in-flow (not absolute) */
+  .controls__console-corner .preset-qr-trigger {
+    position: static;
+    bottom: auto;
+    right: auto;
+  }
+}
+
 /* Mobile responsive */
 @media (max-width: 767px) {
   .controls {
@@ -568,6 +822,10 @@
     right: auto;
     height: auto;
     width: 10px;
+  }
+
+  .controls__osc-goopable {
+    flex: none;
   }
 
   .controls__oscillators {

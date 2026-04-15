@@ -1,0 +1,28 @@
+.ascii-ribbon {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #060810;
+  overflow: hidden;
+  font-family: 'Courier New', monospace;
+  /* Industrial inset — ribbon feels like it's pressed into the panel */
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.7), inset 0 -1px 4px rgba(60,90,160,0.08);
+}
+
+.ascii-ribbon__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ascii-ribbon__label {
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  color: rgba(80, 90, 120, 0.4);
+  letter-spacing: 0.12em;
+  pointer-events: none;
+  text-transform: uppercase;
+}

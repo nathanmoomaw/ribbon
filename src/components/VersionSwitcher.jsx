@@ -1,20 +1,21 @@
 /**
- * VersionSwitcher — fixed upper-left overlay
- * Switches between v2 (Puddle) and v3 (ASCII Ribbon) via ?v= URL param.
+ * VersionSwitcher — inline header element
+ * Navigates between version snapshots via URL paths: /v1/ /v2/ / (v3=root)
  */
 export function VersionSwitcher({ current }) {
   function switchTo(v) {
-    const url = new URL(window.location.href)
-    if (v === 2) {
-      url.searchParams.set('v', '2')
-    } else {
-      url.searchParams.delete('v')
-    }
-    window.location.href = url.toString()
+    if (v === current) return
+    window.location.href = v === 3 ? '/' : `/v${v}/`
   }
 
   return (
     <div className="version-switcher">
+      <button
+        className={`version-btn${current === 1 ? ' version-btn--active' : ''}`}
+        onClick={() => switchTo(1)}
+        title="v1 Ribbon"
+      >v1</button>
+      <span className="version-sep">|</span>
       <button
         className={`version-btn${current === 2 ? ' version-btn--active' : ''}`}
         onClick={() => switchTo(2)}

@@ -10,8 +10,8 @@ import '@rainbow-me/rainbowkit/styles.css'
 
 const queryClient = new QueryClient()
 
-const urlVersion = new URLSearchParams(window.location.search).get('v')
-export const version = urlVersion === '2' ? 2 : 3
+const path = window.location.pathname
+export const version = path.startsWith('/v1') ? 1 : path.startsWith('/v2') ? 2 : 3
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

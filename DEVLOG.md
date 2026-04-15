@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-15 — OSC responsive scaling + version switcher paths (DUMP 592-593)
+
+- **592**: Replaced hard `@media (min-width: 1440px)` OSC overrides with continuous `clamp()` on `.ascii-osc` scoped selectors. Knob arc: `clamp(18px, 4.8vw, 80px)` — 57px at 1200px (was 21.6px), 72px at 1500px (unchanged feel). Wave buttons: `clamp(14px, 3vw, 52px)`. Side panels also shrink with vw: toggles `clamp(110px,12vw,155px)`, fx `clamp(140px,14vw,190px)`.
+- **593**: Version switcher rewritten to use path navigation (`/v1/`, `/v2/`, `/` for v3). `main.jsx` detects version from `window.location.pathname`. Added v1 button alongside v2/v3.
+
 ## 2026-04-15 — version switcher (DUMP 591)
 
 - **591**: `VersionSwitcher` component — fixed upper-left overlay showing `v2 | v3` toggle. `?v=2` loads `App.jsx` (Puddle), default loads `TextRibbonApp.jsx` (ASCII). Fades to 45% opacity at rest, full opacity on hover. ASCII monospace aesthetic matching existing header style.

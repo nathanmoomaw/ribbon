@@ -475,7 +475,7 @@ export const Controls = forwardRef(function Controls({
           )}
 
           <div className="controls__version-switcher">
-            <VersionSwitcher current={2} />
+            <VersionSwitcher current={window.location.pathname.startsWith('/v1') ? 1 : 2} />
           </div>
         </div>
 

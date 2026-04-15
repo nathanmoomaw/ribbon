@@ -30,11 +30,17 @@ jobs:
       - name: Deploy to S3 root
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
-      - name: Build for /v1
+      - name: Checkout v1-picker branch (v1 tag + version switcher)
+        run: git fetch origin v1-picker && git checkout v1-picker && npm ci
+
+      - name: Build for /v1 (from v1-picker branch)
         run: npm run build -- --base /v1/
 
       - name: Deploy to /v1
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
+
+      - name: Return to main branch after v1
+        run: git checkout main
 
       - name: Checkout v2-picker branch (v2 tag + version switcher)
         run: git fetch origin v2-picker && git checkout v2-picker && npm ci

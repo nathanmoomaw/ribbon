@@ -33,30 +33,6 @@
   margin-top: 0.25rem;
 }
 
-.controls__visual-toggle {
-  display: flex;
-  gap: 4px;
-  margin-top: 0.5rem;
-}
-
-.controls__visual-btn {
-  background: none;
-  border: 1px solid rgba(255,255,255,0.12);
-  color: var(--text-muted, rgba(255,255,255,0.4));
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  padding: 2px 8px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
-}
-
-.controls__visual-btn.active {
-  color: var(--cyan, #5bf);
-  border-color: var(--cyan, #5bf);
-  background: rgba(85,187,255,0.08);
-}
-
 .controls__fader-label {
   font-family: var(--font-mono);
   font-size: 0.6rem;

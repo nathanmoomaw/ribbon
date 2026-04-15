@@ -1,4 +1,6 @@
 import { useCallback, forwardRef } from 'react'
+import { VersionSwitcher } from './VersionSwitcher'
+import './VersionSwitcher.css'
 import { SCALES } from '../utils/scales'
 import './Controls.css'
 
@@ -271,6 +273,7 @@ export const Controls = forwardRef(function Controls({
           </div>
         </div>
       </div>
+      <VersionSwitcher current={1} />
     </div>
   )
 })

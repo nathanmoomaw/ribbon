@@ -1,7 +1,9 @@
 import { useCallback, useRef as useRefHook, forwardRef, memo } from 'react'
 import { SCALES } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
+import { VersionSwitcher } from './VersionSwitcher'
 import './Controls.css'
+import './VersionSwitcher.css'
 
 function DJFader({ value, onChange, ghostValue }) {
   const trackRef = useRefHook(null)
@@ -317,6 +319,7 @@ export const Controls = forwardRef(function Controls({
             onKillAll={onKillAll}
           />
           <DJFader value={volume} onChange={handleVolume} />
+          <VersionSwitcher current={window.location.pathname.startsWith('/v1') ? 1 : 2} />
         </div>
 
         <div className="controls__main">

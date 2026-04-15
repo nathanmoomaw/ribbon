@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-15 — /v3 prod deploy + v2 party/lo + version switcher in controls (DUMP 596-597)
+
+- **596**: Added `deploy-v3` step to CI workflow — when `nmj/ascii` is pushed, builds deploy to dev AND to `s3://ribbon.obfusco.us/v3/` on prod (with CloudFront invalidation).
+- **597**: v2 Controls now include party/lo toggle buttons (wires up existing `visualMode` state, previously keyboard-only via `KeyV`). Version switcher added below party/lo in `controls__toggles`. Removed from App.jsx header.
+
 ## 2026-04-15 — QR button: ASCII style + moved to header left (DUMP 594-595)
 
 - **594**: QR button moved from `header__right` to `header__left`, positioned before the version switcher. Header left now reads: `[QR] · v1|v2|v3 · ◈ [MODE]`.

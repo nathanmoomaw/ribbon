@@ -59,3 +59,11 @@ jobs:
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+      - name: Deploy v3 snapshot to prod /v3 (nmj/ascii only)
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v3/ --delete
+
+      - name: Invalidate prod /v3 CloudFront cache
+        if: github.ref == 'refs/heads/nmj/ascii'
+        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/v3/*"

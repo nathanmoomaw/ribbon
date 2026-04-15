@@ -3,7 +3,9 @@ import { SCALES, SCALE_LABELS } from '../utils/scales'
 import { ActivationMode } from './ActivationMode'
 import { RotaryKnob } from './RotaryKnob'
 import { VCFControl } from './VCFControl'
+import { VersionSwitcher } from './VersionSwitcher'
 import './Controls.css'
+import './VersionSwitcher.css'
 
 function DJFader({ value, onChange, ghostValue }) {
   const trackRef = useRefHook(null)
@@ -323,6 +325,8 @@ export const Controls = forwardRef(function Controls({
   midiDevice,
   onConnectMIDI,
   utilitySlot,
+  visualMode,
+  setVisualMode,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -455,6 +459,23 @@ export const Controls = forwardRef(function Controls({
           <div className="controls__section">
             <label className="controls__label">Speed <span className="controls__value">{glideSpeed < 0.01 ? 'fast' : glideSpeed > 0.15 ? 'slow' : 'med'}</span></label>
             <RotaryKnob value={glideSpeed} min={0.001} max={0.3} step={0.001} onChange={handleGlideSpeed} color="#39ff14" size={40} />
+          </div>
+
+          {setVisualMode && (
+            <div className="controls__section controls__party-lo">
+              <button
+                className={`controls__visual-btn${visualMode === 'party' ? ' active' : ''}`}
+                onClick={() => setVisualMode('party')}
+              >Party</button>
+              <button
+                className={`controls__visual-btn${visualMode === 'lo' ? ' active' : ''}`}
+                onClick={() => setVisualMode('lo')}
+              >Lo</button>
+            </div>
+          )}
+
+          <div className="controls__version-switcher">
+            <VersionSwitcher current={2} />
           </div>
         </div>
 

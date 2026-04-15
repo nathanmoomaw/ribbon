@@ -9,8 +9,10 @@ import { Ribbon } from './components/Ribbon'
 import { Controls } from './components/Controls'
 import { ActivationMode } from './components/ActivationMode'
 import { RibbonLogo } from './components/RibbonLogo'
+import { VersionSwitcher } from './components/VersionSwitcher'
 import { positionToFrequency } from './utils/pitchMap'
 import './App.css'
+import './components/VersionSwitcher.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 
@@ -207,6 +209,10 @@ function App() {
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
       <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} reverbMix={reverbMix} delayParams={delayParams} />
+
+      <div className="app-version-switcher">
+        <VersionSwitcher current={1} />
+      </div>
 
       <header className="app-header">
         <RibbonLogo />

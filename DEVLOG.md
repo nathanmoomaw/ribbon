@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-15 — restore Rock & Rumble at root/v2; fix VersionSwitcher v3 nav (DUMP 600-601)
+
+- **600**: App.jsx restored to Rock & Rumble (Ribbon + Visualizer), NOT puddle. Root and /v2 now correctly serve v2 ribbon. VCFControl guarded with `vcfCutoff !== undefined` check so Controls.jsx renders cleanly without puddle VCF props.
+- **600**: Pass `visualMode`, `setVisualMode`, `midiDevice`, `onConnectMIDI` from v2 App to Controls so party/lo buttons and MIDI integration work correctly.
+- **601**: Saved memory `feedback_version_routing.md` documenting the invariant: App.jsx = Rock & Rumble, puddle is a separate project.
+- Also fixed: VersionSwitcher was sending v3 clicks to `/` (root) instead of `/v3/`.
+
 ## 2026-04-15 — fix /v3 MIME error, correct base-path builds for /v2 and /v3 (DUMP 598-599)
 
 - **598**: Root cause: Vite built with `base=/` so `/v3/index.html` referenced `/assets/index-xxx.js` — a different hash from main's root assets. Fixed by building with `--base /v3/` so assets are self-contained under `/v3/assets/`.

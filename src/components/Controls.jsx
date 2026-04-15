@@ -507,15 +507,17 @@ export const Controls = forwardRef(function Controls({
             puddleActivity={puddleActivity || 0}
             className="controls__shared"
           >
-            <VCFControl
-              vcfCutoff={vcfCutoff}
-              vcfResonance={vcfResonance}
-              vcfRouting={vcfRouting}
-              getEngine={getEngine}
-              onCutoffChange={onVcfCutoffChange}
-              onResonanceChange={onVcfResonanceChange}
-              onRoutingToggle={onVcfRoutingToggle}
-            />
+            {vcfCutoff !== undefined && (
+              <VCFControl
+                vcfCutoff={vcfCutoff}
+                vcfResonance={vcfResonance}
+                vcfRouting={vcfRouting}
+                getEngine={getEngine}
+                onCutoffChange={onVcfCutoffChange}
+                onResonanceChange={onVcfResonanceChange}
+                onRoutingToggle={onVcfRoutingToggle}
+              />
+            )}
             <MiniShakeBolt onClick={() => {
               const engine = getEngine()
               const newOctaves = OCTAVE_OPTIONS[Math.floor(Math.random() * OCTAVE_OPTIONS.length)]

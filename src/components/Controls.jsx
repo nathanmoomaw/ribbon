@@ -319,7 +319,6 @@ export const Controls = forwardRef(function Controls({
             onKillAll={onKillAll}
           />
           <DJFader value={volume} onChange={handleVolume} />
-          <VersionSwitcher current={window.location.pathname.startsWith('/v1') ? 1 : 2} />
         </div>
 
         <div className="controls__main">

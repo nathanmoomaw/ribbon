@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-15 — version switcher (DUMP 591)
+
+- **591**: `VersionSwitcher` component — fixed upper-left overlay showing `v2 | v3` toggle. `?v=2` loads `App.jsx` (Puddle), default loads `TextRibbonApp.jsx` (ASCII). Fades to 45% opacity at rest, full opacity on hover. ASCII monospace aesthetic matching existing header style.
+
 ## 2026-04-14 — ascii ribbon: larger OSC controls on desktop, more confetti (DUMP 585-586)
 
 - **585**: Added `@media (min-width: 1440px)` overrides in AsciiControls.css — OSC arc chars scale to `clamp(48px,5vw,80px)` (vs 24px cap before), wave buttons to `clamp(28px,3.2vw,52px)`. Labels/vals also bump up. Space/Tone BipolarKnobs unchanged (user said fine).

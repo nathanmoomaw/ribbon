@@ -1,0 +1,48 @@
+.version-switcher {
+  position: fixed;
+  top: 8px;
+  left: 10px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+}
+
+.version-switcher:hover {
+  opacity: 1;
+}
+
+.version-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  letter-spacing: inherit;
+  color: #5a5e7a;
+  padding: 2px 4px;
+  border-radius: 2px;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.version-btn:hover {
+  color: #8899dd;
+}
+
+.version-btn--active {
+  color: #8899dd;
+  background: rgba(85, 102, 170, 0.15);
+}
+
+.version-sep {
+  color: #2a2a44;
+  font-size: 8px;
+  line-height: 1;
+  user-select: none;
+}

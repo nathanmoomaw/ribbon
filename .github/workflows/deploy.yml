@@ -1,22 +1,24 @@
-name: Deploy to S3
+name: Deploy v1
 
 on:
   push:
-    branches: [main]
+    branches: [v1]
 
 jobs:
-  deploy:
+  deploy-v1:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      - name: Build for /v1
+        run: npm run build -- --base /v1/
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -24,8 +26,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to S3
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete
+      - name: Deploy to /v1
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
 
       - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/v1/*"

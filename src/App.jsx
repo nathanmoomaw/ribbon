@@ -403,14 +403,15 @@ function App() {
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
       <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
 
-      <header className="app-header">
-        <div className="app-header__left">
-          <div className="app-header__visual-toggle">
-            <button className={`app-header__visual-btn${visualMode === 'party' ? ' active' : ''}`} onClick={() => setVisualMode('party')}>Party</button>
-            <button className={`app-header__visual-btn${visualMode === 'lo' ? ' active' : ''}`} onClick={() => setVisualMode('lo')}>Lo</button>
-          </div>
-          <VersionSwitcher current={2} />
+      <div className="app-corner">
+        <div className="app-corner__visual-toggle">
+          <button className={`app-corner__visual-btn${visualMode === 'party' ? ' active' : ''}`} onClick={() => setVisualMode('party')}>Party</button>
+          <button className={`app-corner__visual-btn${visualMode === 'lo' ? ' active' : ''}`} onClick={() => setVisualMode('lo')}>Lo</button>
         </div>
+        <VersionSwitcher current={2} />
+      </div>
+
+      <header className="app-header">
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
           <RibbonLogo />
         </div>

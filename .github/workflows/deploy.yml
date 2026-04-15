@@ -36,6 +36,12 @@ jobs:
       - name: Deploy v2 snapshot to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
 
+      - name: Build for /v3
+        run: npm run build -- --base /v3/
+
+      - name: Deploy v3 snapshot to /v3
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v3/ --delete
+
       - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
 

@@ -293,6 +293,13 @@ export default function TextRibbonApp() {
 
       <header className="text-ribbon-header">
         <div className="text-ribbon-header__left">
+          <button
+            className="header-qr-btn"
+            onClick={handleOpenQR}
+            title="Share preset (QR code)"
+            aria-label="QR code"
+          >[QR]</button>
+          <span className="version-status-sep">·</span>
           <VersionSwitcher current={3} />
           <span className="version-status-sep">·</span>
           <div className="text-ribbon-header__status">
@@ -305,12 +312,6 @@ export default function TextRibbonApp() {
         <AsciiLogo onClick={() => handleShake(1.5)} />
         <div className="text-ribbon-header__right">
           <WalletButton flagSet={false} onForget={() => {}} />
-          <button
-            className="header-qr-btn"
-            onClick={handleOpenQR}
-            title="Share preset (QR code)"
-            aria-label="QR code"
-          >⬡</button>
           <button
             className="header-shake-btn"
             onClick={() => handleShake(1)}

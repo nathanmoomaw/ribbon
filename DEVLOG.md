@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-15 — QR button: ASCII style + moved to header left (DUMP 594-595)
+
+- **594**: QR button moved from `header__right` to `header__left`, positioned before the version switcher. Header left now reads: `[QR] · v1|v2|v3 · ◈ [MODE]`.
+- **595**: QR button restyled to ASCII monospace aesthetic — text `[QR]`, `Courier New` 9px, matches version switcher opacity/color scheme. Removed pulse animation.
+
 ## 2026-04-15 — OSC responsive scaling + version switcher paths (DUMP 592-593)
 
 - **592**: Replaced hard `@media (min-width: 1440px)` OSC overrides with continuous `clamp()` on `.ascii-osc` scoped selectors. Knob arc: `clamp(18px, 4.8vw, 80px)` — 57px at 1200px (was 21.6px), 72px at 1500px (unchanged feel). Wave buttons: `clamp(14px, 3vw, 52px)`. Side panels also shrink with vw: toggles `clamp(110px,12vw,155px)`, fx `clamp(140px,14vw,190px)`.

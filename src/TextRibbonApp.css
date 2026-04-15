@@ -154,22 +154,19 @@ html, body {
 .header-qr-btn {
   background: none;
   border: none;
-  font-size: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 9px;
+  letter-spacing: 0.05em;
   cursor: pointer;
-  opacity: 0.4;
-  transition: opacity 0.12s, transform 0.12s, filter 0.12s;
-  padding: 2px 4px;
-  color: #6688bb;
+  opacity: 0.45;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 2px 3px;
+  color: #5a5e7a;
   line-height: 1;
-  animation: qr-pulse 4s ease-in-out infinite;
+  flex-shrink: 0;
 }
-.header-qr-btn:hover { opacity: 0.9; filter: drop-shadow(0 0 5px rgba(80,130,220,0.6)); transform: scale(1.1); }
-.header-qr-btn:active { opacity: 1; transform: scale(1.2); }
-
-@keyframes qr-pulse {
-  0%, 100% { opacity: 0.4; filter: none; }
-  50% { opacity: 0.65; filter: drop-shadow(0 0 4px rgba(80,130,220,0.35)); }
-}
+.header-qr-btn:hover { opacity: 1; color: #8899dd; }
+.header-qr-btn:active { opacity: 1; color: #aabbff; }
 
 .header-shake-btn {
   background: none;

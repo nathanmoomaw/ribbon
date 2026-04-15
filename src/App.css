@@ -23,13 +23,6 @@
   position: relative;
 }
 
-.app-header .version-switcher {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 .app-header .ribbon-logo {
   margin: 0;
 }

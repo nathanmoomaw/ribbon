@@ -12,7 +12,6 @@ import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
 import { HelpWizard, WizardTrigger } from './components/HelpWizard'
-import { VersionSwitcher } from './components/VersionSwitcher'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
@@ -403,7 +402,6 @@ function App() {
       <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
 
       <header className="app-header">
-        <VersionSwitcher current={2} />
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">
           <RibbonLogo />
         </div>
@@ -459,6 +457,8 @@ function App() {
         onStop={handleStop}
         onKillAll={handleKillAll}
         onQRCreate={handleQRCreate}
+        visualMode={visualMode}
+        setVisualMode={setVisualMode}
       />
 
       <div className="keys-toggle">

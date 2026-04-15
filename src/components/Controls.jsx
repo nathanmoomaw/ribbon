@@ -236,6 +236,8 @@ export const Controls = forwardRef(function Controls({
   onStop,
   onKillAll,
   onQRCreate,
+  visualMode,
+  setVisualMode,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -319,6 +321,17 @@ export const Controls = forwardRef(function Controls({
             onKillAll={onKillAll}
           />
           <DJFader value={volume} onChange={handleVolume} />
+          <div className="controls__visual-toggle">
+            <button
+              className={`controls__visual-btn${visualMode === 'party' ? ' active' : ''}`}
+              onClick={() => setVisualMode('party')}
+            >Party</button>
+            <button
+              className={`controls__visual-btn${visualMode === 'lo' ? ' active' : ''}`}
+              onClick={() => setVisualMode('lo')}
+            >Lo</button>
+          </div>
+          <VersionSwitcher current={2} />
         </div>
 
         <div className="controls__main">

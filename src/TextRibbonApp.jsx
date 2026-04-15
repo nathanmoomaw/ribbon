@@ -19,8 +19,10 @@ import { readPresetFromUrl, buildPresetUrl } from './utils/presets'
 import { positionToFrequency } from './utils/pitchMap'
 import { PresetQR } from './components/PresetQR'
 import { WalletButton } from './components/WalletButton'
+import { VersionSwitcher } from './components/VersionSwitcher'
 import { useAccount } from 'wagmi'
 import './TextRibbonApp.css'
+import './components/VersionSwitcher.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 
@@ -291,6 +293,8 @@ export default function TextRibbonApp() {
 
       <header className="text-ribbon-header">
         <div className="text-ribbon-header__left">
+          <VersionSwitcher current={3} />
+          <span className="version-status-sep">·</span>
           <div className="text-ribbon-header__status">
             <span className={`status-dot${shaking ? ' status-dot--shake' : ''}`}>◈</span>
             <span className="status-mode">[{mode.toUpperCase()}]</span>

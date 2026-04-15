@@ -23,8 +23,10 @@ import { WalletButton } from './components/WalletButton'
 import { MobileSplash } from './components/MobileSplash'
 import { PresetSplash } from './components/PresetSplash'
 import { useMarbles } from './hooks/useMarbles'
+import { VersionSwitcher } from './components/VersionSwitcher'
 import { useAccount } from 'wagmi'
 import './App.css'
+import './components/VersionSwitcher.css'
 
 const WALLET_FLAG_KEY = 'ribbon_wallet_ever_connected'
 
@@ -730,8 +732,9 @@ function App() {
       <div className="app__grid-floor" ref={gridFloorRef} />
 
       <header className="app-header">
-        {/* Left: QR on mobile only */}
+        {/* Left: version switcher + QR on mobile */}
         <div className="app-header__left">
+          <VersionSwitcher current={2} />
           <button
             className="app-header__qr-mobile"
             onClick={handleQRCreate}

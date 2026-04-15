@@ -1,8 +1,4 @@
 .version-switcher {
-  position: fixed;
-  top: 8px;
-  left: 10px;
-  z-index: 9999;
   display: flex;
   align-items: center;
   gap: 3px;
@@ -11,6 +7,7 @@
   letter-spacing: 0.05em;
   opacity: 0.45;
   transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
 .version-switcher:hover {
@@ -45,4 +42,12 @@
   font-size: 8px;
   line-height: 1;
   user-select: none;
+}
+
+.version-status-sep {
+  color: #2a2a44;
+  font-size: 8px;
+  font-family: 'Courier New', monospace;
+  user-select: none;
+  flex-shrink: 0;
 }

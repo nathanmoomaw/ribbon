@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-15 — fix /v3 MIME error, correct base-path builds for /v2 and /v3 (DUMP 598-599)
+
+- **598**: Root cause: Vite built with `base=/` so `/v3/index.html` referenced `/assets/index-xxx.js` — a different hash from main's root assets. Fixed by building with `--base /v3/` so assets are self-contained under `/v3/assets/`.
+- **599**: CI workflow updated to do separate Vite builds per deploy target: default base for dev, `--base /v2/` for prod /v2, `--base /v3/` for prod /v3. All three targets now get correct asset paths. Both /v2 and /v3 invalided in one CloudFront call.
+
 ## 2026-04-15 — /v3 prod deploy + v2 party/lo + version switcher in controls (DUMP 596-597)
 
 - **596**: Added `deploy-v3` step to CI workflow — when `nmj/ascii` is pushed, builds deploy to dev AND to `s3://ribbon.obfusco.us/v3/` on prod (with CloudFront invalidation).

@@ -5,3 +5,4 @@ dist
 # Domscribe artifacts
 .domscribe
 .mcp.json
+DUMP.md

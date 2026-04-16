@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-04-15 — Version picker below party/lo (v2 branch)
+
+- Version picker (`VersionSwitcher current={2}`) now renders below party/lo buttons in `Visualizer.jsx` inside `visualizer__visuals`.
+- `visualizer__visuals` changed to `flex-direction: column`; party/lo wrapped in `visualizer__visuals-row` to keep them horizontal.
+- **Lesson (painful):** Party/Lo have always lived in `Visualizer.jsx`. Many wrong attempts added duplicates to Controls, App.jsx header, ActivationMode, and standalone divs before finding the right place. Logged to memory.
+- **Lesson:** `app-header` shrinks to content — never use absolute positioning inside it for overlay UI. Use `.app` or the visualizer container instead.
+
 ## 2026-03-27 — Version files + v2 tag update
 
 - Created `versions/v1.md`, `versions/v2.md`, `versions/v3.md` with feature lists

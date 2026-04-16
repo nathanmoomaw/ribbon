@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect, useState } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { SCALES, SCALE_LABELS, HIDDEN_SCALES } from '../utils/scales'
 import './AsciiControls.css'
 
@@ -250,45 +250,12 @@ export function AsciiControls({
   vcfRouting, setVcfRouting,
   onStop, onShake,
   doubleHarmonicUnlocked,
+  space, onSpaceChange,
+  tone, onToneChange,
 }) {
   const allScales = { ...SCALES, ...(doubleHarmonicUnlocked ? HIDDEN_SCALES : {}) }
 
-  // ── Baked knobs ──────────────────────────────────────────────────────────
-  // TONE: 0=GRIT (warm crunch + low filter), 0.5=CLEAN, 1=GLITTER (sparkle resonance)
-  const [tone, setTone] = useState(0.5)
-  const handleTone = useCallback((v) => {
-    setTone(v)
-    if (v <= 0.5) {
-      // Left: warm saturation — crunch + filter closes down, resonance adds warmth
-      const t = (0.5 - v) * 2 // 0 at center, 1 at full left
-      setCrunch(t * 0.82)
-      setVcfCutoff(20000 - t * 19500) // 20000 → 500 Hz
-      setVcfResonance(t * 12)
-    } else {
-      // Right: glittery sparkle — slight bite + resonant presence peak at high freq
-      const t = (v - 0.5) * 2 // 0 at center, 1 at full right
-      setCrunch(t * 0.08)           // tiny harmonic bite
-      setVcfCutoff(20000 - t * 13000) // 20000 → 7000 Hz (resonant presence)
-      setVcfResonance(t * 16)         // high resonance = sparkly singing quality
-    }
-  }, [setCrunch, setVcfCutoff, setVcfResonance])
-
-  // SPACE: 0=CATHEDRAL (reverb+delay wash), 0.5=DRY, 1=ORBIT (rhythmic delay+tail)
-  const [space, setSpace] = useState(0.5)
-  const handleSpace = useCallback((v) => {
-    setSpace(v)
-    if (v <= 0.5) {
-      // Left: cathedral — lush reverb bloom with supporting delay wash
-      const t = (0.5 - v) * 2
-      setReverbMix(t * 0.78)
-      setDelayParams({ time: 0.25 + t * 0.15, feedback: 0.2 + t * 0.3, mix: t * 0.35 })
-    } else {
-      // Right: orbital — rhythmic delay with a reverb halo
-      const t = (v - 0.5) * 2
-      setReverbMix(t * 0.15)
-      setDelayParams({ time: 0.28 + t * 0.22, feedback: 0.3 + t * 0.42, mix: t * 0.7 })
-    }
-  }, [setReverbMix, setDelayParams])
+  // ── Baked knobs — state lifted to TextRibbonApp so shake can randomize them ──
 
   const toggleScale = useCallback((s) => {
     setScale(prev => {
@@ -344,13 +311,13 @@ export function AsciiControls({
           label="SPACE"
           subLabel={{ left: 'CATHEDRAL', right: 'ORBIT' }}
           value={space}
-          onChange={handleSpace}
+          onChange={onSpaceChange}
         />
         <BipolarKnob
           label="TONE"
           subLabel={{ left: 'GRIT', right: 'GLITTER' }}
           value={tone}
-          onChange={handleTone}
+          onChange={onToneChange}
         />
         <div className="ascii-controls__row">
           <span className="ascii-label">VCF→</span>

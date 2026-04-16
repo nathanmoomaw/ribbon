@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-04-15 — shake randomizes space/tone/waveform/scale/vcf; sync branches (DUMP 611-612)
+
+- **611**: Fast-forwarded `nmj/ascii` to match `v3` (was 1 CI commit behind). Branches now identical.
+- **612**: Lifted `space`/`tone` baked-knob state from `AsciiControls` to `TextRibbonApp` so `handleShake` can drive them. Shake now randomizes: osc waveforms (all 3), space knob (reverb/delay), tone knob (crunch/vcf), scale (random pick), and vcf routing (random per-osc on/off).
+
 ## 2026-04-15 — fix /v3 MIME error, correct base-path builds for /v2 and /v3 (DUMP 598-599)
 
 - **598**: Root cause: Vite built with `base=/` so `/v3/index.html` referenced `/assets/index-xxx.js` — a different hash from main's root assets. Fixed by building with `--base /v3/` so assets are self-contained under `/v3/assets/`.

@@ -64,6 +64,8 @@ export default function TextRibbonApp() {
   const [shaking, setShaking] = useState(false)
   const [doubleHarmonicUnlocked, setDoubleHarmonicUnlocked] = useState(false)
   const [qrSettings, setQrSettings] = useState(null)
+  const [space, setSpace] = useState(0.5)
+  const [tone, setTone] = useState(0.5)
 
   const { address: walletAddress } = useAccount()
 
@@ -181,6 +183,36 @@ export default function TextRibbonApp() {
   }, [mode, poly, hold, oscParams, volume, octaves, delayParams, reverbMix, crunch,
     glideSpeed, stepped, scale, arpBpm, arpNotes, vcfCutoff, vcfResonance, vcfRouting, walletAddress])
 
+  // TONE: 0=GRIT (warm crunch + low filter), 0.5=CLEAN, 1=GLITTER (sparkle resonance)
+  const handleTone = useCallback((v) => {
+    setTone(v)
+    if (v <= 0.5) {
+      const t = (0.5 - v) * 2
+      setCrunch(t * 0.82)
+      setVcfCutoff(20000 - t * 19500)
+      setVcfResonance(t * 12)
+    } else {
+      const t = (v - 0.5) * 2
+      setCrunch(t * 0.08)
+      setVcfCutoff(20000 - t * 13000)
+      setVcfResonance(t * 16)
+    }
+  }, [setCrunch, setVcfCutoff, setVcfResonance])
+
+  // SPACE: 0=CATHEDRAL (reverb+delay wash), 0.5=DRY, 1=ORBIT (rhythmic delay+tail)
+  const handleSpace = useCallback((v) => {
+    setSpace(v)
+    if (v <= 0.5) {
+      const t = (0.5 - v) * 2
+      setReverbMix(t * 0.78)
+      setDelayParams({ time: 0.25 + t * 0.15, feedback: 0.2 + t * 0.3, mix: t * 0.35 })
+    } else {
+      const t = (v - 0.5) * 2
+      setReverbMix(t * 0.15)
+      setDelayParams({ time: 0.28 + t * 0.22, feedback: 0.3 + t * 0.42, mix: t * 0.7 })
+    }
+  }, [setReverbMix, setDelayParams])
+
   // Shake noise burst — play a single random note then release
   const shakeNoiseBurst = useCallback((intensity) => {
     const engine = getEngine()
@@ -210,27 +242,31 @@ export default function TextRibbonApp() {
 
     setOscParams(prev => prev.map(p => ({
       ...p,
+      waveform: WAVEFORMS[Math.floor(Math.random() * WAVEFORMS.length)],
       detune: nudge(p.detune, -50, 50, intensity),
       mix: nudge(p.mix, 0, 1, intensity),
     })))
-    setDelayParams(prev => ({
-      time: nudge(prev.time, 0, 1, intensity),
-      feedback: nudge(prev.feedback, 0, 0.9, intensity),
-      mix: nudge(prev.mix, 0, 1, intensity),
-    }))
-    setReverbMix(v => nudge(v, 0, 1, intensity))
-    setCrunch(v => nudge(v, 0, 1, intensity))
-    setArpBpm(v => nudge(v, 40, 280, intensity))
-    setOctaves(v => {
+    setOctaves(() => {
       const opts = [2, 3, 4]
       return opts[Math.floor(Math.random() * opts.length)]
     })
+
+    // Randomize space and tone knobs (drives reverb/delay/crunch/vcf)
+    handleSpace(Math.random())
+    handleTone(Math.random())
+
+    // Randomize scale — pick one random scale from available
+    const scaleKeys = Object.keys(SCALES)
+    setScale([scaleKeys[Math.floor(Math.random() * scaleKeys.length)]])
+
+    // Randomize vcf routing — random on/off per osc
+    setVcfRouting([Math.random() > 0.5, Math.random() > 0.5, Math.random() > 0.5])
 
     // Easter egg: unlock double harmonic scale
     if (Math.random() < 0.03) {
       setDoubleHarmonicUnlocked(true)
     }
-  }, [])
+  }, [shakeNoiseBurst, handleSpace, handleTone])
 
   // Pass sidebar + canvas refs so clicks inside them don't trigger the "click outside" shake
   useShake(handleShake, sidebarRef, canvasAreaRef)
@@ -379,6 +415,8 @@ export default function TextRibbonApp() {
             onStop={handleStop}
             onShake={() => handleShake(1)}
             doubleHarmonicUnlocked={doubleHarmonicUnlocked}
+            space={space} onSpaceChange={handleSpace}
+            tone={tone} onToneChange={handleTone}
           />
         </section>
       </main>

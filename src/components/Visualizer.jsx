@@ -30,15 +30,17 @@ export function Visualizer({ getEngine, ribbonInteraction, visualMode, setVisual
       <div className="visualizer-3d" ref={threeRef} />
       <canvas ref={canvasRef} />
       <div className="visualizer__visuals">
-        {VISUAL_MODES.map((m) => (
-          <button
-            key={m.id}
-            className={visualMode === m.id ? 'active' : ''}
-            onClick={() => setVisualMode(m.id)}
-          >
-            {m.label}
-          </button>
-        ))}
+        <div className="visualizer__visuals-row">
+          {VISUAL_MODES.map((m) => (
+            <button
+              key={m.id}
+              className={visualMode === m.id ? 'active' : ''}
+              onClick={() => setVisualMode(m.id)}
+            >
+              {m.label}
+            </button>
+          ))}
+        </div>
         {versionCurrent && <VersionSwitcher current={versionCurrent} />}
       </div>
       <div className="visualizer__zoom">

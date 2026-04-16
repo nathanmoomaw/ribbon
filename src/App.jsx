@@ -12,8 +12,6 @@ import { Controls } from './components/Controls'
 import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
 import { HelpWizard, WizardTrigger } from './components/HelpWizard'
-import { VersionSwitcher } from './components/VersionSwitcher'
-import './components/VersionSwitcher.css'
 import { positionToFrequency } from './utils/pitchMap'
 import { HIDDEN_SCALES } from './utils/scales'
 import { readPresetFromUrl } from './utils/presets'
@@ -401,15 +399,7 @@ function App() {
 
   return (
     <div className={`app ${visualMode === 'lo' ? 'lo-mode' : ''}`}>
-      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} />
-
-      <div className="app-corner">
-        <div className="app-corner__visual-toggle">
-          <button className={`app-corner__visual-btn${visualMode === 'party' ? ' active' : ''}`} onClick={() => setVisualMode('party')}>Party</button>
-          <button className={`app-corner__visual-btn${visualMode === 'lo' ? ' active' : ''}`} onClick={() => setVisualMode('lo')}>Lo</button>
-        </div>
-        <VersionSwitcher current={2} />
-      </div>
+      <Visualizer getEngine={getEngine} ribbonInteraction={ribbonInteraction} visualMode={visualMode} setVisualMode={setVisualMode} reverbMix={reverbMix} delayParams={delayParams} versionCurrent={2} />
 
       <header className="app-header">
         <div className="app-header__logo" onClick={() => { requestMotionPermission(); handleShake(0.5) }} role="button" tabIndex={0} aria-label="Shake / Randomize">

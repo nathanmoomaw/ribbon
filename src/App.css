@@ -23,39 +23,6 @@
   position: relative;
 }
 
-.app-corner {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.app-corner__visual-toggle {
-  display: flex;
-  gap: 3px;
-}
-
-.app-corner__visual-btn {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.3);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  padding: 1px 5px;
-  cursor: pointer;
-  border-radius: 2px;
-  transition: color 0.15s, background 0.15s;
-  letter-spacing: 0.05em;
-}
-
-.app-corner__visual-btn.active {
-  color: var(--cyan, #5bf);
-  background: rgba(85,187,255,0.1);
-}
 
 .app-header .ribbon-logo {
   margin: 0;

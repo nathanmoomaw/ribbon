@@ -1,14 +1,16 @@
 import { useRef, useCallback } from 'react'
 import { useVisualizer } from '../hooks/useVisualizer'
 import { use3DVisualizer, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from '../hooks/use3DVisualizer'
+import { VersionSwitcher } from './VersionSwitcher'
 import './Visualizer.css'
+import './VersionSwitcher.css'
 
 const VISUAL_MODES = [
   { id: 'party', label: 'Party' },
   { id: 'lo', label: 'Lo' },
 ]
 
-export function Visualizer({ getEngine, ribbonInteraction, visualMode, setVisualMode, reverbMix, delayParams }) {
+export function Visualizer({ getEngine, ribbonInteraction, visualMode, setVisualMode, reverbMix, delayParams, versionCurrent }) {
   const canvasRef = useRef(null)
   const threeRef = useRef(null)
 
@@ -37,6 +39,7 @@ export function Visualizer({ getEngine, ribbonInteraction, visualMode, setVisual
             {m.label}
           </button>
         ))}
+        {versionCurrent && <VersionSwitcher current={versionCurrent} />}
       </div>
       <div className="visualizer__zoom">
         <button onClick={handleZoomIn} aria-label="Zoom in">+</button>

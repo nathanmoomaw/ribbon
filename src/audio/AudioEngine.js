@@ -113,16 +113,51 @@ function ensureResumed() {
   ctx.resume()
 }
 
-let gestureListenerAdded = false
+// iOS silent mode fix: playing an HTML Audio element forces iOS to upgrade the
+// AVAudioSession category from "ambient" (muted by silent mode) to "playback"
+// (bypasses silent mode). Web Audio API alone can't do this.
+//
+// IMPORTANT: Do NOT route this element through Web Audio via createMediaElementSource.
+// If routed through a suspended AudioContext, no audio reaches the speakers and iOS
+// never sees the audio output → AVAudioSession stays "ambient" → muted by silent switch.
+// Playing the element independently lets iOS detect audio output and upgrade the session.
+// iosAudioEl is set only after play() resolves — null means not yet unlocked
+let iosAudioEl = null
+function unlockIOSAudio() {
+  if (iosAudioEl) return
+  const isIOS = /iP(ad|hone|od)/i.test(navigator.userAgent)
+  if (!isIOS) return
+
+  const el = document.createElement('audio')
+  el.setAttribute('playsinline', 'true')
+  el.setAttribute('preload', 'auto')
+  el.volume = 0.001
+  // Minimal valid 1-sample silent WAV
+  el.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
+  el.loop = true
+
+  el.play().then(() => {
+    iosAudioEl = el // only mark unlocked after confirmed playing
+    // Session is now "playback" — resume AudioContext immediately
+    ctx.resume().catch(() => {})
+  }).catch(() => {
+    // play() rejected (no gesture context) — will retry on next gesture
+  })
+}
+
+let gestureListenerActive = false
 function addGestureListener() {
-  if (gestureListenerAdded) return
-  gestureListenerAdded = true
+  if (gestureListenerActive) return
+  gestureListenerActive = true
   const events = ['touchstart', 'touchend', 'mousedown', 'pointerdown', 'click', 'keydown']
   const handler = () => {
+    unlockIOSAudio()
     ensureResumed()
-    // Keep listening until context is actually running (Android can be stubborn)
-    if (ctx && ctx.state === 'running') {
+    // Remove only after BOTH AudioContext is running AND iOS audio is unlocked
+    const iosOk = !/iP(ad|hone|od)/i.test(navigator.userAgent) || iosAudioEl
+    if (ctx && ctx.state === 'running' && iosOk) {
       events.forEach(e => document.removeEventListener(e, handler, true))
+      gestureListenerActive = false // allow re-add if ctx suspends again
     }
   }
   events.forEach(e => document.addEventListener(e, handler, true))
@@ -131,9 +166,29 @@ function addGestureListener() {
 export function init() {
   if (ctx) return getEngine()
 
-  ctx = new (window.AudioContext || window.webkitAudioContext)()
+  ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' })
 
-  // Set up gesture-based resume for mobile browsers
+  // Re-add gesture listener any time AudioContext unexpectedly suspends (phone
+  // call, Siri, tab switch) so the next touch can resume it
+  ctx.addEventListener('statechange', () => {
+    if (ctx.state === 'suspended') addGestureListener()
+  })
+
+  // When page regains visibility, try resuming immediately — works on Android
+  // and some iOS cases without needing a fresh gesture
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {})
+    }
+  })
+
+  // init() is always called from a user-gesture handler (see useAudioEngine.js).
+  // Attempt iOS audio unlock immediately — don't wait for a second gesture.
+  unlockIOSAudio()
+  ctx.resume().catch(() => {})
+
+  // Set up gesture-based resume for mobile browsers (handles subsequent gestures
+  // and recovery after interruptions like phone calls / Siri)
   addGestureListener()
 
   masterGain = ctx.createGain()

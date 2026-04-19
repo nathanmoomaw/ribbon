@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-17 — ascii QR code for v3/ascii mode (DUMP 620)
+
+- Added `asciiMode` prop to `PresetQR`. When true uses `QRCode.toString()` with `type:'utf8'` and renders a styled green-on-black `<pre>` instead of the iridescent canvas QR. `TextRibbonApp` passes `asciiMode` unconditionally.
+
 ## 2026-04-17 — merge nmj/engine-sync into v3: audness engine + iOS audio unlock (DUMP 618-619)
 
 - Fast-forwarded `v3` branch from `nmj/engine-sync` (2 commits ahead). Changes include audness engine lineage docs and iOS audio unlock + latencyHint improvements from puddle.

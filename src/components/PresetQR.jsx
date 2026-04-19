@@ -274,11 +274,12 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
   })
 }
 
-export function PresetQR({ settings, initialName, onClose, onMilestone }) {
+export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMode = false }) {
   const canvasRef = useRef(null)
   const [name, setName] = useState(initialName || '')
   const [copied, setCopied] = useState(false)
   const [mintStep, setMintStep] = useState('idle') // 'idle'|'pinning'|'confirm'|'done'
+  const [asciiQR, setAsciiQR] = useState('')
   // Style seed persists across modal open/close (module-level persistedStyleSeed)
   const [qrStyleSeed, setQrStyleSeed] = useState(() => persistedStyleSeed)
 
@@ -309,13 +310,18 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
 
   // Redraw QR when URL, name, or style seed changes
   useEffect(() => {
-    if (canvasRef.current && url) {
+    if (!url) return
+    if (asciiMode) {
+      QRCode.toString(url, { type: 'utf8', margin: 1, errorCorrectionLevel: 'M' })
+        .then(str => setAsciiQR(str))
+        .catch(() => {})
+    } else if (canvasRef.current) {
       drawColoredQR(canvasRef.current, url, name, qrStyleSeed, {
         marbles: settings.marbles,
         activity: settings.puddleActivity,
       })
     }
-  }, [url, name, qrStyleSeed, settings.marbles, settings.puddleActivity])
+  }, [url, name, qrStyleSeed, settings.marbles, settings.puddleActivity, asciiMode])
 
   const handleDownload = useCallback(() => {
     const canvas = canvasRef.current
@@ -419,7 +425,10 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
         <button className="preset-qr-modal__close" onClick={onClose} aria-label="Close">&times;</button>
         <button className="preset-qr-modal__shake" onClick={handleQRShake} aria-label="Randomize QR style">⚡</button>
 
-        <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
+        {asciiMode
+          ? <pre className="preset-qr-modal__ascii">{asciiQR}</pre>
+          : <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
+        }
 
         <input
           className="preset-qr-modal__name"

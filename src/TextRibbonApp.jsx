@@ -362,6 +362,7 @@ export default function TextRibbonApp() {
         <PresetQR
           settings={qrSettings}
           onClose={() => setQrSettings(null)}
+          asciiMode
         />
       )}
 

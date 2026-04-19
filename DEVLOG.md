@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-17 — merge nmj/engine-sync into v3: audness engine + iOS audio unlock (DUMP 618-619)
+
+- Fast-forwarded `v3` branch from `nmj/engine-sync` (2 commits ahead). Changes include audness engine lineage docs and iOS audio unlock + latencyHint improvements from puddle.
+
 ## 2026-04-15 — shake randomizes space/tone/waveform/scale/vcf; sync branches (DUMP 611-612)
 
 - **611**: Fast-forwarded `nmj/ascii` to match `v3` (was 1 CI commit behind). Branches now identical.

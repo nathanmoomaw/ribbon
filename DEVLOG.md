@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-20 — fix ascii QR rendering SVG instead of block chars (DUMP 621)
+
+- `QRCode.toString(..., {type:'utf8'})` falls back to SVG in the browser bundle. Replaced with `QRCode.create()` + manual half-block rendering (▀ ▄ █) — produces a proper scannable ASCII QR.
+
 ## 2026-04-17 — ascii QR code for v3/ascii mode (DUMP 620)
 
 - Added `asciiMode` prop to `PresetQR`. When true uses `QRCode.toString()` with `type:'utf8'` and renders a styled green-on-black `<pre>` instead of the iridescent canvas QR. `TextRibbonApp` passes `asciiMode` unconditionally.

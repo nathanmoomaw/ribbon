@@ -312,9 +312,28 @@ export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMod
   useEffect(() => {
     if (!url) return
     if (asciiMode) {
-      QRCode.toString(url, { type: 'utf8', margin: 1, errorCorrectionLevel: 'M' })
-        .then(str => setAsciiQR(str))
-        .catch(() => {})
+      try {
+        const qr = QRCode.create(url, { errorCorrectionLevel: 'M' })
+        const { size, data } = qr.modules
+        const margin = 1
+        const lines = []
+        // Use half-block technique: 2 rows per line with ▀ ▄ █ and space
+        for (let row = -margin; row < size + margin; row += 2) {
+          let line = ''
+          for (let col = -margin; col < size + margin; col++) {
+            const top = row >= 0 && row < size && col >= 0 && col < size ? data[row * size + col] : false
+            const bot = (row + 1) >= 0 && (row + 1) < size && col >= 0 && col < size ? data[(row + 1) * size + col] : false
+            if (top && bot) line += '█'
+            else if (top) line += '▀'
+            else if (bot) line += '▄'
+            else line += ' '
+          }
+          lines.push(line)
+        }
+        setAsciiQR(lines.join('\n'))
+      } catch (e) {
+        setAsciiQR('')
+      }
     } else if (canvasRef.current) {
       drawColoredQR(canvasRef.current, url, name, qrStyleSeed, {
         marbles: settings.marbles,

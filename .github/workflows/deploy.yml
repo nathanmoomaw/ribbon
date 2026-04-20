@@ -2,8 +2,8 @@ name: Deploy to S3
 
 # Each version branch auto-deploys its own path on push:
 #   v1 → /v1/
-#   v2 → /v2/ + root /
-#   v3 → /v3/
+#   v2 → /v2/
+#   v3 → /v3/ + root /  (v3 is current stable at ribbon.obfusco.us)
 # Push to main to force a full rebuild of all versions at once.
 
 on:
@@ -31,21 +31,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Checkout v2 branch (root + /v2)
-        run: git fetch origin refs/heads/v2 && git checkout FETCH_HEAD && npm ci
-
-      - name: Build for /v2
-        run: npm run build -- --base /v2/
-
-      - name: Deploy to /v2
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
-
-      - name: Build for root (v2 is current stable)
-        run: npm run build
-
-      - name: Deploy to root
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
-
       - name: Checkout v1 branch
         run: git fetch origin refs/heads/v1 && git checkout FETCH_HEAD && npm ci
 
@@ -55,8 +40,23 @@ jobs:
       - name: Deploy to /v1
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v1/ --delete
 
-      - name: Checkout v3 branch
-        run: git fetch origin v3 && git checkout v3 && npm ci
+      - name: Checkout v2 branch
+        run: git fetch origin refs/heads/v2 && git checkout FETCH_HEAD && npm ci
+
+      - name: Build for /v2
+        run: npm run build -- --base /v2/
+
+      - name: Deploy to /v2
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
+
+      - name: Checkout v3 branch (root + /v3)
+        run: git fetch origin refs/heads/v3 && git checkout FETCH_HEAD && npm ci
+
+      - name: Build for root (v3 is current stable)
+        run: npm run build
+
+      - name: Deploy to root
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
       - name: Build for /v3
         run: npm run build -- --base /v3/

@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-04-20 — v3 promoted to ribbon.obfusco.us root (DUMP 629-631)
+
+- v3 branch deploy.yml: now builds twice — once with base `/` for root, once with base `/v3/` for /v3/. Root sync uses `--exclude "v*/*"` to preserve /v1, /v2, /v3 paths.
+- main branch workflow updated: v3→root+/v3, v2→/v2 only (was v2→root).
+- v1 and v2 remain intact at their respective paths.
+
 ## 2026-04-20 — iridescent colored ascii QR (DUMP 622)
 
 - ASCII QR block chars (▀ ▄ █) now colored with the same spiral iridescent gradient as the canvas version. Each character gets an inline `color:rgb(...)` span via `dangerouslySetInnerHTML`. Background is transparent (spaces unspanned). Removed static green CSS color.

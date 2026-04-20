@@ -1,7 +1,7 @@
 # Roadmap
 
-## v3 "ascii ribbon" (branch: nmj/ascii, codename: ascii ribbon)
-> Note: the original text-ribbon branch was an ASCII version of early puddle; now adopted as the official ascii ribbon v3, based on ribbon v2 feature set.
+## v3 "ascii ribbon" ✓ LIVE at ribbon.obfusco.us (branch: v3, codename: ascii ribbon)
+> Note: the original text-ribbon branch was an ASCII version of early puddle; now adopted as the official ascii ribbon v3, based on ribbon v2 feature set. Promoted to root 2026-04-20.
 - [x] Bootstrap ASCII rendering layer using @chenglou/pretext
 - [x] AsciiRibbon canvas: fluid simulation + rainbow ASCII characters
 - [x] AsciiControls: full terminal-aesthetic UI (transport, OSC, FX, VCF, scale)

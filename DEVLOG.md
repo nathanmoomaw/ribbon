@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-04-20 — iridescent colored ascii QR (DUMP 622)
+
+- ASCII QR block chars (▀ ▄ █) now colored with the same spiral iridescent gradient as the canvas version. Each character gets an inline `color:rgb(...)` span via `dangerouslySetInnerHTML`. Background is transparent (spaces unspanned). Removed static green CSS color.
+
 ## 2026-04-20 — fix ascii QR rendering SVG instead of block chars (DUMP 621)
 
 - `QRCode.toString(..., {type:'utf8'})` falls back to SVG in the browser bundle. Replaced with `QRCode.create()` + manual half-block rendering (▀ ▄ █) — produces a proper scannable ASCII QR.

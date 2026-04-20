@@ -316,21 +316,33 @@ export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMod
         const qr = QRCode.create(url, { errorCorrectionLevel: 'M' })
         const { size, data } = qr.modules
         const margin = 1
-        const lines = []
-        // Use half-block technique: 2 rows per line with ▀ ▄ █ and space
-        for (let row = -margin; row < size + margin; row += 2) {
+        const totalCols = size + margin * 2
+        const totalRows = Math.ceil((size + margin * 2) / 2)
+        const htmlLines = []
+        for (let lineIdx = 0; lineIdx < totalRows; lineIdx++) {
+          const row = lineIdx * 2 - margin
           let line = ''
-          for (let col = -margin; col < size + margin; col++) {
+          for (let colIdx = 0; colIdx < totalCols; colIdx++) {
+            const col = colIdx - margin
             const top = row >= 0 && row < size && col >= 0 && col < size ? data[row * size + col] : false
             const bot = (row + 1) >= 0 && (row + 1) < size && col >= 0 && col < size ? data[(row + 1) * size + col] : false
-            if (top && bot) line += '█'
-            else if (top) line += '▀'
-            else if (bot) line += '▄'
-            else line += ' '
+            const ch = top && bot ? '█' : top ? '▀' : bot ? '▄' : ' '
+            if (ch === ' ') {
+              line += ' '
+            } else {
+              // Iridescent gradient: same spiral logic as canvas version
+              const cx = colIdx / totalCols - 0.5
+              const cy = lineIdx / totalRows - 0.5
+              const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
+              const dist = Math.sqrt(cx * cx + cy * cy) * 2
+              const t = (angle * 0.4 + dist * 0.6 + (colIdx + lineIdx) / (totalCols + totalRows) * 0.3 + qrStyleSeed) % 1
+              const [r, g, b] = lerpColor(GRADIENT_STOPS, t)
+              line += `<span style="color:rgb(${r},${g},${b})">${ch}</span>`
+            }
           }
-          lines.push(line)
+          htmlLines.push(line)
         }
-        setAsciiQR(lines.join('\n'))
+        setAsciiQR(htmlLines.join('\n'))
       } catch (e) {
         setAsciiQR('')
       }
@@ -445,7 +457,7 @@ export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMod
         <button className="preset-qr-modal__shake" onClick={handleQRShake} aria-label="Randomize QR style">⚡</button>
 
         {asciiMode
-          ? <pre className="preset-qr-modal__ascii">{asciiQR}</pre>
+          ? <pre className="preset-qr-modal__ascii" dangerouslySetInnerHTML={{ __html: asciiQR }} />
           : <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
         }
 

@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-05-23 — v4 party/lo mode fix, dev/vX branch deploy pattern, VersionSwitcher v3 link (DUMP 655-657)
+
+- Fixed VersionSwitcher: v3 now always links to `/v3/` (was `/`), which broke on ribbon-dev where root = v4.
+- Party mode redesigned to v2 aesthetic: uses `RibbonLogo` (SVG), opaque dark console (`rgba(10,12,22,0.92)`), `FloatingStaff` only in party. Lo mode keeps transparent ASCII terminal style + `AsciiLogo`.
+- Created `dev/v1`, `dev/v2`, `dev/v3` branches (cut from prod branches, updated deploy.yml) — each deploys to its ribbon-dev subpath via per-branch CI. `dev/v4` also deploys to dev root with `VITE_DEFAULT_VERSION=4`.
+- `deploy.yml`: per-branch pattern — each `dev/vX` push builds only `--base /vX/` and deploys to its own subpath; only `dev/v4` (latest) also deploys to ribbon-dev root.
+- VersionSwitcher propagated with v4 button to all dev branches.
+
 ## 2026-05-23 — v4 foundation: dual-mode app, DualKnobs, static-arc spheres, waveform morphing (DUMP 635-654)
 
 - Created `V4App.jsx` + `V4App.css`: dual party/lo mode synthesizer branching from v3.

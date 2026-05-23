@@ -22,6 +22,7 @@ import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
 import { ConfettiCanvas } from './components/ConfettiCanvas'
 import { FloatingStaff } from './components/FloatingStaff'
+import { RibbonLogo } from './components/RibbonLogo'
 import { PresetQR } from './components/PresetQR'
 import { VersionSwitcher } from './components/VersionSwitcher'
 import { readPresetFromUrl } from './utils/presets'
@@ -641,7 +642,7 @@ export default function V4App() {
       {/* Background layers */}
       <div className="text-ribbon-bg" />
       <div className="text-ribbon-grid-floor" />
-      <FloatingStaff />
+      {isParty && <FloatingStaff />}
 
       {/* Header */}
       <header className="text-ribbon-header v4-header">
@@ -662,7 +663,10 @@ export default function V4App() {
             {poly && <span className="status-poly">POLY</span>}
           </div>
         </div>
-        <AsciiLogo onClick={() => handleShake(1.5)} />
+        {isParty
+          ? <div onClick={() => handleShake(1.5)} style={{ cursor: 'pointer' }}><RibbonLogo /></div>
+          : <AsciiLogo onClick={() => handleShake(1.5)} />
+        }
         <div className="text-ribbon-header__right">
           {/* Party / Lo toggle */}
           <div className="v4-mode-toggle">

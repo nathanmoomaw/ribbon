@@ -5,7 +5,7 @@
 export function VersionSwitcher({ current }) {
   function switchTo(v) {
     if (v === current) return
-    window.location.href = v === 3 ? '/' : `/v${v}/`
+    window.location.href = `/v${v}/`
   }
 
   return (

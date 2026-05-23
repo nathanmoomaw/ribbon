@@ -12,7 +12,13 @@ import '@rainbow-me/rainbowkit/styles.css'
 const queryClient = new QueryClient()
 
 const path = window.location.pathname
-export const version = path.startsWith('/v1') ? 1 : path.startsWith('/v2') ? 2 : path.startsWith('/v4') ? 4 : 3
+const defaultVersion = parseInt(import.meta.env.VITE_DEFAULT_VERSION || '3')
+export const version =
+  path.startsWith('/v1') ? 1 :
+  path.startsWith('/v2') ? 2 :
+  path.startsWith('/v3') ? 3 :
+  path.startsWith('/v4') ? 4 :
+  defaultVersion
 
 function RibbonApp() {
   if (version <= 2) return <App />

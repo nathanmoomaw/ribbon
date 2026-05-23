@@ -635,7 +635,7 @@ export default function V4App() {
   const isParty = visualMode === 'party'
 
   return (
-    <div className="v4-app text-ribbon-app">
+    <div className={`v4-app text-ribbon-app v4-mode--${visualMode}`}>
       <ConfettiCanvas ref={confettiRef} />
 
       {/* Background layers */}

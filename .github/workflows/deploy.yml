@@ -1,8 +1,8 @@
-name: Deploy v3
+name: Deploy
 
 on:
   push:
-    branches: [v3, 'nmj/**']
+    branches: [v3, 'dev/**']
 
 jobs:
   deploy-v3:
@@ -40,7 +40,9 @@ jobs:
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
 
   deploy-dev:
-    if: startsWith(github.ref, 'refs/heads/nmj/')
+    # Each dev/vX branch deploys to its own subpath on ribbon-dev.
+    # The latest version (dev/v4) also deploys to dev root.
+    if: startsWith(github.ref, 'refs/heads/dev/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -52,8 +54,14 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for dev (base /)
-        run: npm run build
+      - name: Set version path
+        id: version
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/dev/}"
+          echo "path=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Build for subpath
+        run: npm run build -- --base /${{ steps.version.outputs.path }}/
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -61,8 +69,18 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to dev S3
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete
+      - name: Deploy to dev subpath
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/${{ steps.version.outputs.path }}/ --delete
+
+      - name: Build for dev root (latest version only)
+        if: github.ref == 'refs/heads/dev/v4'
+        run: npm run build
+        env:
+          VITE_DEFAULT_VERSION: 4
+
+      - name: Deploy to dev root (latest version only)
+        if: github.ref == 'refs/heads/dev/v4'
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete --exclude "v*/*"
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

@@ -201,40 +201,92 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Static electricity arc SVG overlay for party mode
+// Generate a random zigzag arc path from a start point toward a target area
+function makeArcPoints(cx, cy, angle, len, segments) {
+  const pts = []
+  const stepLen = len / segments
+  let x = cx, y = cy
+  const spread = 18
+  for (let i = 0; i <= segments; i++) {
+    const jitter = i === 0 || i === segments ? 0 : (Math.random() - 0.5) * spread * 2
+    const perp = angle + Math.PI / 2
+    pts.push(`${(x + Math.cos(perp) * jitter).toFixed(1)},${(y + Math.sin(perp) * jitter).toFixed(1)}`)
+    x += Math.cos(angle) * stepLen + (Math.random() - 0.5) * spread
+    y += Math.sin(angle) * stepLen + (Math.random() - 0.5) * spread
+  }
+  return pts.join(' ')
+}
+
+const ARC_COLORS = [
+  'rgba(100,150,255,0.65)',
+  'rgba(140,100,255,0.55)',
+  'rgba(80,210,255,0.5)',
+  'rgba(200,100,255,0.5)',
+  'rgba(100,230,200,0.45)',
+]
+
 function StaticArcsOverlay() {
+  const [arcs, setArcs] = useState(() => generateArcs())
+
+  function generateArcs() {
+    // Sphere cluster is roughly centered; arcs radiate from a central zone
+    const cx = 190 + (Math.random() - 0.5) * 60
+    const cy = 140 + (Math.random() - 0.5) * 60
+    return Array.from({ length: 5 }, (_, i) => {
+      const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.8
+      const len = 80 + Math.random() * 80
+      const segs = 4 + Math.floor(Math.random() * 4)
+      return {
+        points: makeArcPoints(cx, cy, angle, len, segs),
+        color: ARC_COLORS[i % ARC_COLORS.length],
+        width: 0.6 + Math.random() * 0.8,
+        opacity: Math.random() > 0.3 ? 1 : 0,
+      }
+    })
+  }
+
+  useEffect(() => {
+    let rafId
+    let lastUpdate = 0
+    function tick(t) {
+      rafId = requestAnimationFrame(tick)
+      // Regenerate arcs at random intervals 40–120ms — electricity crackle rhythm
+      if (t - lastUpdate > 40 + Math.random() * 80) {
+        lastUpdate = t
+        setArcs(generateArcs())
+      }
+    }
+    rafId = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(rafId)
+  }, [])
+
   return (
     <div className="v4-static-arcs" aria-hidden="true">
       <svg className="v4-static-arcs__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
-        {/* Arc 1: top-left to center */}
-        <polyline
-          className="v4-arc v4-arc--1"
-          points="60,40 85,80 70,100 110,130 95,160 140,180"
-          fill="none" stroke="rgba(100,150,255,0.6)" strokeWidth="1" strokeLinecap="round"
-        />
-        {/* Arc 2: center to right */}
-        <polyline
-          className="v4-arc v4-arc--2"
-          points="260,90 240,120 270,145 250,175 290,195"
-          fill="none" stroke="rgba(140,100,255,0.5)" strokeWidth="0.8" strokeLinecap="round"
-        />
-        {/* Arc 3: bottom-left */}
-        <polyline
-          className="v4-arc v4-arc--3"
-          points="50,200 80,180 65,155 100,135"
-          fill="none" stroke="rgba(80,200,255,0.45)" strokeWidth="0.7" strokeLinecap="round"
-        />
-        {/* Arc 4: upper-right */}
-        <polyline
-          className="v4-arc v4-arc--4"
-          points="310,30 290,60 320,85 300,110 340,130"
-          fill="none" stroke="rgba(200,100,255,0.4)" strokeWidth="0.9" strokeLinecap="round"
-        />
-        {/* Spark dots */}
-        <circle className="v4-spark v4-spark--1" cx="140" cy="180" r="2" fill="rgba(150,200,255,0.8)" />
-        <circle className="v4-spark v4-spark--2" cx="290" cy="195" r="1.5" fill="rgba(180,120,255,0.7)" />
-        <circle className="v4-spark v4-spark--3" cx="100" cy="135" r="1.5" fill="rgba(100,220,255,0.6)" />
-        <circle className="v4-spark v4-spark--4" cx="340" cy="130" r="2" fill="rgba(220,150,255,0.7)" />
+        {arcs.map((arc, i) => (
+          <polyline
+            key={i}
+            points={arc.points}
+            fill="none"
+            stroke={arc.color}
+            strokeWidth={arc.width}
+            strokeLinecap="round"
+            opacity={arc.opacity}
+          />
+        ))}
+        {arcs.filter((_, i) => i < 3).map((arc, i) => {
+          const lastPt = arc.points.split(' ').pop().split(',')
+          return (
+            <circle
+              key={i}
+              cx={lastPt[0]}
+              cy={lastPt[1]}
+              r={1 + Math.random() * 1.5}
+              fill={arc.color}
+              opacity={arc.opacity * 0.9}
+            />
+          )
+        })}
       </svg>
     </div>
   )

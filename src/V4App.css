@@ -18,12 +18,24 @@
   background: transparent;
 }
 
-/* ── Party mode: v2-style Controls panel (has its own background/border) ── */
+/* ── Party mode: controls compact at bottom, spheres + ribbon dominate ── */
 .v4-mode--party .text-ribbon-controls {
+  flex: 0 0 auto;
+  max-height: 38vh;
+  overflow-y: auto;
+  overflow-x: hidden;
   background: transparent;
-  border-top: none;
+  border-top: 1px solid rgba(60, 80, 140, 0.15);
   box-shadow: none;
   padding: 0;
+}
+
+/* Strip: no dark background, no negative margin (that's for lo mode overlap) */
+.v4-mode--party .text-ribbon-strip {
+  margin-top: 0 !important;
+  background: transparent !important;
+  height: auto !important;
+  min-height: 90px;
 }
 
 /* Slim overlay strip: only TEMPO + ž in party mode */
@@ -104,41 +116,7 @@
   inset: 0;
 }
 
-/* Arc animations: flicker in and out at different rhythms */
-.v4-arc {
-  animation: arc-flicker 0.12s steps(1) infinite;
-}
-.v4-arc--1 { animation-duration: 0.19s; animation-delay: 0s; }
-.v4-arc--2 { animation-duration: 0.23s; animation-delay: 0.07s; }
-.v4-arc--3 { animation-duration: 0.17s; animation-delay: 0.13s; }
-.v4-arc--4 { animation-duration: 0.31s; animation-delay: 0.04s; }
-
-@keyframes arc-flicker {
-  0%  { opacity: 1; }
-  20% { opacity: 0; }
-  40% { opacity: 0.7; }
-  55% { opacity: 0; }
-  70% { opacity: 0.9; }
-  85% { opacity: 0; }
-  100%{ opacity: 1; }
-}
-
-/* Spark dot pulse */
-.v4-spark {
-  animation: spark-pulse 0.15s steps(1) infinite;
-}
-.v4-spark--1 { animation-duration: 0.22s; animation-delay: 0.02s; }
-.v4-spark--2 { animation-duration: 0.18s; animation-delay: 0.09s; }
-.v4-spark--3 { animation-duration: 0.25s; animation-delay: 0.15s; }
-.v4-spark--4 { animation-duration: 0.20s; animation-delay: 0.06s; }
-
-@keyframes spark-pulse {
-  0%  { opacity: 1;   r: 2; }
-  30% { opacity: 0;   r: 1; }
-  60% { opacity: 0.8; r: 3; }
-  90% { opacity: 0;   r: 1; }
-  100%{ opacity: 1;   r: 2; }
-}
+/* Arc and spark opacity/position driven by JS — no CSS animation needed */
 
 /* ── v4 controls overlay: Mono/Arp + TEMPO + ž + BPM/VOL knobs ── */
 .v4-controls-overlay {

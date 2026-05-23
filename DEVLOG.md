@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-23 — v4 party layout, dynamic lightning, wavy staff (DUMP 662-665)
+
+- Layout fix: party mode controls capped at 38vh (`flex: 0 0 auto; max-height: 38vh`) so spheres + ribbon dominate above.
+- Removed dark background + negative margin-top from `.text-ribbon-strip` in party mode — that was the "black space under ribbon".
+- Dynamic lightning: `StaticArcsOverlay` now uses React state + RAF to regenerate random zigzag polyline paths every 40–120ms from a sphere-center zone. Arcs radiate outward in 5 directions, crackle like static electricity.
+- FloatingStaff sinusoidal wave: each staff strip now has `waveAmp/waveFreq/waveSpeed/wavePhase` params; lines drawn as sine curves, notes and barlines ride the wave.
+
 ## 2026-05-23 — v4 party mode: v2 Ribbon strip, sphere zigzag fix (DUMP 658-661)
 
 - Party mode now renders `Ribbon` (v2 horizontal strip) instead of invisible `AsciiRibbon` canvas.

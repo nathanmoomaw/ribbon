@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-05-23 — v4 party mode uses v2 Controls component (rotary knobs, Rock&Rule console)
+
+- Party mode now renders `Controls` (v2-style: rotary knobs, brushed-metal industrial console, DJFader, VCF panel) instead of `AsciiControls`.
+- Lo mode unchanged: AsciiControls + DualKnob osc section.
+- Party mode `v4-controls-overlay` trimmed to only TEMPO + ž (v4-unique); Mono/Arp, Vol, BPM handled by `Controls`.
+- `Controls` now accepts `currentVersion` prop (default 2) for `VersionSwitcher`.
+- `Controls.css` imported in V4App for party mode styling.
+
 ## 2026-05-23 — v4 party/lo mode fix, dev/vX branch deploy pattern, VersionSwitcher v3 link (DUMP 655-657)
 
 - Fixed VersionSwitcher: v3 now always links to `/v3/` (was `/`), which broke on ribbon-dev where root = v4.

@@ -20,6 +20,7 @@ import { AsciiRibbon } from './components/AsciiRibbon'
 import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
+import { Controls } from './components/Controls'
 import { ConfettiCanvas } from './components/ConfettiCanvas'
 import { FloatingStaff } from './components/FloatingStaff'
 import { RibbonLogo } from './components/RibbonLogo'
@@ -30,6 +31,7 @@ import { positionToFrequency } from './utils/pitchMap'
 import { useAccount } from 'wagmi'
 import './V4App.css'
 import './TextRibbonApp.css'
+import './components/Controls.css'
 import './components/VersionSwitcher.css'
 
 import { DualKnob } from './components/DualKnob'
@@ -633,6 +635,14 @@ export default function V4App() {
     arpStop()
   }, [getEngine, arpStop])
 
+  const handleVcfRoutingToggle = useCallback((index, enabled) => {
+    setVcfRouting(prev => {
+      const next = [...prev]
+      next[index] = enabled
+      return next
+    })
+  }, [])
+
   const isParty = visualMode === 'party'
 
   return (
@@ -740,90 +750,153 @@ export default function V4App() {
 
         {/* Controls */}
         <section className="text-ribbon-controls v4-controls" ref={sidebarRef}>
-          {/* v4-specific top strip: Mono/Arp toggle + TEMPO knob + ž knob */}
-          <div className="v4-controls-overlay">
-            {/* Mono/Arp toggle */}
-            <div className="v4-mono-arp">
-              <button
-                className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
-                onClick={() => setMonoArp('mono')}
-                title="Mono (play mode)"
-              >MONO</button>
-              <button
-                className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
-                onClick={() => setMonoArp('arp')}
-                title="Arp (arpeggiator, poly)"
-              >ARP</button>
-            </div>
+          {isParty ? (
+            <>
+              {/* v4-unique TEMPO + ž strip (party mode — Mono/Arp/Vol handled by Controls) */}
+              <div className="v4-controls-overlay v4-controls-overlay--slim">
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">TEMPO</div>
+                  <BipolarKnob
+                    label={`BPM ${arpBpm}`}
+                    subLabel={{ left: 'SLOW', right: 'FAST' }}
+                    value={tempo}
+                    onChange={handleTempo}
+                  />
+                </div>
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">ž</div>
+                  <BipolarKnob
+                    label="ž"
+                    subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
+                    value={zeta}
+                    onChange={handleZeta}
+                  />
+                </div>
+              </div>
 
-            {/* TEMPO knob */}
-            <div className="v4-knob-group">
-              <div className="v4-knob-group__label">TEMPO</div>
-              <BipolarKnob
-                label={`BPM ${arpBpm}`}
-                subLabel={{ left: 'SLOW', right: 'FAST' }}
-                value={tempo}
-                onChange={handleTempo}
+              {/* v2-style Controls panel for party mode */}
+              <Controls
+                getEngine={getEngine}
+                oscParams={oscParams}
+                setOscParams={setOscParams}
+                volume={volume}
+                setVolume={setVolume}
+                octaves={octaves}
+                setOctaves={setOctaves}
+                stepped={stepped}
+                setStepped={setStepped}
+                scale={scale}
+                setScale={setScale}
+                delayParams={delayParams}
+                setDelayParams={setDelayParams}
+                reverbMix={reverbMix}
+                setReverbMix={setReverbMix}
+                crunch={crunch}
+                setCrunch={setCrunch}
+                filterParams={filterParams}
+                setFilterParams={setFilterParams}
+                glideSpeed={glideSpeed}
+                setGlideSpeed={setGlideSpeed}
+                shaking={shaking}
+                mode={mode}
+                setMode={setMode}
+                poly={poly}
+                setPoly={setPoly}
+                arpBpm={arpBpm}
+                setArpBpm={setArpBpm}
+                hold={hold}
+                setHold={setHold}
+                onStop={handleStop}
+                onKillAll={handleStop}
+                onQRCreate={handleOpenQR}
+                vcfCutoff={vcfCutoff}
+                vcfResonance={vcfResonance}
+                vcfRouting={vcfRouting}
+                onVcfCutoffChange={setVcfCutoff}
+                onVcfResonanceChange={setVcfResonance}
+                onVcfRoutingToggle={handleVcfRoutingToggle}
+                currentVersion={4}
               />
-            </div>
+            </>
+          ) : (
+            <>
+              {/* v4-specific top strip: Mono/Arp toggle + TEMPO knob + ž knob */}
+              <div className="v4-controls-overlay">
+                <div className="v4-mono-arp">
+                  <button
+                    className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
+                    onClick={() => setMonoArp('mono')}
+                    title="Mono (play mode)"
+                  >MONO</button>
+                  <button
+                    className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
+                    onClick={() => setMonoArp('arp')}
+                    title="Arp (arpeggiator, poly)"
+                  >ARP</button>
+                </div>
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">TEMPO</div>
+                  <BipolarKnob
+                    label={`BPM ${arpBpm}`}
+                    subLabel={{ left: 'SLOW', right: 'FAST' }}
+                    value={tempo}
+                    onChange={handleTempo}
+                  />
+                </div>
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">ž</div>
+                  <BipolarKnob
+                    label="ž"
+                    subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
+                    value={zeta}
+                    onChange={handleZeta}
+                  />
+                </div>
+                <AsciiKnob
+                  label="BPM"
+                  value={arpBpm}
+                  min={40}
+                  max={280}
+                  onChange={v => setArpBpm(Math.round(v))}
+                />
+                <AsciiKnob
+                  label="VOL"
+                  value={volume}
+                  min={0}
+                  max={1}
+                  onChange={setVolume}
+                />
+              </div>
 
-            {/* ž knob */}
-            <div className="v4-knob-group">
-              <div className="v4-knob-group__label">ž</div>
-              <BipolarKnob
-                label="ž"
-                subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
-                value={zeta}
-                onChange={handleZeta}
+              {/* v4 oscillator section with DualKnobs */}
+              <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
+
+              {/* ASCII controls panel for lo mode */}
+              <AsciiControls
+                mode={mode} setMode={setMode}
+                poly={poly} setPoly={setPoly}
+                hold={hold} setHold={setHold}
+                arpBpm={arpBpm} setArpBpm={setArpBpm}
+                volume={volume} setVolume={setVolume}
+                octaves={octaves} setOctaves={setOctaves}
+                scale={scale} setScale={setScale}
+                glideSpeed={glideSpeed} setGlideSpeed={setGlideSpeed}
+                stepped={stepped} setStepped={setStepped}
+                oscParams={oscParams} setOscParams={setOscParams}
+                delayParams={delayParams} setDelayParams={setDelayParams}
+                reverbMix={reverbMix} setReverbMix={setReverbMix}
+                crunch={crunch} setCrunch={setCrunch}
+                vcfCutoff={vcfCutoff} setVcfCutoff={setVcfCutoff}
+                vcfResonance={vcfResonance} setVcfResonance={setVcfResonance}
+                vcfRouting={vcfRouting} setVcfRouting={setVcfRouting}
+                onStop={handleStop}
+                onShake={() => handleShake(1)}
+                doubleHarmonicUnlocked={doubleHarmonicUnlocked}
+                space={space} onSpaceChange={handleSpace}
+                tone={tone} onToneChange={handleTone}
               />
-            </div>
-
-            {/* BPM knob (fine control, separate from TEMPO) */}
-            <AsciiKnob
-              label="BPM"
-              value={arpBpm}
-              min={40}
-              max={280}
-              onChange={v => setArpBpm(Math.round(v))}
-            />
-
-            {/* VOL knob */}
-            <AsciiKnob
-              label="VOL"
-              value={volume}
-              min={0}
-              max={1}
-              onChange={setVolume}
-            />
-          </div>
-
-          {/* v4 oscillator section with DualKnobs */}
-          <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
-
-          {/* Main AsciiControls panel — no background (osc section hidden via CSS) */}
-          <AsciiControls
-            mode={mode} setMode={setMode}
-            poly={poly} setPoly={setPoly}
-            hold={hold} setHold={setHold}
-            arpBpm={arpBpm} setArpBpm={setArpBpm}
-            volume={volume} setVolume={setVolume}
-            octaves={octaves} setOctaves={setOctaves}
-            scale={scale} setScale={setScale}
-            glideSpeed={glideSpeed} setGlideSpeed={setGlideSpeed}
-            stepped={stepped} setStepped={setStepped}
-            oscParams={oscParams} setOscParams={setOscParams}
-            delayParams={delayParams} setDelayParams={setDelayParams}
-            reverbMix={reverbMix} setReverbMix={setReverbMix}
-            crunch={crunch} setCrunch={setCrunch}
-            vcfCutoff={vcfCutoff} setVcfCutoff={setVcfCutoff}
-            vcfResonance={vcfResonance} setVcfResonance={setVcfResonance}
-            vcfRouting={vcfRouting} setVcfRouting={setVcfRouting}
-            onStop={handleStop}
-            onShake={() => handleShake(1)}
-            doubleHarmonicUnlocked={doubleHarmonicUnlocked}
-            space={space} onSpaceChange={handleSpace}
-            tone={tone} onToneChange={handleTone}
-          />
+            </>
+          )}
         </section>
       </main>
     </div>

@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [v3, 'nmj/**', 'dev/**']
+    branches: [v3, 'dev/**']
 
 jobs:
   deploy-v3:
@@ -40,7 +40,7 @@ jobs:
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
 
   deploy-dev:
-    if: startsWith(github.ref, 'refs/heads/nmj/') || startsWith(github.ref, 'refs/heads/dev/')
+    if: startsWith(github.ref, 'refs/heads/dev/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

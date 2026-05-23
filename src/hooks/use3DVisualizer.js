@@ -43,7 +43,23 @@ export const MIN_ZOOM = 0.5
 export const MAX_ZOOM = 25
 export const ZOOM_STEP = 0.8
 
-export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}) {
+// Waveform displacement: maps azimuthal angle φ to a radial offset
+function waveDisplace(waveform, phi, t) {
+  switch (waveform) {
+    case 'sine':
+      return Math.sin(phi * 2 + t)
+    case 'square':
+      return Math.sign(Math.sin(phi * 2 + t))
+    case 'sawtooth':
+      return (((phi / Math.PI) % 2) - 1)
+    case 'triangle':
+      return (2 / Math.PI) * Math.asin(Math.sin(phi * 2 + t))
+    default:
+      return 0
+  }
+}
+
+export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}, oscParams = null) {
   const stateRef = useRef(null)
   const zoomRef = useRef(DEFAULT_ZOOM)
   const targetZoomRef = useRef(DEFAULT_ZOOM)
@@ -53,6 +69,8 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
   reverbMixRef.current = reverbMix
   const delayRef = useRef(delayParams)
   delayRef.current = delayParams
+  const oscParamsRef = useRef(oscParams)
+  oscParamsRef.current = oscParams
 
   useEffect(() => {
     const mount = mountRef.current
@@ -292,6 +310,40 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
             arr[v * 3 + 2] = bz + nz * displacement
           }
           posAttr.needsUpdate = true
+        }
+
+        // Waveform morphing: when osc mix > 0 the sphere deforms toward that waveform shape
+        const osc = oscParamsRef.current?.[i]
+        if (osc && osc.mix > 0.05) {
+          const morphAmt = osc.mix * 0.45
+          const posAttr2 = sphere.geo.getAttribute('position')
+          const arr2 = posAttr2.array
+          const base2 = sphere.basePositions
+          const vertCount2 = posAttr2.count
+          const tMorph = time * 0.0008 + i * 1.4
+
+          for (let v = 0; v < vertCount2; v++) {
+            const bx = base2[v * 3]
+            const by = base2[v * 3 + 1]
+            const bz = base2[v * 3 + 2]
+
+            const len = Math.sqrt(bx * bx + by * by + bz * bz)
+            if (len === 0) continue
+            const nx = bx / len
+            const ny = by / len
+            const nz = bz / len
+
+            // Azimuthal angle in x-z plane + elevation tilt for 3D shape
+            const phi = Math.atan2(bz, bx)
+            const elevation = Math.asin(Math.max(-1, Math.min(1, by / len)))
+            const waveMag = waveDisplace(osc.waveform, phi, tMorph) * Math.cos(elevation)
+
+            // Accumulate: read current displaced position, add morph on top
+            arr2[v * 3]     = arr2[v * 3]     + nx * waveMag * morphAmt
+            arr2[v * 3 + 1] = arr2[v * 3 + 1] + ny * waveMag * morphAmt * 0.5
+            arr2[v * 3 + 2] = arr2[v * 3 + 2] + nz * waveMag * morphAmt
+          }
+          posAttr2.needsUpdate = true
         }
 
         // Calculate target reactive offset from pitch + velocity

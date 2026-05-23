@@ -1,0 +1,298 @@
+/* Ribbon v4 — styles
+   Transparent controls panel, party/lo mode toggle, static arc SVG,
+   mono/arp toggle, TEMPO + ž knobs, inactivity prompt.               */
+
+/* ── App shell override: transparent controls panel ── */
+.v4-app .text-ribbon-controls {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Controls still need to scroll but no visual panel background */
+.v4-controls {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* AsciiControls inside v4 also gets transparent bg */
+.v4-app .ascii-controls {
+  background: transparent;
+}
+
+.v4-app .ascii-panel {
+  background: transparent;
+}
+
+/* ── Header: Party/Lo toggle ── */
+.v4-header .text-ribbon-header__right {
+  gap: 8px;
+}
+
+.v4-mode-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-mode-btn {
+  padding: 2px 7px;
+  border: 1px solid #252538;
+  background: #0a0a18;
+  color: #484c64;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  line-height: 1.6;
+}
+.v4-mode-btn:hover {
+  background: #12121f;
+  color: #9090cc;
+  border-color: #353558;
+}
+.v4-mode-btn--on {
+  background: #141428;
+  color: #99aaee;
+  border-color: #5566aa;
+  box-shadow: 0 0 5px rgba(80,100,180,0.3);
+}
+
+/* ── Party mode 3D visualizer mount ── */
+.v4-party-vis {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* v4-orbs: same layout as text-ribbon-orbs but hosts both party+lo */
+.v4-orbs {
+  position: relative;
+}
+
+/* ── Static electricity arcs overlay ── */
+.v4-static-arcs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.v4-static-arcs__svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* Arc animations: flicker in and out at different rhythms */
+.v4-arc {
+  animation: arc-flicker 0.12s steps(1) infinite;
+}
+.v4-arc--1 { animation-duration: 0.19s; animation-delay: 0s; }
+.v4-arc--2 { animation-duration: 0.23s; animation-delay: 0.07s; }
+.v4-arc--3 { animation-duration: 0.17s; animation-delay: 0.13s; }
+.v4-arc--4 { animation-duration: 0.31s; animation-delay: 0.04s; }
+
+@keyframes arc-flicker {
+  0%  { opacity: 1; }
+  20% { opacity: 0; }
+  40% { opacity: 0.7; }
+  55% { opacity: 0; }
+  70% { opacity: 0.9; }
+  85% { opacity: 0; }
+  100%{ opacity: 1; }
+}
+
+/* Spark dot pulse */
+.v4-spark {
+  animation: spark-pulse 0.15s steps(1) infinite;
+}
+.v4-spark--1 { animation-duration: 0.22s; animation-delay: 0.02s; }
+.v4-spark--2 { animation-duration: 0.18s; animation-delay: 0.09s; }
+.v4-spark--3 { animation-duration: 0.25s; animation-delay: 0.15s; }
+.v4-spark--4 { animation-duration: 0.20s; animation-delay: 0.06s; }
+
+@keyframes spark-pulse {
+  0%  { opacity: 1;   r: 2; }
+  30% { opacity: 0;   r: 1; }
+  60% { opacity: 0.8; r: 3; }
+  90% { opacity: 0;   r: 1; }
+  100%{ opacity: 1;   r: 2; }
+}
+
+/* ── v4 controls overlay: Mono/Arp + TEMPO + ž + BPM/VOL knobs ── */
+.v4-controls-overlay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 2px;
+  border-bottom: 1px solid rgba(55, 75, 110, 0.25);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Mono/Arp toggle */
+.v4-mono-arp {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-toggle-btn {
+  padding: 3px 8px;
+  border: 1px solid #252538;
+  background: #0d0d1a;
+  color: #484c64;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 1.1vw, 13px);
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  line-height: 1.5;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), inset 0 1px 0 rgba(0,0,0,0.4);
+}
+.v4-toggle-btn:hover {
+  background: #161628;
+  color: #c0c4e8;
+  border-color: #404068;
+}
+.v4-toggle-btn--on {
+  background: #141428;
+  color: #99aaee;
+  border-color: #5566aa;
+  box-shadow: 0 0 6px rgba(80,100,180,0.25), inset 0 1px 0 rgba(0,0,0,0.4);
+}
+
+/* Knob group: label above bipolar knob */
+.v4-knob-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.v4-knob-group__label {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 0.9vw, 11px);
+  color: #5577cc;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Bipolar knob inside overlay — smaller */
+.v4-bipolar-knob.ascii-bipolar-knob {
+  padding: 2px 4px;
+  border-bottom: none;
+}
+.v4-bipolar-knob .ascii-bipolar-knob__svg {
+  width: 44px;
+  height: 44px;
+}
+.v4-bipolar-knob .ascii-bipolar-knob__label {
+  font-size: clamp(8px, 0.85vw, 10px);
+}
+
+/* AsciiKnob inside overlay */
+.v4-knob.ascii-knob {
+  min-width: 34px;
+}
+
+/* ── "touch to play" inactivity prompt ── */
+.v4-touch-prompt {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Courier New', monospace;
+  font-size: clamp(11px, 1.4vw, 16px);
+  color: rgba(170, 185, 230, 0.45);
+  letter-spacing: 0.18em;
+  pointer-events: none;
+  animation: prompt-fade-in 1.2s ease forwards;
+  white-space: nowrap;
+  z-index: 6;
+}
+
+@keyframes prompt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 600px) {
+  .v4-controls-overlay {
+    gap: 6px;
+    padding: 3px 6px 2px;
+  }
+  .v4-bipolar-knob .ascii-bipolar-knob__svg {
+    width: 36px;
+    height: 36px;
+  }
+  .v4-mode-btn {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+}
+
+/* ── DualKnob osc section ── */
+
+/* Hide the AsciiControls osc panel — replaced by V4OscSection */
+.v4-app .ascii-panel--oscs {
+  display: none;
+}
+
+.v4-osc-section {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 6px 0;
+  flex-wrap: wrap;
+}
+
+.v4-osc-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.v4-osc-panel__label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--osc-color, var(--cyan));
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.v4-osc-waves {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-wave-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.35);
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 2px;
+  line-height: 1.2;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.v4-wave-btn:hover {
+  color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.v4-wave-btn--on {
+  background: color-mix(in srgb, var(--osc-color, var(--cyan)) 15%, transparent);
+  border-color: var(--osc-color, var(--cyan));
+  color: var(--osc-color, var(--cyan));
+  box-shadow: 0 0 4px color-mix(in srgb, var(--osc-color, var(--cyan)) 40%, transparent);
+}

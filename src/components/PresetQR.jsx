@@ -93,54 +93,70 @@ function drawSpillEdges(ctx, w, h, rng) {
   }
 }
 
-// Draw subtle watermark text — iridescent chars woven into the QR grain, not competing with it
+// Draw ribbon-twisted watermark text — chars warp along a Möbius-strip sine path
 function drawWarpedText(ctx, text, cx, cy, size, rng) {
-  const fontSize = Math.min(24, Math.max(12, Math.floor(size / (text.length * 0.65))))
+  const fontSize = Math.min(26, Math.max(13, Math.floor(size / (text.length * 0.6))))
   const chars = text.split('')
 
   ctx.font = `bold ${fontSize}px monospace`
-  const charWidths = chars.map(c => ctx.measureText(c).width * (0.95 + rng() * 0.2))
+  const charWidths = chars.map(c => ctx.measureText(c).width * (0.9 + rng() * 0.25))
   const totalW = charWidths.reduce((a, b) => a + b, 0) + chars.length * 2
-  const bandH = fontSize + 14
+  const bandH = fontSize + 20
 
-  // Gentle wave — present but not jarring
-  const waveAmp = 2 + rng() * 4
-  const waveFreq = 0.7 + rng() * 0.8
-  const wavePhase = rng() * Math.PI * 2
+  // Dual-wave ribbon path: primary + secondary wave creates Möbius-like twist
+  const waveAmp1 = 6 + rng() * 8     // primary ribbon wave
+  const waveFreq1 = 0.8 + rng() * 0.7
+  const wavePhase1 = rng() * Math.PI * 2
+  const waveAmp2 = 3 + rng() * 4     // secondary twist
+  const waveFreq2 = 1.6 + rng() * 1.2
+  const wavePhase2 = rng() * Math.PI * 2
 
-  // Very faint dark veil behind text (just enough to separate from QR dots)
-  const rx = cx - totalW / 2 - 8
+  // Semi-transparent veil follows ribbon wave
+  const rx = cx - totalW / 2 - 10
   const ry = cy - bandH / 2
-  const bw = totalW + 16
+  const bw = totalW + 20
   const bh = bandH
-  ctx.fillStyle = 'rgba(6, 6, 18, 0.38)'
+  const steps = 10
+  ctx.fillStyle = 'rgba(6, 6, 18, 0.42)'
   ctx.beginPath()
-  ctx.moveTo(rx + 4, ry + (rng() - 0.5) * 3)
-  for (let sx = bw / 5; sx <= bw; sx += bw / 5) {
-    ctx.lineTo(rx + sx, ry + (rng() - 0.5) * 4)
+  ctx.moveTo(rx, ry + (rng() - 0.5) * 5)
+  for (let s = 0; s <= steps; s++) {
+    const t = s / steps
+    const wx = rx + t * bw
+    const wy = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 * 0.5)
+    ctx.lineTo(wx, ry + wy + (rng() - 0.5) * 3)
   }
-  ctx.lineTo(rx + bw, ry + bh + (rng() - 0.5) * 3)
-  for (let sx = bw; sx >= 0; sx -= bw / 5) {
-    ctx.lineTo(rx + sx, ry + bh + (rng() - 0.5) * 4)
+  for (let s = steps; s >= 0; s--) {
+    const t = s / steps
+    const wx = rx + t * bw
+    const wy = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 * 0.5)
+    ctx.lineTo(wx, ry + bh + wy + (rng() - 0.5) * 3)
   }
   ctx.closePath()
   ctx.fill()
 
-  // Draw each character — subtle warp, iridescent color, low opacity
+  // Draw each character — ribbon-twisted warp
   let xPos = cx - totalW / 2
   for (let i = 0; i < chars.length; i++) {
     const charW = charWidths[i]
     const charCenterX = xPos + charW / 2
+    const t = (charCenterX - cx + totalW / 2) / Math.max(totalW, 1)
 
-    const waveY = Math.sin(wavePhase + (charCenterX - cx) / size * Math.PI * 2 * waveFreq) * waveAmp
+    const wave1 = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * waveAmp1
+    const wave2 = Math.sin(wavePhase2 + t * Math.PI * 2 * waveFreq2) * waveAmp2
+    const yOff = wave1 + wave2 + (rng() - 0.5) * 4
 
-    const angle = (rng() - 0.5) * 0.22       // ±~12° — legible but not flat
-    const scaleX = 0.88 + rng() * 0.28        // 0.88–1.16
-    const scaleY = 0.88 + rng() * 0.24        // 0.88–1.12
-    const yOff = (rng() - 0.5) * 5 + waveY
-    const skewX = (rng() - 0.5) * 0.18
+    // Angle follows the ribbon tangent (derivative of wave) for authentic twist
+    const tangent = Math.cos(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 / totalW) * Math.PI * 2 * waveFreq1
+    const angle = tangent * 0.6 + (rng() - 0.5) * 0.35   // ribbon tilt + per-char jitter
 
-    const gradT = ((charCenterX - cx + size) / (size * 2) + rng() * 0.1) % 1
+    // Scale breathes with wave position — chars near crest stretch, trough compress
+    const breathe = 1 + Math.sin(wavePhase2 + t * Math.PI * 4) * 0.18
+    const scaleX = (0.82 + rng() * 0.36) * breathe
+    const scaleY = (0.78 + rng() * 0.3) / breathe
+    const skewX = (rng() - 0.5) * 0.32 + tangent * 0.3
+
+    const gradT = (t + rng() * 0.12) % 1
     const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT)
 
     ctx.save()
@@ -151,10 +167,9 @@ function drawWarpedText(ctx, text, cx, cy, size, rng) {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    // Soft glow pass (behind fill)
-    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`
-    ctx.shadowBlur = 3 + rng() * 4
-    ctx.globalAlpha = 0.55 + rng() * 0.2
+    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.65)`
+    ctx.shadowBlur = 4 + rng() * 6
+    ctx.globalAlpha = 0.6 + rng() * 0.25
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
     ctx.fillText(chars[i], 0, 0)
     ctx.shadowBlur = 0

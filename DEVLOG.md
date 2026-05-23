@@ -1,5 +1,23 @@
 # Devlog
 
+## 2026-05-23 — v4 foundation: dual-mode app, DualKnobs, static-arc spheres, waveform morphing (DUMP 635-654)
+
+- Created `V4App.jsx` + `V4App.css`: dual party/lo mode synthesizer branching from v3.
+- Party mode: v2-style Three.js sphere visualizer, zoomed out 4×ZOOM_STEP by default, with SVG static-electricity arc overlay.
+- Lo mode: v3 ASCII ribbon + orbs (same as TextRibbonApp).
+- Copied `DualKnob` from puddle — osc mix (outer ring) + detune (inner circle) in one component. V4OscSection renders 3 DualKnobs with wave symbol buttons, replacing AsciiControls' osc section.
+- Mono/Arp toggle: replaces play/arp + mono/poly — ARP always implies poly.
+- TEMPO BipolarKnob: drives BPM (40–280) and glideSpeed (0.005–0.08) from one control.
+- ž BipolarKnob: FLUTTER (left) = delay LFO at ~8hz, PHASE (right) = reverb tail scale.
+- Default osc2 mix=0.33, osc3 mix=0.66; initial reverbMix=0.7, delay distorted for immediate sphere drama.
+- Controls panel has `background: transparent` — no console chrome.
+- Touch-to-play prompt fades back in after 37s of inactivity via `setTimeout`.
+- QR text: `drawWarpedText` upgraded to dual-wave ribbon path with tangent-driven character angle, breathe-scale, stronger amplitude — more ribbon-twisted aesthetic.
+- `use3DVisualizer`: added `oscParams` parameter; waveform morphing displaces sphere vertices based on waveform function and mix level (sine/square/sawtooth/triangle shapes).
+- `deploy.yml`: `dev/**` branches now trigger dev deploy; dev job builds all /v1 /v2 /v3 /v4 subpaths and deploys to ribbon-dev.obfusco.us for version-switcher testing.
+- VersionSwitcher: added v4 button.
+- main.jsx: routes `/v4/` → V4App, else v3/v1/v2 as before.
+
 ## 2026-04-20 — v3 promoted to ribbon.obfusco.us root (DUMP 629-631)
 
 - v3 branch deploy.yml: now builds twice — once with base `/` for root, once with base `/v3/` for /v3/. Root sync uses `--exclude "v*/*"` to preserve /v1, /v2, /v3 paths.

@@ -12,12 +12,23 @@ Ribbon v1–v3 are **frozen** — self-contained, no external engine dependency,
 
 **Ribbon v4 and all future major versions** will consume `@audness/core` from the [audness monorepo](https://github.com/nathanmoomaw/audness) as their audio engine. The creative surface, UI, and app-specific features remain in this repo; the synthesis engine is shared.
 
-| Version | Engine source          | Status   |
-|---------|------------------------|----------|
-| v1      | self-contained         | frozen   |
-| v2      | self-contained         | frozen   |
-| v3      | self-contained         | frozen   |
-| v4+     | `@audness/core`        | future   |
+| Version | Engine source          | Status        |
+|---------|------------------------|---------------|
+| v1      | self-contained         | frozen        |
+| v2      | self-contained         | frozen        |
+| v3      | self-contained         | frozen (live) |
+| v4      | self-contained → @audness/core | in progress (dev/v4 branch) |
+| v5+     | `@audness/core`        | future        |
+
+### v4 (branch: dev/v4, ribbon-dev.obfusco.us/v4/)
+- Dual-mode: Party (Three.js spheres + static-electricity arcs) / Lo (ASCII ribbon)
+- DualKnob for osc mix+detune (outer ring = mix, inner circle = detune)
+- Mono/Arp toggle (ARP always implies poly)
+- TEMPO BipolarKnob (BPM + glide), ž BipolarKnob (flutter/phase FX)
+- Sphere waveform morphing: osc mix drives vertex displacement toward waveform shape
+- Transparent controls panel (no background chrome)
+- 37s inactivity touch-to-play prompt
+- QR text: ribbon-twisted dual-wave warp rendering
 
 ## Core Concepts
 

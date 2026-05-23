@@ -1,5 +1,22 @@
 # Roadmap
 
+## v4 — In Progress (branch: dev/v4, deploys to ribbon-dev.obfusco.us/v4/)
+> Dual-mode: Party (v2-style 3D spheres + static electricity) and Lo (v3 ASCII ribbon).
+- [x] V4App foundation: party/lo mode toggle
+- [x] DualKnob osc controls (mix outer ring, detune inner circle)
+- [x] Mono/Arp toggle (replaces play/arp + mono/poly)
+- [x] TEMPO BipolarKnob (BPM + glide in one knob)
+- [x] ž BipolarKnob (flutter/phase effects)
+- [x] Sphere waveform morphing (osc mix drives sphere geometry shape)
+- [x] Static electricity arcs overlay (party mode)
+- [x] Transparent controls panel
+- [x] Touch-to-play 37s inactivity prompt
+- [x] QR text: ribbon-twisted dual-wave warp
+- [ ] Mobile layout for v4
+- [ ] v4 preset URL support (serialization)
+- [ ] v4 live at ribbon.obfusco.us/v4
+- [ ] Audness engine (@audness/core) upgrade for v4+
+
 ## v3 "ascii ribbon" ✓ LIVE at ribbon.obfusco.us (branch: v3, codename: ascii ribbon)
 > Note: the original text-ribbon branch was an ASCII version of early puddle; now adopted as the official ascii ribbon v3, based on ribbon v2 feature set. Promoted to root 2026-04-20.
 - [x] Bootstrap ASCII rendering layer using @chenglou/pretext

@@ -1,8 +1,8 @@
-name: Deploy v3
+name: Deploy
 
 on:
   push:
-    branches: [v3, 'nmj/**']
+    branches: [v3, 'nmj/**', 'dev/**']
 
 jobs:
   deploy-v3:
@@ -40,7 +40,7 @@ jobs:
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
 
   deploy-dev:
-    if: startsWith(github.ref, 'refs/heads/nmj/')
+    if: startsWith(github.ref, 'refs/heads/nmj/') || startsWith(github.ref, 'refs/heads/dev/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -52,7 +52,7 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for dev (base /)
+      - name: Build for dev root (base /)
         run: npm run build
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -61,8 +61,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to dev S3
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete
+      - name: Deploy root to dev S3
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete --exclude "v*/*"
+
+      - name: Build for dev /v1
+        run: npm run build -- --base /v1/
+
+      - name: Deploy to dev /v1
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/v1/ --delete
+
+      - name: Build for dev /v2
+        run: npm run build -- --base /v2/
+
+      - name: Deploy to dev /v2
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/v2/ --delete
+
+      - name: Build for dev /v3
+        run: npm run build -- --base /v3/
+
+      - name: Deploy to dev /v3
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/v3/ --delete
+
+      - name: Build for dev /v4
+        run: npm run build -- --base /v4/
+
+      - name: Deploy to dev /v4
+        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/v4/ --delete
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

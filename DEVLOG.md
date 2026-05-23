@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-23 — v4 party mode: v2 Ribbon strip, sphere zigzag fix (DUMP 658-661)
+
+- Party mode now renders `Ribbon` (v2 horizontal strip) instead of invisible `AsciiRibbon` canvas.
+- OSC controls: `Controls` component (party mode) has `OscSection` with rotary knobs + wave buttons.
+- VCF controls: `Controls` renders `VCFControl` with cutoff/resonance/routing.
+- Fixed sphere vertex explosion/zigzag: waveform morphing loop was reading already-displaced `arr` instead of `basePositions`, compounding displacement every frame. Merged reverb + waveform into single pass always reading from base. Reduced `morphAmt` scale 0.45→0.22.
+
 ## 2026-05-23 — v4 party mode uses v2 Controls component (rotary knobs, Rock&Rule console)
 
 - Party mode now renders `Controls` (v2-style: rotary knobs, brushed-metal industrial console, DJFader, VCF panel) instead of `AsciiControls`.

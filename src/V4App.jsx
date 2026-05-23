@@ -21,6 +21,7 @@ import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
 import { Controls } from './components/Controls'
+import { Ribbon } from './components/Ribbon'
 import { ConfettiCanvas } from './components/ConfettiCanvas'
 import { FloatingStaff } from './components/FloatingStaff'
 import { RibbonLogo } from './components/RibbonLogo'
@@ -32,6 +33,7 @@ import { useAccount } from 'wagmi'
 import './V4App.css'
 import './TextRibbonApp.css'
 import './components/Controls.css'
+import './components/Ribbon.css'
 import './components/VersionSwitcher.css'
 
 import { DualKnob } from './components/DualKnob'
@@ -721,28 +723,46 @@ export default function V4App() {
 
         {/* Ribbon strip */}
         <section
-          className="text-ribbon-strip"
+          className={`text-ribbon-strip${isParty ? ' v4-ribbon-strip--party' : ''}`}
           ref={canvasAreaRef}
           onPointerDown={handleInteraction}
         >
-          <AsciiRibbon
-            getEngine={getEngine}
-            mode={mode}
-            octaves={octaves}
-            stepped={stepped}
-            scale={scale}
-            ribbonInteraction={ribbonInteraction}
-            arpStart={arpStart}
-            arpStop={arpStop}
-            hold={hold}
-            poly={poly}
-            shaking={shaking}
-            onArpNoteToggle={handleArpNoteToggle}
-            arpNotes={arpNotes}
-            oscParams={oscParams}
-            onSpawnConfetti={spawnConfetti}
-            onSpawnNote={spawnNote}
-          />
+          {isParty ? (
+            <Ribbon
+              getEngine={getEngine}
+              mode={mode}
+              octaves={octaves}
+              stepped={stepped}
+              scale={scale}
+              ribbonInteraction={ribbonInteraction}
+              arpStart={arpStart}
+              arpStop={arpStop}
+              hold={hold}
+              poly={poly}
+              shaking={shaking}
+              onArpNoteToggle={handleArpNoteToggle}
+              arpNotes={arpNotes}
+            />
+          ) : (
+            <AsciiRibbon
+              getEngine={getEngine}
+              mode={mode}
+              octaves={octaves}
+              stepped={stepped}
+              scale={scale}
+              ribbonInteraction={ribbonInteraction}
+              arpStart={arpStart}
+              arpStop={arpStop}
+              hold={hold}
+              poly={poly}
+              shaking={shaking}
+              onArpNoteToggle={handleArpNoteToggle}
+              arpNotes={arpNotes}
+              oscParams={oscParams}
+              onSpawnConfetti={spawnConfetti}
+              onSpawnNote={spawnNote}
+            />
+          )}
           {showTouchPrompt && (
             <div className="v4-touch-prompt">touch to play</div>
           )}

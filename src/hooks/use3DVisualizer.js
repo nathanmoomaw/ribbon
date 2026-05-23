@@ -277,73 +277,55 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const scalePulse = 1 + energy * 0.3
         sphere.group.scale.setScalar(scalePulse)
 
-        // Brain-like vertex displacement driven by reverb mix
+        // Vertex displacement: reverb brain-folds + waveform morphing, single pass from base
         const reverb = reverbMixRef.current
-        if (reverb > 0.01) {
+        const osc = oscParamsRef.current?.[i]
+        const displaceAmt = reverb * 0.35
+        const morphAmt = (osc && osc.mix > 0.05) ? osc.mix * 0.22 : 0
+
+        if (displaceAmt > 0.001 || morphAmt > 0.001) {
           const posAttr = sphere.geo.getAttribute('position')
           const arr = posAttr.array
           const base = sphere.basePositions
           const vertCount = posAttr.count
-          // Displacement amount: reverb controls intensity, time adds slow undulation
-          const displaceAmt = reverb * 0.35
-          // Slow time crawl for organic pulsing of the folds
           const t = time * 0.0003 + i * 2.0
+          const tMorph = time * 0.0008 + i * 1.4
 
           for (let v = 0; v < vertCount; v++) {
             const bx = base[v * 3]
             const by = base[v * 3 + 1]
             const bz = base[v * 3 + 2]
 
-            // Normal direction (sphere centered at origin, so normal = normalized position)
             const len = Math.sqrt(bx * bx + by * by + bz * bz)
             if (len === 0) continue
             const nx = bx / len
             const ny = by / len
             const nz = bz / len
 
-            // Noise-based displacement along normal (brain folds)
-            const n = noise3D(bx * 1.2 + t, by * 1.2 + t * 0.7, bz * 1.2 + t * 0.5)
-            const displacement = n * displaceAmt
+            // Reverb: noise-based brain folds along normal
+            const fold = displaceAmt > 0.001
+              ? noise3D(bx * 1.2 + t, by * 1.2 + t * 0.7, bz * 1.2 + t * 0.5) * displaceAmt
+              : 0
 
-            arr[v * 3] = bx + nx * displacement
-            arr[v * 3 + 1] = by + ny * displacement
-            arr[v * 3 + 2] = bz + nz * displacement
+            // Waveform morph: azimuthal displacement toward waveform shape
+            let wave = 0
+            if (morphAmt > 0.001) {
+              const phi = Math.atan2(bz, bx)
+              const elevation = Math.asin(Math.max(-1, Math.min(1, by / len)))
+              wave = waveDisplace(osc.waveform, phi, tMorph) * Math.cos(elevation) * morphAmt
+            }
+
+            const totalD = fold + wave
+            arr[v * 3]     = bx + nx * totalD
+            arr[v * 3 + 1] = by + ny * (totalD * 0.75)
+            arr[v * 3 + 2] = bz + nz * totalD
           }
           posAttr.needsUpdate = true
-        }
-
-        // Waveform morphing: when osc mix > 0 the sphere deforms toward that waveform shape
-        const osc = oscParamsRef.current?.[i]
-        if (osc && osc.mix > 0.05) {
-          const morphAmt = osc.mix * 0.45
-          const posAttr2 = sphere.geo.getAttribute('position')
-          const arr2 = posAttr2.array
-          const base2 = sphere.basePositions
-          const vertCount2 = posAttr2.count
-          const tMorph = time * 0.0008 + i * 1.4
-
-          for (let v = 0; v < vertCount2; v++) {
-            const bx = base2[v * 3]
-            const by = base2[v * 3 + 1]
-            const bz = base2[v * 3 + 2]
-
-            const len = Math.sqrt(bx * bx + by * by + bz * bz)
-            if (len === 0) continue
-            const nx = bx / len
-            const ny = by / len
-            const nz = bz / len
-
-            // Azimuthal angle in x-z plane + elevation tilt for 3D shape
-            const phi = Math.atan2(bz, bx)
-            const elevation = Math.asin(Math.max(-1, Math.min(1, by / len)))
-            const waveMag = waveDisplace(osc.waveform, phi, tMorph) * Math.cos(elevation)
-
-            // Accumulate: read current displaced position, add morph on top
-            arr2[v * 3]     = arr2[v * 3]     + nx * waveMag * morphAmt
-            arr2[v * 3 + 1] = arr2[v * 3 + 1] + ny * waveMag * morphAmt * 0.5
-            arr2[v * 3 + 2] = arr2[v * 3 + 2] + nz * waveMag * morphAmt
-          }
-          posAttr2.needsUpdate = true
+        } else {
+          // No displacement — reset to base positions
+          const posAttr = sphere.geo.getAttribute('position')
+          posAttr.array.set(sphere.basePositions)
+          posAttr.needsUpdate = true
         }
 
         // Calculate target reactive offset from pitch + velocity

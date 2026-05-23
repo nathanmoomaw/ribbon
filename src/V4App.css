@@ -237,20 +237,16 @@
   to   { opacity: 1; }
 }
 
-/* ── Party mode: spheres dominate, ASCII ribbon hidden but still interactive ── */
+/* ── Party mode: spheres dominate, ribbon below ── */
 .v4-mode--party .text-ribbon-orbs {
   flex: 1;
   min-height: 0;
 }
 .v4-mode--party .text-ribbon-strip {
   flex: 0 0 auto;
-  min-height: 64px;
+  min-height: 80px;
   background: transparent;
   border-color: rgba(60, 80, 140, 0.2);
-}
-/* Hide the ASCII canvas in party mode — opacity 0 keeps pointer events alive */
-.v4-mode--party .text-ribbon-strip canvas {
-  opacity: 0;
 }
 
 /* ── Lo mode: ribbon is the main canvas ── */

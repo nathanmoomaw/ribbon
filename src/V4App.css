@@ -21,7 +21,7 @@
 /* ── Party mode: controls compact at bottom, spheres + ribbon dominate ── */
 .v4-mode--party .text-ribbon-controls {
   flex: 0 0 auto;
-  max-height: 38vh;
+  max-height: 52vh;
   overflow-y: auto;
   overflow-x: hidden;
   background: transparent;
@@ -219,6 +219,17 @@
 .v4-mode--party .text-ribbon-orbs {
   flex: 1;
   min-height: 0;
+  height: auto;
+  background: transparent;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure Three.js mount fills the orbs area completely */
+.v4-mode--party .v4-party-vis {
+  flex: 1;
+  min-height: 0;
 }
 .v4-mode--party .text-ribbon-strip {
   flex: 0 0 auto;
@@ -226,6 +237,12 @@
   background: transparent;
   border-color: rgba(60, 80, 140, 0.2);
 }
+
+/* Hide ribbon internal touch-to-play label in party mode (v4 has its own prompt) */
+.v4-mode--party .ribbon__label { display: none; }
+
+/* Hide the v2 Controls embedded VersionSwitcher in v4 (header has one) */
+.v4-app .controls__version-switcher { display: none; }
 
 /* ── Lo mode: ribbon is the main canvas ── */
 .v4-mode--lo .text-ribbon-strip {

@@ -1,5 +1,13 @@
 # Devlog
 
+## 2026-05-25 — v4 party layout fixes: top band, touch prompt, version switcher, controls cutoff (DUMP 669-672)
+
+- Fixed unused dark band at top: orbs section now `height: auto; display: flex` in party mode so Three.js canvas fills without height constraint fighting `flex: 1`. Background set to transparent (was `rgba(4,6,14,0.6)`).
+- Fixed 2 "touch to play" prompts: hidden `.ribbon__label` in party mode via CSS (V4App has its own inactivity prompt).
+- Fixed duplicate VersionSwitcher: hidden `.controls__version-switcher` inside Controls component for all v4 (header already has one).
+- Fixed waveform controls cutoff: increased party mode controls `max-height` from 38vh → 52vh with `overflow-y: auto`.
+- Committed screenshot to repo root.
+
 ## 2026-05-23 — v4 party layout, dynamic lightning, wavy staff (DUMP 662-665)
 
 - Layout fix: party mode controls capped at 38vh (`flex: 0 0 auto; max-height: 38vh`) so spheres + ribbon dominate above.

@@ -21,13 +21,39 @@
 /* ── Party mode: controls compact at bottom, spheres + ribbon dominate ── */
 .v4-mode--party .text-ribbon-controls {
   flex: 0 0 auto;
-  max-height: 52vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: visible;
   background: transparent;
   border-top: 1px solid rgba(60, 80, 140, 0.15);
   box-shadow: none;
   padding: 0;
+}
+
+/* Compact party mode control block */
+.v4-party-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 6px;
+}
+
+.v4-party-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.v4-bar-sep {
+  color: rgba(60, 80, 120, 0.35);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.v4-octave-btns {
+  display: flex;
+  gap: 2px;
 }
 
 /* Strip: no dark background, no negative margin (that's for lo mode overlap) */
@@ -248,9 +274,17 @@
 .v4-mode--lo .text-ribbon-strip {
   flex: 1;
   min-height: 0;
+  margin-top: 0;
+  height: auto;
 }
 .v4-mode--lo .text-ribbon-orbs {
   flex: 0 0 auto;
+}
+.v4-mode--lo .text-ribbon-controls {
+  flex: 0 0 auto;
+  max-height: 44vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* ── Mobile adjustments ── */

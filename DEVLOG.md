@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-25 — v4 layout condensed, lo mode fixed (DUMP 673-675)
+
+- Replaced full v2 `<Controls>` in party mode with compact inline bar: Mono/Arp, Hold, Stop, TEMPO knob, ž knob, BPM knob, VOL knob, octave buttons, V4OscSection.
+- Party mode controls now take ~160px instead of 350px+, giving spheres the space they need.
+- Lo mode strip: added `margin-top: 0; height: auto` override to clear the base negative-margin overlap effect. Strip now `flex: 1` as intended.
+- Lo mode controls: added `max-height: 44vh; overflow-y: auto` so AsciiControls scrolls without crowding the ribbon.
+
 ## 2026-05-25 — v4 party layout fixes: top band, touch prompt, version switcher, controls cutoff (DUMP 669-672)
 
 - Fixed unused dark band at top: orbs section now `height: auto; display: flex` in party mode so Three.js canvas fills without height constraint fighting `flex: 1`. Background set to transparent (was `rgba(4,6,14,0.6)`).

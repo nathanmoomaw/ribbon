@@ -824,71 +824,71 @@ export default function V4App() {
         <section className="text-ribbon-controls v4-controls" ref={sidebarRef}>
           {isParty ? (
             <>
-              {/* v4-unique TEMPO + ž strip (party mode — Mono/Arp/Vol handled by Controls) */}
-              <div className="v4-controls-overlay v4-controls-overlay--slim">
-                <div className="v4-knob-group">
-                  <div className="v4-knob-group__label">TEMPO</div>
-                  <BipolarKnob
-                    label={`BPM ${arpBpm}`}
-                    subLabel={{ left: 'SLOW', right: 'FAST' }}
-                    value={tempo}
-                    onChange={handleTempo}
+              {/* Compact party controls: one row + osc section */}
+              <div className="v4-party-controls">
+                <div className="v4-party-bar">
+                  <div className="v4-mono-arp">
+                    <button
+                      className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
+                      onClick={() => setMonoArp('mono')}
+                    >MONO</button>
+                    <button
+                      className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
+                      onClick={() => setMonoArp('arp')}
+                    >ARP</button>
+                  </div>
+                  <button
+                    className={`v4-toggle-btn${hold ? ' v4-toggle-btn--on' : ''}`}
+                    onClick={() => setHold(h => !h)}
+                  >HOLD</button>
+                  <button className="v4-toggle-btn" onClick={handleStop}>STOP</button>
+                  <span className="v4-bar-sep">|</span>
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">TEMPO</div>
+                    <BipolarKnob
+                      label={`BPM ${arpBpm}`}
+                      subLabel={{ left: 'SLOW', right: 'FAST' }}
+                      value={tempo}
+                      onChange={handleTempo}
+                    />
+                  </div>
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">ž</div>
+                    <BipolarKnob
+                      label="ž"
+                      subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
+                      value={zeta}
+                      onChange={handleZeta}
+                    />
+                  </div>
+                  <span className="v4-bar-sep">|</span>
+                  <AsciiKnob
+                    label="BPM"
+                    value={arpBpm}
+                    min={40}
+                    max={280}
+                    onChange={v => setArpBpm(Math.round(v))}
                   />
-                </div>
-                <div className="v4-knob-group">
-                  <div className="v4-knob-group__label">ž</div>
-                  <BipolarKnob
-                    label="ž"
-                    subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
-                    value={zeta}
-                    onChange={handleZeta}
+                  <AsciiKnob
+                    label="VOL"
+                    value={volume}
+                    min={0}
+                    max={1}
+                    onChange={setVolume}
                   />
+                  <span className="v4-bar-sep">|</span>
+                  <div className="v4-octave-btns">
+                    {[1,2,3,4].map(n => (
+                      <button
+                        key={n}
+                        className={`v4-toggle-btn${octaves === n ? ' v4-toggle-btn--on' : ''}`}
+                        onClick={() => setOctaves(n)}
+                      >{n}</button>
+                    ))}
+                  </div>
                 </div>
+                <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
               </div>
-
-              {/* v2-style Controls panel for party mode */}
-              <Controls
-                getEngine={getEngine}
-                oscParams={oscParams}
-                setOscParams={setOscParams}
-                volume={volume}
-                setVolume={setVolume}
-                octaves={octaves}
-                setOctaves={setOctaves}
-                stepped={stepped}
-                setStepped={setStepped}
-                scale={scale}
-                setScale={setScale}
-                delayParams={delayParams}
-                setDelayParams={setDelayParams}
-                reverbMix={reverbMix}
-                setReverbMix={setReverbMix}
-                crunch={crunch}
-                setCrunch={setCrunch}
-                filterParams={filterParams}
-                setFilterParams={setFilterParams}
-                glideSpeed={glideSpeed}
-                setGlideSpeed={setGlideSpeed}
-                shaking={shaking}
-                mode={mode}
-                setMode={setMode}
-                poly={poly}
-                setPoly={setPoly}
-                arpBpm={arpBpm}
-                setArpBpm={setArpBpm}
-                hold={hold}
-                setHold={setHold}
-                onStop={handleStop}
-                onKillAll={handleStop}
-                onQRCreate={handleOpenQR}
-                vcfCutoff={vcfCutoff}
-                vcfResonance={vcfResonance}
-                vcfRouting={vcfRouting}
-                onVcfCutoffChange={setVcfCutoff}
-                onVcfResonanceChange={setVcfResonance}
-                onVcfRoutingToggle={handleVcfRoutingToggle}
-                currentVersion={4}
-              />
             </>
           ) : (
             <>

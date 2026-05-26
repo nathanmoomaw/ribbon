@@ -67,11 +67,12 @@
 }
 
 /* Arc track — faint background track */
+/* rotate(135deg): SVG circle starts at 3-o'clock; 135° clockwise = 7:30 o'clock start */
 .dual-knob__ring-track {
   stroke: rgba(255, 255, 255, 0.07);
   stroke-linecap: round;
   transform-origin: center;
-  transform: rotate(-90deg);
+  transform: rotate(135deg);
 }
 
 /* Arc fill — mix level in osc color */
@@ -79,7 +80,7 @@
   stroke: var(--knob-color, var(--cyan));
   stroke-linecap: round;
   transform-origin: center;
-  transform: rotate(-90deg);
+  transform: rotate(135deg);
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--knob-color, var(--cyan)) 60%, transparent));
   transition: none;
 }
@@ -156,13 +157,13 @@
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Inner circle — detune notch */
+/* Inner circle — detune notch (55% of body so it scales with mobile) */
 .dual-knob__inner {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: var(--inner-size, 32px);
-  height: var(--inner-size, 32px);
+  width: 55%;
+  height: 55%;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background: radial-gradient(
@@ -266,10 +267,10 @@
   transition: none;
 }
 
-/* Responsive scale */
+/* Responsive scale — SVG uses width/height 100% so it follows body size */
 @media (max-width: 767px) {
   .dual-knob__body {
-    width: calc(var(--knob-size, 52px) * 0.85);
-    height: calc(var(--knob-size, 52px) * 0.85);
+    width: calc(var(--knob-size, 52px) * 0.75);
+    height: calc(var(--knob-size, 52px) * 0.75);
   }
 }

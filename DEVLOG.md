@@ -1,5 +1,14 @@
 # Devlog
 
+## 2026-05-26 — DualKnob arc 7→5, mobile responsive, CUT/RES knobs, consolidated bar (DUMP 686-691)
+
+- DualKnob arc: switched from `rotate(-90deg) + negative strokeDashoffset` to `rotate(135deg) + no offset`. SVG circles start at 3 o'clock; 135° clockwise = 7:30. Arc now fills 7:30→4:30 unambiguously.
+- DualKnob mobile: SVG now `width="100%" height="100%"` — scales with container. Inner circle changed from `--inner-size` var to `55%` width/height so it scales correctly on mobile.
+- DualKnob drag: replaced `startY - clientY` with `movementY` incremental approach (fixes drag at screen edge).
+- VCF knobs (686): added CUT and RES AsciiKnobs to party mode.
+- Single bar (687): removed separate FX row; SPACE, TONE, CUT, RES, VCF→[1][2][3] now inline with OSCs in the same wrapping bar.
+- Header cleanup (688): removed redundant `v4-header` class (base CSS already sets `gap: 8px` on `__right`); removed its orphaned CSS rule.
+
 ## 2026-05-26 — DualKnob arc fix, movementY drag, label stability, space/tone/VCF (DUMP 682-685)
 
 - DualKnob mix arc: `startOffset` was `(135/360)*C` placing arc at ~4:30 o'clock (reversed). Fixed to `(225/360)*C` so arc fills 7:30→4:30 clockwise (0%→100%).

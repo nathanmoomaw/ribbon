@@ -87,10 +87,6 @@
 }
 
 /* ── Header: Party/Lo toggle ── */
-.v4-header .text-ribbon-header__right {
-  gap: 8px;
-}
-
 .v4-mode-toggle {
   display: flex;
   gap: 2px;
@@ -305,12 +301,6 @@
   font-variant-numeric: tabular-nums;
   min-width: 5ch;
   text-align: center;
-}
-
-/* FX row in party mode — slightly smaller knobs, same bar layout */
-.v4-party-bar--fx {
-  border-top: 1px solid rgba(55, 75, 110, 0.15);
-  padding-top: 4px;
 }
 
 /* ── Mobile adjustments ── */

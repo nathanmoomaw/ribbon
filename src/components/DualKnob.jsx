@@ -24,7 +24,6 @@ export const DualKnob = memo(function DualKnob({
   const ghostThumbRef = useRef(null)
 
   const draggingZone = useRef(null)
-  const startY = useRef(0)
   const startMix = useRef(0)
   const startDetune = useRef(0)
 
@@ -42,7 +41,7 @@ export const DualKnob = memo(function DualKnob({
   const detuneRatio = Math.max(0, Math.min(1, (detuneValue - minDetune) / detuneRange))
   const detuneAngle = MIN_ANGLE + detuneRatio * ANGLE_RANGE
 
-  // Mix arc: start at 225° in conic terms, fill mix * 270°
+  // Mix arc: 270° sweep from 7:30 (135° clockwise from 3 o'clock) to 4:30
   const mixAngle = mixValue * ANGLE_RANGE // 0–270
 
   // SVG arc parameters for the outer ring fill
@@ -51,8 +50,6 @@ export const DualKnob = memo(function DualKnob({
   const circumference = 2 * Math.PI * ringRadius
   const trackArcLength = (ANGLE_RANGE / 360) * circumference
   const fillArcLength = (mixAngle / 360) * circumference
-  // Offset to start at 7:30 o'clock (225° clockwise from 12 o'clock after rotate(-90deg))
-  const startOffset = (225 / 360) * circumference
 
   // Direct DOM update — zero-lag response
   const applyMixVisuals = useCallback((newMix) => {
@@ -101,7 +98,6 @@ export const DualKnob = memo(function DualKnob({
     const zone = getZone(e)
     draggingZone.current = zone
     applyHoverZone(zone)
-    startY.current = e.clientY
     startMix.current = mixValue
     startDetune.current = detuneValue
     e.currentTarget.setPointerCapture(e.pointerId)
@@ -113,23 +109,23 @@ export const DualKnob = memo(function DualKnob({
       applyHoverZone(getZone(e))
       return
     }
-    const dy = startY.current - e.clientY
-    const deltaRatio = dy / 200
 
     if (draggingZone.current === 'inner') {
       const newDetune = Math.max(minDetune, Math.min(maxDetune,
-        startDetune.current + deltaRatio * detuneRange
+        startDetune.current - e.movementY / 200 * detuneRange
       ))
       const stepped = Math.round(newDetune)
+      startDetune.current = newDetune
       applyDetuneVisuals(stepped)
       onDetuneChange(stepped)
     } else {
-      const newMix = Math.max(0, Math.min(1, startMix.current + deltaRatio))
+      const newMix = Math.max(0, Math.min(1, startMix.current - e.movementY / 200))
       const stepped = Math.round(newMix * 100) / 100
+      startMix.current = newMix
       applyMixVisuals(stepped)
       onMixChange(stepped)
     }
-  }, [minDetune, maxDetune, detuneRange, onMixChange, onDetuneChange, applyMixVisuals, applyDetuneVisuals])
+  }, [minDetune, maxDetune, detuneRange, onMixChange, onDetuneChange, applyMixVisuals, applyDetuneVisuals, getZone, applyHoverZone])
 
   const onPointerUp = useCallback(() => {
     draggingZone.current = null
@@ -137,12 +133,10 @@ export const DualKnob = memo(function DualKnob({
     applyHoverZone(null)
   }, [applyHoverZone])
 
-  const innerSize = size * INNER_RATIO
-
   return (
     <div
       className="dual-knob"
-      style={{ '--knob-size': `${size}px`, '--knob-color': color, '--inner-size': `${innerSize}px` }}
+      style={{ '--knob-size': `${size}px`, '--knob-color': color }}
     >
       {/* Labels */}
       <div className="dual-knob__labels">
@@ -166,10 +160,10 @@ export const DualKnob = memo(function DualKnob({
         <svg
           className="dual-knob__ring-svg"
           viewBox={`0 0 ${size} ${size}`}
-          width={size}
-          height={size}
+          width="100%"
+          height="100%"
         >
-          {/* Track (full 270° background) */}
+          {/* Track (full 270° background) — rotate(135deg) starts arc at 7:30 o'clock */}
           <circle
             className="dual-knob__ring-track"
             cx={size / 2}
@@ -178,7 +172,6 @@ export const DualKnob = memo(function DualKnob({
             fill="none"
             strokeWidth={strokeWidth}
             strokeDasharray={`${trackArcLength} ${circumference}`}
-            strokeDashoffset={-startOffset}
           />
           {/* Fill (mix value arc) */}
           <circle
@@ -190,7 +183,6 @@ export const DualKnob = memo(function DualKnob({
             fill="none"
             strokeWidth={strokeWidth}
             strokeDasharray={`${fillArcLength} ${circumference}`}
-            strokeDashoffset={-startOffset}
           />
           {/* Outer boundary ring — frames the full knob */}
           <circle

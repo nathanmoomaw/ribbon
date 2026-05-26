@@ -708,7 +708,7 @@ export default function V4App() {
       {isParty && <FloatingStaff />}
 
       {/* Header */}
-      <header className="text-ribbon-header v4-header">
+      <header className="text-ribbon-header">
         <div className="text-ribbon-header__left">
           <button
             className="header-qr-btn"
@@ -889,9 +889,8 @@ export default function V4App() {
                   </div>
                   <span className="v4-bar-sep">|</span>
                   <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
-                </div>
-                {/* FX row: SPACE, TONE, VCF routing */}
-                <div className="v4-party-bar v4-party-bar--fx">
+                  <span className="v4-bar-sep">|</span>
+                  {/* SPACE + TONE + VCF — inline with OSCs */}
                   <div className="v4-knob-group">
                     <div className="v4-knob-group__label">SPACE</div>
                     <BipolarKnob
@@ -911,6 +910,20 @@ export default function V4App() {
                     />
                   </div>
                   <span className="v4-bar-sep">|</span>
+                  <AsciiKnob
+                    label="CUT"
+                    value={vcfCutoff}
+                    min={20}
+                    max={20000}
+                    onChange={v => setVcfCutoff(Math.round(v))}
+                  />
+                  <AsciiKnob
+                    label="RES"
+                    value={vcfResonance}
+                    min={0}
+                    max={20}
+                    onChange={v => setVcfResonance(parseFloat(v.toFixed(1)))}
+                  />
                   <span className="v4-knob-group__label">VCF→</span>
                   {[0,1,2].map(i => (
                     <button

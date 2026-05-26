@@ -19,6 +19,8 @@
   letter-spacing: 0.04em;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  min-width: 3.5ch;
+  text-align: center;
 }
 
 .dual-knob__label--mix {

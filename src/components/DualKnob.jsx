@@ -51,8 +51,8 @@ export const DualKnob = memo(function DualKnob({
   const circumference = 2 * Math.PI * ringRadius
   const trackArcLength = (ANGLE_RANGE / 360) * circumference
   const fillArcLength = (mixAngle / 360) * circumference
-  // Offset to start at 7 o'clock (225° from top = 225-90 = 135° from SVG 0°/3-o'clock)
-  const startOffset = (135 / 360) * circumference
+  // Offset to start at 7:30 o'clock (225° clockwise from 12 o'clock after rotate(-90deg))
+  const startOffset = (225 / 360) * circumference
 
   // Direct DOM update — zero-lag response
   const applyMixVisuals = useCallback((newMix) => {

@@ -78,15 +78,14 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
 
   const onDown = useCallback((e) => {
     dragging.current = true
-    startY.current = e.clientY
     startVal.current = value
     e.currentTarget.setPointerCapture(e.pointerId)
   }, [value])
 
   const onMove = useCallback((e) => {
     if (!dragging.current) return
-    const delta = (startY.current - e.clientY) / 100
-    const newVal = Math.max(min, Math.min(max, startVal.current + delta * range))
+    const newVal = Math.max(min, Math.min(max, startVal.current - e.movementY / 100 * range))
+    startVal.current = newVal
     onChange(newVal)
   }, [onChange, min, max, range])
 
@@ -143,15 +142,15 @@ function BipolarKnob({ label, subLabel, value, onChange }) {
 
   const onDown = useCallback((e) => {
     dragging.current = true
-    startY.current = e.clientY
     startVal.current = value
     e.currentTarget.setPointerCapture(e.pointerId)
   }, [value])
 
   const onMove = useCallback((e) => {
     if (!dragging.current) return
-    const delta = (startY.current - e.clientY) / 100
-    onChange(Math.max(0, Math.min(1, startVal.current + delta)))
+    const newVal = Math.max(0, Math.min(1, startVal.current - e.movementY / 100))
+    startVal.current = newVal
+    onChange(newVal)
   }, [onChange])
 
   const onUp = useCallback(() => { dragging.current = false }, [])

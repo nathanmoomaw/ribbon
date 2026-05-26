@@ -115,15 +115,15 @@ function BipolarKnob({ label, subLabel, value, onChange }) {
 
   const onDown = useCallback((e) => {
     dragging.current = true
-    startY.current = e.clientY
     startVal.current = value
     e.currentTarget.setPointerCapture(e.pointerId)
   }, [value])
 
   const onMove = useCallback((e) => {
     if (!dragging.current) return
-    const delta = (startY.current - e.clientY) / 100
-    onChange(Math.max(0, Math.min(1, startVal.current + delta)))
+    const newVal = Math.max(0, Math.min(1, startVal.current - e.movementY / 100))
+    startVal.current = newVal
+    onChange(newVal)
   }, [onChange])
 
   const onUp = useCallback(() => { dragging.current = false }, [])
@@ -170,15 +170,14 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
 
   const onDown = useCallback((e) => {
     dragging.current = true
-    startY.current = e.clientY
     startVal.current = value
     e.currentTarget.setPointerCapture(e.pointerId)
   }, [value])
 
   const onMove = useCallback((e) => {
     if (!dragging.current) return
-    const delta = (startY.current - e.clientY) / 100
-    const newVal = Math.max(min, Math.min(max, startVal.current + delta * range))
+    const newVal = Math.max(min, Math.min(max, startVal.current - e.movementY / 100 * range))
+    startVal.current = newVal
     onChange(newVal)
   }, [onChange, min, max, range])
 
@@ -890,6 +889,36 @@ export default function V4App() {
                   </div>
                   <span className="v4-bar-sep">|</span>
                   <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
+                </div>
+                {/* FX row: SPACE, TONE, VCF routing */}
+                <div className="v4-party-bar v4-party-bar--fx">
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">SPACE</div>
+                    <BipolarKnob
+                      label="SPACE"
+                      subLabel={{ left: 'CATHEDRAL', right: 'ORBIT' }}
+                      value={space}
+                      onChange={handleSpace}
+                    />
+                  </div>
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">TONE</div>
+                    <BipolarKnob
+                      label="TONE"
+                      subLabel={{ left: 'GRIT', right: 'GLITTER' }}
+                      value={tone}
+                      onChange={handleTone}
+                    />
+                  </div>
+                  <span className="v4-bar-sep">|</span>
+                  <span className="v4-knob-group__label">VCF→</span>
+                  {[0,1,2].map(i => (
+                    <button
+                      key={i}
+                      className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
+                      onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
+                    >{i+1}</button>
+                  ))}
                 </div>
               </div>
             </>

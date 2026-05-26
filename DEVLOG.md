@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-26 — DualKnob arc fix, movementY drag, label stability, space/tone/VCF (DUMP 682-685)
+
+- DualKnob mix arc: `startOffset` was `(135/360)*C` placing arc at ~4:30 o'clock (reversed). Fixed to `(225/360)*C` so arc fills 7:30→4:30 clockwise (0%→100%).
+- Drag at screen edge: replaced `startY - clientY` absolute delta with `movementY` incremental approach in all knob drag handlers (BipolarKnob and AsciiKnob in V4App.jsx and AsciiControls.jsx). Works at any screen position.
+- Label layout shifts: added `min-width: 3.5ch; tabular-nums` to DualKnob labels; `min-width: 5ch; white-space: nowrap; tabular-nums` to BipolarKnob labels.
+- Space/tone/VCF visible in party mode: added FX row to party controls with SPACE and TONE BipolarKnobs and VCF routing buttons (1/2/3). Lo mode: added `height: auto` override for `.ascii-controls` so VCF/space/tone panel in AsciiControls renders correctly.
+
 ## 2026-05-26 — v4 party controls inline, sphere persistence fix, DualKnob both rings (DUMP 679-681)
 
 - OSC section moved inline in the party bar (to the right of octave buttons on desktop, wraps on mobile).

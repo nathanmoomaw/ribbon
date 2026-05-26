@@ -294,6 +294,25 @@
   overflow-x: hidden;
 }
 
+/* Lo mode: ascii-controls height: 100% doesn't resolve when parent is auto — use auto */
+.v4-mode--lo .ascii-controls {
+  height: auto;
+}
+
+/* Prevent BipolarKnob label width changes from shifting layout */
+.ascii-bipolar-knob__label {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  min-width: 5ch;
+  text-align: center;
+}
+
+/* FX row in party mode — slightly smaller knobs, same bar layout */
+.v4-party-bar--fx {
+  border-top: 1px solid rgba(55, 75, 110, 0.15);
+  padding-top: 4px;
+}
+
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {
   .v4-controls-overlay {

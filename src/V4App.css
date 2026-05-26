@@ -56,6 +56,13 @@
   gap: 2px;
 }
 
+/* OSC section inline in party bar — zero vertical padding, tighter gap */
+.v4-party-bar .v4-osc-section {
+  padding: 0;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
 /* Strip: no dark background, no negative margin (that's for lo mode overlap) */
 .v4-mode--party .text-ribbon-strip {
   margin-top: 0 !important;

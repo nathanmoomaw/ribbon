@@ -764,13 +764,15 @@ export default function V4App() {
       <main className="text-ribbon-main">
         {/* Visualizer / orbs area */}
         <section className="text-ribbon-orbs v4-orbs" aria-label="Visualizer">
-          {isParty ? (
-            <div className="v4-party-vis" ref={visualizerMountRef}>
-              <StaticArcsOverlay />
-            </div>
-          ) : (
-            <AsciiOrbs oscParams={oscParams} shaking={shaking} />
-          )}
+          {/* Always mounted so Three.js canvas survives party↔lo mode switches */}
+          <div
+            className="v4-party-vis"
+            ref={visualizerMountRef}
+            style={{ display: isParty ? undefined : 'none' }}
+          >
+            {isParty && <StaticArcsOverlay />}
+          </div>
+          {!isParty && <AsciiOrbs oscParams={oscParams} shaking={shaking} />}
         </section>
 
         {/* Ribbon strip */}
@@ -886,8 +888,9 @@ export default function V4App() {
                       >{n}</button>
                     ))}
                   </div>
+                  <span className="v4-bar-sep">|</span>
+                  <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
                 </div>
-                <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
               </div>
             </>
           ) : (

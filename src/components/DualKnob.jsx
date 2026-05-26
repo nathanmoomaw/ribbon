@@ -137,7 +137,7 @@ export const DualKnob = memo(function DualKnob({
     applyHoverZone(null)
   }, [applyHoverZone])
 
-  const innerSize = size * INNER_RATIO * 2
+  const innerSize = size * INNER_RATIO
 
   return (
     <div

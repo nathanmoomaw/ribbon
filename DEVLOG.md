@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-26 — v4 party controls inline, sphere persistence fix, DualKnob both rings (DUMP 679-681)
+
+- OSC section moved inline in the party bar (to the right of octave buttons on desktop, wraps on mobile).
+- Spheres disappear fix: always keep `.v4-party-vis` div in DOM; use `display:none` in lo mode. The Three.js canvas was being removed from DOM on mode switch because the div was conditionally rendered.
+- DualKnob both-dials fix: `innerSize = size * INNER_RATIO * 2` was a bug — inner circle was 57px in a 52px container, hiding the outer mix ring. Fixed to `size * INNER_RATIO` (28.6px) so both outer arc and inner notch are visible.
+
 ## 2026-05-25 — v4 layout condensed, lo mode fixed (DUMP 673-675)
 
 - Replaced full v2 `<Controls>` in party mode with compact inline bar: Mono/Arp, Hold, Stop, TEMPO knob, ž knob, BPM knob, VOL knob, octave buttons, V4OscSection.

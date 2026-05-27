@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-26 — Unified DualKnob style across all party mode knobs (DUMP 692)
+
+- Added `mode='single'` prop to DualKnob: hides inner notch, DET label, and zone separator ring; outer ring style identical to dual-mode knobs.
+- Converted all 6 BipolarKnob/AsciiKnob controls in party mode to DualKnob(mode="single"): TEMPO (#ffcc44), ž (#cc55ff), VOL (#44ffcc), SPACE (#44aaff), TONE (#ff6633), CUT (#00eedd), RES (#ff44cc).
+- Each knob in the party bar now shares the same thick-ring visual language with OSC DualKnobs, differentiated only by color.
+
 ## 2026-05-26 — DualKnob arc 7→5, mobile responsive, CUT/RES knobs, consolidated bar (DUMP 686-691)
 
 - DualKnob arc: switched from `rotate(-90deg) + negative strokeDashoffset` to `rotate(135deg) + no offset`. SVG circles start at 3 o'clock; 135° clockwise = 7:30. Arc now fills 7:30→4:30 unambiguously.

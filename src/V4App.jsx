@@ -846,37 +846,37 @@ export default function V4App() {
                   <span className="v4-bar-sep">|</span>
                   <div className="v4-knob-group">
                     <div className="v4-knob-group__label">TEMPO</div>
-                    <BipolarKnob
-                      label={`BPM ${arpBpm}`}
-                      subLabel={{ left: 'SLOW', right: 'FAST' }}
-                      value={tempo}
-                      onChange={handleTempo}
+                    <DualKnob
+                      mode="single"
+                      mixValue={tempo}
+                      onMixChange={handleTempo}
+                      mixLabel={`${arpBpm}`}
+                      color="#ffcc44"
+                      size={52}
                     />
                   </div>
                   <div className="v4-knob-group">
                     <div className="v4-knob-group__label">ž</div>
-                    <BipolarKnob
-                      label="ž"
-                      subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
-                      value={zeta}
-                      onChange={handleZeta}
+                    <DualKnob
+                      mode="single"
+                      mixValue={zeta}
+                      onMixChange={handleZeta}
+                      color="#cc55ff"
+                      size={52}
                     />
                   </div>
                   <span className="v4-bar-sep">|</span>
-                  <AsciiKnob
-                    label="BPM"
-                    value={arpBpm}
-                    min={40}
-                    max={280}
-                    onChange={v => setArpBpm(Math.round(v))}
-                  />
-                  <AsciiKnob
-                    label="VOL"
-                    value={volume}
-                    min={0}
-                    max={1}
-                    onChange={setVolume}
-                  />
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">VOL</div>
+                    <DualKnob
+                      mode="single"
+                      mixValue={volume}
+                      onMixChange={setVolume}
+                      mixLabel={`${Math.round(volume * 100)}%`}
+                      color="#44ffcc"
+                      size={52}
+                    />
+                  </div>
                   <span className="v4-bar-sep">|</span>
                   <div className="v4-octave-btns">
                     {[1,2,3,4].map(n => (
@@ -890,40 +890,50 @@ export default function V4App() {
                   <span className="v4-bar-sep">|</span>
                   <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
                   <span className="v4-bar-sep">|</span>
-                  {/* SPACE + TONE + VCF — inline with OSCs */}
+                  {/* SPACE + TONE + VCF — inline with OSCs, same DualKnob style */}
                   <div className="v4-knob-group">
                     <div className="v4-knob-group__label">SPACE</div>
-                    <BipolarKnob
-                      label="SPACE"
-                      subLabel={{ left: 'CATHEDRAL', right: 'ORBIT' }}
-                      value={space}
-                      onChange={handleSpace}
+                    <DualKnob
+                      mode="single"
+                      mixValue={space}
+                      onMixChange={handleSpace}
+                      color="#44aaff"
+                      size={52}
                     />
                   </div>
                   <div className="v4-knob-group">
                     <div className="v4-knob-group__label">TONE</div>
-                    <BipolarKnob
-                      label="TONE"
-                      subLabel={{ left: 'GRIT', right: 'GLITTER' }}
-                      value={tone}
-                      onChange={handleTone}
+                    <DualKnob
+                      mode="single"
+                      mixValue={tone}
+                      onMixChange={handleTone}
+                      color="#ff6633"
+                      size={52}
                     />
                   </div>
                   <span className="v4-bar-sep">|</span>
-                  <AsciiKnob
-                    label="CUT"
-                    value={vcfCutoff}
-                    min={20}
-                    max={20000}
-                    onChange={v => setVcfCutoff(Math.round(v))}
-                  />
-                  <AsciiKnob
-                    label="RES"
-                    value={vcfResonance}
-                    min={0}
-                    max={20}
-                    onChange={v => setVcfResonance(parseFloat(v.toFixed(1)))}
-                  />
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">CUT</div>
+                    <DualKnob
+                      mode="single"
+                      mixValue={(vcfCutoff - 20) / 19980}
+                      onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
+                      mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
+                      color="#00eedd"
+                      size={52}
+                    />
+                  </div>
+                  <div className="v4-knob-group">
+                    <div className="v4-knob-group__label">RES</div>
+                    <DualKnob
+                      mode="single"
+                      mixValue={vcfResonance / 20}
+                      onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
+                      mixLabel={`${vcfResonance.toFixed(1)}`}
+                      color="#ff44cc"
+                      size={52}
+                    />
+                  </div>
                   <span className="v4-knob-group__label">VCF→</span>
                   {[0,1,2].map(i => (
                     <button

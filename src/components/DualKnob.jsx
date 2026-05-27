@@ -7,15 +7,16 @@ const ANGLE_RANGE = 270
 
 export const DualKnob = memo(function DualKnob({
   mixValue,
-  detuneValue,
+  detuneValue = 0,
   onMixChange,
-  onDetuneChange,
+  onDetuneChange = () => {},
   color = 'var(--cyan)',
   size = 52,
   minDetune = -1200,
   maxDetune = 1200,
   mixLabel,
   detuneLabel,
+  mode = 'dual',  // 'dual' = mix+detune ring+inner, 'single' = outer ring only
 }) {
   const knobRef = useRef(null)
   const innerNotchRef = useRef(null)
@@ -75,6 +76,7 @@ export const DualKnob = memo(function DualKnob({
   }, [minDetune, detuneRange])
 
   const getZone = useCallback((e) => {
+    if (mode === 'single') return 'outer'
     const knob = knobRef.current
     if (!knob) return 'outer'
     const rect = knob.getBoundingClientRect()
@@ -84,7 +86,7 @@ export const DualKnob = memo(function DualKnob({
     const dy = e.clientY - cy
     const dist = Math.sqrt(dx * dx + dy * dy)
     return dist < (rect.width / 2) * INNER_RATIO ? 'inner' : 'outer'
-  }, [])
+  }, [mode])
 
   const onPointerEnter = useCallback((e) => {
     if (!draggingZone.current) applyHoverZone(getZone(e))
@@ -141,7 +143,9 @@ export const DualKnob = memo(function DualKnob({
       {/* Labels */}
       <div className="dual-knob__labels">
         <span className="dual-knob__label dual-knob__label--mix">{mixLabel ?? `${Math.round(mixValue * 100)}%`}</span>
-        <span className="dual-knob__label dual-knob__label--det">{detuneLabel ?? `${detuneValue}¢`}</span>
+        {mode === 'dual' && (
+          <span className="dual-knob__label dual-knob__label--det">{detuneLabel ?? `${detuneValue}¢`}</span>
+        )}
       </div>
 
       {/* Main hit area — outer ring + inner circle both handled here */}
@@ -192,31 +196,38 @@ export const DualKnob = memo(function DualKnob({
             r={(size / 2) - 1.5}
             fill="none"
           />
-          {/* Zone separator ring — visible boundary between outer (mix) and inner (detune) zones */}
-          <circle
-            className="dual-knob__zone-sep"
-            cx={size / 2}
-            cy={size / 2}
-            r={(size / 2) * INNER_RATIO}
-            fill="none"
-          />
+          {/* Zone separator ring — only in dual mode */}
+          {mode === 'dual' && (
+            <circle
+              className="dual-knob__zone-sep"
+              cx={size / 2}
+              cy={size / 2}
+              r={(size / 2) * INNER_RATIO}
+              fill="none"
+            />
+          )}
         </svg>
 
-        {/* Inner circle — detune notch */}
-        <div className="dual-knob__inner">
-          <div
-            className="dual-knob__notch-ring"
-            ref={innerNotchRef}
-            style={{ transform: `rotate(${detuneAngle}deg)` }}
-          >
-            <div className="dual-knob__notch" />
-          </div>
-          {/* Zone label inside inner circle */}
-          <span className="dual-knob__zone-label dual-knob__zone-label--det">DET</span>
+        {/* Inner circle — detune notch (dual) or plain body (single) */}
+        <div className={`dual-knob__inner${mode === 'single' ? ' dual-knob__inner--single' : ''}`}>
+          {mode === 'dual' && (
+            <>
+              <div
+                className="dual-knob__notch-ring"
+                ref={innerNotchRef}
+                style={{ transform: `rotate(${detuneAngle}deg)` }}
+              >
+                <div className="dual-knob__notch" />
+              </div>
+              <span className="dual-knob__zone-label dual-knob__zone-label--det">DET</span>
+            </>
+          )}
         </div>
 
-        {/* Mix zone label — top of outer ring */}
-        <span className="dual-knob__zone-label dual-knob__zone-label--mix">MIX</span>
+        {/* Zone label — only in dual mode */}
+        {mode === 'dual' && (
+          <span className="dual-knob__zone-label dual-knob__zone-label--mix">MIX</span>
+        )}
 
         {/* Ghost slider overlay — shows during drag */}
         <div className="dual-knob__ghost" ref={ghostRef}>

@@ -205,6 +205,21 @@
     inset 0 -1px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Single-mode inner: no notch, just a plain center disc */
+.dual-knob__inner--single {
+  background: radial-gradient(
+    circle at 40% 35%,
+    rgba(55, 55, 85, 0.9),
+    rgba(20, 20, 40, 0.95) 60%,
+    rgba(10, 10, 20, 1)
+  );
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 0 8px color-mix(in srgb, var(--knob-color, var(--cyan)) 15%, transparent);
+  border-color: color-mix(in srgb, var(--knob-color, var(--cyan)) 30%, rgba(255,255,255,0.15));
+}
+
 /* Notch ring — rotates to show detune (pointer-events: none from parent) */
 .dual-knob__notch-ring {
   position: absolute;

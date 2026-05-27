@@ -623,8 +623,8 @@ export default function V4App() {
     setOscParams(prev => prev.map(p => ({
       ...p,
       waveform: WAVEFORMS[Math.floor(Math.random() * WAVEFORMS.length)],
-      detune: nudge(p.detune, -50, 50, intensity),
-      mix: nudge(p.mix, 0, 1, intensity),
+      detune: Math.round(nudge(p.detune, -50, 50, intensity)),
+      mix: Math.round(nudge(p.mix, 0, 1, intensity) * 100) / 100,
     })))
     setOctaves(() => {
       const opts = [2, 3, 4]

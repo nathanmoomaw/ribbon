@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-27 — Ribbon fills gap ≤769px, value label decimal cap (DUMP 699-700)
+
+- Party mode ≤769px: ribbon strip now `flex: 1 !important` so it expands to fill the gap between orbs and controls.
+- DualKnob detune label: display capped to 2 decimal places (`toFixed(2)`).
+- Shake source: `detune` rounded to integer, `mix` rounded to 2dp — prevents long floats accumulating in state.
+
 ## 2026-05-27 — Touch-to-play fix, VCF label above buttons, VCF mobile wrap (DUMP 696-698)
 
 - Touch-to-play prompt: changed from `bottom: 10px` to `top: 50%; transform: translate(-50%, -50%)` so it centers vertically in the ribbon strip at all sizes.

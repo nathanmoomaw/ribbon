@@ -144,7 +144,7 @@ export const DualKnob = memo(function DualKnob({
       <div className="dual-knob__labels">
         <span className="dual-knob__label dual-knob__label--mix">{mixLabel ?? `${Math.round(mixValue * 100)}%`}</span>
         {mode === 'dual' && (
-          <span className="dual-knob__label dual-knob__label--det">{detuneLabel ?? `${detuneValue}¢`}</span>
+          <span className="dual-knob__label dual-knob__label--det">{detuneLabel ?? `${Number(Number(detuneValue).toFixed(2))}¢`}</span>
         )}
       </div>
 

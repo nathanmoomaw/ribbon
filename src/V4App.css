@@ -317,6 +317,15 @@
   gap: 2px;
 }
 
+/* ── ≤769px: ribbon fills the gap in party mode ── */
+@media (max-width: 769px) {
+  .v4-mode--party .text-ribbon-strip {
+    flex: 1 !important;
+    height: auto !important;
+    min-height: 80px;
+  }
+}
+
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {
   .v4-controls-overlay {

@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-27 — Fix dark gap between ribbon and controls (DUMP 704-705)
+
+- Root cause: base `TextRibbonApp.css` sets `.text-ribbon-strip { height: clamp(140px, 28vh, 240px) }`. Party mode override only set `flex: 0 0 auto` (which respects the explicit height property). So the strip was 140–240px tall while the ribbon track inside is only 100px, leaving a 40–140px dark gap.
+- Fix: add `height: auto` to `.v4-mode--party .text-ribbon-strip` to override the base clamp. Strip now shrinks to exactly the ribbon track height (~100–130px).
+- Both the "band at top" and "gap between ribbon and controls" were the same dark empty strip space.
+
 ## 2026-05-27 — Fix gap at top of screen (DUMP 703)
 
 - Root cause: setting strip to `clamp(100px,18vh,160px)` made it 60px taller, shrinking the orbs section, which pushed the Three.js sphere down leaving dark space at top.

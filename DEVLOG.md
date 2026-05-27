@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-27 — Ribbon visible again, empty strip fixed (DUMP 701-702)
+
+- Root cause: `height: 100%` on `.ribbon__track` resolved to `.ribbon` (no height), not the strip — creating a circular dependency that collapsed to 0.
+- Fix: chain `height: 100%` on both `.ribbon` AND `.ribbon__track` in party mode so the explicit `height: clamp(100px, 18vh, 160px)` on the strip propagates all the way down.
+- Removed lingering `height: auto !important` that was overriding strip's explicit height.
+- "Empty bar" between orbs and ribbon was the collapsed ribbon track — same fix.
+
 ## 2026-05-27 — Ribbon fills gap ≤769px, value label decimal cap (DUMP 699-700)
 
 - Party mode ≤769px: ribbon strip now `flex: 1 !important` so it expands to fill the gap between orbs and controls.

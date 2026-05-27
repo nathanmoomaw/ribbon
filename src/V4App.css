@@ -67,8 +67,6 @@
 .v4-mode--party .text-ribbon-strip {
   margin-top: 0 !important;
   background: transparent !important;
-  height: auto !important;
-  min-height: 90px;
 }
 
 /* Slim overlay strip: only TEMPO + ž in party mode */
@@ -262,11 +260,16 @@
 }
 .v4-mode--party .text-ribbon-strip {
   flex: 0 0 clamp(100px, 18vh, 160px);
+  height: clamp(100px, 18vh, 160px);
   background: transparent;
   border-color: rgba(60, 80, 140, 0.2);
+  overflow: hidden;
 }
 
-/* Ribbon track fills the strip height in party mode */
+/* Ribbon fills the strip height in party mode */
+.v4-mode--party .ribbon {
+  height: 100%;
+}
 .v4-mode--party .ribbon__track {
   height: 100%;
 }

@@ -317,8 +317,13 @@
   gap: 2px;
 }
 
-/* ── ≤769px: ribbon fills the gap in party mode ── */
+/* ── ≤769px: ribbon fills gap — orbs pinned, ribbon expands ── */
 @media (max-width: 769px) {
+  .v4-mode--party .text-ribbon-orbs {
+    flex: 0 0 auto !important;
+    height: 28vh;
+    min-height: 60px;
+  }
   .v4-mode--party .text-ribbon-strip {
     flex: 1 !important;
     height: auto !important;

@@ -261,10 +261,14 @@
   min-height: 0;
 }
 .v4-mode--party .text-ribbon-strip {
-  flex: 0 0 auto;
-  min-height: 80px;
+  flex: 0 0 clamp(100px, 18vh, 160px);
   background: transparent;
   border-color: rgba(60, 80, 140, 0.2);
+}
+
+/* Ribbon track fills the strip height in party mode */
+.v4-mode--party .ribbon__track {
+  height: 100%;
 }
 
 /* Hide ribbon internal touch-to-play label in party mode (v4 has its own prompt) */
@@ -317,19 +321,6 @@
   gap: 2px;
 }
 
-/* ── ≤769px: ribbon fills gap — orbs pinned, ribbon expands ── */
-@media (max-width: 769px) {
-  .v4-mode--party .text-ribbon-orbs {
-    flex: 0 0 auto !important;
-    height: 28vh;
-    min-height: 60px;
-  }
-  .v4-mode--party .text-ribbon-strip {
-    flex: 1 !important;
-    height: auto !important;
-    min-height: 80px;
-  }
-}
 
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {

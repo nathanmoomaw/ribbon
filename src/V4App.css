@@ -226,11 +226,11 @@
 /* ── "touch to play" inactivity prompt ── */
 .v4-touch-prompt {
   position: absolute;
-  bottom: 10px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   font-family: 'Courier New', monospace;
-  font-size: clamp(11px, 1.4vw, 16px);
+  font-size: clamp(10px, 1.4vw, 16px);
   color: rgba(170, 185, 230, 0.45);
   letter-spacing: 0.18em;
   pointer-events: none;
@@ -303,6 +303,20 @@
   text-align: center;
 }
 
+/* ── VCF routing group: label above 1/2/3 buttons ── */
+.v4-vcf-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.v4-vcf-btns {
+  display: flex;
+  gap: 2px;
+}
+
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {
   .v4-controls-overlay {
@@ -316,6 +330,15 @@
   .v4-mode-btn {
     font-size: 9px;
     padding: 2px 5px;
+  }
+
+  /* VCF group wraps to its own line as a complete unit below 600px */
+  .v4-vcf-group {
+    flex-basis: 100%;
+    align-items: flex-start;
+  }
+  .v4-vcf-btns {
+    flex-wrap: nowrap;
   }
 }
 

@@ -934,14 +934,18 @@ export default function V4App() {
                       size={52}
                     />
                   </div>
-                  <span className="v4-knob-group__label">VCF→</span>
-                  {[0,1,2].map(i => (
-                    <button
-                      key={i}
-                      className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
-                      onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
-                    >{i+1}</button>
-                  ))}
+                  <div className="v4-vcf-group">
+                    <span className="v4-knob-group__label">VCF</span>
+                    <div className="v4-vcf-btns">
+                      {[0,1,2].map(i => (
+                        <button
+                          key={i}
+                          className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
+                          onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
+                        >{i+1}</button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </>

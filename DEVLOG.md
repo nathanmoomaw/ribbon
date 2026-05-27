@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-27 — Touch-to-play fix, VCF label above buttons, VCF mobile wrap (DUMP 696-698)
+
+- Touch-to-play prompt: changed from `bottom: 10px` to `top: 50%; transform: translate(-50%, -50%)` so it centers vertically in the ribbon strip at all sizes.
+- VCF routing: wrapped `VCF` label + 1/2/3 buttons in `.v4-vcf-group` (column flex) so label sits above buttons instead of inline.
+- Mobile <600px: `.v4-vcf-group { flex-basis: 100% }` forces VCF section to wrap as a complete unit onto its own line.
+
 ## 2026-05-26 — Unified DualKnob style across all party mode knobs (DUMP 692)
 
 - Added `mode='single'` prop to DualKnob: hides inner notch, DET label, and zone separator ring; outer ring style identical to dual-mode knobs.

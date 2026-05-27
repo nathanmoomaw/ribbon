@@ -259,19 +259,9 @@
   min-height: 0;
 }
 .v4-mode--party .text-ribbon-strip {
-  flex: 0 0 clamp(100px, 18vh, 160px);
-  height: clamp(100px, 18vh, 160px);
+  flex: 0 0 auto;
   background: transparent;
   border-color: rgba(60, 80, 140, 0.2);
-  overflow: hidden;
-}
-
-/* Ribbon fills the strip height in party mode */
-.v4-mode--party .ribbon {
-  height: 100%;
-}
-.v4-mode--party .ribbon__track {
-  height: 100%;
 }
 
 /* Hide ribbon internal touch-to-play label in party mode (v4 has its own prompt) */
@@ -324,6 +314,13 @@
   gap: 2px;
 }
 
+
+/* ── ≤769px: taller ribbon track fills visual space ── */
+@media (max-width: 769px) {
+  .v4-mode--party .ribbon__track {
+    height: 130px;
+  }
+}
 
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {

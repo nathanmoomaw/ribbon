@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-05-27 — Fix gap at top of screen (DUMP 703)
+
+- Root cause: setting strip to `clamp(100px,18vh,160px)` made it 60px taller, shrinking the orbs section, which pushed the Three.js sphere down leaving dark space at top.
+- Fix: revert strip to `flex:0 0 auto` (auto height from ribbon content ~100px). Orbs gets its full flex:1 space back.
+- For ≤769px: increase ribbon__track to 130px (instead of 64px) — fills visual space without affecting orbs.
+
 ## 2026-05-27 — Ribbon visible again, empty strip fixed (DUMP 701-702)
 
 - Root cause: `height: 100%` on `.ribbon__track` resolved to `.ribbon` (no height), not the strip — creating a circular dependency that collapsed to 0.

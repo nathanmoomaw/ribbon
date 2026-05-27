@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-05-27 — Constrain RibbonLogo to header bounds
+
+- Root cause: `.ribbon-logo { width: 280px; height: auto }` with viewBox 162×72 renders at 124px tall — 3× the 40px header height. Logo overflowed downward into the sphere area while QR/status/toggle items were properly contained.
+- Fix: `.text-ribbon-header .ribbon-logo { height: 32px; width: auto }` scales logo to fit within the header.
+
 ## 2026-05-27 — Fix dark gap between ribbon and controls (DUMP 704-705)
 
 - Root cause: base `TextRibbonApp.css` sets `.text-ribbon-strip { height: clamp(140px, 28vh, 240px) }`. Party mode override only set `flex: 0 0 auto` (which respects the explicit height property). So the strip was 140–240px tall while the ribbon track inside is only 100px, leaving a 40–140px dark gap.

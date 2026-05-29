@@ -2,8 +2,14 @@
    Party mode: v2-style opaque console, RibbonLogo, FloatingStaff
    Lo mode: transparent ASCII console, AsciiLogo                     */
 
-/* ── v4 header: transparent — animating bg shows through, buttons float ── */
+/* ── v4 header: absolute floating — zero layout height, buttons float over bg ── */
 .v4-app .text-ribbon-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  height: auto;
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

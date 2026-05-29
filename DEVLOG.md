@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-05-29 — DUMP 712: header position:absolute, eliminate top gap + IAM fix for dev deploy
+
+- **712**: `text-ribbon-header` was a flex child taking 40px. Added `position: absolute; top: 0; left: 0; right: 0; z-index: 10; height: auto` to `.v4-app .text-ribbon-header` — pulls it out of flex flow so `text-ribbon-main` fills 100vh. Buttons float over the animated bg. Logo unchanged.
+- **IAM**: Added `ribbon.obfusco.us` + `ribbon-dev.obfusco.us` S3 buckets and CloudFront distributions `E1JO9PQKZGMYPQ` + `E3PCRBQ7HG3ZHJ` to `moomaw-deploy` IAM policy. Set `DEV_CLOUDFRONT_DISTRIBUTION_ID=E3PCRBQ7HG3ZHJ` GitHub secret. Re-ran failed deploy.
+
 ## 2026-05-29 — DUMP 710-711: [i] info button + fix dev deploy (s3 sync → s3 cp)
 
 - **710**: Added `[i]` button to v4 header. Vite now injects `__BUILD_COMMIT__` (short git hash) at build time via `define`. Clicking `[i]` toggles a small overlay showing version, commit hash, and branch name.

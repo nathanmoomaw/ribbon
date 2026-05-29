@@ -70,7 +70,8 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy to dev subpath
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/${{ steps.version.outputs.path }}/ --delete
+        # s3 cp avoids needing s3:ListBucket (which s3 sync requires)
+        run: aws s3 cp dist/ s3://ribbon-dev.obfusco.us/${{ steps.version.outputs.path }}/ --recursive
 
       - name: Build for dev root (latest version only)
         if: github.ref == 'refs/heads/dev/v4'
@@ -79,8 +80,9 @@ jobs:
           VITE_DEFAULT_VERSION: 4
 
       - name: Deploy to dev root (latest version only)
+        # s3 cp: no --delete so existing /v1 /v2 /v3 /v4 subpaths are preserved
         if: github.ref == 'refs/heads/dev/v4'
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete --exclude "v*/*"
+        run: aws s3 cp dist/ s3://ribbon-dev.obfusco.us/ --recursive
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

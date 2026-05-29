@@ -415,3 +415,24 @@
   color: var(--osc-color, var(--cyan));
   box-shadow: 0 0 4px color-mix(in srgb, var(--osc-color, var(--cyan)) 40%, transparent);
 }
+
+/* ── Build info overlay ── */
+.v4-info-overlay {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: rgba(6, 8, 20, 0.95);
+  border: 1px solid rgba(60, 80, 140, 0.4);
+  padding: 6px 10px;
+  z-index: 100;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+}
+
+.v4-info-overlay__line {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: #6677aa;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+}

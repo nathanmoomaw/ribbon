@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-05-29 — DUMP 710-711: [i] info button + fix dev deploy (s3 sync → s3 cp)
+
+- **710**: Added `[i]` button to v4 header. Vite now injects `__BUILD_COMMIT__` (short git hash) at build time via `define`. Clicking `[i]` toggles a small overlay showing version, commit hash, and branch name.
+- **711**: Dev deploy was failing with `AccessDenied: s3:ListBucket` — `aws s3 sync` always lists the bucket to compare files, requiring ListBucket permission which the IAM user lost. Fixed by switching to `aws s3 cp --recursive` (no listing needed). Without `--delete`, existing versioned subpaths (`/v1/`, `/v2/`, `/v3/`) are preserved on S3.
+
 ## 2026-05-29 — v4 DUMP 706-709: transparent header, unified controls, orbital orbs, chaotic lightning
 
 - **706**: Reverted logo size constraint (removed `height: 32px` rule). Made v4 header fully transparent — no background, no border, no shadow — so the animated bg grid/spheres show through and logo/buttons float over it.

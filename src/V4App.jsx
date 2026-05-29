@@ -17,10 +17,8 @@ import { useShake } from './hooks/useShake'
 import { use3DVisualizer, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from './hooks/use3DVisualizer'
 import { SCALES } from './utils/scales'
 import { AsciiRibbon } from './components/AsciiRibbon'
-import { AsciiControls } from './components/AsciiControls'
 import { AsciiLogo } from './components/AsciiLogo'
 import { AsciiOrbs } from './components/AsciiOrbs'
-import { Controls } from './components/Controls'
 import { Ribbon } from './components/Ribbon'
 import { ConfettiCanvas } from './components/ConfettiCanvas'
 import { FloatingStaff } from './components/FloatingStaff'
@@ -32,7 +30,6 @@ import { positionToFrequency } from './utils/pitchMap'
 import { useAccount } from 'wagmi'
 import './V4App.css'
 import './TextRibbonApp.css'
-import './components/Controls.css'
 import './components/Ribbon.css'
 import './components/VersionSwitcher.css'
 
@@ -200,48 +197,59 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Generate a random zigzag arc path from a start point toward a target area
+// Generate a chaotic zigzag arc path — high lateral jitter for electricity feel
 function makeArcPoints(cx, cy, angle, len, segments) {
   const pts = []
   const stepLen = len / segments
   let x = cx, y = cy
-  const spread = 18
+  const spread = 36  // wider perpendicular jitter (was 18)
   for (let i = 0; i <= segments; i++) {
-    const jitter = i === 0 || i === segments ? 0 : (Math.random() - 0.5) * spread * 2
+    const jitter = i === 0 ? 0 : (Math.random() - 0.5) * spread * 2
     const perp = angle + Math.PI / 2
     pts.push(`${(x + Math.cos(perp) * jitter).toFixed(1)},${(y + Math.sin(perp) * jitter).toFixed(1)}`)
-    x += Math.cos(angle) * stepLen + (Math.random() - 0.5) * spread
-    y += Math.sin(angle) * stepLen + (Math.random() - 0.5) * spread
+    if (i < segments) {
+      // Also drift the main direction randomly for extra chaos
+      x += Math.cos(angle) * stepLen + (Math.random() - 0.5) * spread * 0.6
+      y += Math.sin(angle) * stepLen + (Math.random() - 0.5) * spread * 0.6
+    }
   }
   return pts.join(' ')
 }
 
 const ARC_COLORS = [
-  'rgba(100,150,255,0.65)',
-  'rgba(140,100,255,0.55)',
-  'rgba(80,210,255,0.5)',
-  'rgba(200,100,255,0.5)',
-  'rgba(100,230,200,0.45)',
+  'rgba(100,150,255,0.7)',
+  'rgba(140,100,255,0.6)',
+  'rgba(80,210,255,0.55)',
+  'rgba(200,100,255,0.55)',
+  'rgba(100,230,200,0.5)',
+  'rgba(255,180,80,0.45)',
 ]
 
 function StaticArcsOverlay() {
   const [arcs, setArcs] = useState(() => generateArcs())
 
   function generateArcs() {
-    // Sphere cluster is roughly centered; arcs radiate from a central zone
-    const cx = 190 + (Math.random() - 0.5) * 60
-    const cy = 140 + (Math.random() - 0.5) * 60
-    return Array.from({ length: 5 }, (_, i) => {
-      const angle = (i / 5) * Math.PI * 2 + Math.random() * 0.8
-      const len = 80 + Math.random() * 80
-      const segs = 4 + Math.floor(Math.random() * 4)
-      return {
-        points: makeArcPoints(cx, cy, angle, len, segs),
-        color: ARC_COLORS[i % ARC_COLORS.length],
-        width: 0.6 + Math.random() * 0.8,
-        opacity: Math.random() > 0.3 ? 1 : 0,
+    const result = []
+    // Multiple independent origin points — bolts branch from different locations
+    const numOrigins = 2 + Math.floor(Math.random() * 2)  // 2–3 origins
+    for (let o = 0; o < numOrigins; o++) {
+      // Origins spread across a wider area to match sphere drift
+      const cx = 110 + Math.random() * 180  // 110–290
+      const cy = 50 + Math.random() * 180   // 50–230
+      const arcsFromThis = 2 + Math.floor(Math.random() * 2)  // 2–3 per origin
+      for (let i = 0; i < arcsFromThis; i++) {
+        const angle = (i / arcsFromThis) * Math.PI * 2 + Math.random() * 1.2
+        const len = 130 + Math.random() * 150  // 130–280 (was 80–160)
+        const segs = 6 + Math.floor(Math.random() * 5)  // 6–11 segments (was 4–8)
+        result.push({
+          points: makeArcPoints(cx, cy, angle, len, segs),
+          color: ARC_COLORS[result.length % ARC_COLORS.length],
+          width: 0.5 + Math.random() * 1.0,
+          opacity: Math.random() > 0.18 ? 1 : 0,
+        })
       }
-    })
+    }
+    return result
   }
 
   useEffect(() => {
@@ -821,213 +829,130 @@ export default function V4App() {
           )}
         </section>
 
-        {/* Controls */}
+        {/* Controls — same compact layout for both party and lo mode */}
         <section className="text-ribbon-controls v4-controls" ref={sidebarRef}>
-          {isParty ? (
-            <>
-              {/* Compact party controls: one row + osc section */}
-              <div className="v4-party-controls">
-                <div className="v4-party-bar">
-                  <div className="v4-mono-arp">
-                    <button
-                      className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
-                      onClick={() => setMonoArp('mono')}
-                    >MONO</button>
-                    <button
-                      className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
-                      onClick={() => setMonoArp('arp')}
-                    >ARP</button>
-                  </div>
-                  <button
-                    className={`v4-toggle-btn${hold ? ' v4-toggle-btn--on' : ''}`}
-                    onClick={() => setHold(h => !h)}
-                  >HOLD</button>
-                  <button className="v4-toggle-btn" onClick={handleStop}>STOP</button>
-                  <span className="v4-bar-sep">|</span>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">TEMPO</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={tempo}
-                      onMixChange={handleTempo}
-                      mixLabel={`${arpBpm}`}
-                      color="#ffcc44"
-                      size={52}
-                    />
-                  </div>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">ž</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={zeta}
-                      onMixChange={handleZeta}
-                      color="#cc55ff"
-                      size={52}
-                    />
-                  </div>
-                  <span className="v4-bar-sep">|</span>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">VOL</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={volume}
-                      onMixChange={setVolume}
-                      mixLabel={`${Math.round(volume * 100)}%`}
-                      color="#44ffcc"
-                      size={52}
-                    />
-                  </div>
-                  <span className="v4-bar-sep">|</span>
-                  <div className="v4-octave-btns">
-                    {[1,2,3,4].map(n => (
-                      <button
-                        key={n}
-                        className={`v4-toggle-btn${octaves === n ? ' v4-toggle-btn--on' : ''}`}
-                        onClick={() => setOctaves(n)}
-                      >{n}</button>
-                    ))}
-                  </div>
-                  <span className="v4-bar-sep">|</span>
-                  <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
-                  <span className="v4-bar-sep">|</span>
-                  {/* SPACE + TONE + VCF — inline with OSCs, same DualKnob style */}
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">SPACE</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={space}
-                      onMixChange={handleSpace}
-                      color="#44aaff"
-                      size={52}
-                    />
-                  </div>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">TONE</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={tone}
-                      onMixChange={handleTone}
-                      color="#ff6633"
-                      size={52}
-                    />
-                  </div>
-                  <span className="v4-bar-sep">|</span>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">CUT</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={(vcfCutoff - 20) / 19980}
-                      onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
-                      mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
-                      color="#00eedd"
-                      size={52}
-                    />
-                  </div>
-                  <div className="v4-knob-group">
-                    <div className="v4-knob-group__label">RES</div>
-                    <DualKnob
-                      mode="single"
-                      mixValue={vcfResonance / 20}
-                      onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
-                      mixLabel={`${vcfResonance.toFixed(1)}`}
-                      color="#ff44cc"
-                      size={52}
-                    />
-                  </div>
-                  <div className="v4-vcf-group">
-                    <span className="v4-knob-group__label">VCF</span>
-                    <div className="v4-vcf-btns">
-                      {[0,1,2].map(i => (
-                        <button
-                          key={i}
-                          className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
-                          onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
-                        >{i+1}</button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+          <div className="v4-party-controls">
+            <div className="v4-party-bar">
+              <div className="v4-mono-arp">
+                <button
+                  className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
+                  onClick={() => setMonoArp('mono')}
+                >MONO</button>
+                <button
+                  className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
+                  onClick={() => setMonoArp('arp')}
+                >ARP</button>
               </div>
-            </>
-          ) : (
-            <>
-              {/* v4-specific top strip: Mono/Arp toggle + TEMPO knob + ž knob */}
-              <div className="v4-controls-overlay">
-                <div className="v4-mono-arp">
-                  <button
-                    className={`v4-toggle-btn${monoArp === 'mono' ? ' v4-toggle-btn--on' : ''}`}
-                    onClick={() => setMonoArp('mono')}
-                    title="Mono (play mode)"
-                  >MONO</button>
-                  <button
-                    className={`v4-toggle-btn${monoArp === 'arp' ? ' v4-toggle-btn--on' : ''}`}
-                    onClick={() => setMonoArp('arp')}
-                    title="Arp (arpeggiator, poly)"
-                  >ARP</button>
-                </div>
-                <div className="v4-knob-group">
-                  <div className="v4-knob-group__label">TEMPO</div>
-                  <BipolarKnob
-                    label={`BPM ${arpBpm}`}
-                    subLabel={{ left: 'SLOW', right: 'FAST' }}
-                    value={tempo}
-                    onChange={handleTempo}
-                  />
-                </div>
-                <div className="v4-knob-group">
-                  <div className="v4-knob-group__label">ž</div>
-                  <BipolarKnob
-                    label="ž"
-                    subLabel={{ left: 'FLUTTER', right: 'PHASE' }}
-                    value={zeta}
-                    onChange={handleZeta}
-                  />
-                </div>
-                <AsciiKnob
-                  label="BPM"
-                  value={arpBpm}
-                  min={40}
-                  max={280}
-                  onChange={v => setArpBpm(Math.round(v))}
-                />
-                <AsciiKnob
-                  label="VOL"
-                  value={volume}
-                  min={0}
-                  max={1}
-                  onChange={setVolume}
+              <button
+                className={`v4-toggle-btn${hold ? ' v4-toggle-btn--on' : ''}`}
+                onClick={() => setHold(h => !h)}
+              >HOLD</button>
+              <button className="v4-toggle-btn" onClick={handleStop}>STOP</button>
+              <span className="v4-bar-sep">|</span>
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">TEMPO</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={tempo}
+                  onMixChange={handleTempo}
+                  mixLabel={`${arpBpm}`}
+                  color="#ffcc44"
+                  size={52}
                 />
               </div>
-
-              {/* v4 oscillator section with DualKnobs */}
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">ž</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={zeta}
+                  onMixChange={handleZeta}
+                  color="#cc55ff"
+                  size={52}
+                />
+              </div>
+              <span className="v4-bar-sep">|</span>
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">VOL</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={volume}
+                  onMixChange={setVolume}
+                  mixLabel={`${Math.round(volume * 100)}%`}
+                  color="#44ffcc"
+                  size={52}
+                />
+              </div>
+              <span className="v4-bar-sep">|</span>
+              <div className="v4-octave-btns">
+                {[1,2,3,4].map(n => (
+                  <button
+                    key={n}
+                    className={`v4-toggle-btn${octaves === n ? ' v4-toggle-btn--on' : ''}`}
+                    onClick={() => setOctaves(n)}
+                  >{n}</button>
+                ))}
+              </div>
+              <span className="v4-bar-sep">|</span>
               <V4OscSection oscParams={oscParams} setOscParams={setOscParams} />
-
-              {/* ASCII controls panel for lo mode */}
-              <AsciiControls
-                mode={mode} setMode={setMode}
-                poly={poly} setPoly={setPoly}
-                hold={hold} setHold={setHold}
-                arpBpm={arpBpm} setArpBpm={setArpBpm}
-                volume={volume} setVolume={setVolume}
-                octaves={octaves} setOctaves={setOctaves}
-                scale={scale} setScale={setScale}
-                glideSpeed={glideSpeed} setGlideSpeed={setGlideSpeed}
-                stepped={stepped} setStepped={setStepped}
-                oscParams={oscParams} setOscParams={setOscParams}
-                delayParams={delayParams} setDelayParams={setDelayParams}
-                reverbMix={reverbMix} setReverbMix={setReverbMix}
-                crunch={crunch} setCrunch={setCrunch}
-                vcfCutoff={vcfCutoff} setVcfCutoff={setVcfCutoff}
-                vcfResonance={vcfResonance} setVcfResonance={setVcfResonance}
-                vcfRouting={vcfRouting} setVcfRouting={setVcfRouting}
-                onStop={handleStop}
-                onShake={() => handleShake(1)}
-                doubleHarmonicUnlocked={doubleHarmonicUnlocked}
-                space={space} onSpaceChange={handleSpace}
-                tone={tone} onToneChange={handleTone}
-              />
-            </>
-          )}
+              <span className="v4-bar-sep">|</span>
+              {/* SPACE + TONE + VCF — inline with OSCs */}
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">SPACE</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={space}
+                  onMixChange={handleSpace}
+                  color="#44aaff"
+                  size={52}
+                />
+              </div>
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">TONE</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={tone}
+                  onMixChange={handleTone}
+                  color="#ff6633"
+                  size={52}
+                />
+              </div>
+              <span className="v4-bar-sep">|</span>
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">CUT</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={(vcfCutoff - 20) / 19980}
+                  onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
+                  mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
+                  color="#00eedd"
+                  size={52}
+                />
+              </div>
+              <div className="v4-knob-group">
+                <div className="v4-knob-group__label">RES</div>
+                <DualKnob
+                  mode="single"
+                  mixValue={vcfResonance / 20}
+                  onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
+                  mixLabel={`${vcfResonance.toFixed(1)}`}
+                  color="#ff44cc"
+                  size={52}
+                />
+              </div>
+              <div className="v4-vcf-group">
+                <span className="v4-knob-group__label">VCF</span>
+                <div className="v4-vcf-btns">
+                  {[0,1,2].map(i => (
+                    <button
+                      key={i}
+                      className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
+                      onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
+                    >{i+1}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>

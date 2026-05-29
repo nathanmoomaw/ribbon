@@ -123,11 +123,6 @@ html, body {
   justify-content: flex-end;
 }
 
-/* Constrain logo to fit the 40px header */
-.text-ribbon-header .ribbon-logo {
-  height: 32px;
-  width: auto;
-}
 
 .text-ribbon-header__status {
   display: flex;

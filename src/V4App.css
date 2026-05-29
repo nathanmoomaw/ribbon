@@ -2,6 +2,15 @@
    Party mode: v2-style opaque console, RibbonLogo, FloatingStaff
    Lo mode: transparent ASCII console, AsciiLogo                     */
 
+/* ── v4 header: transparent — animating bg shows through, buttons float ── */
+.v4-app .text-ribbon-header {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
 /* ── Lo mode: transparent ASCII console ── */
 .v4-mode--lo .text-ribbon-controls {
   background: transparent;

@@ -1,5 +1,12 @@
 # Devlog
 
+## 2026-05-29 — v4 DUMP 706-709: transparent header, unified controls, orbital orbs, chaotic lightning
+
+- **706**: Reverted logo size constraint (removed `height: 32px` rule). Made v4 header fully transparent — no background, no border, no shadow — so the animated bg grid/spheres show through and logo/buttons float over it.
+- **707**: Lo mode now uses the same compact party controls bar instead of the old verbose AsciiControls panel. Both modes render identical control layout. Removed `AsciiControls` and `Controls` from V4App imports.
+- **708**: Rewrote `AsciiOrbs` — all 3 spheres now share a single canvas and orbit a common center via Lissajous-style paths. Different orbital speeds/phases cause them to drift into and through each other continuously.
+- **709**: Enhanced `StaticArcsOverlay` — spread jitter doubled (18→36), bolt length up to 260px (was 160px), segments increased (6–11, was 4–8), multiple independent origin points per frame (2–3). Bolts now span the full sphere cluster area with more chaotic branching paths.
+
 ## 2026-05-27 — Constrain RibbonLogo to header bounds
 
 - Root cause: `.ribbon-logo { width: 280px; height: auto }` with viewBox 162×72 renders at 124px tall — 3× the 40px header height. Logo overflowed downward into the sphere area while QR/status/toggle items were properly contained.

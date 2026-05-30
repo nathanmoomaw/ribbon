@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-05-30 — DUMP 719: compact version switcher for narrow screens
+
+- **719**: VersionSwitcher now renders two variants: the existing inline row (wide) and a new compact "v" toggle (≤640px). Clicking "v" opens a vertical dropdown of v1–v4. Click-outside closes it. CSS hides each variant at the appropriate breakpoint.
+
 ## 2026-05-30 — DUMP 718: narrow-screen header fix — logo centered, PARTY/LO visible
 
 - **718**: At ≤640px, hide `.version-switcher`, `.text-ribbon-header__status`, and `.version-status-sep` so the left `1fr` column stays narrow. Logo stays centered in its grid column; PARTY/LO/⚡ remain visible in the right column.

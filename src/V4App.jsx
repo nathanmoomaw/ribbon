@@ -735,19 +735,21 @@ export default function V4App() {
             {poly && <span className="status-poly">POLY</span>}
           </div>
           <span className="version-status-sep">·</span>
-          <button
-            className="header-qr-btn"
-            onClick={() => setShowInfo(v => !v)}
-            title="Build info"
-            aria-label="Info"
-          >[i]</button>
-          {showInfo && (
-            <div className="v4-info-overlay">
-              <div className="v4-info-overlay__line">ribbon v4</div>
-              <div className="v4-info-overlay__line">commit: {typeof __BUILD_COMMIT__ !== 'undefined' ? __BUILD_COMMIT__ : 'dev'}</div>
-              <div className="v4-info-overlay__line">branch: dev/v4</div>
-            </div>
-          )}
+          <span className="v4-info-anchor">
+            <button
+              className="header-qr-btn"
+              onClick={() => setShowInfo(v => !v)}
+              title="Build info"
+              aria-label="Info"
+            >[i]</button>
+            {showInfo && (
+              <div className="v4-info-overlay">
+                <div className="v4-info-overlay__line">ribbon v4</div>
+                <div className="v4-info-overlay__line">commit: {typeof __BUILD_COMMIT__ !== 'undefined' ? __BUILD_COMMIT__ : 'dev'}</div>
+                <div className="v4-info-overlay__line">branch: dev/v4</div>
+              </div>
+            )}
+          </span>
         </div>
         {isParty
           ? <div onClick={() => handleShake(1.5)} style={{ cursor: 'pointer' }}><RibbonLogo /></div>

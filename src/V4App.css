@@ -17,6 +17,19 @@
   box-shadow: none;
 }
 
+/* Float button groups to the very top of the viewport, logo stays centered in grid */
+.v4-app .text-ribbon-header__left {
+  position: absolute;
+  top: 6px;
+  left: 12px;
+}
+
+.v4-app .text-ribbon-header__right {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+}
+
 /* ── Lo mode: transparent ASCII console ── */
 .v4-mode--lo .text-ribbon-controls {
   background: transparent;
@@ -422,10 +435,16 @@
   box-shadow: 0 0 4px color-mix(in srgb, var(--osc-color, var(--cyan)) 40%, transparent);
 }
 
-/* ── Build info overlay ── */
+/* ── Build info overlay anchored to [i] button ── */
+.v4-info-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
 .v4-info-overlay {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 4px);
   left: 0;
   background: rgba(6, 8, 20, 0.95);
   border: 1px solid rgba(60, 80, 140, 0.4);

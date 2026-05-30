@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-05-30 — DUMP 716-717: button groups float to top, [i] popup anchored to button
+
+- **716**: Left/right header button groups (`__left`, `__right`) now `position: absolute; top: 6px` within the already-absolute header — they float at the very top of the viewport while the logo stays in its natural grid-center position. Logo untouched.
+- **717**: Wrapped `[i]` button and info overlay in `.v4-info-anchor` (`position: relative; display: inline-flex`). Overlay now positions `top: calc(100% + 4px); left: 0` relative to the `[i]` button itself, not the full header.
+
 ## 2026-05-29 — DUMP 712: header position:absolute, eliminate top gap + IAM fix for dev deploy
 
 - **712**: `text-ribbon-header` was a flex child taking 40px. Added `position: absolute; top: 0; left: 0; right: 0; z-index: 10; height: auto` to `.v4-app .text-ribbon-header` — pulls it out of flex flow so `text-ribbon-main` fills 100vh. Buttons float over the animated bg. Logo unchanged.

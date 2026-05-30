@@ -17,19 +17,6 @@
   box-shadow: none;
 }
 
-/* Float button groups to the very top of the viewport, logo stays centered in grid */
-.v4-app .text-ribbon-header__left {
-  position: absolute;
-  top: 6px;
-  left: 12px;
-}
-
-.v4-app .text-ribbon-header__right {
-  position: absolute;
-  top: 6px;
-  right: 12px;
-}
-
 /* ── Lo mode: transparent ASCII console ── */
 .v4-mode--lo .text-ribbon-controls {
   background: transparent;

@@ -17,6 +17,13 @@
   box-shadow: none;
 }
 
+/* Button groups float to top of their grid cell — logo stays centered in middle column */
+.v4-app .text-ribbon-header__left,
+.v4-app .text-ribbon-header__right {
+  align-self: start;
+  padding-top: 6px;
+}
+
 /* ── Lo mode: transparent ASCII console ── */
 .v4-mode--lo .text-ribbon-controls {
   background: transparent;

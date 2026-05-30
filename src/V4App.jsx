@@ -781,7 +781,7 @@ export default function V4App() {
         <PresetQR
           settings={qrSettings}
           onClose={() => setQrSettings(null)}
-          asciiMode
+          asciiMode={!isParty}
         />
       )}
 

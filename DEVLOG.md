@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-05-30 — DUMP 720: ASCII QR in lo mode — lime green / lemon / pink gradient
+
+- **720**: In lo mode the QR modal now renders an ASCII QR (block chars █▀▄) instead of the canvas oil-spill version. Added `ASCII_GRADIENT_STOPS` palette: terminal lime green dominant, with meyer lemon, white, orange, light pink accents. Border glow updated to lime green. Party mode still uses the full iridescent canvas QR. `asciiMode` prop in V4App is now `!isParty` instead of hardcoded `true`.
+
 ## 2026-05-30 — DUMP 719: compact version switcher for narrow screens
 
 - **719**: VersionSwitcher now renders two variants: the existing inline row (wide) and a new compact "v" toggle (≤640px). Clicking "v" opens a vertical dropdown of v1–v4. Click-outside closes it. CSS hides each variant at the appropriate breakpoint.

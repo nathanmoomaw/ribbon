@@ -23,6 +23,18 @@ const GRADIENT_STOPS = [
   { offset: 1, color: [180, 40, 255] },      // back to violet
 ]
 
+// Lo/ASCII mode gradient — terminal lime green lean with meyer lemon, white, orange, light pink
+const ASCII_GRADIENT_STOPS = [
+  { offset: 0,    color: [57, 255, 20] },    // terminal lime green
+  { offset: 0.18, color: [255, 247, 100] },  // meyer lemon
+  { offset: 0.34, color: [255, 255, 255] },  // white
+  { offset: 0.5,  color: [57, 255, 20] },    // lime green again
+  { offset: 0.65, color: [255, 160, 60] },   // orange
+  { offset: 0.78, color: [255, 180, 200] },  // light pink
+  { offset: 0.9,  color: [57, 255, 20] },    // back to lime
+  { offset: 1,    color: [200, 255, 80] },   // yellow-green
+]
+
 function lerpColor(stops, t) {
   t = Math.max(0, Math.min(1, t))
   for (let i = 0; i < stops.length - 1; i++) {
@@ -345,13 +357,13 @@ export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMod
             if (ch === ' ') {
               line += ' '
             } else {
-              // Iridescent gradient: same spiral logic as canvas version
+              // Lo-mode terminal gradient — lime green lean with lemon/white/orange/pink
               const cx = colIdx / totalCols - 0.5
               const cy = lineIdx / totalRows - 0.5
               const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
               const dist = Math.sqrt(cx * cx + cy * cy) * 2
               const t = (angle * 0.4 + dist * 0.6 + (colIdx + lineIdx) / (totalCols + totalRows) * 0.3 + qrStyleSeed) % 1
-              const [r, g, b] = lerpColor(GRADIENT_STOPS, t)
+              const [r, g, b] = lerpColor(ASCII_GRADIENT_STOPS, t)
               line += `<span style="color:rgb(${r},${g},${b})">${ch}</span>`
             }
           }

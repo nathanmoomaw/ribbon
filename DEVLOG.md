@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-05-30 — DUMP 718: narrow-screen header fix — logo centered, PARTY/LO visible
+
+- **718**: At ≤640px, hide `.version-switcher`, `.text-ribbon-header__status`, and `.version-status-sep` so the left `1fr` column stays narrow. Logo stays centered in its grid column; PARTY/LO/⚡ remain visible in the right column.
+
 ## 2026-05-30 — DUMP 716-717: button groups float to top, [i] popup anchored to button
 
 - **716**: Left/right header button groups (`__left`, `__right`) now `position: absolute; top: 6px` within the already-absolute header — they float at the very top of the viewport while the logo stays in its natural grid-center position. Logo untouched.

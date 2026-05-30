@@ -345,6 +345,15 @@
   }
 }
 
+/* ── Narrow header: hide version switcher + status so logo stays centered ── */
+@media (max-width: 640px) {
+  .v4-app .version-switcher,
+  .v4-app .text-ribbon-header__status,
+  .v4-app .version-status-sep {
+    display: none;
+  }
+}
+
 /* ── Mobile adjustments ── */
 @media (max-width: 600px) {
   .v4-controls-overlay {

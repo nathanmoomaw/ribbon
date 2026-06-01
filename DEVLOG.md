@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-06-01 — DUMP 722: citrus palette applied to ASCII ribbon
+
+- **722**: `AsciiRibbon.jsx` `RAINBOW` array replaced with citrus cycle: lime green `#39FF14`, yellow-lime, meyer lemon `#FFE840`, golden lemon, orange `#FF9030`, light orange, light pink `#FFB4C8`, warm pink. `oscColors` updated to lime/lemon/orange matching the rest of v4. Arp note markers: `#00ffcc` → `#39FF14`. Keyboard key indicators: `#ffffaa` → `#FFE840`. Background fill: `#0a0a0f` → `#080d08` (slight green tint). `AsciiRibbon.css` background `#060810` → `#060d06`, box-shadow blue tint → lime tint, label color blue-gray → dim lime green.
+
 ## 2026-06-01 — DUMP 721: citrus retheme — lime, lemon, orange, pink across all of v4
 
 - **721**: Full citrus palette applied across party and lo modes. Sphere colors: lime green / meyer lemon / orange (was red/gold/green). Lightning arc colors: lime/lemon/orange/pink (was blue/purple/cyan). OSC DualKnob colors: lime, lemon, orange. Control knobs (TEMPO/ž/VOL/SPACE/TONE/CUT/RES): remapped to citrus. Buttons (PARTY/LO, MONO/ARP/HOLD/STOP/octaves/VCF): active = lemon `#FFE840`, on-hover = olive-lime, inactive = dark olive. `--cyan` overridden to `#39FF14` in `.v4-app` scope. Ribbon track gradient: lime→lemon→orange→pink. AsciiOrbs: lime/lemon/orange foreground colors. Info overlay: lime green border and text. Touch-to-play prompt: lime green. Separator bars: dim lime.

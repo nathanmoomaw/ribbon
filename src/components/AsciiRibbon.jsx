@@ -6,10 +6,19 @@ import './AsciiRibbon.css'
 
 // ASCII characters from sparse to dense — maps wave height to char
 const CHARS = ' .·:;+=*#@'
+// Citrus palette — lime green lean with lemon/orange/pink accents
 const RAINBOW = [
-  '#ff0080', '#ff4040', '#ff8000', '#ffcc00',
-  '#80ff00', '#00ff80', '#00ccff', '#0080ff',
-  '#8000ff', '#cc00ff', '#ff00cc',
+  '#39FF14', // terminal lime
+  '#6AFF30', // lime-yellow
+  '#FFE840', // meyer lemon
+  '#FFCC20', // golden lemon
+  '#FF9030', // orange
+  '#FFB050', // light orange
+  '#FFB4C8', // light pink
+  '#FF7090', // warm pink
+  '#55FF20', // lime variant
+  '#AAFF50', // yellow-lime
+  '#FFE840', // lemon
 ]
 
 // Keyboard → ribbon position map (ASDF home row + JKL)
@@ -187,7 +196,7 @@ export function AsciiRibbon({
       fluid.step()
       frame++
 
-      ctx.fillStyle = '#0a0a0f'
+      ctx.fillStyle = '#080d08'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.font = fontRef.current
 
@@ -210,7 +219,7 @@ export function AsciiRibbon({
 
       // Draw oscillator waveforms — each osc gets a horizontal band with its waveform shape
       const oscs = oscParamsRef.current
-      const oscColors = ['#ff0080', '#00ccff', '#aaff00']
+      const oscColors = ['#39FF14', '#FFE840', '#FF9030']
       const waveTime = frame * 0.025
       for (let oscIdx = 0; oscIdx < oscs.length; oscIdx++) {
         const osc = oscs[oscIdx]
@@ -273,7 +282,7 @@ export function AsciiRibbon({
         if (nx == null) return
         const col = Math.floor(nx * cols)
         ctx.globalAlpha = 0.85
-        ctx.fillStyle = '#ffffaa'
+        ctx.fillStyle = '#FFE840'
         ctx.font = `bold ${fontRef.current}`
         for (let r = 0; r < rows; r++) {
           ctx.fillText('┊', col * gw, (r + 1) * gh)
@@ -287,7 +296,7 @@ export function AsciiRibbon({
         for (const hz of arpNotes) {
           const pos = frequencyToPosition(hz, { octaves })
           const col = Math.floor(pos * cols)
-          ctx.fillStyle = '#00ffcc'
+          ctx.fillStyle = '#39FF14'
           for (let r = 0; r < rows; r++) {
             ctx.fillText('│', col * gw, (r + 1) * gh)
           }

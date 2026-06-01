@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-06-01 — DUMP 723: citrus emoji confetti — 1% lemon/orange/lime in bursts
+
+- **723**: Added `CITRUS_EMOJIS = ['🍋', '🍊', '🍋‍🟩']` to `ConfettiCanvas.jsx`. Each spawned particle has a 1% chance of being a citrus emoji instead of a `CONFETTI_CHARS` glyph. Emoji particles get a slightly larger size (22–30px), `isEmoji: true` flag, and render with `sans-serif` font so the emoji glyphs display correctly instead of falling back to monospace squares.
+
 ## 2026-06-01 — DUMP 722: citrus palette applied to ASCII ribbon
 
 - **722**: `AsciiRibbon.jsx` `RAINBOW` array replaced with citrus cycle: lime green `#39FF14`, yellow-lime, meyer lemon `#FFE840`, golden lemon, orange `#FF9030`, light orange, light pink `#FFB4C8`, warm pink. `oscColors` updated to lime/lemon/orange matching the rest of v4. Arp note markers: `#00ffcc` → `#39FF14`. Keyboard key indicators: `#ffffaa` → `#FFE840`. Background fill: `#0a0a0f` → `#080d08` (slight green tint). `AsciiRibbon.css` background `#060810` → `#060d06`, box-shadow blue tint → lime tint, label color blue-gray → dim lime green.

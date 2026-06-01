@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-06-01 — DUMP 724-725: v4 codename "Citrus Sipper" + party QR citrus palette
+
+- **724**: v4 codename set to "Citrus Sipper" — CLAUDE.md version table and section header updated.
+- **725**: Party-mode QR in v4 now uses the citrus palette (`ASCII_GRADIENT_STOPS`: lime green, meyer lemon, orange, light pink) instead of the oil-spill iridescent purple/cyan palette. Added `citrusPalette` prop to `PresetQR` and `drawColoredQR` (with `palette` param defaulting to `GRADIENT_STOPS` so all older versions are unchanged). `V4App.jsx` passes `citrusPalette={true}` unconditionally so both party and lo mode QRs use citrus colors. `drawSpillEdges` and `drawWarpedText` also receive the palette so spill drips and warped text match.
+
 ## 2026-06-01 — DUMP 723: citrus emoji confetti — 1% lemon/orange/lime in bursts
 
 - **723**: Added `CITRUS_EMOJIS = ['🍋', '🍊', '🍋‍🟩']` to `ConfettiCanvas.jsx`. Each spawned particle has a 1% chance of being a citrus emoji instead of a `CONFETTI_CHARS` glyph. Emoji particles get a slightly larger size (22–30px), `isEmoji: true` flag, and render with `sans-serif` font so the emoji glyphs display correctly instead of falling back to monospace squares.

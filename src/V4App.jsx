@@ -782,6 +782,7 @@ export default function V4App() {
           settings={qrSettings}
           onClose={() => setQrSettings(null)}
           asciiMode={!isParty}
+          citrusPalette={true}
         />
       )}
 

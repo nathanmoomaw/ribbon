@@ -15,9 +15,9 @@ const WAVE_CHARS = {
 }
 
 const OSC_COLORS = [
-  { fg: '#9988cc', bright: '#ddccff' },  // osc1: purple-steel
-  { fg: '#7799bb', bright: '#aaccee' },  // osc2: steel-blue
-  { fg: '#668899', bright: '#99ccbb' },  // osc3: steel-teal
+  { fg: '#39FF14', bright: '#aaff80' },  // osc1: terminal lime
+  { fg: '#FFE840', bright: '#fffaaa' },  // osc2: meyer lemon
+  { fg: '#FF9030', bright: '#ffcc88' },  // osc3: orange
 ]
 
 // Draw a single orb at (cx, cy) on the given canvas context

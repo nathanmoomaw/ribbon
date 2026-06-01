@@ -38,7 +38,7 @@ import './components/DualKnob.css'
 
 const WAVEFORMS = ['sine', 'square', 'sawtooth', 'triangle']
 const WAVE_GLYPHS = { sine: '∿', square: '⊓', sawtooth: '⧸', triangle: '∧' }
-const OSC_COLORS = ['#ff4080', '#40ff80', '#4080ff']
+const OSC_COLORS = ['#39FF14', '#FFE840', '#FF9030']
 const INACTIVITY_TIMEOUT = 37000
 
 function V4OscSection({ oscParams, setOscParams }) {
@@ -217,12 +217,12 @@ function makeArcPoints(cx, cy, angle, len, segments) {
 }
 
 const ARC_COLORS = [
-  'rgba(100,150,255,0.7)',
-  'rgba(140,100,255,0.6)',
-  'rgba(80,210,255,0.55)',
-  'rgba(200,100,255,0.55)',
-  'rgba(100,230,200,0.5)',
-  'rgba(255,180,80,0.45)',
+  'rgba(57,255,20,0.75)',     // lime green
+  'rgba(255,232,64,0.65)',    // meyer lemon
+  'rgba(255,144,48,0.65)',    // orange
+  'rgba(255,180,200,0.6)',    // light pink
+  'rgba(180,255,100,0.6)',    // yellow-lime
+  'rgba(255,255,200,0.55)',   // near-white warm
 ]
 
 function StaticArcsOverlay() {
@@ -873,7 +873,7 @@ export default function V4App() {
                   mixValue={tempo}
                   onMixChange={handleTempo}
                   mixLabel={`${arpBpm}`}
-                  color="#ffcc44"
+                  color="#FFE840"
                   size={52}
                 />
               </div>
@@ -883,7 +883,7 @@ export default function V4App() {
                   mode="single"
                   mixValue={zeta}
                   onMixChange={handleZeta}
-                  color="#cc55ff"
+                  color="#FFB4C8"
                   size={52}
                 />
               </div>
@@ -895,7 +895,7 @@ export default function V4App() {
                   mixValue={volume}
                   onMixChange={setVolume}
                   mixLabel={`${Math.round(volume * 100)}%`}
-                  color="#44ffcc"
+                  color="#39FF14"
                   size={52}
                 />
               </div>
@@ -919,7 +919,7 @@ export default function V4App() {
                   mode="single"
                   mixValue={space}
                   onMixChange={handleSpace}
-                  color="#44aaff"
+                  color="#FFB4C8"
                   size={52}
                 />
               </div>
@@ -929,7 +929,7 @@ export default function V4App() {
                   mode="single"
                   mixValue={tone}
                   onMixChange={handleTone}
-                  color="#ff6633"
+                  color="#FF9030"
                   size={52}
                 />
               </div>
@@ -941,7 +941,7 @@ export default function V4App() {
                   mixValue={(vcfCutoff - 20) / 19980}
                   onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
                   mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
-                  color="#00eedd"
+                  color="#FFE840"
                   size={52}
                 />
               </div>
@@ -952,7 +952,7 @@ export default function V4App() {
                   mixValue={vcfResonance / 20}
                   onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
                   mixLabel={`${vcfResonance.toFixed(1)}`}
-                  color="#ff44cc"
+                  color="#FF9030"
                   size={52}
                 />
               </div>

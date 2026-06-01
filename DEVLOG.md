@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-06-01 — DUMP 721: citrus retheme — lime, lemon, orange, pink across all of v4
+
+- **721**: Full citrus palette applied across party and lo modes. Sphere colors: lime green / meyer lemon / orange (was red/gold/green). Lightning arc colors: lime/lemon/orange/pink (was blue/purple/cyan). OSC DualKnob colors: lime, lemon, orange. Control knobs (TEMPO/ž/VOL/SPACE/TONE/CUT/RES): remapped to citrus. Buttons (PARTY/LO, MONO/ARP/HOLD/STOP/octaves/VCF): active = lemon `#FFE840`, on-hover = olive-lime, inactive = dark olive. `--cyan` overridden to `#39FF14` in `.v4-app` scope. Ribbon track gradient: lime→lemon→orange→pink. AsciiOrbs: lime/lemon/orange foreground colors. Info overlay: lime green border and text. Touch-to-play prompt: lime green. Separator bars: dim lime.
+
 ## 2026-05-30 — DUMP 720: ASCII QR in lo mode — lime green / lemon / pink gradient
 
 - **720**: In lo mode the QR modal now renders an ASCII QR (block chars █▀▄) instead of the canvas oil-spill version. Added `ASCII_GRADIENT_STOPS` palette: terminal lime green dominant, with meyer lemon, white, orange, light pink accents. Border glow updated to lime green. Party mode still uses the full iridescent canvas QR. `asciiMode` prop in V4App is now `!isParty` instead of hardcoded `true`.

@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-06-01 — DUMP 726-727: shake randomizes mono/arp/hold/tempo + sporadic sphere-constrained lightning
+
+- **726**: `handleShake` in V4App now also randomizes mono/arp toggle (30% chance per shake), hold state (15% chance), and nudges the tempo BipolarKnob by ±0.3 × intensity. Added `tempoRef` to track current tempo value in the callback without stale closure. `handleTempo` added to deps array.
+- **727**: Replaced `StaticArcsOverlay` with a sphere-constrained, sporadic lightning design. Three named sphere positions (`SPHERE_CENTERS`) anchor arc origins/endpoints to sphere surfaces. Bolts now arc between sphere pairs using `makeLightningPoints` (straight-path zigzag with lateral jitter). Timing changed from constant 40–120ms to sporadic 60–500ms with 35% blank periods — gives real static-electricity rhythm. Branch bolts spawn 40% of the time from arc midpoints. Glow filter applied to half the primary arcs.
+
 ## 2026-06-01 — DUMP 724-725: v4 codename "Citrus Sipper" + party QR citrus palette
 
 - **724**: v4 codename set to "Citrus Sipper" — CLAUDE.md version table and section header updated.

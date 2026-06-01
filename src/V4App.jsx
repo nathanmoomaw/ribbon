@@ -197,70 +197,102 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Generate a chaotic zigzag arc path — high lateral jitter for electricity feel
-function makeArcPoints(cx, cy, angle, len, segments) {
-  const pts = []
-  const stepLen = len / segments
-  let x = cx, y = cy
-  const spread = 36  // wider perpendicular jitter (was 18)
-  for (let i = 0; i <= segments; i++) {
-    const jitter = i === 0 ? 0 : (Math.random() - 0.5) * spread * 2
-    const perp = angle + Math.PI / 2
-    pts.push(`${(x + Math.cos(perp) * jitter).toFixed(1)},${(y + Math.sin(perp) * jitter).toFixed(1)}`)
-    if (i < segments) {
-      // Also drift the main direction randomly for extra chaos
-      x += Math.cos(angle) * stepLen + (Math.random() - 0.5) * spread * 0.6
-      y += Math.sin(angle) * stepLen + (Math.random() - 0.5) * spread * 0.6
-    }
+// Generate a jagged lightning path from (x1,y1) to (x2,y2)
+function makeLightningPoints(x1, y1, x2, y2, segments) {
+  const pts = [`${x1.toFixed(1)},${y1.toFixed(1)}`]
+  const dx = x2 - x1, dy = y2 - y1
+  const len = Math.sqrt(dx * dx + dy * dy)
+  const perpX = -dy / len, perpY = dx / len
+  const maxOffset = len * 0.25
+  for (let i = 1; i < segments; i++) {
+    const t = i / segments
+    const bx = x1 + dx * t
+    const by = y1 + dy * t
+    const jitter = (Math.random() - 0.5) * 2 * maxOffset * (1 - Math.abs(t - 0.5) * 1.2)
+    pts.push(`${(bx + perpX * jitter).toFixed(1)},${(by + perpY * jitter).toFixed(1)}`)
   }
+  pts.push(`${x2.toFixed(1)},${y2.toFixed(1)}`)
   return pts.join(' ')
 }
 
-const ARC_COLORS = [
-  'rgba(57,255,20,0.75)',     // lime green
-  'rgba(255,232,64,0.65)',    // meyer lemon
-  'rgba(255,144,48,0.65)',    // orange
-  'rgba(255,180,200,0.6)',    // light pink
-  'rgba(180,255,100,0.6)',    // yellow-lime
-  'rgba(255,255,200,0.55)',   // near-white warm
+// Three approximate sphere centers in SVG viewBox (400×300)
+const SPHERE_CENTERS = [
+  { x: 150, y: 130, r: 70 },   // osc1 — left
+  { x: 250, y: 115, r: 65 },   // osc2 — upper right
+  { x: 200, y: 185, r: 60 },   // osc3 — lower center
 ]
 
-function StaticArcsOverlay() {
-  const [arcs, setArcs] = useState(() => generateArcs())
+const ARC_COLORS = [
+  'rgba(57,255,20,0.85)',     // lime green
+  'rgba(255,232,64,0.75)',    // meyer lemon
+  'rgba(255,144,48,0.75)',    // orange
+  'rgba(255,180,200,0.7)',    // light pink
+  'rgba(180,255,100,0.7)',    // yellow-lime
+  'rgba(255,255,200,0.65)',   // near-white warm
+]
 
-  function generateArcs() {
-    const result = []
-    // Multiple independent origin points — bolts branch from different locations
-    const numOrigins = 2 + Math.floor(Math.random() * 2)  // 2–3 origins
-    for (let o = 0; o < numOrigins; o++) {
-      // Origins spread across a wider area to match sphere drift
-      const cx = 110 + Math.random() * 180  // 110–290
-      const cy = 50 + Math.random() * 180   // 50–230
-      const arcsFromThis = 2 + Math.floor(Math.random() * 2)  // 2–3 per origin
-      for (let i = 0; i < arcsFromThis; i++) {
-        const angle = (i / arcsFromThis) * Math.PI * 2 + Math.random() * 1.2
-        const len = 130 + Math.random() * 150  // 130–280 (was 80–160)
-        const segs = 6 + Math.floor(Math.random() * 5)  // 6–11 segments (was 4–8)
-        result.push({
-          points: makeArcPoints(cx, cy, angle, len, segs),
-          color: ARC_COLORS[result.length % ARC_COLORS.length],
-          width: 0.5 + Math.random() * 1.0,
-          opacity: Math.random() > 0.18 ? 1 : 0,
-        })
-      }
-    }
-    return result
+function randomPointOnSphere(sphere, inward = false) {
+  const angle = Math.random() * Math.PI * 2
+  const r = inward ? sphere.r * (0.7 + Math.random() * 0.3) : sphere.r
+  return {
+    x: sphere.x + Math.cos(angle) * r,
+    y: sphere.y + Math.sin(angle) * r,
   }
+}
+
+function generateArcs() {
+  const result = []
+  // Pick 1–2 sphere pairs to arc between
+  const numArcs = 1 + Math.floor(Math.random() * 3)
+  for (let i = 0; i < numArcs; i++) {
+    // Pick two different spheres
+    const fromIdx = Math.floor(Math.random() * SPHERE_CENTERS.length)
+    let toIdx = Math.floor(Math.random() * (SPHERE_CENTERS.length - 1))
+    if (toIdx >= fromIdx) toIdx++
+    const from = randomPointOnSphere(SPHERE_CENTERS[fromIdx])
+    const to = randomPointOnSphere(SPHERE_CENTERS[toIdx])
+    const segs = 5 + Math.floor(Math.random() * 5)
+    const colorIdx = Math.floor(Math.random() * ARC_COLORS.length)
+    result.push({
+      points: makeLightningPoints(from.x, from.y, to.x, to.y, segs),
+      color: ARC_COLORS[colorIdx],
+      width: 0.4 + Math.random() * 0.9,
+      opacity: 1,
+      glow: Math.random() > 0.5,
+    })
+    // Occasional branch from midpoint
+    if (Math.random() > 0.6) {
+      const mid = {
+        x: (from.x + to.x) / 2 + (Math.random() - 0.5) * 20,
+        y: (from.y + to.y) / 2 + (Math.random() - 0.5) * 20,
+      }
+      const branchTo = randomPointOnSphere(SPHERE_CENTERS[Math.floor(Math.random() * SPHERE_CENTERS.length)])
+      result.push({
+        points: makeLightningPoints(mid.x, mid.y, branchTo.x, branchTo.y, 3 + Math.floor(Math.random() * 3)),
+        color: ARC_COLORS[colorIdx],
+        width: 0.25 + Math.random() * 0.4,
+        opacity: 0.6,
+        glow: false,
+      })
+    }
+  }
+  return result
+}
+
+function StaticArcsOverlay() {
+  const [arcs, setArcs] = useState([])
+  const nextFireRef = useRef(0)
 
   useEffect(() => {
     let rafId
-    let lastUpdate = 0
     function tick(t) {
       rafId = requestAnimationFrame(tick)
-      // Regenerate arcs at random intervals 40–120ms — electricity crackle rhythm
-      if (t - lastUpdate > 40 + Math.random() * 80) {
-        lastUpdate = t
-        setArcs(generateArcs())
+      if (t >= nextFireRef.current) {
+        // Sporadic: sometimes fire, sometimes blank (empty arcs)
+        const isFiring = Math.random() > 0.35
+        setArcs(isFiring ? generateArcs() : [])
+        // Next firing delay: 60–500ms — gives sporadic static-electricity rhythm
+        nextFireRef.current = t + 60 + Math.random() * 440
       }
     }
     rafId = requestAnimationFrame(tick)
@@ -270,6 +302,12 @@ function StaticArcsOverlay() {
   return (
     <div className="v4-static-arcs" aria-hidden="true">
       <svg className="v4-static-arcs__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <filter id="arc-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          </filter>
+        </defs>
         {arcs.map((arc, i) => (
           <polyline
             key={i}
@@ -279,21 +317,9 @@ function StaticArcsOverlay() {
             strokeWidth={arc.width}
             strokeLinecap="round"
             opacity={arc.opacity}
+            filter={arc.glow ? 'url(#arc-glow)' : undefined}
           />
         ))}
-        {arcs.filter((_, i) => i < 3).map((arc, i) => {
-          const lastPt = arc.points.split(' ').pop().split(',')
-          return (
-            <circle
-              key={i}
-              cx={lastPt[0]}
-              cy={lastPt[1]}
-              r={1 + Math.random() * 1.5}
-              fill={arc.color}
-              opacity={arc.opacity * 0.9}
-            />
-          )
-        })}
       </svg>
     </div>
   )
@@ -356,6 +382,8 @@ export default function V4App() {
   // Left  → BPM=40,  glide=0.005 (slow)
   // Right → BPM=280, glide=0.08  (fast)
   const [tempo, setTempo] = useState(0.5)
+  const tempoRef = useRef(0.5)
+  tempoRef.current = tempo
 
   // ── v4-specific: ž knob (0=flutter, 0.5=neutral, 1=phase) ──
   const [zeta, setZeta] = useState(0.5)
@@ -650,7 +678,20 @@ export default function V4App() {
     if (Math.random() < 0.03) {
       setDoubleHarmonicUnlocked(true)
     }
-  }, [shakeNoiseBurst, handleSpace, handleTone])
+
+    // Randomize mono/arp (30% chance per shake)
+    if (Math.random() < 0.3) {
+      setMonoArp(prev => prev === 'mono' ? 'arp' : 'mono')
+    }
+
+    // Randomly toggle hold (15% chance)
+    if (Math.random() < 0.15) {
+      setHold(prev => !prev)
+    }
+
+    // Nudge tempo by ±0.3 (clamped 0–1)
+    handleTempo(Math.max(0, Math.min(1, tempoRef.current + (Math.random() - 0.5) * 0.6 * intensity)))
+  }, [shakeNoiseBurst, handleSpace, handleTone, handleTempo])
 
   useShake(handleShake, sidebarRef, canvasAreaRef)
 

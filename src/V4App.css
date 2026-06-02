@@ -185,7 +185,18 @@
   inset: 0;
 }
 
-/* Arc and spark opacity/position driven by JS — no CSS animation needed */
+/* Arc fade: primary lingers, secondary/tertiary tendrils vanish first */
+@keyframes arcFadeOut {
+  0%   { opacity: 1; }
+  40%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+.v4-arc-line {
+  animation-name: arcFadeOut;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
 
 /* ── v4 controls overlay: Mono/Arp + TEMPO + ž + BPM/VOL knobs ── */
 .v4-controls-overlay {

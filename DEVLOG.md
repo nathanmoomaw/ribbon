@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-06-02 — DUMP 729: arc diffusion — 3-level branching tree + CSS fade-out
+
+- **729**: Static electricity arcs now diffuse into smaller lines that fade into the air instead of snapping on/off. Replaced `generateArcs()` with `generateArcTree()` — a 3-level recursive branch structure: primary bolt (thick 0.45–1px, 300–700ms fade), secondary branches (medium 0.18–0.4px, 140–360ms fade), and tertiary tendrils (thin 0.07–0.17px, 50–160ms fade) spreading outward at random angles. Deeper levels get scaleAlpha (0.58× and 0.28× the primary color alpha) so they appear naturally dimmer. Changed `StaticArcsOverlay` to multi-burst state: each burst tracks `expiresAt` and overlaps with previous ones while their CSS animations play out. Added `@keyframes arcFadeOut` + `.v4-arc-line` to `V4App.css` — each polyline fades from opacity 1 → 0 over its `fadeDuration`ms. Sporadic timing: 45% chance of quiet gap (650–1550ms), otherwise fast succession (80–400ms).
+
 ## 2026-06-02 — DUMP 728: lightning arcs now fill viewport + recursive midpoint displacement
 
 - **728**: Rewrote `StaticArcsOverlay` arc geometry. Root cause: sphere radii (60–70) in a 400×300 viewBox were tiny; `preserveAspectRatio="meet"` also letterboxed the SVG. Fix: switched to a 100×100 viewBox with `preserveAspectRatio="none"` (fills container exactly), and radius ~43 per sphere in that space — arc endpoints now span nearly the full viewport. Replaced straight-path zigzag with recursive midpoint displacement (`depth=3–4` → 8–16 segments, jitter factor 0.38 halved each level) for genuinely jagged lightning that looks like static electricity. `SPHERE_OFFSETS` positions three nearly-overlapping sphere centers matching the Three.js idle offsets.

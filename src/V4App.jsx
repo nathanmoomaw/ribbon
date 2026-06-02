@@ -214,22 +214,27 @@ function makeLightningPoints(x1, y1, x2, y2, depth, jitterFrac = 0.38) {
 }
 
 // Sphere definitions: large radii so surface points span most of the 100×100 viewBox
-// The three Three.js spheres are nearly coincident at desktop zoom — treat as one cluster
-const SPHERE_CLUSTER = { x: 50, y: 50, r: 46 }  // fills ~92% of 100×100 canvas
+const SPHERE_CLUSTER = { x: 50, y: 50, r: 46 }
 const SPHERE_OFFSETS = [
   { dx: -8, dy: -7, r: 44 },  // osc1 slightly upper-left
   { dx:  9, dy: -5, r: 42 },  // osc2 slightly upper-right
   { dx:  0, dy:  9, r: 41 },  // osc3 slightly lower-center
 ]
 
-const ARC_COLORS = [
-  'rgba(57,255,20,0.9)',      // lime green
-  'rgba(255,232,64,0.8)',     // meyer lemon
-  'rgba(255,144,48,0.8)',     // orange
-  'rgba(255,180,200,0.75)',   // light pink
-  'rgba(180,255,100,0.75)',   // yellow-lime
-  'rgba(255,255,220,0.7)',    // near-white warm
+const ARC_PRIMARY_COLORS = [
+  'rgba(57,255,20,0.95)',    // lime green
+  'rgba(255,232,64,0.9)',    // meyer lemon
+  'rgba(255,144,48,0.9)',    // orange
+  'rgba(255,180,200,0.85)',  // light pink
+  'rgba(180,255,100,0.85)',  // yellow-lime
+  'rgba(255,255,220,0.8)',   // near-white warm
 ]
+
+function scaleAlpha(color, factor) {
+  return color.replace(/rgba\((.+),\s*([\d.]+)\)/, (_, rgb, a) =>
+    `rgba(${rgb},${Math.min(1, parseFloat(a) * factor).toFixed(2)})`
+  )
+}
 
 function randomSurfacePoint(idx) {
   const o = SPHERE_OFFSETS[idx]
@@ -239,57 +244,89 @@ function randomSurfacePoint(idx) {
   return { x: cx + Math.cos(angle) * o.r, y: cy + Math.sin(angle) * o.r }
 }
 
-function generateArcs() {
-  const result = []
-  const numArcs = 1 + Math.floor(Math.random() * 3)
-  for (let i = 0; i < numArcs; i++) {
-    const fromIdx = Math.floor(Math.random() * 3)
-    let toIdx = Math.floor(Math.random() * 2)
-    if (toIdx >= fromIdx) toIdx++
-    const from = randomSurfacePoint(fromIdx)
-    const to = randomSurfacePoint(toIdx)
-    const depth = 3 + Math.floor(Math.random() * 2)  // 3–4 levels → 8–16 segments
-    const colorIdx = Math.floor(Math.random() * ARC_COLORS.length)
-    const pts = makeLightningPoints(from.x, from.y, to.x, to.y, depth)
-    result.push({
-      points: pts.join(' '),
-      color: ARC_COLORS[colorIdx],
-      width: 0.3 + Math.random() * 0.7,
-      opacity: 0.85 + Math.random() * 0.15,
-      glow: Math.random() > 0.4,
-    })
-    // Branch bolt from a random midpoint
-    if (Math.random() > 0.5) {
-      const midIdx = Math.floor(pts.length * (0.3 + Math.random() * 0.4))
-      const [bx, by] = pts[midIdx].split(',').map(Number)
-      const branchTo = randomSurfacePoint(Math.floor(Math.random() * 3))
-      const bPts = makeLightningPoints(bx, by, branchTo.x, branchTo.y, 2)
-      result.push({
-        points: bPts.join(' '),
-        color: ARC_COLORS[colorIdx],
-        width: 0.18 + Math.random() * 0.3,
-        opacity: 0.5 + Math.random() * 0.3,
-        glow: false,
-      })
+// Generates a burst of arcs as a 3-level tree:
+//   level 2 (primary) — thick bright bolt between sphere surfaces
+//   level 1 (secondary) — medium branches spreading outward from primary midpoints
+//   level 0 (tertiary) — thin dim tendrils from secondary midpoints, fade fastest
+// Each level has its own fadeDuration so deeper branches vanish first,
+// giving the visual impression of energy diffusing into the air.
+function generateArcTree() {
+  const allArcs = []
+  const colorIdx = Math.floor(Math.random() * ARC_PRIMARY_COLORS.length)
+  const primaryColor = ARC_PRIMARY_COLORS[colorIdx]
+
+  function addBranch(x1, y1, x2, y2, level) {
+    const ptsDepth = level === 2 ? (3 + Math.floor(Math.random() * 2)) : (2 + Math.floor(Math.random() * 2))
+    const pts = makeLightningPoints(x1, y1, x2, y2, ptsDepth, 0.35 + level * 0.06)
+
+    const width = level === 2 ? (0.45 + Math.random() * 0.55)
+                : level === 1 ? (0.18 + Math.random() * 0.22)
+                : (0.07 + Math.random() * 0.10)
+
+    const color = level === 2 ? primaryColor
+                : level === 1 ? scaleAlpha(primaryColor, 0.58)
+                : scaleAlpha(primaryColor, 0.28)
+
+    // Primary lingers longest; tertiary tendrils flicker out first
+    const fadeDuration = level === 2 ? (300 + Math.random() * 400)
+                       : level === 1 ? (140 + Math.random() * 220)
+                       : (50 + Math.random() * 110)
+
+    const glow = level === 2 && Math.random() > 0.45
+
+    allArcs.push({ points: pts.join(' '), color, width, fadeDuration, glow })
+
+    if (level > 0) {
+      const numBranches = level === 2 ? (2 + Math.floor(Math.random() * 2)) : (1 + Math.floor(Math.random() * 2))
+      for (let b = 0; b < numBranches; b++) {
+        const midIdx = Math.floor(pts.length * (0.1 + Math.random() * 0.8))
+        const [bx, by] = pts[midIdx].split(',').map(Number)
+        // Branches spread outward at random angles — not forced to hit another sphere
+        const angle = Math.random() * Math.PI * 2
+        const branchLen = level === 2 ? (12 + Math.random() * 28) : (5 + Math.random() * 14)
+        const ex = Math.max(1, Math.min(99, bx + Math.cos(angle) * branchLen))
+        const ey = Math.max(1, Math.min(99, by + Math.sin(angle) * branchLen))
+        addBranch(bx, by, ex, ey, level - 1)
+      }
     }
   }
-  return result
+
+  const numPrimary = 1 + Math.floor(Math.random() * 2)
+  for (let i = 0; i < numPrimary; i++) {
+    const fromIdx = Math.floor(Math.random() * 3)
+    const toIdx = (fromIdx + 1 + Math.floor(Math.random() * 2)) % 3
+    const from = randomSurfacePoint(fromIdx)
+    const to = randomSurfacePoint(toIdx)
+    addBranch(from.x, from.y, to.x, to.y, 2)
+  }
+
+  return allArcs
 }
 
 function StaticArcsOverlay() {
-  const [arcs, setArcs] = useState([])
+  const [bursts, setBursts] = useState([])
   const nextFireRef = useRef(0)
+  const burstIdRef = useRef(0)
 
   useEffect(() => {
     let rafId
     function tick(t) {
       rafId = requestAnimationFrame(tick)
-      if (t >= nextFireRef.current) {
-        const isFiring = Math.random() > 0.3
-        setArcs(isFiring ? generateArcs() : [])
-        // Sporadic timing: 50–450ms — quick bursts followed by quiet pauses
-        nextFireRef.current = t + 50 + Math.random() * 400
-      }
+      if (t < nextFireRef.current) return
+
+      const id = ++burstIdRef.current
+      const arcs = generateArcTree()
+      const maxDuration = Math.max(...arcs.map(a => a.fadeDuration))
+      const expiresAt = t + maxDuration + 80
+
+      setBursts(prev => {
+        const live = prev.filter(b => b.expiresAt > t)
+        return [...live, { id, arcs, expiresAt }]
+      })
+
+      // Sporadic: short bursts 45% of the time, longer quiet gaps 55%
+      const quiet = Math.random() > 0.45
+      nextFireRef.current = t + (quiet ? 650 + Math.random() * 900 : 80 + Math.random() * 320)
     }
     rafId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(rafId)
@@ -297,7 +334,6 @@ function StaticArcsOverlay() {
 
   return (
     <div className="v4-static-arcs" aria-hidden="true">
-      {/* viewBox 0 0 100 100 with preserveAspectRatio=none fills container without letterboxing */}
       <svg className="v4-static-arcs__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <filter id="arc-glow" x="-60%" y="-60%" width="220%" height="220%">
@@ -305,18 +341,21 @@ function StaticArcsOverlay() {
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
-        {arcs.map((arc, i) => (
-          <polyline
-            key={i}
-            points={arc.points}
-            fill="none"
-            stroke={arc.color}
-            strokeWidth={arc.width}
-            strokeLinecap="round"
-            opacity={arc.opacity}
-            filter={arc.glow ? 'url(#arc-glow)' : undefined}
-          />
-        ))}
+        {bursts.flatMap(burst =>
+          burst.arcs.map((arc, i) => (
+            <polyline
+              key={`${burst.id}-${i}`}
+              points={arc.points}
+              fill="none"
+              stroke={arc.color}
+              strokeWidth={arc.width}
+              strokeLinecap="round"
+              className="v4-arc-line"
+              style={{ animationDuration: `${arc.fadeDuration}ms` }}
+              filter={arc.glow ? 'url(#arc-glow)' : undefined}
+            />
+          ))
+        )}
       </svg>
     </div>
   )

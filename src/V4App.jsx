@@ -197,81 +197,78 @@ function AsciiKnob({ label, value, min = 0, max = 1, onChange }) {
   )
 }
 
-// Generate a jagged lightning path from (x1,y1) to (x2,y2)
-function makeLightningPoints(x1, y1, x2, y2, segments) {
-  const pts = [`${x1.toFixed(1)},${y1.toFixed(1)}`]
+// Recursive midpoint-displacement lightning bolt — each segment splits in half with jitter
+function makeLightningPoints(x1, y1, x2, y2, depth, jitterFrac = 0.38) {
+  if (depth === 0) return [`${x1.toFixed(1)},${y1.toFixed(1)}`, `${x2.toFixed(1)},${y2.toFixed(1)}`]
+  const mx = (x1 + x2) / 2
+  const my = (y1 + y2) / 2
   const dx = x2 - x1, dy = y2 - y1
   const len = Math.sqrt(dx * dx + dy * dy)
-  const perpX = -dy / len, perpY = dx / len
-  const maxOffset = len * 0.25
-  for (let i = 1; i < segments; i++) {
-    const t = i / segments
-    const bx = x1 + dx * t
-    const by = y1 + dy * t
-    const jitter = (Math.random() - 0.5) * 2 * maxOffset * (1 - Math.abs(t - 0.5) * 1.2)
-    pts.push(`${(bx + perpX * jitter).toFixed(1)},${(by + perpY * jitter).toFixed(1)}`)
-  }
-  pts.push(`${x2.toFixed(1)},${y2.toFixed(1)}`)
-  return pts.join(' ')
+  const perp = { x: -dy / len, y: dx / len }
+  const offset = (Math.random() - 0.5) * len * jitterFrac
+  const mx2 = mx + perp.x * offset
+  const my2 = my + perp.y * offset
+  const left = makeLightningPoints(x1, y1, mx2, my2, depth - 1, jitterFrac * 0.8)
+  const right = makeLightningPoints(mx2, my2, x2, y2, depth - 1, jitterFrac * 0.8)
+  return [...left.slice(0, -1), ...right]
 }
 
-// Three approximate sphere centers in SVG viewBox (400×300)
-const SPHERE_CENTERS = [
-  { x: 150, y: 130, r: 70 },   // osc1 — left
-  { x: 250, y: 115, r: 65 },   // osc2 — upper right
-  { x: 200, y: 185, r: 60 },   // osc3 — lower center
+// Sphere definitions: large radii so surface points span most of the 100×100 viewBox
+// The three Three.js spheres are nearly coincident at desktop zoom — treat as one cluster
+const SPHERE_CLUSTER = { x: 50, y: 50, r: 46 }  // fills ~92% of 100×100 canvas
+const SPHERE_OFFSETS = [
+  { dx: -8, dy: -7, r: 44 },  // osc1 slightly upper-left
+  { dx:  9, dy: -5, r: 42 },  // osc2 slightly upper-right
+  { dx:  0, dy:  9, r: 41 },  // osc3 slightly lower-center
 ]
 
 const ARC_COLORS = [
-  'rgba(57,255,20,0.85)',     // lime green
-  'rgba(255,232,64,0.75)',    // meyer lemon
-  'rgba(255,144,48,0.75)',    // orange
-  'rgba(255,180,200,0.7)',    // light pink
-  'rgba(180,255,100,0.7)',    // yellow-lime
-  'rgba(255,255,200,0.65)',   // near-white warm
+  'rgba(57,255,20,0.9)',      // lime green
+  'rgba(255,232,64,0.8)',     // meyer lemon
+  'rgba(255,144,48,0.8)',     // orange
+  'rgba(255,180,200,0.75)',   // light pink
+  'rgba(180,255,100,0.75)',   // yellow-lime
+  'rgba(255,255,220,0.7)',    // near-white warm
 ]
 
-function randomPointOnSphere(sphere, inward = false) {
+function randomSurfacePoint(idx) {
+  const o = SPHERE_OFFSETS[idx]
+  const cx = SPHERE_CLUSTER.x + o.dx
+  const cy = SPHERE_CLUSTER.y + o.dy
   const angle = Math.random() * Math.PI * 2
-  const r = inward ? sphere.r * (0.7 + Math.random() * 0.3) : sphere.r
-  return {
-    x: sphere.x + Math.cos(angle) * r,
-    y: sphere.y + Math.sin(angle) * r,
-  }
+  return { x: cx + Math.cos(angle) * o.r, y: cy + Math.sin(angle) * o.r }
 }
 
 function generateArcs() {
   const result = []
-  // Pick 1–2 sphere pairs to arc between
   const numArcs = 1 + Math.floor(Math.random() * 3)
   for (let i = 0; i < numArcs; i++) {
-    // Pick two different spheres
-    const fromIdx = Math.floor(Math.random() * SPHERE_CENTERS.length)
-    let toIdx = Math.floor(Math.random() * (SPHERE_CENTERS.length - 1))
+    const fromIdx = Math.floor(Math.random() * 3)
+    let toIdx = Math.floor(Math.random() * 2)
     if (toIdx >= fromIdx) toIdx++
-    const from = randomPointOnSphere(SPHERE_CENTERS[fromIdx])
-    const to = randomPointOnSphere(SPHERE_CENTERS[toIdx])
-    const segs = 5 + Math.floor(Math.random() * 5)
+    const from = randomSurfacePoint(fromIdx)
+    const to = randomSurfacePoint(toIdx)
+    const depth = 3 + Math.floor(Math.random() * 2)  // 3–4 levels → 8–16 segments
     const colorIdx = Math.floor(Math.random() * ARC_COLORS.length)
+    const pts = makeLightningPoints(from.x, from.y, to.x, to.y, depth)
     result.push({
-      points: makeLightningPoints(from.x, from.y, to.x, to.y, segs),
+      points: pts.join(' '),
       color: ARC_COLORS[colorIdx],
-      width: 0.4 + Math.random() * 0.9,
-      opacity: 1,
-      glow: Math.random() > 0.5,
+      width: 0.3 + Math.random() * 0.7,
+      opacity: 0.85 + Math.random() * 0.15,
+      glow: Math.random() > 0.4,
     })
-    // Occasional branch from midpoint
-    if (Math.random() > 0.6) {
-      const mid = {
-        x: (from.x + to.x) / 2 + (Math.random() - 0.5) * 20,
-        y: (from.y + to.y) / 2 + (Math.random() - 0.5) * 20,
-      }
-      const branchTo = randomPointOnSphere(SPHERE_CENTERS[Math.floor(Math.random() * SPHERE_CENTERS.length)])
+    // Branch bolt from a random midpoint
+    if (Math.random() > 0.5) {
+      const midIdx = Math.floor(pts.length * (0.3 + Math.random() * 0.4))
+      const [bx, by] = pts[midIdx].split(',').map(Number)
+      const branchTo = randomSurfacePoint(Math.floor(Math.random() * 3))
+      const bPts = makeLightningPoints(bx, by, branchTo.x, branchTo.y, 2)
       result.push({
-        points: makeLightningPoints(mid.x, mid.y, branchTo.x, branchTo.y, 3 + Math.floor(Math.random() * 3)),
+        points: bPts.join(' '),
         color: ARC_COLORS[colorIdx],
-        width: 0.25 + Math.random() * 0.4,
-        opacity: 0.6,
+        width: 0.18 + Math.random() * 0.3,
+        opacity: 0.5 + Math.random() * 0.3,
         glow: false,
       })
     }
@@ -288,11 +285,10 @@ function StaticArcsOverlay() {
     function tick(t) {
       rafId = requestAnimationFrame(tick)
       if (t >= nextFireRef.current) {
-        // Sporadic: sometimes fire, sometimes blank (empty arcs)
-        const isFiring = Math.random() > 0.35
+        const isFiring = Math.random() > 0.3
         setArcs(isFiring ? generateArcs() : [])
-        // Next firing delay: 60–500ms — gives sporadic static-electricity rhythm
-        nextFireRef.current = t + 60 + Math.random() * 440
+        // Sporadic timing: 50–450ms — quick bursts followed by quiet pauses
+        nextFireRef.current = t + 50 + Math.random() * 400
       }
     }
     rafId = requestAnimationFrame(tick)
@@ -301,10 +297,11 @@ function StaticArcsOverlay() {
 
   return (
     <div className="v4-static-arcs" aria-hidden="true">
-      <svg className="v4-static-arcs__svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet">
+      {/* viewBox 0 0 100 100 with preserveAspectRatio=none fills container without letterboxing */}
+      <svg className="v4-static-arcs__svg" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          <filter id="arc-glow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <filter id="arc-glow" x="-60%" y="-60%" width="220%" height="220%">
+            <feGaussianBlur stdDeviation="0.8" result="blur" />
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>

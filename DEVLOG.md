@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-06-02 — DUMP 728: lightning arcs now fill viewport + recursive midpoint displacement
+
+- **728**: Rewrote `StaticArcsOverlay` arc geometry. Root cause: sphere radii (60–70) in a 400×300 viewBox were tiny; `preserveAspectRatio="meet"` also letterboxed the SVG. Fix: switched to a 100×100 viewBox with `preserveAspectRatio="none"` (fills container exactly), and radius ~43 per sphere in that space — arc endpoints now span nearly the full viewport. Replaced straight-path zigzag with recursive midpoint displacement (`depth=3–4` → 8–16 segments, jitter factor 0.38 halved each level) for genuinely jagged lightning that looks like static electricity. `SPHERE_OFFSETS` positions three nearly-overlapping sphere centers matching the Three.js idle offsets.
+
 ## 2026-06-01 — DUMP 726-727: shake randomizes mono/arp/hold/tempo + sporadic sphere-constrained lightning
 
 - **726**: `handleShake` in V4App now also randomizes mono/arp toggle (30% chance per shake), hold state (15% chance), and nudges the tempo BipolarKnob by ±0.3 × intensity. Added `tempoRef` to track current tempo value in the callback without stale closure. `handleTempo` added to deps array.

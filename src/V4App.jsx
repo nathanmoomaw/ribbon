@@ -898,6 +898,8 @@ export default function V4App() {
               shaking={shaking}
               onArpNoteToggle={handleArpNoteToggle}
               arpNotes={arpNotes}
+              onSpawnConfetti={spawnConfetti}
+              onSpawnNote={spawnNote}
             />
           ) : (
             <AsciiRibbon
@@ -1012,38 +1014,40 @@ export default function V4App() {
                 />
               </div>
               <span className="v4-bar-sep">|</span>
-              <div className="v4-knob-group">
-                <div className="v4-knob-group__label">CUT</div>
-                <DualKnob
-                  mode="single"
-                  mixValue={(vcfCutoff - 20) / 19980}
-                  onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
-                  mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
-                  color="#FFE840"
-                  size={52}
-                />
-              </div>
-              <div className="v4-knob-group">
-                <div className="v4-knob-group__label">RES</div>
-                <DualKnob
-                  mode="single"
-                  mixValue={vcfResonance / 20}
-                  onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
-                  mixLabel={`${vcfResonance.toFixed(1)}`}
-                  color="#FF9030"
-                  size={52}
-                />
-              </div>
-              <div className="v4-vcf-group">
-                <span className="v4-knob-group__label">VCF</span>
-                <div className="v4-vcf-btns">
-                  {[0,1,2].map(i => (
-                    <button
-                      key={i}
-                      className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
-                      onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
-                    >{i+1}</button>
-                  ))}
+              <div className="v4-vcf-cluster">
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">CUT</div>
+                  <DualKnob
+                    mode="single"
+                    mixValue={(vcfCutoff - 20) / 19980}
+                    onMixChange={v => setVcfCutoff(Math.round(20 + v * 19980))}
+                    mixLabel={vcfCutoff >= 1000 ? `${(vcfCutoff / 1000).toFixed(1)}k` : `${vcfCutoff}`}
+                    color="#FFE840"
+                    size={52}
+                  />
+                </div>
+                <div className="v4-knob-group">
+                  <div className="v4-knob-group__label">RES</div>
+                  <DualKnob
+                    mode="single"
+                    mixValue={vcfResonance / 20}
+                    onMixChange={v => setVcfResonance(parseFloat((v * 20).toFixed(1)))}
+                    mixLabel={`${vcfResonance.toFixed(1)}`}
+                    color="#FF9030"
+                    size={52}
+                  />
+                </div>
+                <div className="v4-vcf-group">
+                  <span className="v4-knob-group__label">VCF</span>
+                  <div className="v4-vcf-btns">
+                    {[0,1,2].map(i => (
+                      <button
+                        key={i}
+                        className={`v4-toggle-btn${vcfRouting[i] ? ' v4-toggle-btn--on' : ''}`}
+                        onClick={() => handleVcfRoutingToggle(i, !vcfRouting[i])}
+                      >{i+1}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

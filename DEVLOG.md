@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-07-13 — DUMP 733-734: VCF mobile layout fix + party-mode ribbon confetti restored
+
+- **733**: CUT, RES, and the VCF 1/2/3 routing buttons now live inside a single `.v4-vcf-cluster` flex container (`nowrap`) in `V4App.jsx`/`V4App.css`, replacing the old `.v4-vcf-group { flex-basis: 100% }` mobile rule that forced VCF onto its own row. The cluster wraps as one unit if space runs out, so VCF always stays adjacent to CUT/RES instead of splitting off.
+- **734**: Confetti-on-ribbon-click was only ever wired into `AsciiRibbon.jsx` (lo mode) — the default party-mode `Ribbon.jsx` component had no `onSpawnConfetti`/`onSpawnNote` props at all, so v4's default experience (party mode) never showed ribbon-click confetti. Added the same `spawnConfetti`/`spawnNote` wiring used by `AsciiRibbon` to `Ribbon.jsx` (tap spawns a burst + note particle, sliding to a new note spawns a note particle), and wired `onSpawnConfetti`/`onSpawnNote` from `V4App.jsx` into `<Ribbon>` alongside the existing `<AsciiRibbon>` wiring.
+
 ## 2026-06-02 — DUMP 729: arc diffusion — 3-level branching tree + CSS fade-out
 
 - **729**: Static electricity arcs now diffuse into smaller lines that fade into the air instead of snapping on/off. Replaced `generateArcs()` with `generateArcTree()` — a 3-level recursive branch structure: primary bolt (thick 0.45–1px, 300–700ms fade), secondary branches (medium 0.18–0.4px, 140–360ms fade), and tertiary tendrils (thin 0.07–0.17px, 50–160ms fade) spreading outward at random angles. Deeper levels get scaleAlpha (0.58× and 0.28× the primary color alpha) so they appear naturally dimmer. Changed `StaticArcsOverlay` to multi-burst state: each burst tracks `expiresAt` and overlaps with previous ones while their CSS animations play out. Added `@keyframes arcFadeOut` + `.v4-arc-line` to `V4App.css` — each polyline fades from opacity 1 → 0 over its `fadeDuration`ms. Sporadic timing: 45% chance of quiet gap (650–1550ms), otherwise fast succession (80–400ms).

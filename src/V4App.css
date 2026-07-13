@@ -354,7 +354,16 @@
   text-align: center;
 }
 
-/* ── VCF routing group: label above 1/2/3 buttons ── */
+/* ── CUT/RES + VCF routing: kept as one non-breaking unit so VCF never wraps away from the knobs ── */
+.v4-vcf-cluster {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
 .v4-vcf-group {
   display: flex;
   flex-direction: column;
@@ -398,15 +407,6 @@
   .v4-mode-btn {
     font-size: 9px;
     padding: 2px 5px;
-  }
-
-  /* VCF group wraps to its own line as a complete unit below 600px */
-  .v4-vcf-group {
-    flex-basis: 100%;
-    align-items: flex-start;
-  }
-  .v4-vcf-btns {
-    flex-wrap: nowrap;
   }
 }
 

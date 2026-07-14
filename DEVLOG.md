@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-07-14 — DUMP 735-736: real-device mobile overflow fixes — octave/OSC row + header logo width
+
+- **735**: Confirmed via Playwright at 320–390px viewports that `.v4-octave-btns` and `.v4-party-bar .v4-osc-section` are unrelated flex-wrap items in the same single `.v4-party-bar` row as TEMPO/ž/VOL — depending on exact leftover width after earlier items, the OSC section could land on the same line as the octave buttons instead of wrapping to its own line, squeezing OSC3 off-screen. Gave both `flex-basis: 100%` in the existing `@media (max-width: 600px)` block so each always starts a fresh full-width row regardless of what preceded it.
+- **736**: Root cause of PARTY/LO toggle rendering off-screen on mobile: `.ribbon-logo` (`RibbonLogo.css`) is a fixed `width: 280px` SVG, and the header is a CSS grid (`1fr auto 1fr`) whose middle "auto" track sizes to that fixed 280px regardless of viewport — at any width below ~469px (280px logo + ~85px left column + ~104px right column) the grid overflows uniformly rather than shrinking, pushing `.text-ribbon-header__right` (mode toggle + shake bolt) entirely past the right edge. Fixed by scoping a v4-only override, `.v4-app .ribbon-logo { width: clamp(110px, 38vw, 280px); }` — shrinks only below ~737px viewport width where it's actually needed; desktop/tablet stay pixel-identical (confirmed 280px unchanged at 1280px). Verified header now fits with zero horizontal overflow at 390/375/360px and ~2px negligible overflow at the extreme 320px width (iPhone SE). `RibbonLogo.css`'s own fixed 280px is untouched since it's shared with the frozen v1/v2 `App.jsx`.
+
 ## 2026-07-13 — DUMP 733-734: VCF mobile layout fix + party-mode ribbon confetti restored
 
 - **733**: CUT, RES, and the VCF 1/2/3 routing buttons now live inside a single `.v4-vcf-cluster` flex container (`nowrap`) in `V4App.jsx`/`V4App.css`, replacing the old `.v4-vcf-group { flex-basis: 100% }` mobile rule that forced VCF onto its own row. The cluster wraps as one unit if space runs out, so VCF always stays adjacent to CUT/RES instead of splitting off.

@@ -37,6 +37,14 @@
   box-shadow: none;
 }
 
+/* Logo is fixed 280px wide (RibbonLogo.css) — on narrow phones that alone exceeds
+   the viewport once the QR/version/info and PARTY/LO/shake columns are added,
+   pushing the header__right column off-screen. Scale it down only where needed;
+   clamp's max (280px) keeps desktop/tablet identical to before. */
+.v4-app .ribbon-logo {
+  width: clamp(110px, 38vw, 280px);
+}
+
 /* Button groups float to top of their grid cell — logo stays centered in middle column */
 .v4-app .text-ribbon-header__left,
 .v4-app .text-ribbon-header__right {
@@ -407,6 +415,14 @@
   .v4-mode-btn {
     font-size: 9px;
     padding: 2px 5px;
+  }
+
+  /* Octave buttons and OSC section always get their own full-width row —
+     otherwise they unpredictably share a line with whatever preceded them
+     (TEMPO/ž/VOL), squeezing OSC3 off-screen depending on exact viewport width */
+  .v4-octave-btns,
+  .v4-party-bar .v4-osc-section {
+    flex-basis: 100%;
   }
 }
 

@@ -45,6 +45,26 @@
   width: clamp(110px, 38vw, 280px);
 }
 
+/* Lo mode uses AsciiLogo instead — same header-overflow problem, different source:
+   its ribbon text + canvas + tagline flex row has no responsive shrink at all.
+   Scale the ribbon text and canvas down, and drop the decorative tagline on narrow
+   phones (it's just a label, not needed for the header to stay on-screen). */
+.v4-app .ascii-logo {
+  gap: clamp(4px, 2vw, 12px);
+}
+.v4-app .ascii-logo__ribbon {
+  font-size: clamp(11px, 3.4vw, 18px);
+}
+.v4-app .ascii-logo__moebius-canvas {
+  width: clamp(36px, 12vw, 64px);
+  height: clamp(16px, 5.3vw, 28px);
+}
+@media (max-width: 640px) {
+  .v4-app .ascii-logo__tag {
+    display: none;
+  }
+}
+
 /* Button groups float to top of their grid cell — logo stays centered in middle column */
 .v4-app .text-ribbon-header__left,
 .v4-app .text-ribbon-header__right {

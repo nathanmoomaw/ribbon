@@ -334,7 +334,9 @@ export function AsciiRibbon({
 
   const handlePointerDown = useCallback((e) => {
     e.preventDefault()
-    canvasRef.current?.setPointerCapture(e.pointerId)
+    // setPointerCapture can throw InvalidPointerId under rapid/overlapping pointer
+    // events (browser quirk, esp. touch). Never let that swallow the note-on below.
+    try { canvasRef.current?.setPointerCapture(e.pointerId) } catch (_) {}
     const { nx, ny, velocity } = normalizePointer(e)
     activePointersRef.current.set(e.pointerId, { nx, ny })
     lastInteractionRef.current = Date.now()

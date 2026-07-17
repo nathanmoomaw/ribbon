@@ -3,11 +3,13 @@ import { positionToFrequency } from '../utils/pitchMap'
 
 const KEYS = ['KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG', 'KeyH', 'KeyJ', 'KeyK', 'KeyL']
 
-export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove) {
+export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove, enabled = true) {
   const activeKeysRef = useRef(new Set())
   const keyFreqRef = useRef(new Map()) // track hz per key for arp+poly removal
 
   useEffect(() => {
+    if (!enabled) return
+
     function onKeyDown(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.repeat) return
@@ -97,7 +99,7 @@ export function useKeyboardPlay(getEngine, inputMode, mode, octaves, stepped, sc
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('keyup', onKeyUp)
     }
-  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove])
+  }, [getEngine, inputMode, mode, octaves, stepped, scale, onPositionsChange, arpStart, arpStop, hold, poly, onArpNoteToggle, onArpNoteAdd, onArpNoteRemove, enabled])
 }
 
 export { KEYS }

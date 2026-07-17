@@ -12,6 +12,7 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react'
 import { useAudioEngine } from './hooks/useAudioEngine'
 import { useKeyboard } from './hooks/useKeyboard'
+import { useKeyboardPlay } from './hooks/useKeyboardPlay'
 import { useArpeggiator } from './hooks/useArpeggiator'
 import { useShake } from './hooks/useShake'
 import { use3DVisualizer, MIN_ZOOM, MAX_ZOOM, ZOOM_STEP } from './hooks/use3DVisualizer'
@@ -412,6 +413,7 @@ export default function V4App() {
   const [space, setSpace] = useState(0.5)
   const [tone, setTone] = useState(0.5)
   const [showInfo, setShowInfo] = useState(false)
+  const [keyboardPositions, setKeyboardPositions] = useState(new Map())
 
   // ── v4-specific: TEMPO bipolar (0=slow BPM+low glide, 0.5=center, 1=fast BPM+high glide) ──
   // Center: BPM=120, glide=0.01
@@ -767,6 +769,49 @@ export default function V4App() {
     })
   }, [])
 
+  // Add/remove notes for live arp+poly (keys held down)
+  const handleArpNoteAdd = useCallback((hz) => {
+    setArpNotes(prev => {
+      if (prev.some(n => Math.abs(n - hz) < 1)) return prev
+      return [...prev, hz]
+    })
+  }, [])
+
+  const handleArpNoteRemove = useCallback((hz) => {
+    setArpNotes(prev => prev.filter(n => Math.abs(n - hz) >= 1))
+  }, [])
+
+  // Auto-start/stop arp when notes are added/removed (arp always implies poly in v4,
+  // so neither onArpNoteToggle nor onArpNoteAdd call arpStart directly — this is what
+  // actually kicks off playback the first time a note lands in arp+hold or live arp+poly)
+  const prevArpNotesLenRef = useRef(0)
+  useEffect(() => {
+    if (mode === 'arp') {
+      const prevLen = prevArpNotesLenRef.current
+      if (prevLen === 0 && arpNotes.length > 0) {
+        arpStart()
+      } else if (prevLen > 0 && arpNotes.length === 0) {
+        arpStop()
+      }
+    }
+    prevArpNotesLenRef.current = arpNotes.length
+  }, [arpNotes, mode, arpStart, arpStop])
+
+  // Clear arp notes when leaving arp mode
+  useEffect(() => {
+    if (mode !== 'arp') {
+      setArpNotes([])
+    }
+  }, [mode])
+
+  const handleKeyboardPositions = useCallback((posMap) => {
+    setKeyboardPositions(posMap)
+  }, [])
+
+  // ASDF keyboard play — party mode only; lo mode's AsciiRibbon has its own
+  // independent keydown/keyup listener, so enabling both would double-trigger notes
+  useKeyboardPlay(getEngine, undefined, mode, octaves, stepped, scale, handleKeyboardPositions, arpStart, arpStop, hold, poly, handleArpNoteToggle, handleArpNoteAdd, handleArpNoteRemove, visualMode === 'party')
+
   const handleStop = useCallback(() => {
     getEngine().allNotesOff()
     setHold(false)
@@ -898,6 +943,7 @@ export default function V4App() {
               shaking={shaking}
               onArpNoteToggle={handleArpNoteToggle}
               arpNotes={arpNotes}
+              externalPositions={keyboardPositions}
               onSpawnConfetti={spawnConfetti}
               onSpawnNote={spawnNote}
             />

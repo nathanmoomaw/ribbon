@@ -28,17 +28,24 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
 
-  // Sync external positions from keyboard play or hold mode
+  // Sync external positions from keyboard play or hold mode.
+  // Runs on every change (including externalPositions becoming empty) so that
+  // releasing a key actually clears its cursor line instead of leaving it stuck.
   useEffect(() => {
-    if (externalPositions && externalPositions.size > 0) {
-      setPositions(prev => {
-        const next = new Map(prev)
-        for (const [id, pos] of externalPositions) {
-          next.set(id, pos)
+    if (!externalPositions) return
+    setPositions(prev => {
+      const next = new Map(prev)
+      // Drop keyboard-sourced entries no longer present externally
+      for (const id of next.keys()) {
+        if (id.startsWith('key_') && !externalPositions.has(id)) {
+          next.delete(id)
         }
-        return next
-      })
-    }
+      }
+      for (const [id, pos] of externalPositions) {
+        next.set(id, pos)
+      }
+      return next
+    })
   }, [externalPositions])
 
   const stepPositions = useMemo(() => {

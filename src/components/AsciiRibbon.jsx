@@ -434,6 +434,7 @@ export function AsciiRibbon({
       const voiceId = `key_${e.code}`
       activeKeysRef.current.set(e.code, voiceId)
       lastInteractionRef.current = Date.now()
+      if (onPuddleActivity) onPuddleActivity()
 
       fluid.splash(nx, 0.5, 0.7, 2)
       spawnConfetti(nx, 0.5)
@@ -484,7 +485,7 @@ export function AsciiRibbon({
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [getEngine, fluid, spawnConfetti, spawnNote, arpStart, arpStop])
+  }, [getEngine, fluid, spawnConfetti, spawnNote, arpStart, arpStop, onPuddleActivity])
 
   return (
     <div className="ascii-ribbon" ref={containerRef}>

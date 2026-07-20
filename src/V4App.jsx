@@ -806,7 +806,8 @@ export default function V4App() {
 
   const handleKeyboardPositions = useCallback((posMap) => {
     setKeyboardPositions(posMap)
-  }, [])
+    if (posMap.size > 0) handleInteraction()
+  }, [handleInteraction])
 
   // ASDF keyboard play — party mode only; lo mode's AsciiRibbon has its own
   // independent keydown/keyup listener, so enabling both would double-trigger notes
@@ -868,7 +869,6 @@ export default function V4App() {
               <div className="v4-info-overlay">
                 <div className="v4-info-overlay__line">ribbon v4</div>
                 <div className="v4-info-overlay__line">commit: {typeof __BUILD_COMMIT__ !== 'undefined' ? __BUILD_COMMIT__ : 'dev'}</div>
-                <div className="v4-info-overlay__line">branch: dev/v4</div>
               </div>
             )}
           </span>
@@ -963,6 +963,7 @@ export default function V4App() {
               onArpNoteToggle={handleArpNoteToggle}
               arpNotes={arpNotes}
               oscParams={oscParams}
+              onPuddleActivity={handleInteraction}
               onSpawnConfetti={spawnConfetti}
               onSpawnNote={spawnNote}
             />

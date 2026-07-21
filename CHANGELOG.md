@@ -1,5 +1,36 @@
 # Changelog
 
+## v3 — "ASCII Ribbon"
+
+### Rendering
+- **Fully text-based visuals** — ribbon surface, oscillator spheres, musical staff, logo, and QR codes all rendered in ASCII/monospace characters instead of canvas graphics
+- **2D fluid simulation** — wave-equation fluid sim (`useAsciiFluid`) drives the ribbon surface's response to touch, ambient idle rippling, and shake splashes, rendered as a density-character gradient (` .·:;+=*#@`)
+
+### Sound Engine
+- **Audness engine merge** — synced onto the shared engine lineage (`nmj/engine-sync`) with iOS audio unlock and improved `latencyHint` handling
+- **Baked FX knobs** — SPACE (reverb+delay "sweet spots": cathedral / dry / orbit) and TONE (crunch+VCF sweet spots: grit / clean / glitter) blend multiple parameters into one satisfying rotary knob instead of separate sliders
+- **3 oscillators engaged by default** with varied waveform/detune/mix
+
+### Visuals
+- **AsciiOrbs** — 3 animated ASCII wireframe spheres, one per oscillator, reflecting its waveform, mix, and detune
+- **Oscillator waveform bands** — each active osc draws its live waveform shape across a horizontal band of the ribbon canvas
+- **FloatingStaff** — drifting ASCII musical staves with notes/barlines crossing the screen, wave-like motion inspired by v2's staff
+- **Full-screen ASCII confetti** — dedicated `ConfettiCanvas` overlay; note-name particles (e.g. "C", "F#") spawn on every voice trigger, plus organic multi-burst shake confetti
+- **Ambient idle behavior** — small ripples fire automatically after ~1.5s of inactivity; rare glitch-flicker bursts (character corruption + color shift) when idle longer
+- **Animated ASCII möbius-strip logo** with rainbow gradient wordmark
+
+### Controls
+- **SVG circular knobs** — smooth 270° continuous-rotation dials replacing discrete arrow/bar indicators
+- **Responsive scaling** — all control fonts/sizes use `clamp()` to scale continuously from mobile through large desktop
+- **ASDF/JKL/; keyboard play** — mapped ribbon positions with velocity, live key markers drawn on the canvas
+- **QR/NFT/wallet** — ported from Puddle; QR renders as a styled, iridescently-colored ASCII block-character code (not the canvas/SVG version)
+
+### Infrastructure
+- **Deployed at ribbon.obfusco.us root + /v3** with its own dev branch autodeploy
+- **Version switcher** (v1 | v2 | v3) with path-based routing, shown across all versions
+
+---
+
 ## v2 — "Rock & Rumble"
 
 ### Sound Engine

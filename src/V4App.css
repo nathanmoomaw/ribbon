@@ -72,6 +72,18 @@
   padding-top: 6px;
 }
 
+/* The PARTY/LO toggle sits right next to the shake bolt at the base 8px gap —
+   easy to mis-tap on mobile (shake has a ~30% chance of also flipping mono→arp),
+   which reads as "switching modes randomly enables arp". Give it more breathing room. */
+.v4-app .text-ribbon-header__right {
+  gap: clamp(10px, 5vw, 18px);
+}
+@media (max-width: 340px) {
+  .v4-app .text-ribbon-header__right {
+    gap: 10px;
+  }
+}
+
 /* ── Lo mode: transparent ASCII console ── */
 .v4-mode--lo .text-ribbon-controls {
   background: transparent;

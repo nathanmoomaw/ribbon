@@ -13,7 +13,9 @@ export function useRibbon(onPositionChange, onDown, onUp) {
 
   const handlePointerDown = useCallback((e) => {
     if (!ribbonRef.current) return
-    ribbonRef.current.setPointerCapture(e.pointerId)
+    // setPointerCapture can throw InvalidPointerId under rapid/overlapping pointer
+    // events (browser quirk, esp. touch). Never let that swallow the note-on below.
+    try { ribbonRef.current.setPointerCapture(e.pointerId) } catch (_) {}
     activePointers.current.add(e.pointerId)
     const { x, y } = getPosition(e)
     onDown?.(e.pointerId, x, y)
@@ -30,7 +32,7 @@ export function useRibbon(onPositionChange, onDown, onUp) {
     if (!activePointers.current.has(e.pointerId)) return
     activePointers.current.delete(e.pointerId)
     if (ribbonRef.current) {
-      ribbonRef.current.releasePointerCapture(e.pointerId)
+      try { ribbonRef.current.releasePointerCapture(e.pointerId) } catch (_) {}
     }
     onUp?.(e.pointerId)
   }, [onUp])

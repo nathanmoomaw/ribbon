@@ -6,6 +6,7 @@
 import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react'
 
 const CONFETTI_CHARS = ['*', '+', '×', '◇', '△', '○', '◈', '❋', '✦']
+const CITRUS_EMOJIS = ['🍋', '🍊', '🍋‍🟩']
 const RAINBOW = [
   '#ff0080', '#ff4040', '#ff8000', '#ffcc00',
   '#80ff00', '#00ff80', '#00ccff', '#0080ff',
@@ -25,15 +26,19 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
         const angle = Math.random() * Math.PI * 2
         // Vary speed per particle for organic feel
         const speed = baseSpeed * (0.4 + Math.random() * 1.2)
+        const isCitrus = Math.random() < 0.01
         particlesRef.current.push({
           x, y,
           vx: Math.cos(angle) * speed,
           vy: Math.sin(angle) * speed - 1.5 - Math.random() * 2,
           life: 0.85 + Math.random() * 0.3,
           decay: 0.005 + Math.random() * 0.012,
-          ch: CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
+          ch: isCitrus
+            ? CITRUS_EMOJIS[Math.floor(Math.random() * CITRUS_EMOJIS.length)]
+            : CONFETTI_CHARS[Math.floor(Math.random() * CONFETTI_CHARS.length)],
           color: RAINBOW[Math.floor(Math.random() * RAINBOW.length)],
-          size: opts.size ?? (10 + Math.floor(Math.random() * 6)),
+          size: isCitrus ? 22 + Math.floor(Math.random() * 8) : (opts.size ?? (10 + Math.floor(Math.random() * 6))),
+          isEmoji: isCitrus,
         })
       }
     },
@@ -88,7 +93,9 @@ export const ConfettiCanvas = forwardRef(function ConfettiCanvas(_props, ref) {
 
       particlesRef.current = particlesRef.current.filter(p => p.life > 0)
       for (const p of particlesRef.current) {
-        const font = `${p.isNote ? 'bold ' : ''}${p.size ?? 14}px "Courier New", monospace`
+        const font = p.isEmoji
+          ? `${p.size ?? 22}px sans-serif`
+          : `${p.isNote ? 'bold ' : ''}${p.size ?? 14}px "Courier New", monospace`
         if (font !== lastFont) { ctx.font = font; lastFont = font }
         ctx.globalAlpha = p.life * (p.isNote ? 0.95 : 0.88)
         ctx.fillStyle = p.color

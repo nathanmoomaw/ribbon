@@ -327,6 +327,7 @@ export const Controls = forwardRef(function Controls({
   utilitySlot,
   visualMode,
   setVisualMode,
+  currentVersion = 2,
 }, ref) {
   const handleOscUpdate = useCallback((index, newParams) => {
     setOscParams((prev) => {
@@ -475,7 +476,7 @@ export const Controls = forwardRef(function Controls({
           )}
 
           <div className="controls__version-switcher">
-            <VersionSwitcher current={window.location.pathname.startsWith('/v1') ? 1 : 2} />
+            <VersionSwitcher current={currentVersion} />
           </div>
         </div>
 

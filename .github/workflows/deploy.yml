@@ -1,18 +1,20 @@
 name: Deploy to S3
 
-# Each version branch auto-deploys its own path on push:
+# Each version branch auto-deploys its own path on push (see each branch's own deploy.yml):
 #   v1 → /v1/
 #   v2 → /v2/
-#   v3 → /v3/ + root /  (v3 is current stable at ribbon.obfusco.us)
+#   v3 → /v3/
+#   v4 → /v4/ + root /  (v4 is current stable at ribbon.obfusco.us)
 # Push to main to force a full rebuild of all versions at once.
 
 on:
   push:
-    branches: [main, 'nmj/**']
+    branches: [main, 'dev/**']
 
 jobs:
   deploy-prod:
-    # Full rebuild: checks out each version branch and deploys all paths.
+    # Full rebuild: builds main's own tree (v4, current stable) for root + /v4,
+    # then checks out each older version branch and redeploys its frozen subpath.
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
@@ -25,11 +27,25 @@ jobs:
 
       - run: npm ci
 
+      - name: Build for root (v4 is current stable)
+        run: npm run build
+        env:
+          VITE_DEFAULT_VERSION: 4
+
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+
+      - name: Deploy to root
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
+
+      - name: Build for /v4
+        run: npm run build -- --base /v4/
+
+      - name: Deploy to /v4
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v4/ --delete
 
       - name: Checkout v1 branch
         run: git fetch origin refs/heads/v1 && git checkout FETCH_HEAD && npm ci
@@ -49,14 +65,8 @@ jobs:
       - name: Deploy to /v2
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v2/ --delete
 
-      - name: Checkout v3 branch (root + /v3)
+      - name: Checkout v3 branch
         run: git fetch origin refs/heads/v3 && git checkout FETCH_HEAD && npm ci
-
-      - name: Build for root (v3 is current stable)
-        run: npm run build
-
-      - name: Deploy to root
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
       - name: Build for /v3
         run: npm run build -- --base /v3/
@@ -68,7 +78,9 @@ jobs:
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
 
   deploy-dev:
-    if: startsWith(github.ref, 'refs/heads/nmj/')
+    # Each dev/vX branch deploys to its own subpath on ribbon-dev.
+    # The latest version (dev/v4) also deploys to dev root.
+    if: startsWith(github.ref, 'refs/heads/dev/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -80,8 +92,14 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for dev (base /)
-        run: npm run build
+      - name: Set version path
+        id: version
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/dev/}"
+          echo "path=$BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Build for subpath
+        run: npm run build -- --base /${{ steps.version.outputs.path }}/
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -89,8 +107,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy to dev S3
-        run: aws s3 sync dist/ s3://ribbon-dev.obfusco.us/ --delete
+      - name: Deploy to dev subpath
+        # s3 cp avoids needing s3:ListBucket (which s3 sync requires)
+        run: aws s3 cp dist/ s3://ribbon-dev.obfusco.us/${{ steps.version.outputs.path }}/ --recursive
+
+      - name: Build for dev root (latest version only)
+        if: github.ref == 'refs/heads/dev/v4'
+        run: npm run build
+        env:
+          VITE_DEFAULT_VERSION: 4
+
+      - name: Deploy to dev root (latest version only)
+        # s3 cp: no --delete so existing /v1 /v2 /v3 /v4 subpaths are preserved
+        if: github.ref == 'refs/heads/dev/v4'
+        run: aws s3 cp dist/ s3://ribbon-dev.obfusco.us/ --recursive
 
       - name: Invalidate dev CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"

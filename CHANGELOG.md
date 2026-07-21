@@ -1,5 +1,67 @@
 # Changelog
 
+## v4 — "Citrus Sipper"
+
+### Dual Mode
+- **Party / Lo toggle** — Party mode blends v2's Three.js sphere visualizer with static-electricity arcs between the spheres; Lo mode is the v3 ASCII ribbon, both sharing the same v4 control set (VCF, space/tone, DualKnob oscillators)
+- **Static-electricity spheres** — lightning arcs (recursive midpoint displacement, branching diffusion) jump between the 3 oscillator spheres, constrained to their outer edges and scaling with how far the spheres have drifted apart
+- **Waveform morphing** — turning up an oscillator's mix warps its sphere's vertex displacement toward that waveform's shape
+
+### Controls
+- **DualKnob** — combined mix (outer ring) + detune (inner ring) control per oscillator, ported from Puddle
+- **Mono/Arp toggle** — replaces the old Play/Arp + Mono/Poly pair; arp always implies poly
+- **TEMPO knob** — bipolar knob combining BPM and glide into one control
+- **ž knob** — bipolar knob combining flutter/flange and phased decay into one fun-to-turn effect
+- **Transparent controls panel** — no background chrome; the animated party/lo background shows through behind floating controls
+- Space/tone baked knobs and per-osc VCF routing carried over from v3
+
+### Visuals & Theme
+- **Citrus palette** — lime, lemon, orange, and pink across party mode, lo mode, the ASCII ribbon, and QR codes, replacing v3's terminal green
+- **Citrus emoji confetti** — a rare (~1%) slice of confetti particles render as 🍋🍊🟢 slice emoji instead of shapes
+- **Ribbon-twisted QR text** — preset names render with a dual-wave warp, in the family of v3's recaptcha-style distortion
+- **[i] info button** — shows build/version info including the current commit hash
+
+### Behavior
+- **37s touch-to-play prompt** — fades back in after 37 seconds of inactivity; dismissed by ribbon touch or keyboard play alike
+- **Shake randomization** — extended to mono/arp, hold, tempo, and octave in addition to v3's existing shake targets
+- **ASDF keyboard play** — wired into party mode (previously lo-mode only)
+
+### Engine
+- Built on the shared `@audness/core` engine lineage (in progress) — v1–v3 remain self-contained/frozen
+
+---
+
+## v3 — "ASCII Ribbon"
+
+### Rendering
+- **Fully text-based visuals** — ribbon surface, oscillator spheres, musical staff, logo, and QR codes all rendered in ASCII/monospace characters instead of canvas graphics
+- **2D fluid simulation** — wave-equation fluid sim (`useAsciiFluid`) drives the ribbon surface's response to touch, ambient idle rippling, and shake splashes, rendered as a density-character gradient (` .·:;+=*#@`)
+
+### Sound Engine
+- **Audness engine merge** — synced onto the shared engine lineage (`nmj/engine-sync`) with iOS audio unlock and improved `latencyHint` handling
+- **Baked FX knobs** — SPACE (reverb+delay "sweet spots": cathedral / dry / orbit) and TONE (crunch+VCF sweet spots: grit / clean / glitter) blend multiple parameters into one satisfying rotary knob instead of separate sliders
+- **3 oscillators engaged by default** with varied waveform/detune/mix
+
+### Visuals
+- **AsciiOrbs** — 3 animated ASCII wireframe spheres, one per oscillator, reflecting its waveform, mix, and detune
+- **Oscillator waveform bands** — each active osc draws its live waveform shape across a horizontal band of the ribbon canvas
+- **FloatingStaff** — drifting ASCII musical staves with notes/barlines crossing the screen, wave-like motion inspired by v2's staff
+- **Full-screen ASCII confetti** — dedicated `ConfettiCanvas` overlay; note-name particles (e.g. "C", "F#") spawn on every voice trigger, plus organic multi-burst shake confetti
+- **Ambient idle behavior** — small ripples fire automatically after ~1.5s of inactivity; rare glitch-flicker bursts (character corruption + color shift) when idle longer
+- **Animated ASCII möbius-strip logo** with rainbow gradient wordmark
+
+### Controls
+- **SVG circular knobs** — smooth 270° continuous-rotation dials replacing discrete arrow/bar indicators
+- **Responsive scaling** — all control fonts/sizes use `clamp()` to scale continuously from mobile through large desktop
+- **ASDF/JKL/; keyboard play** — mapped ribbon positions with velocity, live key markers drawn on the canvas
+- **QR/NFT/wallet** — ported from Puddle; QR renders as a styled, iridescently-colored ASCII block-character code (not the canvas/SVG version)
+
+### Infrastructure
+- **Deployed at ribbon.obfusco.us root + /v3** with its own dev branch autodeploy
+- **Version switcher** (v1 | v2 | v3) with path-based routing, shown across all versions
+
+---
+
 ## v2 — "Rock & Rumble"
 
 ### Sound Engine

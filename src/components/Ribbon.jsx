@@ -1,27 +1,51 @@
-import { useState, useCallback, useEffect, useMemo, forwardRef } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef, forwardRef } from 'react'
 import { useRibbon } from '../hooks/useRibbon'
-import { positionToFrequency, frequencyToPosition, getStepPositions } from '../utils/pitchMap'
+import { positionToFrequency, frequencyToPosition, getStepPositions, frequencyToNoteName } from '../utils/pitchMap'
 import { KEYS } from '../hooks/useKeyboardPlay'
 import './Ribbon.css'
 
 const KEY_LABELS = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L']
 
-export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold, poly, shaking, undulating, onArpNoteToggle, arpNotes }, ref) {
+export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, octaves, stepped, scale, externalPositions, ribbonInteraction, arpStart, arpStop, hold, poly, shaking, undulating, onArpNoteToggle, arpNotes, onSpawnConfetti, onSpawnNote }, ref) {
+  const trackRef = useRef(null)
+  const lastSpawnedNoteRef = useRef(new Map())
+
+  // Spawn confetti/note particles at a normalized ribbon position — converts to viewport coords
+  const spawnConfettiAt = useCallback((pos) => {
+    if (!onSpawnConfetti) return
+    const rect = trackRef.current?.getBoundingClientRect()
+    if (!rect) return
+    onSpawnConfetti(rect.left + pos * rect.width, rect.top + rect.height / 2)
+  }, [onSpawnConfetti])
+
+  const spawnNoteAt = useCallback((pos, hz) => {
+    if (!onSpawnNote) return
+    const rect = trackRef.current?.getBoundingClientRect()
+    if (!rect) return
+    onSpawnNote(rect.left + pos * rect.width, rect.top + rect.height / 2, frequencyToNoteName(hz))
+  }, [onSpawnNote])
   // Map of voice id -> position (for both touch and keyboard cursors)
   const [positions, setPositions] = useState(new Map())
   const [activePointers, setActivePointers] = useState(new Set())
 
-  // Sync external positions from keyboard play or hold mode
+  // Sync external positions from keyboard play or hold mode.
+  // Runs on every change (including externalPositions becoming empty) so that
+  // releasing a key actually clears its cursor line instead of leaving it stuck.
   useEffect(() => {
-    if (externalPositions && externalPositions.size > 0) {
-      setPositions(prev => {
-        const next = new Map(prev)
-        for (const [id, pos] of externalPositions) {
-          next.set(id, pos)
+    if (!externalPositions) return
+    setPositions(prev => {
+      const next = new Map(prev)
+      // Drop keyboard-sourced entries no longer present externally
+      for (const id of next.keys()) {
+        if (id.startsWith('key_') && !externalPositions.has(id)) {
+          next.delete(id)
         }
-        return next
-      })
-    }
+      }
+      for (const [id, pos] of externalPositions) {
+        next.set(id, pos)
+      }
+      return next
+    })
   }, [externalPositions])
 
   const stepPositions = useMemo(() => {
@@ -60,7 +84,14 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     }
     setPositions(prev => new Map(prev).set(voiceId, pos))
     if (velocity !== undefined) engine.voiceSetVelocity(voiceId, velocity)
-  }, [getEngine, mode, poly, hold, octaves, stepped, scale, ribbonInteraction])
+
+    // Spawn note particle when sliding past a new note
+    const noteName = frequencyToNoteName(hz)
+    if (lastSpawnedNoteRef.current.get(pointerId) !== noteName) {
+      lastSpawnedNoteRef.current.set(pointerId, noteName)
+      spawnNoteAt(pos, hz)
+    }
+  }, [getEngine, mode, poly, hold, octaves, stepped, scale, ribbonInteraction, spawnNoteAt])
 
   const onDown = useCallback((pointerId, pos, velocity) => {
     const engine = getEngine()
@@ -68,6 +99,10 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     const hz = positionToFrequency(pos, { octaves, stepped, scale })
     setActivePointers(prev => new Set(prev).add(voiceId))
     if (ribbonInteraction) ribbonInteraction.current.active = true
+
+    spawnConfettiAt(pos)
+    lastSpawnedNoteRef.current.set(pointerId, frequencyToNoteName(hz))
+    spawnNoteAt(pos, hz)
 
     if (mode === 'play') {
       if (hold && !poly && engine.getActiveVoiceCount() > 0) {
@@ -93,11 +128,12 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
     if (hold && mode !== 'arp' && engine.getActiveVoiceCount() === 0) {
       engine.voiceOn(voiceId, hz, velocity)
     }
-  }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle])
+  }, [getEngine, mode, hold, poly, octaves, stepped, scale, ribbonInteraction, arpStart, onArpNoteToggle, spawnConfettiAt, spawnNoteAt])
 
   const onUp = useCallback((pointerId) => {
     const voiceId = `touch_${pointerId}`
     const engine = getEngine()
+    lastSpawnedNoteRef.current.delete(pointerId)
     setActivePointers(prev => {
       const next = new Set(prev)
       next.delete(voiceId)
@@ -144,7 +180,7 @@ export const Ribbon = forwardRef(function Ribbon({ getEngine, mode, inputMode, o
       {...handlers}
       style={{ touchAction: 'none' }}
     >
-      <div className={`ribbon__track ${undulating ? 'ribbon__track--undulating' : ''}`}>
+      <div ref={trackRef} className={`ribbon__track ${undulating ? 'ribbon__track--undulating' : ''}`}>
         {allPositions.map(([id, pos]) => (
           <div
             key={id}

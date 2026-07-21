@@ -39,13 +39,19 @@ function makeStrip(canvasW, canvasH) {
     ? -width - randBetween(0, canvasW * 0.5)
     : canvasW + randBetween(0, canvasW * 0.5)
 
+  // Wave parameters — flag-like undulation
+  const waveAmp   = randBetween(4, 14)     // vertical wave height
+  const waveFreq  = randBetween(0.008, 0.018) // wave frequency along x
+  const waveSpeed = randBetween(0.8, 2.2)  // how fast the wave flows
+  const wavePhase = Math.random() * Math.PI * 2
+
   // Scatter notes along the strip
   const noteCount = Math.floor(randBetween(4, 12))
   const notes = []
   for (let i = 0; i < noteCount; i++) {
     notes.push({
-      xOff: randBetween(0, width),        // x offset within strip
-      lineOff: Math.floor(randBetween(-2, 7)), // above/on/below staff lines
+      xOff: randBetween(0, width),
+      lineOff: Math.floor(randBetween(-2, 7)),
       sym: NOTE_SYMS[Math.floor(Math.random() * NOTE_SYMS.length)],
       color: randColor(alpha * 1.8),
       size: randBetween(10, 16),
@@ -62,7 +68,8 @@ function makeStrip(canvasW, canvasH) {
     })
   }
 
-  return { x: startX, y, speed, direction, lineSpacing, alpha, width, notes, bars }
+  return { x: startX, y, speed, direction, lineSpacing, alpha, width, notes, bars,
+           waveAmp, waveFreq, waveSpeed, wavePhase }
 }
 
 export function FloatingStaff() {
@@ -84,13 +91,16 @@ export function FloatingStaff() {
     window.addEventListener('resize', resize)
 
     const ctx = canvas.getContext('2d')
+    let timeMs = 0
 
-    function draw() {
+    function draw(ts) {
       rafRef.current = requestAnimationFrame(draw)
+      timeMs = ts
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       const W = canvas.width
       const H = canvas.height
+      const t = ts * 0.001  // seconds
 
       for (const s of stripsRef.current) {
         s.x += s.speed * s.direction
@@ -104,35 +114,47 @@ export function FloatingStaff() {
           continue
         }
 
-        // Draw 5 staff lines
+        // Helper: y offset at a given x for this strip's wave
+        const waveY = (wx) =>
+          Math.sin(wx * s.waveFreq + t * s.waveSpeed + s.wavePhase) * s.waveAmp
+
+        // Draw 5 staff lines as sine curves (wavy flag effect)
         ctx.strokeStyle = COLORS[0] + s.alpha + ')'
         ctx.lineWidth = 0.7
         for (let l = 0; l < 5; l++) {
-          const ly = s.y + l * s.lineSpacing
+          const baseY = s.y + l * s.lineSpacing
           ctx.beginPath()
-          ctx.moveTo(s.x, ly)
-          ctx.lineTo(s.x + s.width, ly)
+          // Sample the wave at small intervals for smooth curve
+          const steps = Math.ceil(s.width / 4)
+          for (let si = 0; si <= steps; si++) {
+            const wx = s.x + (si / steps) * s.width
+            const wy = baseY + waveY(wx)
+            if (si === 0) ctx.moveTo(wx, wy)
+            else ctx.lineTo(wx, wy)
+          }
           ctx.stroke()
         }
 
-        // Draw barlines (vertical)
+        // Draw barlines (vertical, tilted with the wave)
         for (const b of s.bars) {
           ctx.strokeStyle = b.color
           ctx.lineWidth = 0.8
           const bx = s.x + b.xOff
+          const wOffset = waveY(bx)
           ctx.beginPath()
-          ctx.moveTo(bx, s.y - s.lineSpacing)
-          ctx.lineTo(bx, s.y + 5 * s.lineSpacing)
+          ctx.moveTo(bx, s.y - s.lineSpacing + wOffset)
+          ctx.lineTo(bx, s.y + 5 * s.lineSpacing + wOffset)
           ctx.stroke()
         }
 
-        // Draw notes
+        // Draw notes — float on the wave
         for (const n of s.notes) {
           ctx.font = `${n.size}px "Courier New", monospace`
           ctx.fillStyle = n.color
           ctx.globalAlpha = 1
           const nx = s.x + n.xOff
-          const ny = s.y + n.lineOff * s.lineSpacing
+          const wy = waveY(nx)
+          const ny = s.y + n.lineOff * s.lineSpacing + wy
           ctx.fillText(n.sym, nx, ny)
         }
       }

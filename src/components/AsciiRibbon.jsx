@@ -6,10 +6,19 @@ import './AsciiRibbon.css'
 
 // ASCII characters from sparse to dense — maps wave height to char
 const CHARS = ' .·:;+=*#@'
+// Citrus palette — lime green lean with lemon/orange/pink accents
 const RAINBOW = [
-  '#ff0080', '#ff4040', '#ff8000', '#ffcc00',
-  '#80ff00', '#00ff80', '#00ccff', '#0080ff',
-  '#8000ff', '#cc00ff', '#ff00cc',
+  '#39FF14', // terminal lime
+  '#6AFF30', // lime-yellow
+  '#FFE840', // meyer lemon
+  '#FFCC20', // golden lemon
+  '#FF9030', // orange
+  '#FFB050', // light orange
+  '#FFB4C8', // light pink
+  '#FF7090', // warm pink
+  '#55FF20', // lime variant
+  '#AAFF50', // yellow-lime
+  '#FFE840', // lemon
 ]
 
 // Keyboard → ribbon position map (ASDF home row + JKL)
@@ -187,7 +196,7 @@ export function AsciiRibbon({
       fluid.step()
       frame++
 
-      ctx.fillStyle = '#0a0a0f'
+      ctx.fillStyle = '#080d08'
       ctx.fillRect(0, 0, canvas.width, canvas.height)
       ctx.font = fontRef.current
 
@@ -210,7 +219,7 @@ export function AsciiRibbon({
 
       // Draw oscillator waveforms — each osc gets a horizontal band with its waveform shape
       const oscs = oscParamsRef.current
-      const oscColors = ['#ff0080', '#00ccff', '#aaff00']
+      const oscColors = ['#39FF14', '#FFE840', '#FF9030']
       const waveTime = frame * 0.025
       for (let oscIdx = 0; oscIdx < oscs.length; oscIdx++) {
         const osc = oscs[oscIdx]
@@ -273,7 +282,7 @@ export function AsciiRibbon({
         if (nx == null) return
         const col = Math.floor(nx * cols)
         ctx.globalAlpha = 0.85
-        ctx.fillStyle = '#ffffaa'
+        ctx.fillStyle = '#FFE840'
         ctx.font = `bold ${fontRef.current}`
         for (let r = 0; r < rows; r++) {
           ctx.fillText('┊', col * gw, (r + 1) * gh)
@@ -287,7 +296,7 @@ export function AsciiRibbon({
         for (const hz of arpNotes) {
           const pos = frequencyToPosition(hz, { octaves })
           const col = Math.floor(pos * cols)
-          ctx.fillStyle = '#00ffcc'
+          ctx.fillStyle = '#39FF14'
           for (let r = 0; r < rows; r++) {
             ctx.fillText('│', col * gw, (r + 1) * gh)
           }
@@ -325,7 +334,9 @@ export function AsciiRibbon({
 
   const handlePointerDown = useCallback((e) => {
     e.preventDefault()
-    canvasRef.current?.setPointerCapture(e.pointerId)
+    // setPointerCapture can throw InvalidPointerId under rapid/overlapping pointer
+    // events (browser quirk, esp. touch). Never let that swallow the note-on below.
+    try { canvasRef.current?.setPointerCapture(e.pointerId) } catch (_) {}
     const { nx, ny, velocity } = normalizePointer(e)
     activePointersRef.current.set(e.pointerId, { nx, ny })
     lastInteractionRef.current = Date.now()
@@ -423,6 +434,7 @@ export function AsciiRibbon({
       const voiceId = `key_${e.code}`
       activeKeysRef.current.set(e.code, voiceId)
       lastInteractionRef.current = Date.now()
+      if (onPuddleActivity) onPuddleActivity()
 
       fluid.splash(nx, 0.5, 0.7, 2)
       spawnConfetti(nx, 0.5)
@@ -473,7 +485,7 @@ export function AsciiRibbon({
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
     }
-  }, [getEngine, fluid, spawnConfetti, spawnNote, arpStart, arpStop])
+  }, [getEngine, fluid, spawnConfetti, spawnNote, arpStart, arpStop, onPuddleActivity])
 
   return (
     <div className="ascii-ribbon" ref={containerRef}>

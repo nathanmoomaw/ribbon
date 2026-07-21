@@ -1,5 +1,257 @@
 # Devlog
 
+## 2026-07-21 — v4 "Citrus Sipper" tagged, deployed, and merged to main (DUMP 753-754, 759)
+
+- **753**: Added a v3 "ASCII Ribbon" section to CHANGELOG.md (previously undocumented).
+- **754**: Cut `dev/v4` to a permanent `v4` branch + `v4` tag, matching the existing v1/v2/v3 branch-per-version pattern. `v4` now owns root + `/v4` (its own deploy.yml mirrors what `v3`'s used to do). Demoted `v3`'s branch to `/v3`-only (dropped its root build/deploy, scoped its CloudFront invalidation to `/v3/*`). Added a v4 button to the `VersionSwitcher` on the `v1`, `v2`, and `v3` branches and redeployed each so old versions can navigate forward. Merged `v4` into `main` — resolved conflicts in `deploy.yml` (rewrote the "full rebuild" job so `main`'s own tree, now v4, builds root + `/v4`, while `v1`/`v2`/`v3` are checked out individually for their frozen subpaths; also updated the dev-deploy trigger from the stale `nmj/**` pattern to `dev/**`), `DEVLOG.md` (interleaved main's 2 unique CI-history entries back into chronological order), `src/main.jsx` and `src/components/Controls.jsx` (took v4's more general version-detection logic in both).
+- **759**: Added a v4 "Citrus Sipper" section to CHANGELOG.md.
+
+## 2026-07-20 — DUMP 749: widened PARTY/LO ↔ shake bolt tap spacing (best-effort, unconfirmed root cause)
+
+- **749**: "Switching party/lo seems to automatically enable arp" — could not reproduce through direct testing: clean Playwright clicks on the PARTY/LO buttons (desktop width, mobile width, both the local dev build and the live `ribbon-dev.obfusco.us` production build) never changed `monoArp` state or any shake-randomized parameter across 10 rapid alternating clicks. Traced `handleShake`'s 30% chance of flipping mono→arp (`V4App.jsx`) as the only code path that could produce this symptom, and found the header-right's `.header-shake-btn` (⚡) sits only 8px from the PARTY/LO toggle (`.text-ribbon-header__right`'s base `gap: 8px`, shared with v3) — both are ~20px tall targets, a tight enough margin for a real-finger mis-tap to land on the shake bolt instead, especially on mobile where this whole header is already cramped (see DUMP 736/741/742). This matches this project's repeated history of adjacent-header-element mis-triggers. Since I couldn't get a definitive repro, this is a best-effort fix rather than a confirmed root cause: widened the gap between the toggle and shake bolt to `clamp(10px, 5vw, 18px)` (scoped to `.v4-app`, v3 unaffected), with a `10px` floor below 340px width to avoid reintroducing the header overflow fixed in DUMP 736/742 — verified 0px overflow from 344px up, and only 4px (negligible) at the extreme 320px width.
+
+## 2026-07-20 — DUMP 747-748: fixed stuck keyboard cursor lines + touch-prompt not dismissing on keyboard input
+
+- **747**: Root cause of the stuck vertical lines on the ribbon (visible even once no key/touch was active): `Ribbon.jsx`'s `externalPositions` sync effect only ever added/updated entries into local `positions` state, never removed them — and was gated behind `externalPositions.size > 0`, so it did nothing at all once a key was released and the map went back to empty. This is a latent bug in code that predates last session's DUMP-743 keyboard wiring, but that session is what first fed it real (non-empty-then-empty) data, exposing it. Fixed by running the sync on every change (dropping the `size > 0` guard) and explicitly deleting any `key_*`-prefixed id from `positions` that's no longer present in the incoming `externalPositions` map, while leaving `touch_*` ids (from Ribbon's own pointer handling) untouched. Verified with Playwright: pressing/releasing a single key, and pressing/releasing 4 keys at once, both now leave 0 `.ribbon__cursor` elements behind afterward.
+- **748**: The "touch to play" prompt (`showTouchPrompt` in `V4App.jsx`) was only ever dismissed via `onPointerDown` on the ribbon strip's parent `<section>` — keyboard input never called `handleInteraction()` in either mode. Fixed for party mode by calling `handleInteraction()` from `handleKeyboardPositions` whenever the incoming position map is non-empty. Fixed for lo mode by adding an `onPuddleActivity?.()` call inside `AsciiRibbon.jsx`'s own keydown handler (it already called this on pointer-down, just not on keys) and wiring `onPuddleActivity={handleInteraction}` into `V4App.jsx`'s `<AsciiRibbon>` (previously never passed at all). Verified on a fresh page load with no prior click: the prompt is visible on load and disappears after a single ASDF key press.
+
+## 2026-07-17 — DUMP 743: ASDF keyboard play wired up for party mode
+
+- **743**: "asdf keyboard no longer triggering ribbon" turned out to be "never wired up in party mode" rather than a regression — confirmed via Playwright oscillator-count instrumentation that party mode's `<Ribbon>` had zero response to ASDF keys (0 new voices for 4 key presses) while lo mode's `AsciiRibbon` (which has its own independent inline keydown/keyup handler) correctly created a voice per key. `V4App.jsx` never called the shared `useKeyboardPlay` hook at all. Wired it in: added `keyboardPositions` state + `externalPositions={keyboardPositions}` on the party-mode `<Ribbon>`, added `handleArpNoteAdd`/`handleArpNoteRemove` (for live arp+poly key-holding, mirroring `App.jsx`'s v1/v2 pattern), and — the part that actually makes it produce sound — an auto-start/stop effect watching `arpNotes.length`. Since v4's `poly` is always `true` in arp mode (`poly = monoArp === 'arp'`), neither `onArpNoteToggle` (arp+hold) nor `onArpNoteAdd` (arp, no hold) ever call `arpStart()` themselves; without this effect, arp+hold and live arp+poly would silently build a note list without ever playing it — true for keyboard input and, it turns out, for existing ribbon-tap arp+hold too (a latent gap, not something I introduced). Added `enabled` param (default `true`, backward compatible) to `useKeyboardPlay` so it only attaches listeners in party mode — lo mode keeps its own handler, avoiding double-triggered notes. Verified with Playwright: party mode now produces 12 oscillator starts for 4 ASDF keys (was 0), lo mode unchanged at 12 (no double-trigger), and a 2-note arp+hold sequence built via keys plays continuously for the full 1.5s test window with clean mode-switch afterward.
+
+## 2026-07-16 — DUMP 740-742: silent-click fix (pointer capture) + lo-mode header overflow (AsciiLogo)
+
+- **740**: Root-caused "some clicks not causing sound" to `setPointerCapture` being called at the very top of `handlePointerDown` in both `useRibbon.js` (party) and `AsciiRibbon.jsx` (lo), *before* `onDown`/`engine.voiceOn` run. Pointer-capture APIs can throw `InvalidPointerId` under rapid/overlapping pointer events (a known cross-browser quirk, worse on touch) — when that happens the exception aborts the handler and the note-on call never fires, silencing that one click while everything else keeps working (matches "some clicks", not all). Wrapped `setPointerCapture`/`releasePointerCapture` in try/catch in both files so capture failures can no longer block sound. Verified with Playwright by forcing `Element.prototype.setPointerCapture` to always throw: before understanding this, that would produce 0 oscillator starts per click; with the fix, a click still produces the expected 3 oscillator `start()` calls (one full voice) even though the capture call is throwing every time.
+- **741/742**: These turned out to be the same underlying bug reported from **lo mode**, which my DUMP-736 fix (July 14) never touched — I'd only scoped the header-overflow fix to `.ribbon-logo` (party mode's SVG). Lo mode swaps in `<AsciiLogo>` instead, whose `.ascii-logo` flex row (ribbon text + moebius canvas + `"v3 · ascii ribbon"` tagline) has no responsive shrink either, and sizes the header grid's middle column just as wide. Confirmed via Playwright against the live `ribbon-dev.obfusco.us/v4/` site: lo mode overflowed the header at every real phone width tested, 320–412px (32px–102px of overflow), while party mode stayed at 0–2px thanks to the existing fix. The VCF row itself was never actually broken — it just visually reads as "everything is wrong" when the header above it is overflowing the viewport. Fixed by scoping the same clamp-based shrink to `.ascii-logo__ribbon` (font-size), `.ascii-logo__moebius-canvas` (width/height), and `.ascii-logo` (gap), plus hiding the decorative `.ascii-logo__tag` below 640px — all under `.v4-app` so v3's frozen `TextRibbonApp` usage of `AsciiLogo` is untouched. Verified 0px header overflow in lo mode at 320/344/375/390/412px locally after the fix.
+
+## 2026-07-14 — DUMP 735-736: real-device mobile overflow fixes — octave/OSC row + header logo width
+
+- **735**: Confirmed via Playwright at 320–390px viewports that `.v4-octave-btns` and `.v4-party-bar .v4-osc-section` are unrelated flex-wrap items in the same single `.v4-party-bar` row as TEMPO/ž/VOL — depending on exact leftover width after earlier items, the OSC section could land on the same line as the octave buttons instead of wrapping to its own line, squeezing OSC3 off-screen. Gave both `flex-basis: 100%` in the existing `@media (max-width: 600px)` block so each always starts a fresh full-width row regardless of what preceded it.
+- **736**: Root cause of PARTY/LO toggle rendering off-screen on mobile: `.ribbon-logo` (`RibbonLogo.css`) is a fixed `width: 280px` SVG, and the header is a CSS grid (`1fr auto 1fr`) whose middle "auto" track sizes to that fixed 280px regardless of viewport — at any width below ~469px (280px logo + ~85px left column + ~104px right column) the grid overflows uniformly rather than shrinking, pushing `.text-ribbon-header__right` (mode toggle + shake bolt) entirely past the right edge. Fixed by scoping a v4-only override, `.v4-app .ribbon-logo { width: clamp(110px, 38vw, 280px); }` — shrinks only below ~737px viewport width where it's actually needed; desktop/tablet stay pixel-identical (confirmed 280px unchanged at 1280px). Verified header now fits with zero horizontal overflow at 390/375/360px and ~2px negligible overflow at the extreme 320px width (iPhone SE). `RibbonLogo.css`'s own fixed 280px is untouched since it's shared with the frozen v1/v2 `App.jsx`.
+
+## 2026-07-13 — DUMP 733-734: VCF mobile layout fix + party-mode ribbon confetti restored
+
+- **733**: CUT, RES, and the VCF 1/2/3 routing buttons now live inside a single `.v4-vcf-cluster` flex container (`nowrap`) in `V4App.jsx`/`V4App.css`, replacing the old `.v4-vcf-group { flex-basis: 100% }` mobile rule that forced VCF onto its own row. The cluster wraps as one unit if space runs out, so VCF always stays adjacent to CUT/RES instead of splitting off.
+- **734**: Confetti-on-ribbon-click was only ever wired into `AsciiRibbon.jsx` (lo mode) — the default party-mode `Ribbon.jsx` component had no `onSpawnConfetti`/`onSpawnNote` props at all, so v4's default experience (party mode) never showed ribbon-click confetti. Added the same `spawnConfetti`/`spawnNote` wiring used by `AsciiRibbon` to `Ribbon.jsx` (tap spawns a burst + note particle, sliding to a new note spawns a note particle), and wired `onSpawnConfetti`/`onSpawnNote` from `V4App.jsx` into `<Ribbon>` alongside the existing `<AsciiRibbon>` wiring.
+
+## 2026-06-02 — DUMP 729: arc diffusion — 3-level branching tree + CSS fade-out
+
+- **729**: Static electricity arcs now diffuse into smaller lines that fade into the air instead of snapping on/off. Replaced `generateArcs()` with `generateArcTree()` — a 3-level recursive branch structure: primary bolt (thick 0.45–1px, 300–700ms fade), secondary branches (medium 0.18–0.4px, 140–360ms fade), and tertiary tendrils (thin 0.07–0.17px, 50–160ms fade) spreading outward at random angles. Deeper levels get scaleAlpha (0.58× and 0.28× the primary color alpha) so they appear naturally dimmer. Changed `StaticArcsOverlay` to multi-burst state: each burst tracks `expiresAt` and overlaps with previous ones while their CSS animations play out. Added `@keyframes arcFadeOut` + `.v4-arc-line` to `V4App.css` — each polyline fades from opacity 1 → 0 over its `fadeDuration`ms. Sporadic timing: 45% chance of quiet gap (650–1550ms), otherwise fast succession (80–400ms).
+
+## 2026-06-02 — DUMP 728: lightning arcs now fill viewport + recursive midpoint displacement
+
+- **728**: Rewrote `StaticArcsOverlay` arc geometry. Root cause: sphere radii (60–70) in a 400×300 viewBox were tiny; `preserveAspectRatio="meet"` also letterboxed the SVG. Fix: switched to a 100×100 viewBox with `preserveAspectRatio="none"` (fills container exactly), and radius ~43 per sphere in that space — arc endpoints now span nearly the full viewport. Replaced straight-path zigzag with recursive midpoint displacement (`depth=3–4` → 8–16 segments, jitter factor 0.38 halved each level) for genuinely jagged lightning that looks like static electricity. `SPHERE_OFFSETS` positions three nearly-overlapping sphere centers matching the Three.js idle offsets.
+
+## 2026-06-01 — DUMP 726-727: shake randomizes mono/arp/hold/tempo + sporadic sphere-constrained lightning
+
+- **726**: `handleShake` in V4App now also randomizes mono/arp toggle (30% chance per shake), hold state (15% chance), and nudges the tempo BipolarKnob by ±0.3 × intensity. Added `tempoRef` to track current tempo value in the callback without stale closure. `handleTempo` added to deps array.
+- **727**: Replaced `StaticArcsOverlay` with a sphere-constrained, sporadic lightning design. Three named sphere positions (`SPHERE_CENTERS`) anchor arc origins/endpoints to sphere surfaces. Bolts now arc between sphere pairs using `makeLightningPoints` (straight-path zigzag with lateral jitter). Timing changed from constant 40–120ms to sporadic 60–500ms with 35% blank periods — gives real static-electricity rhythm. Branch bolts spawn 40% of the time from arc midpoints. Glow filter applied to half the primary arcs.
+
+## 2026-06-01 — DUMP 724-725: v4 codename "Citrus Sipper" + party QR citrus palette
+
+- **724**: v4 codename set to "Citrus Sipper" — CLAUDE.md version table and section header updated.
+- **725**: Party-mode QR in v4 now uses the citrus palette (`ASCII_GRADIENT_STOPS`: lime green, meyer lemon, orange, light pink) instead of the oil-spill iridescent purple/cyan palette. Added `citrusPalette` prop to `PresetQR` and `drawColoredQR` (with `palette` param defaulting to `GRADIENT_STOPS` so all older versions are unchanged). `V4App.jsx` passes `citrusPalette={true}` unconditionally so both party and lo mode QRs use citrus colors. `drawSpillEdges` and `drawWarpedText` also receive the palette so spill drips and warped text match.
+
+## 2026-06-01 — DUMP 723: citrus emoji confetti — 1% lemon/orange/lime in bursts
+
+- **723**: Added `CITRUS_EMOJIS = ['🍋', '🍊', '🍋‍🟩']` to `ConfettiCanvas.jsx`. Each spawned particle has a 1% chance of being a citrus emoji instead of a `CONFETTI_CHARS` glyph. Emoji particles get a slightly larger size (22–30px), `isEmoji: true` flag, and render with `sans-serif` font so the emoji glyphs display correctly instead of falling back to monospace squares.
+
+## 2026-06-01 — DUMP 722: citrus palette applied to ASCII ribbon
+
+- **722**: `AsciiRibbon.jsx` `RAINBOW` array replaced with citrus cycle: lime green `#39FF14`, yellow-lime, meyer lemon `#FFE840`, golden lemon, orange `#FF9030`, light orange, light pink `#FFB4C8`, warm pink. `oscColors` updated to lime/lemon/orange matching the rest of v4. Arp note markers: `#00ffcc` → `#39FF14`. Keyboard key indicators: `#ffffaa` → `#FFE840`. Background fill: `#0a0a0f` → `#080d08` (slight green tint). `AsciiRibbon.css` background `#060810` → `#060d06`, box-shadow blue tint → lime tint, label color blue-gray → dim lime green.
+
+## 2026-06-01 — DUMP 721: citrus retheme — lime, lemon, orange, pink across all of v4
+
+- **721**: Full citrus palette applied across party and lo modes. Sphere colors: lime green / meyer lemon / orange (was red/gold/green). Lightning arc colors: lime/lemon/orange/pink (was blue/purple/cyan). OSC DualKnob colors: lime, lemon, orange. Control knobs (TEMPO/ž/VOL/SPACE/TONE/CUT/RES): remapped to citrus. Buttons (PARTY/LO, MONO/ARP/HOLD/STOP/octaves/VCF): active = lemon `#FFE840`, on-hover = olive-lime, inactive = dark olive. `--cyan` overridden to `#39FF14` in `.v4-app` scope. Ribbon track gradient: lime→lemon→orange→pink. AsciiOrbs: lime/lemon/orange foreground colors. Info overlay: lime green border and text. Touch-to-play prompt: lime green. Separator bars: dim lime.
+
+## 2026-05-30 — DUMP 720: ASCII QR in lo mode — lime green / lemon / pink gradient
+
+- **720**: In lo mode the QR modal now renders an ASCII QR (block chars █▀▄) instead of the canvas oil-spill version. Added `ASCII_GRADIENT_STOPS` palette: terminal lime green dominant, with meyer lemon, white, orange, light pink accents. Border glow updated to lime green. Party mode still uses the full iridescent canvas QR. `asciiMode` prop in V4App is now `!isParty` instead of hardcoded `true`.
+
+## 2026-05-30 — DUMP 719: compact version switcher for narrow screens
+
+- **719**: VersionSwitcher now renders two variants: the existing inline row (wide) and a new compact "v" toggle (≤640px). Clicking "v" opens a vertical dropdown of v1–v4. Click-outside closes it. CSS hides each variant at the appropriate breakpoint.
+
+## 2026-05-30 — DUMP 718: narrow-screen header fix — logo centered, PARTY/LO visible
+
+- **718**: At ≤640px, hide `.version-switcher`, `.text-ribbon-header__status`, and `.version-status-sep` so the left `1fr` column stays narrow. Logo stays centered in its grid column; PARTY/LO/⚡ remain visible in the right column.
+
+## 2026-05-30 — DUMP 716-717: button groups float to top, [i] popup anchored to button
+
+- **716**: Left/right header button groups (`__left`, `__right`) now `position: absolute; top: 6px` within the already-absolute header — they float at the very top of the viewport while the logo stays in its natural grid-center position. Logo untouched.
+- **717**: Wrapped `[i]` button and info overlay in `.v4-info-anchor` (`position: relative; display: inline-flex`). Overlay now positions `top: calc(100% + 4px); left: 0` relative to the `[i]` button itself, not the full header.
+
+## 2026-05-29 — DUMP 712: header position:absolute, eliminate top gap + IAM fix for dev deploy
+
+- **712**: `text-ribbon-header` was a flex child taking 40px. Added `position: absolute; top: 0; left: 0; right: 0; z-index: 10; height: auto` to `.v4-app .text-ribbon-header` — pulls it out of flex flow so `text-ribbon-main` fills 100vh. Buttons float over the animated bg. Logo unchanged.
+- **IAM**: Added `ribbon.obfusco.us` + `ribbon-dev.obfusco.us` S3 buckets and CloudFront distributions `E1JO9PQKZGMYPQ` + `E3PCRBQ7HG3ZHJ` to `moomaw-deploy` IAM policy. Set `DEV_CLOUDFRONT_DISTRIBUTION_ID=E3PCRBQ7HG3ZHJ` GitHub secret. Re-ran failed deploy.
+
+## 2026-05-29 — DUMP 710-711: [i] info button + fix dev deploy (s3 sync → s3 cp)
+
+- **710**: Added `[i]` button to v4 header. Vite now injects `__BUILD_COMMIT__` (short git hash) at build time via `define`. Clicking `[i]` toggles a small overlay showing version, commit hash, and branch name.
+- **711**: Dev deploy was failing with `AccessDenied: s3:ListBucket` — `aws s3 sync` always lists the bucket to compare files, requiring ListBucket permission which the IAM user lost. Fixed by switching to `aws s3 cp --recursive` (no listing needed). Without `--delete`, existing versioned subpaths (`/v1/`, `/v2/`, `/v3/`) are preserved on S3.
+
+## 2026-05-29 — v4 DUMP 706-709: transparent header, unified controls, orbital orbs, chaotic lightning
+
+- **706**: Reverted logo size constraint (removed `height: 32px` rule). Made v4 header fully transparent — no background, no border, no shadow — so the animated bg grid/spheres show through and logo/buttons float over it.
+- **707**: Lo mode now uses the same compact party controls bar instead of the old verbose AsciiControls panel. Both modes render identical control layout. Removed `AsciiControls` and `Controls` from V4App imports.
+- **708**: Rewrote `AsciiOrbs` — all 3 spheres now share a single canvas and orbit a common center via Lissajous-style paths. Different orbital speeds/phases cause them to drift into and through each other continuously.
+- **709**: Enhanced `StaticArcsOverlay` — spread jitter doubled (18→36), bolt length up to 260px (was 160px), segments increased (6–11, was 4–8), multiple independent origin points per frame (2–3). Bolts now span the full sphere cluster area with more chaotic branching paths.
+
+## 2026-05-27 — Constrain RibbonLogo to header bounds
+
+- Root cause: `.ribbon-logo { width: 280px; height: auto }` with viewBox 162×72 renders at 124px tall — 3× the 40px header height. Logo overflowed downward into the sphere area while QR/status/toggle items were properly contained.
+- Fix: `.text-ribbon-header .ribbon-logo { height: 32px; width: auto }` scales logo to fit within the header.
+
+## 2026-05-27 — Fix dark gap between ribbon and controls (DUMP 704-705)
+
+- Root cause: base `TextRibbonApp.css` sets `.text-ribbon-strip { height: clamp(140px, 28vh, 240px) }`. Party mode override only set `flex: 0 0 auto` (which respects the explicit height property). So the strip was 140–240px tall while the ribbon track inside is only 100px, leaving a 40–140px dark gap.
+- Fix: add `height: auto` to `.v4-mode--party .text-ribbon-strip` to override the base clamp. Strip now shrinks to exactly the ribbon track height (~100–130px).
+- Both the "band at top" and "gap between ribbon and controls" were the same dark empty strip space.
+
+## 2026-05-27 — Fix gap at top of screen (DUMP 703)
+
+- Root cause: setting strip to `clamp(100px,18vh,160px)` made it 60px taller, shrinking the orbs section, which pushed the Three.js sphere down leaving dark space at top.
+- Fix: revert strip to `flex:0 0 auto` (auto height from ribbon content ~100px). Orbs gets its full flex:1 space back.
+- For ≤769px: increase ribbon__track to 130px (instead of 64px) — fills visual space without affecting orbs.
+
+## 2026-05-27 — Ribbon visible again, empty strip fixed (DUMP 701-702)
+
+- Root cause: `height: 100%` on `.ribbon__track` resolved to `.ribbon` (no height), not the strip — creating a circular dependency that collapsed to 0.
+- Fix: chain `height: 100%` on both `.ribbon` AND `.ribbon__track` in party mode so the explicit `height: clamp(100px, 18vh, 160px)` on the strip propagates all the way down.
+- Removed lingering `height: auto !important` that was overriding strip's explicit height.
+- "Empty bar" between orbs and ribbon was the collapsed ribbon track — same fix.
+
+## 2026-05-27 — Ribbon fills gap ≤769px, value label decimal cap (DUMP 699-700)
+
+- Party mode ≤769px: ribbon strip now `flex: 1 !important` so it expands to fill the gap between orbs and controls.
+- DualKnob detune label: display capped to 2 decimal places (`toFixed(2)`).
+- Shake source: `detune` rounded to integer, `mix` rounded to 2dp — prevents long floats accumulating in state.
+
+## 2026-05-27 — Touch-to-play fix, VCF label above buttons, VCF mobile wrap (DUMP 696-698)
+
+- Touch-to-play prompt: changed from `bottom: 10px` to `top: 50%; transform: translate(-50%, -50%)` so it centers vertically in the ribbon strip at all sizes.
+- VCF routing: wrapped `VCF` label + 1/2/3 buttons in `.v4-vcf-group` (column flex) so label sits above buttons instead of inline.
+- Mobile <600px: `.v4-vcf-group { flex-basis: 100% }` forces VCF section to wrap as a complete unit onto its own line.
+
+## 2026-05-26 — Unified DualKnob style across all party mode knobs (DUMP 692)
+
+- Added `mode='single'` prop to DualKnob: hides inner notch, DET label, and zone separator ring; outer ring style identical to dual-mode knobs.
+- Converted all 6 BipolarKnob/AsciiKnob controls in party mode to DualKnob(mode="single"): TEMPO (#ffcc44), ž (#cc55ff), VOL (#44ffcc), SPACE (#44aaff), TONE (#ff6633), CUT (#00eedd), RES (#ff44cc).
+- Each knob in the party bar now shares the same thick-ring visual language with OSC DualKnobs, differentiated only by color.
+
+## 2026-05-26 — DualKnob arc 7→5, mobile responsive, CUT/RES knobs, consolidated bar (DUMP 686-691)
+
+- DualKnob arc: switched from `rotate(-90deg) + negative strokeDashoffset` to `rotate(135deg) + no offset`. SVG circles start at 3 o'clock; 135° clockwise = 7:30. Arc now fills 7:30→4:30 unambiguously.
+- DualKnob mobile: SVG now `width="100%" height="100%"` — scales with container. Inner circle changed from `--inner-size` var to `55%` width/height so it scales correctly on mobile.
+- DualKnob drag: replaced `startY - clientY` with `movementY` incremental approach (fixes drag at screen edge).
+- VCF knobs (686): added CUT and RES AsciiKnobs to party mode.
+- Single bar (687): removed separate FX row; SPACE, TONE, CUT, RES, VCF→[1][2][3] now inline with OSCs in the same wrapping bar.
+- Header cleanup (688): removed redundant `v4-header` class (base CSS already sets `gap: 8px` on `__right`); removed its orphaned CSS rule.
+
+## 2026-05-26 — DualKnob arc fix, movementY drag, label stability, space/tone/VCF (DUMP 682-685)
+
+- DualKnob mix arc: `startOffset` was `(135/360)*C` placing arc at ~4:30 o'clock (reversed). Fixed to `(225/360)*C` so arc fills 7:30→4:30 clockwise (0%→100%).
+- Drag at screen edge: replaced `startY - clientY` absolute delta with `movementY` incremental approach in all knob drag handlers (BipolarKnob and AsciiKnob in V4App.jsx and AsciiControls.jsx). Works at any screen position.
+- Label layout shifts: added `min-width: 3.5ch; tabular-nums` to DualKnob labels; `min-width: 5ch; white-space: nowrap; tabular-nums` to BipolarKnob labels.
+- Space/tone/VCF visible in party mode: added FX row to party controls with SPACE and TONE BipolarKnobs and VCF routing buttons (1/2/3). Lo mode: added `height: auto` override for `.ascii-controls` so VCF/space/tone panel in AsciiControls renders correctly.
+
+## 2026-05-26 — v4 party controls inline, sphere persistence fix, DualKnob both rings (DUMP 679-681)
+
+- OSC section moved inline in the party bar (to the right of octave buttons on desktop, wraps on mobile).
+- Spheres disappear fix: always keep `.v4-party-vis` div in DOM; use `display:none` in lo mode. The Three.js canvas was being removed from DOM on mode switch because the div was conditionally rendered.
+- DualKnob both-dials fix: `innerSize = size * INNER_RATIO * 2` was a bug — inner circle was 57px in a 52px container, hiding the outer mix ring. Fixed to `size * INNER_RATIO` (28.6px) so both outer arc and inner notch are visible.
+
+## 2026-05-25 — v4 layout condensed, lo mode fixed (DUMP 673-675)
+
+- Replaced full v2 `<Controls>` in party mode with compact inline bar: Mono/Arp, Hold, Stop, TEMPO knob, ž knob, BPM knob, VOL knob, octave buttons, V4OscSection.
+- Party mode controls now take ~160px instead of 350px+, giving spheres the space they need.
+- Lo mode strip: added `margin-top: 0; height: auto` override to clear the base negative-margin overlap effect. Strip now `flex: 1` as intended.
+- Lo mode controls: added `max-height: 44vh; overflow-y: auto` so AsciiControls scrolls without crowding the ribbon.
+
+## 2026-05-25 — v4 party layout fixes: top band, touch prompt, version switcher, controls cutoff (DUMP 669-672)
+
+- Fixed unused dark band at top: orbs section now `height: auto; display: flex` in party mode so Three.js canvas fills without height constraint fighting `flex: 1`. Background set to transparent (was `rgba(4,6,14,0.6)`).
+- Fixed 2 "touch to play" prompts: hidden `.ribbon__label` in party mode via CSS (V4App has its own inactivity prompt).
+- Fixed duplicate VersionSwitcher: hidden `.controls__version-switcher` inside Controls component for all v4 (header already has one).
+- Fixed waveform controls cutoff: increased party mode controls `max-height` from 38vh → 52vh with `overflow-y: auto`.
+- Committed screenshot to repo root.
+
+## 2026-05-23 — v4 party layout, dynamic lightning, wavy staff (DUMP 662-665)
+
+- Layout fix: party mode controls capped at 38vh (`flex: 0 0 auto; max-height: 38vh`) so spheres + ribbon dominate above.
+- Removed dark background + negative margin-top from `.text-ribbon-strip` in party mode — that was the "black space under ribbon".
+- Dynamic lightning: `StaticArcsOverlay` now uses React state + RAF to regenerate random zigzag polyline paths every 40–120ms from a sphere-center zone. Arcs radiate outward in 5 directions, crackle like static electricity.
+- FloatingStaff sinusoidal wave: each staff strip now has `waveAmp/waveFreq/waveSpeed/wavePhase` params; lines drawn as sine curves, notes and barlines ride the wave.
+
+## 2026-05-23 — v4 party mode: v2 Ribbon strip, sphere zigzag fix (DUMP 658-661)
+
+- Party mode now renders `Ribbon` (v2 horizontal strip) instead of invisible `AsciiRibbon` canvas.
+- OSC controls: `Controls` component (party mode) has `OscSection` with rotary knobs + wave buttons.
+- VCF controls: `Controls` renders `VCFControl` with cutoff/resonance/routing.
+- Fixed sphere vertex explosion/zigzag: waveform morphing loop was reading already-displaced `arr` instead of `basePositions`, compounding displacement every frame. Merged reverb + waveform into single pass always reading from base. Reduced `morphAmt` scale 0.45→0.22.
+
+## 2026-05-23 — v4 party mode uses v2 Controls component (rotary knobs, Rock&Rule console)
+
+- Party mode now renders `Controls` (v2-style: rotary knobs, brushed-metal industrial console, DJFader, VCF panel) instead of `AsciiControls`.
+- Lo mode unchanged: AsciiControls + DualKnob osc section.
+- Party mode `v4-controls-overlay` trimmed to only TEMPO + ž (v4-unique); Mono/Arp, Vol, BPM handled by `Controls`.
+- `Controls` now accepts `currentVersion` prop (default 2) for `VersionSwitcher`.
+- `Controls.css` imported in V4App for party mode styling.
+
+## 2026-05-23 — v4 party/lo mode fix, dev/vX branch deploy pattern, VersionSwitcher v3 link (DUMP 655-657)
+
+- Fixed VersionSwitcher: v3 now always links to `/v3/` (was `/`), which broke on ribbon-dev where root = v4.
+- Party mode redesigned to v2 aesthetic: uses `RibbonLogo` (SVG), opaque dark console (`rgba(10,12,22,0.92)`), `FloatingStaff` only in party. Lo mode keeps transparent ASCII terminal style + `AsciiLogo`.
+- Created `dev/v1`, `dev/v2`, `dev/v3` branches (cut from prod branches, updated deploy.yml) — each deploys to its ribbon-dev subpath via per-branch CI. `dev/v4` also deploys to dev root with `VITE_DEFAULT_VERSION=4`.
+- `deploy.yml`: per-branch pattern — each `dev/vX` push builds only `--base /vX/` and deploys to its own subpath; only `dev/v4` (latest) also deploys to ribbon-dev root.
+- VersionSwitcher propagated with v4 button to all dev branches.
+
+## 2026-05-23 — v4 foundation: dual-mode app, DualKnobs, static-arc spheres, waveform morphing (DUMP 635-654)
+
+- Created `V4App.jsx` + `V4App.css`: dual party/lo mode synthesizer branching from v3.
+- Party mode: v2-style Three.js sphere visualizer, zoomed out 4×ZOOM_STEP by default, with SVG static-electricity arc overlay.
+- Lo mode: v3 ASCII ribbon + orbs (same as TextRibbonApp).
+- Copied `DualKnob` from puddle — osc mix (outer ring) + detune (inner circle) in one component. V4OscSection renders 3 DualKnobs with wave symbol buttons, replacing AsciiControls' osc section.
+- Mono/Arp toggle: replaces play/arp + mono/poly — ARP always implies poly.
+- TEMPO BipolarKnob: drives BPM (40–280) and glideSpeed (0.005–0.08) from one control.
+- ž BipolarKnob: FLUTTER (left) = delay LFO at ~8hz, PHASE (right) = reverb tail scale.
+- Default osc2 mix=0.33, osc3 mix=0.66; initial reverbMix=0.7, delay distorted for immediate sphere drama.
+- Controls panel has `background: transparent` — no console chrome.
+- Touch-to-play prompt fades back in after 37s of inactivity via `setTimeout`.
+- QR text: `drawWarpedText` upgraded to dual-wave ribbon path with tangent-driven character angle, breathe-scale, stronger amplitude — more ribbon-twisted aesthetic.
+- `use3DVisualizer`: added `oscParams` parameter; waveform morphing displaces sphere vertices based on waveform function and mix level (sine/square/sawtooth/triangle shapes).
+- `deploy.yml`: `dev/**` branches now trigger dev deploy; dev job builds all /v1 /v2 /v3 /v4 subpaths and deploys to ribbon-dev.obfusco.us for version-switcher testing.
+- VersionSwitcher: added v4 button.
+- main.jsx: routes `/v4/` → V4App, else v3/v1/v2 as before.
+
+## 2026-04-20 — v3 promoted to ribbon.obfusco.us root (DUMP 629-631)
+
+- v3 branch deploy.yml: now builds twice — once with base `/` for root, once with base `/v3/` for /v3/. Root sync uses `--exclude "v*/*"` to preserve /v1, /v2, /v3 paths.
+- main branch workflow updated: v3→root+/v3, v2→/v2 only (was v2→root).
+- v1 and v2 remain intact at their respective paths.
+
+## 2026-04-20 — iridescent colored ascii QR (DUMP 622)
+
+- ASCII QR block chars (▀ ▄ █) now colored with the same spiral iridescent gradient as the canvas version. Each character gets an inline `color:rgb(...)` span via `dangerouslySetInnerHTML`. Background is transparent (spaces unspanned). Removed static green CSS color.
+
+## 2026-04-20 — fix ascii QR rendering SVG instead of block chars (DUMP 621)
+
+- `QRCode.toString(..., {type:'utf8'})` falls back to SVG in the browser bundle. Replaced with `QRCode.create()` + manual half-block rendering (▀ ▄ █) — produces a proper scannable ASCII QR.
+
+## 2026-04-17 — ascii QR code for v3/ascii mode (DUMP 620)
+
+- Added `asciiMode` prop to `PresetQR`. When true uses `QRCode.toString()` with `type:'utf8'` and renders a styled green-on-black `<pre>` instead of the iridescent canvas QR. `TextRibbonApp` passes `asciiMode` unconditionally.
+
+## 2026-04-17 — merge nmj/engine-sync into v3: audness engine + iOS audio unlock (DUMP 618-619)
+
+- Fast-forwarded `v3` branch from `nmj/engine-sync` (2 commits ahead). Changes include audness engine lineage docs and iOS audio unlock + latencyHint improvements from puddle.
+
+## 2026-04-15 — shake randomizes space/tone/waveform/scale/vcf; sync branches (DUMP 611-612)
+
+- **611**: Fast-forwarded `nmj/ascii` to match `v3` (was 1 CI commit behind). Branches now identical.
+- **612**: Lifted `space`/`tone` baked-knob state from `AsciiControls` to `TextRibbonApp` so `handleShake` can drive them. Shake now randomizes: osc waveforms (all 3), space knob (reverb/delay), tone knob (crunch/vcf), scale (random pick), and vcf routing (random per-osc on/off).
+
 ## 2026-04-15 — branch-per-version CI architecture (DUMP 604-609)
 
 - Created `v1`, `v2`, `v3` branches (from v1-picker, v2-picker, nmj/ascii respectively).

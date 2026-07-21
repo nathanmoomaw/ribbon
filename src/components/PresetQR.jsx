@@ -23,6 +23,18 @@ const GRADIENT_STOPS = [
   { offset: 1, color: [180, 40, 255] },      // back to violet
 ]
 
+// Lo/ASCII mode gradient — terminal lime green lean with meyer lemon, white, orange, light pink
+const ASCII_GRADIENT_STOPS = [
+  { offset: 0,    color: [57, 255, 20] },    // terminal lime green
+  { offset: 0.18, color: [255, 247, 100] },  // meyer lemon
+  { offset: 0.34, color: [255, 255, 255] },  // white
+  { offset: 0.5,  color: [57, 255, 20] },    // lime green again
+  { offset: 0.65, color: [255, 160, 60] },   // orange
+  { offset: 0.78, color: [255, 180, 200] },  // light pink
+  { offset: 0.9,  color: [57, 255, 20] },    // back to lime
+  { offset: 1,    color: [200, 255, 80] },   // yellow-green
+]
+
 function lerpColor(stops, t) {
   t = Math.max(0, Math.min(1, t))
   for (let i = 0; i < stops.length - 1; i++) {
@@ -51,7 +63,7 @@ function hashString(str) {
 }
 
 // Draw organic spill drips extending beyond QR boundary
-function drawSpillEdges(ctx, w, h, rng) {
+function drawSpillEdges(ctx, w, h, rng, palette = GRADIENT_STOPS) {
   const spillCount = 8 + Math.floor(rng() * 6)
   for (let i = 0; i < spillCount; i++) {
     const side = Math.floor(rng() * 4) // 0=top, 1=right, 2=bottom, 3=left
@@ -76,7 +88,7 @@ function drawSpillEdges(ctx, w, h, rng) {
     cp2y = sy + (ey - sy) * 0.7 + (rng() - 0.5) * spillWidth * 0.5
 
     const gradT = (sx + sy) / (w + h)
-    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT)
+    const [r, g, b] = lerpColor(palette, gradT)
 
     ctx.beginPath()
     ctx.moveTo(sx, sy)
@@ -93,55 +105,71 @@ function drawSpillEdges(ctx, w, h, rng) {
   }
 }
 
-// Draw subtle watermark text — iridescent chars woven into the QR grain, not competing with it
-function drawWarpedText(ctx, text, cx, cy, size, rng) {
-  const fontSize = Math.min(24, Math.max(12, Math.floor(size / (text.length * 0.65))))
+// Draw ribbon-twisted watermark text — chars warp along a Möbius-strip sine path
+function drawWarpedText(ctx, text, cx, cy, size, rng, palette = GRADIENT_STOPS) {
+  const fontSize = Math.min(26, Math.max(13, Math.floor(size / (text.length * 0.6))))
   const chars = text.split('')
 
   ctx.font = `bold ${fontSize}px monospace`
-  const charWidths = chars.map(c => ctx.measureText(c).width * (0.95 + rng() * 0.2))
+  const charWidths = chars.map(c => ctx.measureText(c).width * (0.9 + rng() * 0.25))
   const totalW = charWidths.reduce((a, b) => a + b, 0) + chars.length * 2
-  const bandH = fontSize + 14
+  const bandH = fontSize + 20
 
-  // Gentle wave — present but not jarring
-  const waveAmp = 2 + rng() * 4
-  const waveFreq = 0.7 + rng() * 0.8
-  const wavePhase = rng() * Math.PI * 2
+  // Dual-wave ribbon path: primary + secondary wave creates Möbius-like twist
+  const waveAmp1 = 6 + rng() * 8     // primary ribbon wave
+  const waveFreq1 = 0.8 + rng() * 0.7
+  const wavePhase1 = rng() * Math.PI * 2
+  const waveAmp2 = 3 + rng() * 4     // secondary twist
+  const waveFreq2 = 1.6 + rng() * 1.2
+  const wavePhase2 = rng() * Math.PI * 2
 
-  // Very faint dark veil behind text (just enough to separate from QR dots)
-  const rx = cx - totalW / 2 - 8
+  // Semi-transparent veil follows ribbon wave
+  const rx = cx - totalW / 2 - 10
   const ry = cy - bandH / 2
-  const bw = totalW + 16
+  const bw = totalW + 20
   const bh = bandH
-  ctx.fillStyle = 'rgba(6, 6, 18, 0.38)'
+  const steps = 10
+  ctx.fillStyle = 'rgba(6, 6, 18, 0.42)'
   ctx.beginPath()
-  ctx.moveTo(rx + 4, ry + (rng() - 0.5) * 3)
-  for (let sx = bw / 5; sx <= bw; sx += bw / 5) {
-    ctx.lineTo(rx + sx, ry + (rng() - 0.5) * 4)
+  ctx.moveTo(rx, ry + (rng() - 0.5) * 5)
+  for (let s = 0; s <= steps; s++) {
+    const t = s / steps
+    const wx = rx + t * bw
+    const wy = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 * 0.5)
+    ctx.lineTo(wx, ry + wy + (rng() - 0.5) * 3)
   }
-  ctx.lineTo(rx + bw, ry + bh + (rng() - 0.5) * 3)
-  for (let sx = bw; sx >= 0; sx -= bw / 5) {
-    ctx.lineTo(rx + sx, ry + bh + (rng() - 0.5) * 4)
+  for (let s = steps; s >= 0; s--) {
+    const t = s / steps
+    const wx = rx + t * bw
+    const wy = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 * 0.5)
+    ctx.lineTo(wx, ry + bh + wy + (rng() - 0.5) * 3)
   }
   ctx.closePath()
   ctx.fill()
 
-  // Draw each character — subtle warp, iridescent color, low opacity
+  // Draw each character — ribbon-twisted warp
   let xPos = cx - totalW / 2
   for (let i = 0; i < chars.length; i++) {
     const charW = charWidths[i]
     const charCenterX = xPos + charW / 2
+    const t = (charCenterX - cx + totalW / 2) / Math.max(totalW, 1)
 
-    const waveY = Math.sin(wavePhase + (charCenterX - cx) / size * Math.PI * 2 * waveFreq) * waveAmp
+    const wave1 = Math.sin(wavePhase1 + t * Math.PI * 2 * waveFreq1) * waveAmp1
+    const wave2 = Math.sin(wavePhase2 + t * Math.PI * 2 * waveFreq2) * waveAmp2
+    const yOff = wave1 + wave2 + (rng() - 0.5) * 4
 
-    const angle = (rng() - 0.5) * 0.22       // ±~12° — legible but not flat
-    const scaleX = 0.88 + rng() * 0.28        // 0.88–1.16
-    const scaleY = 0.88 + rng() * 0.24        // 0.88–1.12
-    const yOff = (rng() - 0.5) * 5 + waveY
-    const skewX = (rng() - 0.5) * 0.18
+    // Angle follows the ribbon tangent (derivative of wave) for authentic twist
+    const tangent = Math.cos(wavePhase1 + t * Math.PI * 2 * waveFreq1) * (waveAmp1 / totalW) * Math.PI * 2 * waveFreq1
+    const angle = tangent * 0.6 + (rng() - 0.5) * 0.35   // ribbon tilt + per-char jitter
 
-    const gradT = ((charCenterX - cx + size) / (size * 2) + rng() * 0.1) % 1
-    const [r, g, b] = lerpColor(GRADIENT_STOPS, gradT)
+    // Scale breathes with wave position — chars near crest stretch, trough compress
+    const breathe = 1 + Math.sin(wavePhase2 + t * Math.PI * 4) * 0.18
+    const scaleX = (0.82 + rng() * 0.36) * breathe
+    const scaleY = (0.78 + rng() * 0.3) / breathe
+    const skewX = (rng() - 0.5) * 0.32 + tangent * 0.3
+
+    const gradT = (t + rng() * 0.12) % 1
+    const [r, g, b] = lerpColor(palette, gradT)
 
     ctx.save()
     ctx.translate(charCenterX, cy + yOff)
@@ -151,10 +179,9 @@ function drawWarpedText(ctx, text, cx, cy, size, rng) {
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
-    // Soft glow pass (behind fill)
-    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`
-    ctx.shadowBlur = 3 + rng() * 4
-    ctx.globalAlpha = 0.55 + rng() * 0.2
+    ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.65)`
+    ctx.shadowBlur = 4 + rng() * 6
+    ctx.globalAlpha = 0.6 + rng() * 0.25
     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`
     ctx.fillText(chars[i], 0, 0)
     ctx.shadowBlur = 0
@@ -168,7 +195,8 @@ function drawWarpedText(ctx, text, cx, cy, size, rng) {
 
 // styleSeed: 0–1, rotates/varies the gradient and spill shapes
 // puddleState: { marbles: [{x,y}], activity: 0|1 } — influences gradient from current puddle
-export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}) {
+// palette: gradient stops array — defaults to oil-spill, pass ASCII_GRADIENT_STOPS for citrus
+export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}, palette = GRADIENT_STOPS) {
   const qrSize = 280
   const spill = 24 // extra space for spill effects
   const size = qrSize + spill * 2
@@ -212,7 +240,7 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
     // Draw spill edges first (behind QR)
     ctx.save()
     ctx.translate(spill, spill)
-    drawSpillEdges(ctx, qrSize, qrSize, rng)
+    drawSpillEdges(ctx, qrSize, qrSize, rng, palette)
     ctx.restore()
 
     // Draw the QR onto main canvas with offset
@@ -233,7 +261,7 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
           const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
           const dist = Math.sqrt(cx * cx + cy * cy) * 2
           const t = (angle * (1 - spiralFactor) + dist * spiralFactor + (x + y) / (qrSize * 3) + gradOffset) % 1
-          const [r, g, b] = lerpColor(GRADIENT_STOPS, t)
+          const [r, g, b] = lerpColor(palette, t)
           data[idx] = r
           data[idx + 1] = g
           data[idx + 2] = b
@@ -243,13 +271,16 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
     }
     ctx.putImageData(imageData, spill, spill)
 
-    // Add subtle iridescent glow around QR edges (boosted when puddle is active)
+    // Add subtle glow around QR edges (boosted when puddle is active)
+    const [gc0r, gc0g, gc0b] = lerpColor(palette, 0)
+    const [gc1r, gc1g, gc1b] = lerpColor(palette, 0.35)
+    const [gc2r, gc2g, gc2b] = lerpColor(palette, 0.7)
     ctx.save()
     ctx.translate(spill, spill)
     const glowGrad = ctx.createRadialGradient(qrSize / 2, qrSize / 2, qrSize * 0.3, qrSize / 2, qrSize / 2, qrSize * 0.6)
-    glowGrad.addColorStop(0, 'rgba(180, 40, 255, 0)')
-    glowGrad.addColorStop(0.7, `rgba(0, 200, 255, ${0.04 + glowBoost})`)
-    glowGrad.addColorStop(1, `rgba(255, 60, 180, ${0.08 + glowBoost})`)
+    glowGrad.addColorStop(0, `rgba(${gc0r}, ${gc0g}, ${gc0b}, 0)`)
+    glowGrad.addColorStop(0.7, `rgba(${gc1r}, ${gc1g}, ${gc1b}, ${0.04 + glowBoost})`)
+    glowGrad.addColorStop(1, `rgba(${gc2r}, ${gc2g}, ${gc2b}, ${0.08 + glowBoost})`)
     ctx.globalCompositeOperation = 'screen'
     ctx.fillStyle = glowGrad
     ctx.fillRect(-spill, -spill, size, size)
@@ -260,7 +291,7 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
     ctx.save()
     ctx.translate(spill, spill)
     ctx.globalAlpha = 0.4
-    drawSpillEdges(ctx, qrSize, qrSize, rng)
+    drawSpillEdges(ctx, qrSize, qrSize, rng, palette)
     ctx.globalAlpha = 1
     ctx.restore()
 
@@ -268,17 +299,18 @@ export function drawColoredQR(canvas, url, name, styleSeed = 0, puddleState = {}
     if (name) {
       const trimmed = name.trim()
       if (trimmed) {
-        drawWarpedText(ctx, trimmed, size / 2, size / 2, qrSize, rng)
+        drawWarpedText(ctx, trimmed, size / 2, size / 2, qrSize, rng, palette)
       }
     }
   })
 }
 
-export function PresetQR({ settings, initialName, onClose, onMilestone }) {
+export function PresetQR({ settings, initialName, onClose, onMilestone, asciiMode = false, citrusPalette = false }) {
   const canvasRef = useRef(null)
   const [name, setName] = useState(initialName || '')
   const [copied, setCopied] = useState(false)
   const [mintStep, setMintStep] = useState('idle') // 'idle'|'pinning'|'confirm'|'done'
+  const [asciiQR, setAsciiQR] = useState('')
   // Style seed persists across modal open/close (module-level persistedStyleSeed)
   const [qrStyleSeed, setQrStyleSeed] = useState(() => persistedStyleSeed)
 
@@ -309,13 +341,49 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
 
   // Redraw QR when URL, name, or style seed changes
   useEffect(() => {
-    if (canvasRef.current && url) {
+    if (!url) return
+    if (asciiMode) {
+      try {
+        const qr = QRCode.create(url, { errorCorrectionLevel: 'M' })
+        const { size, data } = qr.modules
+        const margin = 1
+        const totalCols = size + margin * 2
+        const totalRows = Math.ceil((size + margin * 2) / 2)
+        const htmlLines = []
+        for (let lineIdx = 0; lineIdx < totalRows; lineIdx++) {
+          const row = lineIdx * 2 - margin
+          let line = ''
+          for (let colIdx = 0; colIdx < totalCols; colIdx++) {
+            const col = colIdx - margin
+            const top = row >= 0 && row < size && col >= 0 && col < size ? data[row * size + col] : false
+            const bot = (row + 1) >= 0 && (row + 1) < size && col >= 0 && col < size ? data[(row + 1) * size + col] : false
+            const ch = top && bot ? '█' : top ? '▀' : bot ? '▄' : ' '
+            if (ch === ' ') {
+              line += ' '
+            } else {
+              // Lo-mode terminal gradient — lime green lean with lemon/white/orange/pink
+              const cx = colIdx / totalCols - 0.5
+              const cy = lineIdx / totalRows - 0.5
+              const angle = Math.atan2(cy, cx) / (Math.PI * 2) + 0.5
+              const dist = Math.sqrt(cx * cx + cy * cy) * 2
+              const t = (angle * 0.4 + dist * 0.6 + (colIdx + lineIdx) / (totalCols + totalRows) * 0.3 + qrStyleSeed) % 1
+              const [r, g, b] = lerpColor(ASCII_GRADIENT_STOPS, t)
+              line += `<span style="color:rgb(${r},${g},${b})">${ch}</span>`
+            }
+          }
+          htmlLines.push(line)
+        }
+        setAsciiQR(htmlLines.join('\n'))
+      } catch (e) {
+        setAsciiQR('')
+      }
+    } else if (canvasRef.current) {
       drawColoredQR(canvasRef.current, url, name, qrStyleSeed, {
         marbles: settings.marbles,
         activity: settings.puddleActivity,
-      })
+      }, citrusPalette ? ASCII_GRADIENT_STOPS : GRADIENT_STOPS)
     }
-  }, [url, name, qrStyleSeed, settings.marbles, settings.puddleActivity])
+  }, [url, name, qrStyleSeed, settings.marbles, settings.puddleActivity, asciiMode, citrusPalette])
 
   const handleDownload = useCallback(() => {
     const canvas = canvasRef.current
@@ -419,7 +487,10 @@ export function PresetQR({ settings, initialName, onClose, onMilestone }) {
         <button className="preset-qr-modal__close" onClick={onClose} aria-label="Close">&times;</button>
         <button className="preset-qr-modal__shake" onClick={handleQRShake} aria-label="Randomize QR style">⚡</button>
 
-        <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
+        {asciiMode
+          ? <pre className="preset-qr-modal__ascii" dangerouslySetInnerHTML={{ __html: asciiQR }} />
+          : <canvas ref={canvasRef} className="preset-qr-modal__canvas" />
+        }
 
         <input
           className="preset-qr-modal__name"

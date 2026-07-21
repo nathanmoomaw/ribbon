@@ -1,0 +1,545 @@
+/* Ribbon v4 — styles
+   Party mode: v2-style opaque console, RibbonLogo, FloatingStaff
+   Lo mode: transparent ASCII console, AsciiLogo                     */
+
+/* ── v4 citrus palette — override global --cyan with lime green ── */
+.v4-app {
+  --cyan: #39FF14;
+  --glow-cyan: 0 0 8px #39FF14, 0 0 20px rgba(57,255,20,0.3);
+}
+
+/* v4 ribbon track — citrus gradient (lime, lemon, orange, pink) */
+.v4-app .ribbon__track {
+  background: linear-gradient(
+    90deg,
+    rgba(57, 255, 20, 0.45),
+    rgba(255, 232, 64, 0.45),
+    rgba(255, 144, 48, 0.45),
+    rgba(255, 180, 200, 0.4),
+    rgba(57, 255, 20, 0.35),
+    rgba(255, 232, 64, 0.45),
+    rgba(57, 255, 20, 0.45)
+  );
+}
+
+/* ── v4 header: absolute floating — zero layout height, buttons float over bg ── */
+.v4-app .text-ribbon-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  height: auto;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+/* Logo is fixed 280px wide (RibbonLogo.css) — on narrow phones that alone exceeds
+   the viewport once the QR/version/info and PARTY/LO/shake columns are added,
+   pushing the header__right column off-screen. Scale it down only where needed;
+   clamp's max (280px) keeps desktop/tablet identical to before. */
+.v4-app .ribbon-logo {
+  width: clamp(110px, 38vw, 280px);
+}
+
+/* Lo mode uses AsciiLogo instead — same header-overflow problem, different source:
+   its ribbon text + canvas + tagline flex row has no responsive shrink at all.
+   Scale the ribbon text and canvas down, and drop the decorative tagline on narrow
+   phones (it's just a label, not needed for the header to stay on-screen). */
+.v4-app .ascii-logo {
+  gap: clamp(4px, 2vw, 12px);
+}
+.v4-app .ascii-logo__ribbon {
+  font-size: clamp(11px, 3.4vw, 18px);
+}
+.v4-app .ascii-logo__moebius-canvas {
+  width: clamp(36px, 12vw, 64px);
+  height: clamp(16px, 5.3vw, 28px);
+}
+@media (max-width: 640px) {
+  .v4-app .ascii-logo__tag {
+    display: none;
+  }
+}
+
+/* Button groups float to top of their grid cell — logo stays centered in middle column */
+.v4-app .text-ribbon-header__left,
+.v4-app .text-ribbon-header__right {
+  align-self: start;
+  padding-top: 6px;
+}
+
+/* The PARTY/LO toggle sits right next to the shake bolt at the base 8px gap —
+   easy to mis-tap on mobile (shake has a ~30% chance of also flipping mono→arp),
+   which reads as "switching modes randomly enables arp". Give it more breathing room. */
+.v4-app .text-ribbon-header__right {
+  gap: clamp(10px, 5vw, 18px);
+}
+@media (max-width: 340px) {
+  .v4-app .text-ribbon-header__right {
+    gap: 10px;
+  }
+}
+
+/* ── Lo mode: transparent ASCII console ── */
+.v4-mode--lo .text-ribbon-controls {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+}
+
+.v4-mode--lo .ascii-controls {
+  background: transparent;
+}
+
+.v4-mode--lo .ascii-panel {
+  background: transparent;
+}
+
+/* ── Party mode: controls compact at bottom, spheres + ribbon dominate ── */
+.v4-mode--party .text-ribbon-controls {
+  flex: 0 0 auto;
+  overflow: visible;
+  background: transparent;
+  border-top: 1px solid rgba(57, 255, 20, 0.1);
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Compact party mode control block */
+.v4-party-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px 6px;
+}
+
+.v4-party-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.v4-bar-sep {
+  color: rgba(57, 255, 20, 0.22);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.v4-octave-btns {
+  display: flex;
+  gap: 2px;
+}
+
+/* OSC section inline in party bar — zero vertical padding, tighter gap */
+.v4-party-bar .v4-osc-section {
+  padding: 0;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+/* Strip: no dark background, no negative margin (that's for lo mode overlap) */
+.v4-mode--party .text-ribbon-strip {
+  margin-top: 0 !important;
+  background: transparent !important;
+}
+
+/* Slim overlay strip: only TEMPO + ž in party mode */
+.v4-controls-overlay--slim {
+  justify-content: center;
+  gap: 20px;
+  padding: 6px 10px 4px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.12);
+}
+
+/* Controls always need column flow */
+.v4-controls {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Header: Party/Lo toggle ── */
+.v4-mode-toggle {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-mode-btn {
+  padding: 2px 7px;
+  border: 1px solid #252520;
+  background: #0a0a08;
+  color: #5a5a44;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  line-height: 1.6;
+}
+.v4-mode-btn:hover {
+  background: #121208;
+  color: #aabb44;
+  border-color: #3a3a20;
+}
+.v4-mode-btn--on {
+  background: #141408;
+  color: #39FF14;
+  border-color: #2a8800;
+  box-shadow: 0 0 5px rgba(57,255,20,0.28);
+}
+
+/* ── Party mode 3D visualizer mount ── */
+.v4-party-vis {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* v4-orbs: same layout as text-ribbon-orbs but hosts both party+lo */
+.v4-orbs {
+  position: relative;
+}
+
+/* ── Static electricity arcs overlay ── */
+.v4-static-arcs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.v4-static-arcs__svg {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+}
+
+/* Arc fade: primary lingers, secondary/tertiary tendrils vanish first */
+@keyframes arcFadeOut {
+  0%   { opacity: 1; }
+  40%  { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+.v4-arc-line {
+  animation-name: arcFadeOut;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
+}
+
+/* ── v4 controls overlay: Mono/Arp + TEMPO + ž + BPM/VOL knobs ── */
+.v4-controls-overlay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px 2px;
+  border-bottom: 1px solid rgba(57, 255, 20, 0.15);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* Mono/Arp toggle */
+.v4-mono-arp {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-toggle-btn {
+  padding: 3px 8px;
+  border: 1px solid #252520;
+  background: #0d0d0a;
+  color: #5a5a44;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 1.1vw, 13px);
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  line-height: 1.5;
+  transition: background 0.1s, color 0.1s, border-color 0.1s;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04), inset 0 1px 0 rgba(0,0,0,0.4);
+}
+.v4-toggle-btn:hover {
+  background: #161610;
+  color: #ccee88;
+  border-color: #3a3a28;
+}
+.v4-toggle-btn--on {
+  background: #141408;
+  color: #FFE840;
+  border-color: #886600;
+  box-shadow: 0 0 6px rgba(255,232,64,0.22), inset 0 1px 0 rgba(0,0,0,0.4);
+}
+
+/* Knob group: label above bipolar knob */
+.v4-knob-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.v4-knob-group__label {
+  font-family: 'Courier New', monospace;
+  font-size: clamp(9px, 0.9vw, 11px);
+  color: #7aaa44;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Bipolar knob inside overlay — smaller */
+.v4-bipolar-knob.ascii-bipolar-knob {
+  padding: 2px 4px;
+  border-bottom: none;
+}
+.v4-bipolar-knob .ascii-bipolar-knob__svg {
+  width: 44px;
+  height: 44px;
+}
+.v4-bipolar-knob .ascii-bipolar-knob__label {
+  font-size: clamp(8px, 0.85vw, 10px);
+}
+
+/* AsciiKnob inside overlay */
+.v4-knob.ascii-knob {
+  min-width: 34px;
+}
+
+/* ── "touch to play" inactivity prompt ── */
+.v4-touch-prompt {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'Courier New', monospace;
+  font-size: clamp(10px, 1.4vw, 16px);
+  color: rgba(57, 255, 20, 0.35);
+  letter-spacing: 0.18em;
+  pointer-events: none;
+  animation: prompt-fade-in 1.2s ease forwards;
+  white-space: nowrap;
+  z-index: 6;
+}
+
+@keyframes prompt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Party mode: spheres dominate, ribbon below ── */
+.v4-mode--party .text-ribbon-orbs {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  background: transparent;
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure Three.js mount fills the orbs area completely */
+.v4-mode--party .v4-party-vis {
+  flex: 1;
+  min-height: 0;
+}
+.v4-mode--party .text-ribbon-strip {
+  flex: 0 0 auto;
+  height: auto;
+  background: transparent;
+  border-color: rgba(57, 255, 20, 0.15);
+}
+
+/* Hide ribbon internal touch-to-play label in party mode (v4 has its own prompt) */
+.v4-mode--party .ribbon__label { display: none; }
+
+/* Hide the v2 Controls embedded VersionSwitcher in v4 (header has one) */
+.v4-app .controls__version-switcher { display: none; }
+
+/* ── Lo mode: ribbon is the main canvas ── */
+.v4-mode--lo .text-ribbon-strip {
+  flex: 1;
+  min-height: 0;
+  margin-top: 0;
+  height: auto;
+}
+.v4-mode--lo .text-ribbon-orbs {
+  flex: 0 0 auto;
+}
+.v4-mode--lo .text-ribbon-controls {
+  flex: 0 0 auto;
+  max-height: 44vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Lo mode: ascii-controls height: 100% doesn't resolve when parent is auto — use auto */
+.v4-mode--lo .ascii-controls {
+  height: auto;
+}
+
+/* Prevent BipolarKnob label width changes from shifting layout */
+.ascii-bipolar-knob__label {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  min-width: 5ch;
+  text-align: center;
+}
+
+/* ── CUT/RES + VCF routing: kept as one non-breaking unit so VCF never wraps away from the knobs ── */
+.v4-vcf-cluster {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
+}
+
+.v4-vcf-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.v4-vcf-btns {
+  display: flex;
+  gap: 2px;
+}
+
+
+/* ── ≤769px: taller ribbon track fills visual space ── */
+@media (max-width: 769px) {
+  .v4-mode--party .ribbon__track {
+    height: 130px;
+  }
+}
+
+/* ── Narrow header: hide version switcher + status so logo stays centered ── */
+@media (max-width: 640px) {
+  .v4-app .version-switcher,
+  .v4-app .text-ribbon-header__status,
+  .v4-app .version-status-sep {
+    display: none;
+  }
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 600px) {
+  .v4-controls-overlay {
+    gap: 6px;
+    padding: 3px 6px 2px;
+  }
+  .v4-bipolar-knob .ascii-bipolar-knob__svg {
+    width: 36px;
+    height: 36px;
+  }
+  .v4-mode-btn {
+    font-size: 9px;
+    padding: 2px 5px;
+  }
+
+  /* Octave buttons and OSC section always get their own full-width row —
+     otherwise they unpredictably share a line with whatever preceded them
+     (TEMPO/ž/VOL), squeezing OSC3 off-screen depending on exact viewport width */
+  .v4-octave-btns,
+  .v4-party-bar .v4-osc-section {
+    flex-basis: 100%;
+  }
+}
+
+/* ── DualKnob osc section ── */
+
+/* Hide the AsciiControls osc panel — replaced by V4OscSection */
+.v4-app .ascii-panel--oscs {
+  display: none;
+}
+
+.v4-osc-section {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  padding: 6px 0;
+  flex-wrap: wrap;
+}
+
+.v4-osc-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.v4-osc-panel__label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--osc-color, #39FF14);
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+}
+
+.v4-osc-waves {
+  display: flex;
+  gap: 2px;
+}
+
+.v4-wave-btn {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.35);
+  font-size: 0.75rem;
+  padding: 2px 4px;
+  cursor: pointer;
+  border-radius: 2px;
+  line-height: 1.2;
+  transition: color 0.1s, border-color 0.1s, background 0.1s;
+}
+
+.v4-wave-btn:hover {
+  color: rgba(255,255,255,0.7);
+  border-color: rgba(255,255,255,0.25);
+}
+
+.v4-wave-btn--on {
+  background: color-mix(in srgb, var(--osc-color, var(--cyan)) 15%, transparent);
+  border-color: var(--osc-color, var(--cyan));
+  color: var(--osc-color, var(--cyan));
+  box-shadow: 0 0 4px color-mix(in srgb, var(--osc-color, var(--cyan)) 40%, transparent);
+}
+
+/* ── Build info overlay anchored to [i] button ── */
+.v4-info-anchor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.v4-info-overlay {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  background: rgba(6, 8, 4, 0.95);
+  border: 1px solid rgba(57, 255, 20, 0.3);
+  padding: 6px 10px;
+  z-index: 100;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+}
+
+.v4-info-overlay__line {
+  font-family: 'Courier New', monospace;
+  font-size: 10px;
+  color: #5a8833;
+  letter-spacing: 0.06em;
+  line-height: 1.6;
+}

@@ -26,8 +26,8 @@ const SPHERE_ROTATION_AXES = [
   new THREE.Vector3(1, -0.3, -0.6).normalize(),
 ]
 
-// Colors for each sphere: red, gold, green (console button palette)
-const SPHERE_COLORS = [0xcc3344, 0xccaa22, 0x22aa55]
+// Colors for each sphere: citrus palette — lime green, meyer lemon, orange
+const SPHERE_COLORS = [0x39FF14, 0xFFE840, 0xFF9030]
 
 // Idle drift offsets so spheres aren't perfectly centered on each other
 const SPHERE_IDLE_OFFSETS = [
@@ -43,7 +43,23 @@ export const MIN_ZOOM = 0.5
 export const MAX_ZOOM = 25
 export const ZOOM_STEP = 0.8
 
-export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}) {
+// Waveform displacement: maps azimuthal angle φ to a radial offset
+function waveDisplace(waveform, phi, t) {
+  switch (waveform) {
+    case 'sine':
+      return Math.sin(phi * 2 + t)
+    case 'square':
+      return Math.sign(Math.sin(phi * 2 + t))
+    case 'sawtooth':
+      return (((phi / Math.PI) % 2) - 1)
+    case 'triangle':
+      return (2 / Math.PI) * Math.asin(Math.sin(phi * 2 + t))
+    default:
+      return 0
+  }
+}
+
+export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMode, reverbMix = 0, delayParams = {}, oscParams = null) {
   const stateRef = useRef(null)
   const zoomRef = useRef(DEFAULT_ZOOM)
   const targetZoomRef = useRef(DEFAULT_ZOOM)
@@ -53,6 +69,8 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
   reverbMixRef.current = reverbMix
   const delayRef = useRef(delayParams)
   delayRef.current = delayParams
+  const oscParamsRef = useRef(oscParams)
+  oscParamsRef.current = oscParams
 
   useEffect(() => {
     const mount = mountRef.current
@@ -259,38 +277,54 @@ export function use3DVisualizer(mountRef, getEngine, ribbonInteraction, visualMo
         const scalePulse = 1 + energy * 0.3
         sphere.group.scale.setScalar(scalePulse)
 
-        // Brain-like vertex displacement driven by reverb mix
+        // Vertex displacement: reverb brain-folds + waveform morphing, single pass from base
         const reverb = reverbMixRef.current
-        if (reverb > 0.01) {
+        const osc = oscParamsRef.current?.[i]
+        const displaceAmt = reverb * 0.35
+        const morphAmt = (osc && osc.mix > 0.05) ? osc.mix * 0.22 : 0
+
+        if (displaceAmt > 0.001 || morphAmt > 0.001) {
           const posAttr = sphere.geo.getAttribute('position')
           const arr = posAttr.array
           const base = sphere.basePositions
           const vertCount = posAttr.count
-          // Displacement amount: reverb controls intensity, time adds slow undulation
-          const displaceAmt = reverb * 0.35
-          // Slow time crawl for organic pulsing of the folds
           const t = time * 0.0003 + i * 2.0
+          const tMorph = time * 0.0008 + i * 1.4
 
           for (let v = 0; v < vertCount; v++) {
             const bx = base[v * 3]
             const by = base[v * 3 + 1]
             const bz = base[v * 3 + 2]
 
-            // Normal direction (sphere centered at origin, so normal = normalized position)
             const len = Math.sqrt(bx * bx + by * by + bz * bz)
             if (len === 0) continue
             const nx = bx / len
             const ny = by / len
             const nz = bz / len
 
-            // Noise-based displacement along normal (brain folds)
-            const n = noise3D(bx * 1.2 + t, by * 1.2 + t * 0.7, bz * 1.2 + t * 0.5)
-            const displacement = n * displaceAmt
+            // Reverb: noise-based brain folds along normal
+            const fold = displaceAmt > 0.001
+              ? noise3D(bx * 1.2 + t, by * 1.2 + t * 0.7, bz * 1.2 + t * 0.5) * displaceAmt
+              : 0
 
-            arr[v * 3] = bx + nx * displacement
-            arr[v * 3 + 1] = by + ny * displacement
-            arr[v * 3 + 2] = bz + nz * displacement
+            // Waveform morph: azimuthal displacement toward waveform shape
+            let wave = 0
+            if (morphAmt > 0.001) {
+              const phi = Math.atan2(bz, bx)
+              const elevation = Math.asin(Math.max(-1, Math.min(1, by / len)))
+              wave = waveDisplace(osc.waveform, phi, tMorph) * Math.cos(elevation) * morphAmt
+            }
+
+            const totalD = fold + wave
+            arr[v * 3]     = bx + nx * totalD
+            arr[v * 3 + 1] = by + ny * (totalD * 0.75)
+            arr[v * 3 + 2] = bz + nz * totalD
           }
+          posAttr.needsUpdate = true
+        } else {
+          // No displacement — reset to base positions
+          const posAttr = sphere.geo.getAttribute('position')
+          posAttr.array.set(sphere.basePositions)
           posAttr.needsUpdate = true
         }
 

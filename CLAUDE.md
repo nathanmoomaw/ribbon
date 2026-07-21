@@ -7,6 +7,29 @@ A web-based analog ribbon synthesizer inspired by the Korg Monotribe. Mobile and
 - Web Audio API (oscillators, effects, routing)
 - npm as package manager
 
+## Audness Engine Lineage
+Ribbon v1–v3 are **frozen** — self-contained, no external engine dependency, permanent at their deployed URLs.
+
+**Ribbon v4 and all future major versions** will consume `@audness/core` from the [audness monorepo](https://github.com/nathanmoomaw/audness) as their audio engine. The creative surface, UI, and app-specific features remain in this repo; the synthesis engine is shared.
+
+| Version | Engine source          | Status        |
+|---------|------------------------|---------------|
+| v1      | self-contained         | frozen        |
+| v2      | self-contained         | frozen        |
+| v3      | self-contained         | frozen        |
+| v4 "Citrus Sipper" | self-contained → @audness/core | live (main, root + /v4) |
+| v5+     | `@audness/core`        | future        |
+
+### v4 "Citrus Sipper" (branch: v4, dev branch: dev/v4, ribbon.obfusco.us/ + /v4/)
+- Dual-mode: Party (Three.js spheres + static-electricity arcs) / Lo (ASCII ribbon)
+- DualKnob for osc mix+detune (outer ring = mix, inner circle = detune)
+- Mono/Arp toggle (ARP always implies poly)
+- TEMPO BipolarKnob (BPM + glide), ž BipolarKnob (flutter/phase FX)
+- Sphere waveform morphing: osc mix drives vertex displacement toward waveform shape
+- Transparent controls panel (no background chrome)
+- 37s inactivity touch-to-play prompt
+- QR text: ribbon-twisted dual-wave warp rendering
+
 ## Core Concepts
 
 ### Puddle Surface (v3)

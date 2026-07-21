@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { domscribe } from '@domscribe/react/vite'
 import fs from 'fs'
 import path from 'path'
+import { execSync } from 'child_process'
 
 // Use mkcert certs if available for HTTPS dev server (required for AudioWorklet on mobile)
 function getHttpsConfig() {
@@ -15,9 +16,17 @@ function getHttpsConfig() {
   return undefined
 }
 
+const GIT_COMMIT = (() => {
+  try { return execSync('git rev-parse --short HEAD').toString().trim() }
+  catch { return 'dev' }
+})()
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), domscribe()],
+  define: {
+    __BUILD_COMMIT__: JSON.stringify(GIT_COMMIT),
+  },
   server: {
     host: true,
     https: getHttpsConfig(),

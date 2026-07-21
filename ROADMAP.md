@@ -1,6 +1,6 @@
 # Roadmap
 
-## v4 — In Progress (branch: dev/v4, deploys to ribbon-dev.obfusco.us/v4/)
+## v4 "Citrus Sipper" ✓ LIVE at ribbon.obfusco.us (root + /v4) (branch: v4, dev branch: dev/v4)
 > Dual-mode: Party (v2-style 3D spheres + static electricity) and Lo (v3 ASCII ribbon).
 - [x] V4App foundation: party/lo mode toggle
 - [x] DualKnob osc controls (mix outer ring, detune inner circle)
@@ -12,9 +12,9 @@
 - [x] Transparent controls panel
 - [x] Touch-to-play 37s inactivity prompt
 - [x] QR text: ribbon-twisted dual-wave warp
+- [x] v4 live at ribbon.obfusco.us root + /v4; v1/v2/v3 demoted to their frozen /vN subpaths; version switchers updated on all 4 branches
 - [ ] Mobile layout for v4
 - [ ] v4 preset URL support (serialization)
-- [ ] v4 live at ribbon.obfusco.us/v4
 - [ ] Audness engine (@audness/core) upgrade for v4+
 
 ## v3 "ascii ribbon" ✓ LIVE at ribbon.obfusco.us (branch: v3, codename: ascii ribbon)

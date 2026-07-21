@@ -16,11 +16,11 @@ Ribbon v1–v3 are **frozen** — self-contained, no external engine dependency,
 |---------|------------------------|---------------|
 | v1      | self-contained         | frozen        |
 | v2      | self-contained         | frozen        |
-| v3      | self-contained         | frozen (live) |
-| v4 "Citrus Sipper" | self-contained → @audness/core | in progress (dev/v4 branch) |
+| v3      | self-contained         | frozen        |
+| v4 "Citrus Sipper" | self-contained → @audness/core | live (main, root + /v4) — ongoing dev on dev/v4 |
 | v5+     | `@audness/core`        | future        |
 
-### v4 "Citrus Sipper" (branch: dev/v4, ribbon-dev.obfusco.us/v4/)
+### v4 "Citrus Sipper" (branch: v4, dev branch: dev/v4, ribbon.obfusco.us/ + /v4/, dev preview: ribbon-dev.obfusco.us/v4/)
 - Dual-mode: Party (Three.js spheres + static-electricity arcs) / Lo (ASCII ribbon)
 - DualKnob for osc mix+detune (outer ring = mix, inner circle = detune)
 - Mono/Arp toggle (ARP always implies poly)

@@ -2,11 +2,11 @@ name: Deploy
 
 on:
   push:
-    branches: [v3, 'dev/**']
+    branches: [v4, 'dev/**']
 
 jobs:
-  deploy-v3:
-    if: github.ref == 'refs/heads/v3'
+  deploy-v4:
+    if: github.ref == 'refs/heads/v4'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -18,8 +18,10 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for root (v3 is now live at ribbon.obfusco.us)
+      - name: Build for root (v4 is now live at ribbon.obfusco.us)
         run: npm run build
+        env:
+          VITE_DEFAULT_VERSION: 4
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -30,11 +32,11 @@ jobs:
       - name: Deploy to root
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
-      - name: Build for /v3
-        run: npm run build -- --base /v3/
+      - name: Build for /v4
+        run: npm run build -- --base /v4/
 
-      - name: Deploy to /v3
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v3/ --delete
+      - name: Deploy to /v4
+        run: aws s3 sync dist/ s3://ribbon.obfusco.us/v4/ --delete
 
       - name: Invalidate CloudFront cache
         run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"

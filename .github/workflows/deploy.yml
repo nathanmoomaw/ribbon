@@ -18,17 +18,11 @@ jobs:
 
       - run: npm ci
 
-      - name: Build for root (v3 is now live at ribbon.obfusco.us)
-        run: npm run build
-
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: Deploy to root
-        run: aws s3 sync dist/ s3://ribbon.obfusco.us/ --delete --exclude "v*/*"
 
       - name: Build for /v3
         run: npm run build -- --base /v3/
@@ -37,7 +31,7 @@ jobs:
         run: aws s3 sync dist/ s3://ribbon.obfusco.us/v3/ --delete
 
       - name: Invalidate CloudFront cache
-        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/*"
+        run: aws cloudfront create-invalidation --distribution-id E1JO9PQKZGMYPQ --paths "/v3/*"
 
   deploy-dev:
     if: startsWith(github.ref, 'refs/heads/nmj/')

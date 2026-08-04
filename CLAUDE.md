@@ -104,8 +104,4 @@ Ribbon v1–v3 are **frozen** — self-contained, no external engine dependency,
 - Dev CloudFront distribution ID stored in `DEV_CLOUDFRONT_DISTRIBUTION_ID` GitHub secret
 
 ## Git Workflow
-- Push after every commit
-- Keep CLAUDE.md, DEVLOG.md, ROADMAP.md, and MEMORY.md updated before committing
-- DEVLOG: reverse-chronological (newest at top)
-- ROADMAP: mark completed items with `[x]`, move to Completed section
-- Git auth via `gh auth` with HTTPS
+- Follows the global default git workflow (`~/.claude/CLAUDE.md`) — push after every commit, keep CLAUDE.md/DEVLOG.md/ROADMAP.md/MEMORY.md updated, `gh auth` HTTPS. No project-specific overrides.

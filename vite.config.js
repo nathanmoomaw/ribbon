@@ -23,14 +23,7 @@ const GIT_COMMIT = (() => {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react({
-      babel: {
-        plugins: [['babel-plugin-react-compiler', {}]],
-      },
-    }),
-    domscribe(),
-  ],
+  plugins: [react(), domscribe()],
   define: {
     __BUILD_COMMIT__: JSON.stringify(GIT_COMMIT),
   },

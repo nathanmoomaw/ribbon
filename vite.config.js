@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { domscribe } from '@domscribe/react/vite'
 import fs from 'fs'
 import path from 'path'
 import { execSync } from 'child_process'
@@ -23,7 +22,7 @@ const GIT_COMMIT = (() => {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), domscribe()],
+  plugins: [react({ compiler: true })],
   define: {
     __BUILD_COMMIT__: JSON.stringify(GIT_COMMIT),
   },

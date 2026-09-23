@@ -1,5 +1,9 @@
 # Devlog
 
+## 2026-09-23 — Google Tag Manager added (DUMP Sep 22)
+
+- Added GTM container `GTM-M5GKBML2` to `index.html` (head script + body noscript iframe). Committed to `dev/v4` (ribbon-dev), and cherry-picked the same index.html-only commit onto `v4` and `main` — both deploy production root (`main` also rebuilds /v4 + frozen /v1–/v3; v1–v3 branches left untouched, so their subpaths have no GTM).
+
 ## 2026-07-21 — v4 "Citrus Sipper" tagged, deployed, and merged to main (DUMP 753-754, 759)
 
 - **753**: Added a v3 "ASCII Ribbon" section to CHANGELOG.md (previously undocumented).

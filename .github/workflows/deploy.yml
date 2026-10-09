@@ -7,6 +7,11 @@ on:
 jobs:
   deploy-v4:
     if: github.ref == 'refs/heads/v4'
+    # Shared with the other prod deploy workflow (main/v4) so root syncs never overlap.
+    # Concurrent `s3 sync --delete` runs delete each other's hashed assets → blank prod.
+    concurrency:
+      group: ribbon-prod-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

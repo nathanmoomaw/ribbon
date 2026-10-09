@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-10-08 — Latest dev/v4 promoted to prod
+
+- Merged `dev/v4` (React Compiler 1.0, Vite 8.3/rolldown, v0.1.0, Playwright devDep, docs) into `v4` and `main`; `main` doc conflicts (CLAUDE.md, DEVLOG.md) resolved with dev/v4's superset. Each branch kept its own deploy.yml. Both prod deploys ran serialized via the new concurrency group; verified root + `/v1`–`/v4` all serve JS/CSS with 200 and correct content types.
+- Note: a `v4` tag and `v4` branch both exist — push with `refs/heads/v4:refs/heads/v4` to avoid "src refspec v4 matches more than one".
+
 ## 2026-10-08 — Prod blank-page fix: serialized prod deploys (DUMP Oct 8)
 
 - Root `ribbon.obfusco.us` was blank since 2026-09-23: the GTM commit was pushed to `main` and `v4` at the same moment, and both workflows ran `aws s3 sync … --delete` against root concurrently, each deleting the other's hashed assets. Root `index.html` referenced JS/CSS that no longer existed (CloudFront SPA fallback served HTML in their place). `/v1`–`/v4` were unaffected.

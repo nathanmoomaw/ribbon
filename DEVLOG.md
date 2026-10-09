@@ -1,5 +1,10 @@
 # Devlog
 
+## 2026-10-08 — Prod blank-page fix: serialized prod deploys (DUMP Oct 8)
+
+- Root `ribbon.obfusco.us` was blank since 2026-09-23: the GTM commit was pushed to `main` and `v4` at the same moment, and both workflows ran `aws s3 sync … --delete` against root concurrently, each deleting the other's hashed assets. Root `index.html` referenced JS/CSS that no longer existed (CloudFront SPA fallback served HTML in their place). `/v1`–`/v4` were unaffected.
+- Fix: `deploy-prod` (main) and `deploy-v4` (v4) now share `concurrency: group: ribbon-prod-deploy` (`cancel-in-progress: false`), so prod deploys queue instead of overlapping. Pushed to `v4` then `main`; the runs serialized as intended and root assets now load (verified 200 + JS/CSS content types).
+
 ## 2026-09-23 — Google Tag Manager added (DUMP Sep 22)
 
 - Added GTM container `GTM-M5GKBML2` to `index.html` (head script + body noscript iframe). Committed to `dev/v4` (ribbon-dev), and cherry-picked the same index.html-only commit onto `v4` and `main` — both deploy production root (`main` also rebuilds /v4 + frozen /v1–/v3; v1–v3 branches left untouched, so their subpaths have no GTM).

@@ -1,5 +1,11 @@
 # Devlog
 
+## 2026-10-09 — Ribbon clicks triggering shake: judge by pointerdown origin (DUMP Oct 9)
+
+- Couldn't reproduce in Chromium (desktop + emulated iPhone; prod, dev, local; taps, holds, slides off-strip, party + lo) — pointer capture retargets `click` to the ribbon, so `useShake`'s ribbon exclusion holds. Safari doesn't retarget `click` to the capture element; it fires on the common ancestor of the down/up targets, which sits outside the ribbon and passes the exclusion → shake. Playwright WebKit won't launch on this macOS, so verified by simulating that dispatch: old prod code shakes, fix doesn't; background clicks still shake.
+- Fix (`useShake.js`): exclusion check factored into `isExcluded()`, and a capture-phase `pointerdown` listener records whether the press started in an excluded zone; `click` is skipped if either the press origin or the click target is excluded.
+- Prod check: root + `/v1`–`/v4` all 200 with JS/CSS assets loading, no page errors (only WalletConnect placeholder-projectId 403/400, pre-existing).
+
 ## 2026-10-08 — Latest dev/v4 promoted to prod
 
 - Merged `dev/v4` (React Compiler 1.0, Vite 8.3/rolldown, v0.1.0, Playwright devDep, docs) into `v4` and `main`; `main` doc conflicts (CLAUDE.md, DEVLOG.md) resolved with dev/v4's superset. Each branch kept its own deploy.yml. Both prod deploys ran serialized via the new concurrency group; verified root + `/v1`–`/v4` all serve JS/CSS with 200 and correct content types.

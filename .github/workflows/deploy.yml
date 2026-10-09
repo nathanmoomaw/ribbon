@@ -16,6 +16,11 @@ jobs:
     # Full rebuild: builds main's own tree (v4, current stable) for root + /v4,
     # then checks out each older version branch and redeploys its frozen subpath.
     if: github.ref == 'refs/heads/main'
+    # Shared with the other prod deploy workflow (main/v4) so root syncs never overlap.
+    # Concurrent `s3 sync --delete` runs delete each other's hashed assets → blank prod.
+    concurrency:
+      group: ribbon-prod-deploy
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5

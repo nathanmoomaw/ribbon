@@ -1,10 +1,20 @@
 # Devlog
 
+## 2026-10-08 — Prod blank-page fix: serialized prod deploys (DUMP Oct 8)
+
+- Root `ribbon.obfusco.us` was blank since 2026-09-23: the GTM commit was pushed to `main` and `v4` at the same moment, and both workflows ran `aws s3 sync … --delete` against root concurrently, each deleting the other's hashed assets. Root `index.html` referenced JS/CSS that no longer existed (CloudFront SPA fallback served HTML in their place). `/v1`–`/v4` were unaffected.
+- Fix: `deploy-prod` (main) and `deploy-v4` (v4) now share `concurrency: group: ribbon-prod-deploy` (`cancel-in-progress: false`), so prod deploys queue instead of overlapping. Pushed to `v4` then `main`; the runs serialized as intended and root assets now load (verified 200 + JS/CSS content types).
+
+## 2026-09-23 — Google Tag Manager added (DUMP Sep 22)
+
+- Added GTM container `GTM-M5GKBML2` to `index.html` (head script + body noscript iframe). Committed to `dev/v4` (ribbon-dev), and cherry-picked the same index.html-only commit onto `v4` and `main` — both deploy production root (`main` also rebuilds /v4 + frozen /v1–/v3; v1–v3 branches left untouched, so their subpaths have no GTM).
+
 ## 2026-07-21 — v4 "Citrus Sipper" tagged, deployed, and merged to main (DUMP 753-754, 759)
 
 - **753**: Added a v3 "ASCII Ribbon" section to CHANGELOG.md (previously undocumented).
-- **754**: Cut `dev/v4` to a permanent `v4` branch + `v4` tag, matching the existing v1/v2/v3 branch-per-version pattern. `v4` now owns root + `/v4` (its own deploy.yml mirrors what `v3`'s used to do). Demoted `v3`'s branch to `/v3`-only (dropped its root build/deploy, scoped its CloudFront invalidation to `/v3/*`). Added a v4 button to the `VersionSwitcher` on the `v1`, `v2`, and `v3` branches and redeployed each so old versions can navigate forward. Merged `v4` into `main` — resolved conflicts in `deploy.yml` (rewrote the "full rebuild" job so `main`'s own tree, now v4, builds root + `/v4`, while `v1`/`v2`/`v3` are checked out individually for their frozen subpaths; also updated the dev-deploy trigger from the stale `nmj/**` pattern to `dev/**`), `DEVLOG.md` (interleaved main's 2 unique CI-history entries back into chronological order), `src/main.jsx` and `src/components/Controls.jsx` (took v4's more general version-detection logic in both).
+- **754**: Cut `dev/v4` to a permanent `v4` branch + `v4` tag, matching the existing v1/v2/v3 branch-per-version pattern. `v4` now owns root + `/v4` (its own deploy.yml mirrors what `v3`'s used to do). Demoted `v3`'s branch to `/v3`-only (dropped its root build/deploy, scoped its CloudFront invalidation to `/v3/*`). Added a v4 button to the `VersionSwitcher` on the `v1`, `v2`, and `v3` branches and redeployed each so old versions can navigate forward. Merged `v4` into `main` — resolved conflicts in `deploy.yml` (rewrote the "full rebuild" job so `main`'s own tree, now v4, builds root + `/v4`, while `v1`/`v2`/`v3` are checked out individually for their frozen subpaths; also updated the dev-deploy trigger from the stale `nmj/**` pattern to `dev/**`), `DEVLOG.md` (interleaved main's 2 unique CI-history entries back into chronological order), `src/main.jsx` and `src/components/Controls.jsx` (took v4's more general version-detection logic in both). Verified live: root and `/v4` serve matching bundle hashes, and all of `/v1` `/v2` `/v3` `/v4` return 200.
 - **759**: Added a v4 "Citrus Sipper" section to CHANGELOG.md.
+- **764** (inbox): Clarified for the user that the branch-per-version deploy pattern (separate `vN` branches, each owning its own `/vN` path) is the actual versioning/lineage architecture and is already reusable across projects; `git worktree` was a session-local technique used to safely edit several of those branches without repeatedly checking out over the same working directory, not itself the versioning pattern. Mid-task, an attempt to hand-roll a branch switch via `git symbolic-ref HEAD` (skipping a real checkout) desynced the working tree and a subsequent `git reset --hard` destroyed an unrelated uncommitted change to `.claude/commands/dump.md` that predated the session — unrecoverable. Switched to `git worktree add` per branch for the remainder of the task; confirmed with the user this was the right call to continue with.
 
 ## 2026-07-20 — DUMP 749: widened PARTY/LO ↔ shake bolt tap spacing (best-effort, unconfirmed root cause)
 
@@ -251,22 +261,6 @@
 
 - **611**: Fast-forwarded `nmj/ascii` to match `v3` (was 1 CI commit behind). Branches now identical.
 - **612**: Lifted `space`/`tone` baked-knob state from `AsciiControls` to `TextRibbonApp` so `handleShake` can drive them. Shake now randomizes: osc waveforms (all 3), space knob (reverb/delay), tone knob (crunch/vcf), scale (random pick), and vcf routing (random per-osc on/off).
-
-## 2026-04-15 — branch-per-version CI architecture (DUMP 604-609)
-
-- Created `v1`, `v2`, `v3` branches (from v1-picker, v2-picker, nmj/ascii respectively).
-- Each version branch has its own deploy.yml: push to `v1` → deploys /v1/; push to `v2` → deploys /v2/ + root; push to `v3` → deploys /v3/.
-- Main's deploy.yml updated to "rebuild all" mode: checks out each version branch in sequence and deploys all paths. Push to main triggers full rebuild.
-- `v1`/`v2` checkouts use `git fetch origin refs/heads/vN && git checkout FETCH_HEAD` to avoid ambiguity with v1/v2 git tags.
-- Old `v1-picker` and `v2-picker` branches superseded (logical names now `v1`/`v2`).
-- Pattern: each toy version lives on its own branch, branch name = URL path segment.
-
-## 2026-04-15 — restore Rock & Rumble at root/v2; fix VersionSwitcher v3 nav (DUMP 600-601)
-
-- **600**: App.jsx restored to Rock & Rumble (Ribbon + Visualizer), NOT puddle. Root and /v2 now correctly serve v2 ribbon. VCFControl guarded with `vcfCutoff !== undefined` check so Controls.jsx renders cleanly without puddle VCF props.
-- **600**: Pass `visualMode`, `setVisualMode`, `midiDevice`, `onConnectMIDI` from v2 App to Controls so party/lo buttons and MIDI integration work correctly.
-- **601**: Saved memory `feedback_version_routing.md` documenting the invariant: App.jsx = Rock & Rumble, puddle is a separate project.
-- Also fixed: VersionSwitcher was sending v3 clicks to `/` (root) instead of `/v3/`.
 
 ## 2026-04-15 — fix /v3 MIME error, correct base-path builds for /v2 and /v3 (DUMP 598-599)
 

@@ -95,23 +95,36 @@ export function useShake(onShake, controlsRef, ribbonRef) {
     // Enter key moved to looper (useLooper) — toggles recording
 
     // --- Click outside controls/ribbon ---
-    function onClick(e) {
-      // If the clicked element was removed from the DOM before this handler ran
+    function isExcluded(target) {
+      // If the element was removed from the DOM before this handler ran
       // (e.g. a modal close button that unmounts its parent), we can't safely
-      // determine whether it was in an excluded zone — skip shake entirely.
-      if (!document.body.contains(e.target)) return
+      // determine whether it was in an excluded zone — treat as excluded.
+      if (!target || !target.closest || !document.body.contains(target)) return true
 
       const controls = controlsRef?.current
       const ribbon = ribbonRef?.current
-      if (controls && controls.contains(e.target)) return
-      if (ribbon && ribbon.contains(e.target)) return
-      if (e.target.closest('.activation') || e.target.closest('.app-header') || e.target.closest('.text-ribbon-header') || e.target.closest('.visualizer__zoom') || e.target.closest('.visualizer__visuals')) return
-      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('.vcf-control')) return
+      if (controls && controls.contains(target)) return true
+      if (ribbon && ribbon.contains(target)) return true
+      if (target.closest('.activation') || target.closest('.app-header') || target.closest('.text-ribbon-header') || target.closest('.visualizer__zoom') || target.closest('.visualizer__visuals')) return true
+      if (target.closest('button') || target.closest('input') || target.closest('.vcf-control')) return true
       // Don't shake when interacting with modals/overlays
-      if (e.target.closest('.preset-splash') || e.target.closest('.preset-qr-overlay') || e.target.closest('.milestone-toast')) return
+      if (target.closest('.preset-splash') || target.closest('.preset-qr-overlay') || target.closest('.milestone-toast')) return true
       // Don't shake for clicks inside portals (e.g. RainbowKit wallet modal appended directly to body)
       const appRoot = document.getElementById('root')
-      if (appRoot && !appRoot.contains(e.target)) return
+      if (appRoot && !appRoot.contains(target)) return true
+      return false
+    }
+
+    // Where the press started decides it. Safari doesn't retarget `click` to the
+    // pointer-capture element — a press on the ribbon can fire `click` on a common
+    // ancestor outside it — so the click target alone can't be trusted.
+    let downExcluded = false
+    function onPointerDown(e) {
+      downExcluded = isExcluded(e.target)
+    }
+
+    function onClick(e) {
+      if (downExcluded || isExcluded(e.target)) return
       triggerShake(0.4)
     }
 
@@ -133,9 +146,11 @@ export function useShake(onShake, controlsRef, ribbonRef) {
       gestureEvents.forEach(e => document.addEventListener(e, onFirstGesture, true))
     }
 
+    window.addEventListener('pointerdown', onPointerDown, true)
     window.addEventListener('click', onClick)
 
     return () => {
+      window.removeEventListener('pointerdown', onPointerDown, true)
       window.removeEventListener('click', onClick)
       if (motionListenerRef.current && typeof motionListenerRef.current === 'function') {
         window.removeEventListener('devicemotion', motionListenerRef.current)
